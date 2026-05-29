@@ -204,6 +204,26 @@ They are used for:
 
 They do not write directly to the repository and do not make canonical design decisions. Their outputs must be reviewed, curated, and approved before entering the repository or game data.
 
+### Art Documentation Branch Rule
+
+Further repository changes related to art direction, moodboards, visual review sheets, art pipeline rules, or art styleguide updates should happen on a dedicated branch.
+
+Recommended branch naming:
+
+```text
+art/<short-topic>
+```
+
+Examples:
+
+```text
+art/moodboard-cafe-interior
+art/day1-day7-visual-progression
+art/character-sheets
+```
+
+This applies to repository edits, not to raw image generation. Raw AI Studio / Gemini / Nano Banana image outputs may continue to be saved in the external moodboard working folder until they are reviewed and curated.
+
 ### Gemini / Google AI Studio / Nano Banana Workflow
 
 Gemini, Google AI Studio, and Nano Banana may be used to reduce Codex credit usage for visual exploration.
@@ -255,4 +275,3 @@ Ask the user before proceeding if a task would:
 - require broad rework if wrong
 - start a new prompt/run while the previous run has no protocol
 - spend credits without recording start/end credit state
-    
