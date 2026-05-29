@@ -1,6 +1,7 @@
 import type { AchievementId, EventId, GuestId } from "../types/content";
 import type {
   DayManagementState,
+  DayObjectiveResult,
   DayPhase,
   DaySummary,
   DayActionId,
@@ -14,7 +15,7 @@ import type {
 } from "../types/game";
 import { createInitialDayManagement, SUPPLY_CAPS } from "./management";
 
-export const CURRENT_GAME_STATE_VERSION = 4;
+export const CURRENT_GAME_STATE_VERSION = 5;
 export const CURRENT_CONTENT_CATALOG_VERSION = "week-one-v1";
 
 const initialResources: ResourceState = {
@@ -56,8 +57,9 @@ export function createInitialGameState(): GameState {
     supplies: { ...initialSupplies },
     helperAssignment: null,
     pendingSupplyPurchase: { ...emptySupplyPurchase },
-    dayManagement: createInitialDayManagement(initialResources.reputation),
+    dayManagement: createInitialDayManagement(initialResources.reputation, 1),
     daySummary: null,
+    objectiveResults: [],
     stressEventLog: [],
     hiddenWeirdness: 1,
     weirdnessVisible: false,
@@ -100,6 +102,7 @@ export function isValidGameState(value: unknown): value is GameState {
     isValidDayManagement(candidate.dayManagement) &&
     isValidHelperAssignment(candidate.helperAssignment) &&
     isValidDaySummary(candidate.daySummary) &&
+    isValidObjectiveResults(candidate.objectiveResults) &&
     isValidUnlocks(candidate.unlocks) &&
     isStringArray(candidate.stressEventLog) &&
     isStringArray(candidate.completedActions) &&
@@ -155,10 +158,17 @@ function isValidDayManagement(value: unknown): value is DayManagementState {
   const management = value as Partial<DayManagementState>;
 
   return (
+    typeof management.actionPointsRemaining === "number" &&
+    typeof management.actionPointsSpent === "number" &&
     typeof management.customersServed === "number" &&
     typeof management.moneyEarned === "number" &&
     typeof management.moneySpent === "number" &&
+    isValidSupplies(management.suppliesUsed) &&
     typeof management.cleaningActions === "number" &&
+    typeof management.offerReviewed === "boolean" &&
+    typeof management.advertisingRun === "boolean" &&
+    typeof management.kassandraConsulted === "boolean" &&
+    typeof management.helperDecisionMade === "boolean" &&
     typeof management.reputationAtStart === "number" &&
     typeof management.cleanlinessStressApplied === "boolean" &&
     typeof management.noCleaningStressApplied === "boolean" &&
@@ -207,16 +217,44 @@ function isValidDaySummary(value: unknown): value is DaySummary | null {
 
   return (
     typeof summary.day === "number" &&
+    typeof summary.rating === "string" &&
     typeof summary.moneyEarned === "number" &&
     typeof summary.moneySpent === "number" &&
     typeof summary.customersServed === "number" &&
+    isValidSupplies(summary.suppliesUsed) &&
+    isValidSupplies(summary.suppliesRestocked) &&
     isValidSupplies(summary.suppliesRemaining) &&
     typeof summary.cleanlinessLabel === "string" &&
     typeof summary.stressLabel === "string" &&
     typeof summary.reputationDelta === "number" &&
+    typeof summary.objectiveTitle === "string" &&
+    typeof summary.objectiveCompleted === "boolean" &&
     (summary.helperRecap === null || typeof summary.helperRecap === "string") &&
     (summary.stressEvent === null || typeof summary.stressEvent === "string") &&
     isStringArray(summary.flavorLines)
+  );
+}
+
+function isValidObjectiveResults(value: unknown): value is DayObjectiveResult[] {
+  return (
+    Array.isArray(value) &&
+    value.every((entry) => {
+      if (!entry || typeof entry !== "object") {
+        return false;
+      }
+
+      const result = entry as Partial<DayObjectiveResult>;
+
+      return (
+        typeof result.day === "number" &&
+        Number.isInteger(result.day) &&
+        result.day >= 1 &&
+        result.day <= 7 &&
+        typeof result.objectiveId === "string" &&
+        typeof result.title === "string" &&
+        (result.status === "completed" || result.status === "missed")
+      );
+    })
   );
 }
 

@@ -62,6 +62,9 @@ export function App() {
           onPrepareDrink={() => dispatch({ type: "prepare_drink" })}
           onCheckSupplies={() => dispatch({ type: "check_supplies" })}
           onCleanTables={() => dispatch({ type: "clean_tables" })}
+          onAdjustOffer={() => dispatch({ type: "adjust_offer" })}
+          onRunAdvertising={() => dispatch({ type: "run_advertising" })}
+          onConsultKassandra={() => dispatch({ type: "consult_kassandra" })}
           onSelectHelper={(helperId, taskId) =>
             dispatch({ type: "select_helper", helperId, taskId })
           }

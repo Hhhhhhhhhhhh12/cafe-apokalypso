@@ -8,12 +8,14 @@ import {
   weekOneStaffOptions
 } from "../data";
 import {
+  ACTION_BUDGET_BY_DAY,
   getCleanlinessLabel,
   getHelperLabel,
   getStressLabel,
   SUPPLY_CAPS,
   SUPPLY_UNIT_COSTS
 } from "./management";
+import { getCurrentObjective, getObjectiveStatus } from "./objectives";
 import type {
   DayDefinition,
   EventDefinition,
@@ -23,6 +25,8 @@ import type {
   StaffOptionDefinition
 } from "../types/content";
 import type { DayActionId, GameState, IngredientKey, SupplyState } from "../types/game";
+
+export { getCurrentObjective, getObjectiveStatus };
 
 export const requiredDayActionIds: readonly DayActionId[] = [
   "take_order",
@@ -122,8 +126,13 @@ export function getManagementHudLabels(state: GameState) {
     cleanliness: getCleanlinessLabel(state.resources.cleanliness),
     stress: getStressLabel(state.resources.stress),
     reputation: getReputationLabel(state.resources.reputation),
-    helper: getHelperLabel(state.helperAssignment)
+    helper: getHelperLabel(state.helperAssignment),
+    actionCapacity: `${state.dayManagement.actionPointsRemaining}/${ACTION_BUDGET_BY_DAY[state.day]} actions left`
   };
+}
+
+export function hasActionCapacity(state: GameState): boolean {
+  return state.dayManagement.actionPointsRemaining > 0;
 }
 
 export function getRestockPreview(state: GameState) {

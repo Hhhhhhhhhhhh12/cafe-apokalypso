@@ -7,6 +7,7 @@ import {
 } from "./gameState";
 import { weekOneAchievements } from "../data";
 import { getCurrentDayDefinition } from "./selectors";
+import { getObjectiveStatus } from "./objectives";
 import {
   applyProductConsumption,
   clampMeter,
@@ -16,6 +17,8 @@ import {
   createHelperAssignment,
   createInitialDayManagement,
   findSubstituteProduct,
+  getDayShiftRating,
+  getIngredientRequirement,
   getCleanlinessLabel,
   getDefaultProductForState,
   getHelperLabel,
@@ -35,6 +38,8 @@ import type {
   ResourceState,
   SupplyState
 } from "../types/game";
+
+const ADVERTISING_ACTION_COST = 3;
 
 export function gameReducer(state: GameState, action: GameAction): GameState {
   if (state.demoComplete && action.type !== "reset_game") {
@@ -57,14 +62,19 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
     case "prepare_counter":
     case "check_supplies":
-      return {
-        ...state,
-        completedActions: addUniqueDayAction(state.completedActions, "check_supplies"),
-        statusMessage: `Supply check: coffee ${state.supplies.coffee}/${SUPPLY_CAPS.coffee}, milk ${state.supplies.milk}/${SUPPLY_CAPS.milk}, pastries ${state.supplies.pastries}/${SUPPLY_CAPS.pastries}.`
-      };
+      return checkSupplies(state);
 
     case "clean_tables":
       return cleanTables(state);
+
+    case "adjust_offer":
+      return adjustOffer(state);
+
+    case "run_advertising":
+      return runAdvertising(state);
+
+    case "consult_kassandra":
+      return consultKassandra(state);
 
     case "select_helper":
       return selectHelper(state, action.helperId, action.taskId);
@@ -100,11 +110,16 @@ function serveProduct(state: GameState, productId: ProductId): GameState {
     };
   }
 
+  const actionState = spendActionPoint(state, "serve another order");
+  if (!actionState) {
+    return noActionCapacityState(state);
+  }
+
   const requestedProduct = getProductById(productId);
   const missingIngredients = getMissingIngredients(
     requestedProduct,
-    state.supplies,
-    state.helperAssignment
+    actionState.supplies,
+    actionState.helperAssignment
   );
 
   if (missingIngredients.length > 0) {
@@ -113,7 +128,7 @@ function serveProduct(state: GameState, productId: ProductId): GameState {
       state.supplies,
       state.helperAssignment
     );
-    const stressedState = applyEmptySupplyStress(state, missingIngredients);
+    const stressedState = applyEmptySupplyStress(actionState, missingIngredients);
     const reputationPenaltyResources = {
       ...stressedState.resources,
       reputation: clampMeter(stressedState.resources.reputation - 1)
@@ -144,7 +159,7 @@ function serveProduct(state: GameState, productId: ProductId): GameState {
     };
   }
 
-  const servedState = applySuccessfulServe(state, requestedProduct);
+  const servedState = applySuccessfulServe(actionState, requestedProduct);
 
   return {
     ...servedState,
@@ -186,6 +201,7 @@ function applySuccessfulServe(
     }
 
     supplies = applyProductConsumption(product, supplies, workingState.helperAssignment);
+    const suppliesUsed = getSuppliesUsedForProduct(product, workingState.helperAssignment);
     resources = {
       ...resources,
       money: clampResource(resources.money + product.basePrice),
@@ -204,7 +220,8 @@ function applySuccessfulServe(
     management = {
       ...management,
       customersServed: management.customersServed + 1,
-      moneyEarned: clampResource(management.moneyEarned + product.basePrice)
+      moneyEarned: clampResource(management.moneyEarned + product.basePrice),
+      suppliesUsed: addSupplies(management.suppliesUsed, suppliesUsed)
     };
 
     if (resources.cleanliness < 40 && !management.cleanlinessStressApplied) {
@@ -259,32 +276,187 @@ function cleanTables(state: GameState): GameState {
     };
   }
 
-  const capacity = COMFORTABLE_CAPACITY_BY_DAY[state.day];
+  const actionState = spendActionPoint(state, "clean the tables");
+  if (!actionState) {
+    return noActionCapacityState(state);
+  }
+
+  const capacity = COMFORTABLE_CAPACITY_BY_DAY[actionState.day];
   const slowWindowReduction =
-    state.dayManagement.customersServed < capacity &&
-    !state.dayManagement.slowCleaningStressReductionUsed
+    actionState.dayManagement.customersServed < capacity &&
+    !actionState.dayManagement.slowCleaningStressReductionUsed
       ? 5
       : 0;
 
   return {
-    ...state,
-    completedActions: addUniqueDayAction(state.completedActions, "clean_tables"),
+    ...actionState,
+    completedActions: addUniqueDayAction(actionState.completedActions, "clean_tables"),
     resources: {
-      ...state.resources,
-      cleanliness: clampMeter(state.resources.cleanliness + 12),
-      stress: clampMeter(state.resources.stress - slowWindowReduction),
+      ...actionState.resources,
+      cleanliness: clampMeter(actionState.resources.cleanliness + 12),
+      stress: clampMeter(actionState.resources.stress - slowWindowReduction),
       mood: "calm"
     },
     dayManagement: {
-      ...state.dayManagement,
-      cleaningActions: state.dayManagement.cleaningActions + 1,
+      ...actionState.dayManagement,
+      cleaningActions: actionState.dayManagement.cleaningActions + 1,
       slowCleaningStressReductionUsed:
-        state.dayManagement.slowCleaningStressReductionUsed || slowWindowReduction > 0
+        actionState.dayManagement.slowCleaningStressReductionUsed || slowWindowReduction > 0
     },
     statusMessage:
       slowWindowReduction > 0
         ? "Tables cleaned during a quiet window. Cleanliness rises and stress drops slightly."
         : "Tables cleaned. Cleanliness rises."
+  };
+}
+
+function checkSupplies(state: GameState): GameState {
+  if (state.dayPhase !== "open") {
+    return {
+      ...state,
+      statusMessage: "Supply checks belong to the open café day."
+    };
+  }
+
+  const actionState = spendActionPoint(state, "check supplies");
+  if (!actionState) {
+    return noActionCapacityState(state);
+  }
+
+  return {
+    ...actionState,
+    completedActions: addUniqueDayAction(
+      actionState.completedActions,
+      "check_supplies"
+    ),
+    statusMessage: `Supply check: coffee ${actionState.supplies.coffee}/${SUPPLY_CAPS.coffee}, milk ${actionState.supplies.milk}/${SUPPLY_CAPS.milk}, pastries ${actionState.supplies.pastries}/${SUPPLY_CAPS.pastries}.`
+  };
+}
+
+function adjustOffer(state: GameState): GameState {
+  if (!state.unlocks.pricing || state.day < 3) {
+    return {
+      ...state,
+      statusMessage: "Offer and pricing choices unlock on Day 3."
+    };
+  }
+
+  if (state.dayPhase !== "open") {
+    return {
+      ...state,
+      statusMessage: "Review the offer board during the open café day."
+    };
+  }
+
+  const actionState = spendActionPoint(state, "review the offer board");
+  if (!actionState) {
+    return noActionCapacityState(state);
+  }
+
+  return {
+    ...actionState,
+    completedActions: addUniqueDayAction(actionState.completedActions, "adjust_offer"),
+    dayManagement: {
+      ...actionState.dayManagement,
+      offerReviewed: true
+    },
+    statusMessage:
+      "Offer board reviewed. The register recommends being normal in a slightly more profitable way."
+  };
+}
+
+function runAdvertising(state: GameState): GameState {
+  if (!state.unlocks.advertising || state.day < 4) {
+    return {
+      ...state,
+      statusMessage: "Local advertising unlocks on Day 4."
+    };
+  }
+
+  if (state.dayPhase !== "open") {
+    return {
+      ...state,
+      statusMessage: "Advertising choices belong to the open café day."
+    };
+  }
+
+  if (state.resources.money < ADVERTISING_ACTION_COST) {
+    return {
+      ...state,
+      statusMessage: "The café cannot afford a small ad today."
+    };
+  }
+
+  const hasBonusAdvertisingAction = state.dayManagement.extraAdvertisingActions > 0;
+  const actionState = hasBonusAdvertisingAction
+    ? {
+        ...state,
+        dayManagement: {
+          ...state.dayManagement,
+          extraAdvertisingActions: state.dayManagement.extraAdvertisingActions - 1
+        }
+      }
+    : spendActionPoint(state, "run a local ad");
+
+  if (!actionState) {
+    return noActionCapacityState(state);
+  }
+
+  return {
+    ...actionState,
+    completedActions: addUniqueDayAction(
+      actionState.completedActions,
+      "run_advertising"
+    ),
+    resources: {
+      ...actionState.resources,
+      money: clampResource(actionState.resources.money - ADVERTISING_ACTION_COST),
+      reputation: clampMeter(actionState.resources.reputation + 1)
+    },
+    dayManagement: {
+      ...actionState.dayManagement,
+      moneySpent: clampResource(
+        actionState.dayManagement.moneySpent + ADVERTISING_ACTION_COST
+      ),
+      advertisingRun: true
+    },
+    statusMessage:
+      "A local ad goes out. It costs €3, improves reputation by 1, and may make the counter feel smaller."
+  };
+}
+
+function consultKassandra(state: GameState): GameState {
+  if (!state.kassandraInstalled || !state.unlocks.kassandra || state.day < 6) {
+    return {
+      ...state,
+      statusMessage: "KASSANDRA is still just a quiet cash register."
+    };
+  }
+
+  if (state.dayPhase !== "open") {
+    return {
+      ...state,
+      statusMessage: "KASSANDRA updates are reviewed during the open café day."
+    };
+  }
+
+  const actionState = spendActionPoint(state, "consult KASSANDRA");
+  if (!actionState) {
+    return noActionCapacityState(state);
+  }
+
+  return {
+    ...actionState,
+    completedActions: addUniqueDayAction(
+      actionState.completedActions,
+      "consult_kassandra"
+    ),
+    dayManagement: {
+      ...actionState.dayManagement,
+      kassandraConsulted: true
+    },
+    statusMessage:
+      "KASSANDRA update reviewed. Demand forecast: medium. Emotional volatility: locally elevated."
   };
 }
 
@@ -355,7 +527,8 @@ function openDay(state: GameState): GameState {
       state.helperAssignment?.helperId === "mira" &&
       state.helperAssignment.taskId === "marketing"
         ? 1
-        : 0
+        : 0,
+    helperDecisionMade: true
   };
 
   if (state.helperAssignment) {
@@ -416,10 +589,31 @@ function completeCurrentDay(state: GameState): GameState {
   };
   const closedState = applyDayEndConsequences({ ...state, ...nextHistoryState });
   const daySevenClose = state.day === 7;
+  const objectiveStatus = getObjectiveStatus({
+    ...closedState,
+    dayPhase: "day_end"
+  });
+  const objectiveResult = {
+    day: state.day,
+    objectiveId: objectiveStatus.objective.id,
+    title: objectiveStatus.objective.title,
+    status: objectiveStatus.completed ? "completed" : "missed"
+  } as const;
 
   return {
     ...closedState,
     dayPhase: "day_end",
+    daySummary: closedState.daySummary
+      ? {
+          ...closedState.daySummary,
+          objectiveTitle: objectiveStatus.objective.title,
+          objectiveCompleted: objectiveStatus.completed
+        }
+      : closedState.daySummary,
+    objectiveResults: [
+      ...closedState.objectiveResults.filter((result) => result.day !== state.day),
+      objectiveResult
+    ],
     demoComplete: daySevenClose,
     weirdnessVisible: daySevenClose ? true : false,
     hiddenWeirdness: daySevenClose
@@ -496,13 +690,18 @@ function applyDayEndConsequences(state: GameState): GameState {
     dayManagement: management,
     daySummary: {
       day: state.day,
+      rating: getDayShiftRating({ ...state, resources, dayManagement: management }),
       moneyEarned: management.moneyEarned,
       moneySpent: management.moneySpent,
       customersServed: management.customersServed,
+      suppliesUsed: { ...management.suppliesUsed },
+      suppliesRestocked: { coffee: 0, milk: 0, pastries: 0 },
       suppliesRemaining: { ...state.supplies },
       cleanlinessLabel: getCleanlinessLabel(resources.cleanliness),
       stressLabel: getStressLabel(resources.stress),
       reputationDelta: resources.reputation - management.reputationAtStart,
+      objectiveTitle: getObjectiveStatus(state).objective.title,
+      objectiveCompleted: false,
       helperRecap: state.helperAssignment ? getHelperLabel(state.helperAssignment) : null,
       stressEvent,
       flavorLines
@@ -577,7 +776,7 @@ function confirmSupplyPurchase(state: GameState): GameState {
     supplies,
     pendingSupplyPurchase: { coffee: 0, milk: 0, pastries: 0 },
     helperAssignment: null,
-    dayManagement: createInitialDayManagement(nextResources.reputation),
+    dayManagement: createInitialDayManagement(nextResources.reputation, nextDay),
     daySummary: null,
     kassandraInstalled: nextDay >= 6,
     unlocks: getUnlocksForDay(nextDay),
@@ -623,6 +822,37 @@ function hasRequiredActions(state: GameState): boolean {
       (state.helperAssignment?.helperId === "jana" &&
         state.helperAssignment.taskId === "cleaning"))
   );
+}
+
+function spendActionPoint(state: GameState, actionLabel: string): GameState | null {
+  if (state.dayManagement.actionPointsRemaining <= 0) {
+    return null;
+  }
+
+  return {
+    ...state,
+    dayManagement: {
+      ...state.dayManagement,
+      actionPointsRemaining: Math.max(
+        0,
+        state.dayManagement.actionPointsRemaining - 1
+      ),
+      actionPointsSpent: state.dayManagement.actionPointsSpent + 1
+    },
+    statusMessage: `Action used to ${actionLabel}.`
+  };
+}
+
+function noActionCapacityState(state: GameState): GameState {
+  return {
+    ...state,
+    dayManagement: {
+      ...state.dayManagement,
+      actionPointsRemaining: Math.max(0, state.dayManagement.actionPointsRemaining)
+    },
+    statusMessage:
+      "No action capacity left today. Close the café or reset if you want to try the day differently."
+  };
 }
 
 function applyCapacityStress(stress: number, customersServedBeforeOrder: number, day: DayNumber): number {
@@ -672,6 +902,25 @@ function applySupplyPurchase(supplies: SupplyState, purchase: SupplyState): Supp
     coffee: clampSupply("coffee", supplies.coffee + purchase.coffee),
     milk: clampSupply("milk", supplies.milk + purchase.milk),
     pastries: clampSupply("pastries", supplies.pastries + purchase.pastries)
+  };
+}
+
+function getSuppliesUsedForProduct(
+  product: ReturnType<typeof getProductById>,
+  assignment: GameState["helperAssignment"]
+): SupplyState {
+  return {
+    coffee: getIngredientRequirement(product, "coffee", assignment),
+    milk: getIngredientRequirement(product, "milk", assignment),
+    pastries: getIngredientRequirement(product, "pastries", assignment)
+  };
+}
+
+function addSupplies(current: SupplyState, added: SupplyState): SupplyState {
+  return {
+    coffee: current.coffee + added.coffee,
+    milk: current.milk + added.milk,
+    pastries: current.pastries + added.pastries
   };
 }
 

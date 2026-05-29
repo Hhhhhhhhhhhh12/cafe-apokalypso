@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { createInitialGameState } from "../src/game/engine/gameState";
 import { gameReducer } from "../src/game/engine/reducer";
 import {
+  getObjectiveStatus,
   getVisibleDaySevenLetter,
   getVisibleKassandraMessages
 } from "../src/game/engine/selectors";
@@ -11,13 +12,17 @@ describe("initial game state", () => {
   it("starts as a serializable day-one placeholder shell", () => {
     const state = createInitialGameState();
 
-    expect(state.version).toBe(4);
+    expect(state.version).toBe(5);
     expect(state.contentCatalogVersion).toBe("week-one-v1");
     expect(state.day).toBe(1);
     expect(state.weirdnessVisible).toBe(false);
     expect(state.kassandraInstalled).toBe(false);
     expect(state.demoComplete).toBe(false);
     expect(state.completedActions).toEqual([]);
+    expect(state.objectiveResults).toEqual([]);
+    expect(state.dayManagement.actionPointsRemaining).toBe(3);
+    expect(getObjectiveStatus(state).objective.title).toBe("Close the first shift");
+    expect(getObjectiveStatus(state).status).toBe("active");
     expect(state.unlocks).toEqual({
       pricing: false,
       advertising: false,

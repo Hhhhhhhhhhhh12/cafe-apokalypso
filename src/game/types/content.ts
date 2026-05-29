@@ -57,6 +57,15 @@ export type AchievementId =
   | "kassandra-installed"
   | "week-one-letter";
 
+export type DayObjectiveId =
+  | "day-1-first-shift"
+  | "day-2-regular-rhythm"
+  | "day-3-offer-board"
+  | "day-4-local-ad"
+  | "day-5-helper-choice"
+  | "day-6-kassandra-check"
+  | "day-7-the-letter";
+
 export interface GuestDefinition {
   id: GuestId;
   name: string;
@@ -129,9 +138,18 @@ export interface DayDefinition {
   day: DayNumber;
   title: string;
   milestone: string;
+  objective: DayObjectiveDefinition;
   unlocks: readonly string[];
   guestIds: readonly GuestId[];
   eventIds: readonly EventId[];
+}
+
+export interface DayObjectiveDefinition {
+  id: DayObjectiveId;
+  day: DayNumber;
+  title: string;
+  description: string;
+  completionHint: string;
 }
 
 export interface KassandraMessageDefinition {
