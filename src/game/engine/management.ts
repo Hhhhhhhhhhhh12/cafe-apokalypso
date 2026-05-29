@@ -3,6 +3,7 @@ import type { ProductDefinition, ProductId, StaffOptionId } from "../types/conte
 import type {
   CleanlinessStateLabel,
   DayManagementState,
+  DayShiftRating,
   GameState,
   HelperAssignment,
   HelperTaskId,
@@ -33,6 +34,16 @@ export const COMFORTABLE_CAPACITY_BY_DAY: Record<GameState["day"], number> = {
   7: 8
 };
 
+export const ACTION_BUDGET_BY_DAY: Record<GameState["day"], number> = {
+  1: 3,
+  2: 4,
+  3: 4,
+  4: 5,
+  5: 5,
+  6: 5,
+  7: 6
+};
+
 export const MUNDANE_STRESS_EVENT_LINES = [
   "PLACEHOLDER STRESS EVENT: The coffee machine made a sound it has not made before. You reset it. The manual did not cover this.",
   "PLACEHOLDER STRESS EVENT: A guest asked for the bill three times before you noticed. You apologised. They tipped anyway, but less.",
@@ -43,13 +54,21 @@ export const MUNDANE_STRESS_EVENT_LINES = [
 ] as const;
 
 export function createInitialDayManagement(
-  reputationAtStart: number
+  reputationAtStart: number,
+  day: GameState["day"] = 1
 ): DayManagementState {
   return {
+    actionPointsRemaining: ACTION_BUDGET_BY_DAY[day],
+    actionPointsSpent: 0,
     customersServed: 0,
     moneyEarned: 0,
     moneySpent: 0,
+    suppliesUsed: { coffee: 0, milk: 0, pastries: 0 },
     cleaningActions: 0,
+    offerReviewed: false,
+    advertisingRun: false,
+    kassandraConsulted: false,
+    helperDecisionMade: day < 5,
     reputationAtStart,
     cleanlinessStressApplied: false,
     noCleaningStressApplied: false,
@@ -85,6 +104,24 @@ export function getStressLabel(value: number): StressStateLabel {
     return "Geschäftig";
   }
   return "Ruhig";
+}
+
+export function getDayShiftRating(state: GameState): DayShiftRating {
+  const { resources, dayManagement } = state;
+
+  if (resources.stress >= 81 || resources.cleanliness < 25) {
+    return "Barely Held Together";
+  }
+
+  if (dayManagement.moneyEarned >= 12 && resources.cleanliness < 50) {
+    return "Messy but Profitable";
+  }
+
+  if (resources.stress >= 41 || dayManagement.customersServed >= 4) {
+    return "Busy Shift";
+  }
+
+  return "Calm Shift";
 }
 
 export function clampSupply(ingredient: IngredientKey, value: number): number {

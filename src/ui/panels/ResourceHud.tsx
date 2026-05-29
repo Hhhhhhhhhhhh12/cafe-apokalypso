@@ -32,6 +32,7 @@ export function ResourceHud({ gameState }: ResourceHudProps) {
           label="Ruf"
           value={`${labels.reputation} (${gameState.resources.reputation})`}
         />
+        <ResourceItem label="Aktionen" value={labels.actionCapacity} />
       </dl>
     </section>
   );

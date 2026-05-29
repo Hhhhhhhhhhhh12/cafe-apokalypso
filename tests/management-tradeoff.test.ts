@@ -1,7 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { createInitialGameState } from "../src/game/engine/gameState";
 import { gameReducer } from "../src/game/engine/reducer";
-import { getVisibleDaySevenLetter } from "../src/game/engine/selectors";
+import {
+  getObjectiveStatus,
+  getVisibleDaySevenLetter,
+  getVisibleKassandraMessages,
+  getVisibleStaffOptions
+} from "../src/game/engine/selectors";
+import { weekOneDays } from "../src/game/data";
 import {
   loadGameState,
   SAVE_KEY,
@@ -12,6 +18,16 @@ import type { DayNumber } from "../src/game/types/content";
 import type { GameState } from "../src/game/types/game";
 
 describe("management tradeoff system", () => {
+  it("defines one visible objective for each week-one day", () => {
+    expect(weekOneDays).toHaveLength(7);
+
+    for (const dayDefinition of weekOneDays) {
+      expect(dayDefinition.objective.day).toBe(dayDefinition.day);
+      expect(dayDefinition.objective.title.length).toBeGreaterThan(0);
+      expect(dayDefinition.objective.completionHint.length).toBeGreaterThan(0);
+    }
+  });
+
   it("consumes the documented supplies for cappuccino orders", () => {
     const state = createInitialGameState();
     const nextState = gameReducer(state, {
@@ -118,7 +134,13 @@ describe("management tradeoff system", () => {
   });
 
   it("adds stress only beyond the comfortable capacity", () => {
-    let state = createInitialGameState();
+    let state: GameState = {
+      ...createInitialGameState(),
+      dayManagement: {
+        ...createInitialGameState().dayManagement,
+        actionPointsRemaining: 10
+      }
+    };
 
     for (let index = 0; index < 5; index += 1) {
       state = gameReducer(state, { type: "serve_product", productId: "filterkaffee" });
@@ -127,6 +149,25 @@ describe("management tradeoff system", () => {
 
     state = gameReducer(state, { type: "serve_product", productId: "filterkaffee" });
     expect(state.resources.stress).toBe(8);
+  });
+
+  it("prevents the action budget from going below zero", () => {
+    let state = createInitialGameState();
+
+    state = gameReducer(state, { type: "serve_product", productId: "filterkaffee" });
+    state = gameReducer(state, { type: "clean_tables" });
+    state = gameReducer(state, { type: "check_supplies" });
+
+    expect(state.dayManagement.actionPointsRemaining).toBe(0);
+
+    const blockedState = gameReducer(state, {
+      type: "serve_product",
+      productId: "filterkaffee"
+    });
+
+    expect(blockedState.dayManagement.actionPointsRemaining).toBe(0);
+    expect(blockedState.dayManagement.actionPointsSpent).toBe(3);
+    expect(blockedState.statusMessage).toContain("No action capacity");
   });
 
   it("adds cleanliness and empty-supply stress only once per condition", () => {
@@ -171,6 +212,60 @@ describe("management tradeoff system", () => {
     expect(stressedState.resources.money).toBeLessThan(42);
   });
 
+  it("evaluates objective completion and missed states deterministically", () => {
+    const completedState = completePreparedDay({
+      ...createInitialGameState(),
+      dayManagement: {
+        ...createInitialGameState().dayManagement,
+        customersServed: 2
+      },
+      completedActions: ["take_order", "clean_tables"]
+    });
+    const missedState = completePreparedDay({
+      ...createInitialGameState(),
+      dayManagement: {
+        ...createInitialGameState().dayManagement,
+        customersServed: 1
+      },
+      completedActions: ["take_order", "clean_tables"]
+    });
+
+    expect(completedState.daySummary?.objectiveCompleted).toBe(true);
+    expect(completedState.objectiveResults[0].status).toBe("completed");
+    expect(getObjectiveStatus(completedState).status).toBe("completed");
+    expect(missedState.daySummary?.objectiveCompleted).toBe(false);
+    expect(missedState.objectiveResults[0].status).toBe("missed");
+    expect(getObjectiveStatus(missedState).status).toBe("missed");
+  });
+
+  it("creates deterministic day-end ratings and management summary fields", () => {
+    const baseState: GameState = {
+      ...createInitialGameState(),
+      resources: { ...createInitialGameState().resources, stress: 45 },
+      dayManagement: {
+        ...createInitialGameState().dayManagement,
+        customersServed: 4,
+        moneyEarned: 12,
+        suppliesUsed: { coffee: 4, milk: 1, pastries: 1 }
+      }
+    };
+
+    const firstSummary = completePreparedDay(baseState).daySummary;
+    const secondSummary = completePreparedDay(baseState).daySummary;
+
+    expect(firstSummary?.rating).toBe(secondSummary?.rating);
+    expect(firstSummary?.moneyEarned).toBe(12);
+    expect(firstSummary?.suppliesUsed).toEqual({ coffee: 4, milk: 1, pastries: 1 });
+    expect(firstSummary?.suppliesRestocked).toEqual({
+      coffee: 0,
+      milk: 0,
+      pastries: 0
+    });
+    expect(firstSummary?.cleanlinessLabel).toBeTruthy();
+    expect(firstSummary?.stressLabel).toBeTruthy();
+    expect(firstSummary?.objectiveTitle).toBe("Close the first shift");
+  });
+
   it("keeps helpers unavailable before Day 5 and locks the Day-5 assignment", () => {
     const earlyState = gameReducer(createInitialGameState(), {
       type: "select_helper",
@@ -195,6 +290,18 @@ describe("management tradeoff system", () => {
     expect(openedState.resources.money).toBe(24);
     expect(openedState.helperAssignment?.locked).toBe(true);
     expect(changedState.helperAssignment?.helperId).toBe("jana");
+  });
+
+  it("makes Day-5 helper and Day-6 KASSANDRA unlocks visible at the right time", () => {
+    expect(getVisibleStaffOptions(createDayStartState(4))).toHaveLength(0);
+    expect(getVisibleStaffOptions(createDayStartState(5))).toHaveLength(3);
+
+    expect(getVisibleKassandraMessages(createDayStartState(5))).toHaveLength(0);
+    const daySixState: GameState = {
+      ...createDayStartState(6),
+      kassandraInstalled: true
+    };
+    expect(getVisibleKassandraMessages(daySixState).length).toBeGreaterThan(0);
   });
 
   it("blocks helper hiring when money is insufficient", () => {
@@ -287,6 +394,30 @@ describe("management tradeoff system", () => {
     expect(loadedState.helperAssignment).toEqual(savedState.helperAssignment);
     expect(loadedState.stressEventLog).toEqual(savedState.stressEventLog);
     expect(loadedState.dayManagement.customersServed).toBe(2);
+    expect(loadedState.dayManagement.actionPointsRemaining).toBe(
+      savedState.dayManagement.actionPointsRemaining
+    );
+  });
+
+  it("resets to Day 1 with clean objective and action state", () => {
+    const progressedState = gameReducer(
+      completePreparedDay({
+        ...createInitialGameState(),
+        dayManagement: {
+          ...createInitialGameState().dayManagement,
+          customersServed: 2,
+          actionPointsRemaining: 1,
+          actionPointsSpent: 2
+        }
+      }),
+      { type: "reset_game" }
+    );
+
+    expect(progressedState.day).toBe(1);
+    expect(progressedState.objectiveResults).toEqual([]);
+    expect(progressedState.dayManagement.actionPointsRemaining).toBe(3);
+    expect(progressedState.dayManagement.actionPointsSpent).toBe(0);
+    expect(getObjectiveStatus(progressedState).status).toBe("active");
   });
 });
 

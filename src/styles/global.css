@@ -299,6 +299,28 @@ h3 {
   gap: 12px;
 }
 
+.action-budget,
+.objective-card {
+  display: grid;
+  gap: 8px;
+  border: 1px solid #c2aaa0;
+  border-radius: 8px;
+  padding: 0.85rem;
+  background: #edf6f7;
+  color: #1d3f46;
+}
+
+.action-budget span,
+.action-budget small {
+  font-weight: 700;
+}
+
+.action-budget strong {
+  color: #7f2f2c;
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
 .product-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -485,6 +507,40 @@ h3 {
   margin: 0 0 18px;
   color: #4a3b34;
   font-weight: 650;
+}
+
+.objective-card {
+  margin: 0 0 18px;
+  background: #fff8ed;
+}
+
+.objective-card p {
+  margin: 0;
+}
+
+.objective-state {
+  width: fit-content;
+  border: 2px solid #5c4037;
+  border-radius: 8px;
+  padding: 0.35rem 0.55rem;
+  background: #fbeddc;
+  color: #35241e;
+}
+
+.objective-state--completed {
+  border-color: #2d6f58;
+  background: #eef3e7;
+}
+
+.objective-state--missed {
+  border-color: #7f2f2c;
+  background: #f7e1db;
+}
+
+.rating-line {
+  margin: 0.5rem 0 0;
+  color: #35241e;
+  font-weight: 800;
 }
 
 .data-grid {

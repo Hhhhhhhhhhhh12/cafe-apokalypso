@@ -7,7 +7,7 @@ import type {
 } from "./content";
 import type { DayNumber } from "./content";
 
-export type GameStateVersion = 4;
+export type GameStateVersion = 5;
 
 export type ContentCatalogVersion = "week-one-v1";
 
@@ -22,7 +22,10 @@ export type DayActionId =
   | "take_order"
   | "prepare_drink"
   | "clean_tables"
-  | "check_supplies";
+  | "check_supplies"
+  | "adjust_offer"
+  | "run_advertising"
+  | "consult_kassandra";
 
 export interface ResourceState {
   money: number;
@@ -45,10 +48,17 @@ export interface HelperAssignment {
 export type SupplyPurchaseState = SupplyState;
 
 export interface DayManagementState {
+  actionPointsRemaining: number;
+  actionPointsSpent: number;
   customersServed: number;
   moneyEarned: number;
   moneySpent: number;
+  suppliesUsed: SupplyState;
   cleaningActions: number;
+  offerReviewed: boolean;
+  advertisingRun: boolean;
+  kassandraConsulted: boolean;
+  helperDecisionMade: boolean;
   reputationAtStart: number;
   cleanlinessStressApplied: boolean;
   noCleaningStressApplied: boolean;
@@ -61,16 +71,36 @@ export interface DayManagementState {
 
 export interface DaySummary {
   day: DayNumber;
+  rating: DayShiftRating;
   moneyEarned: number;
   moneySpent: number;
   customersServed: number;
+  suppliesUsed: SupplyState;
+  suppliesRestocked: SupplyState;
   suppliesRemaining: SupplyState;
   cleanlinessLabel: CleanlinessStateLabel;
   stressLabel: StressStateLabel;
   reputationDelta: number;
+  objectiveTitle: string;
+  objectiveCompleted: boolean;
   helperRecap: string | null;
   stressEvent: string | null;
   flavorLines: string[];
+}
+
+export type DayShiftRating =
+  | "Calm Shift"
+  | "Busy Shift"
+  | "Messy but Profitable"
+  | "Barely Held Together";
+
+export type DayObjectiveStatus = "active" | "completed" | "missed";
+
+export interface DayObjectiveResult {
+  day: DayNumber;
+  objectiveId: string;
+  title: string;
+  status: Exclude<DayObjectiveStatus, "active">;
 }
 
 export interface UnlockState {
@@ -93,6 +123,7 @@ export interface GameState {
   pendingSupplyPurchase: SupplyPurchaseState;
   dayManagement: DayManagementState;
   daySummary: DaySummary | null;
+  objectiveResults: DayObjectiveResult[];
   stressEventLog: string[];
   hiddenWeirdness: number;
   weirdnessVisible: boolean;
@@ -113,6 +144,9 @@ export type GameAction =
   | { type: "prepare_counter" }
   | { type: "check_supplies" }
   | { type: "clean_tables" }
+  | { type: "adjust_offer" }
+  | { type: "run_advertising" }
+  | { type: "consult_kassandra" }
   | {
       type: "select_helper";
       helperId: StaffOptionId;

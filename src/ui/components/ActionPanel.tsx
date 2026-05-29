@@ -4,7 +4,8 @@ import {
   getIngredientLabel,
   getMissingRequiredActions,
   getRestockPreview,
-  getVisibleStaffOptions
+  getVisibleStaffOptions,
+  hasActionCapacity
 } from "../../game/engine/selectors";
 import {
   getHelperTaskLabel,
@@ -22,6 +23,9 @@ interface ActionPanelProps {
   onPrepareDrink: () => void;
   onCheckSupplies: () => void;
   onCleanTables: () => void;
+  onAdjustOffer: () => void;
+  onRunAdvertising: () => void;
+  onConsultKassandra: () => void;
   onSelectHelper: (helperId: StaffOptionId, taskId: HelperTaskId) => void;
   onOpenDay: () => void;
   onCompleteDay: () => void;
@@ -46,6 +50,9 @@ export function ActionPanel({
   onPrepareDrink,
   onCheckSupplies,
   onCleanTables,
+  onAdjustOffer,
+  onRunAdvertising,
+  onConsultKassandra,
   onSelectHelper,
   onOpenDay,
   onCompleteDay,
@@ -79,6 +86,9 @@ export function ActionPanel({
           onPrepareDrink={onPrepareDrink}
           onCheckSupplies={onCheckSupplies}
           onCleanTables={onCleanTables}
+          onAdjustOffer={onAdjustOffer}
+          onRunAdvertising={onRunAdvertising}
+          onConsultKassandra={onConsultKassandra}
           onCompleteDay={onCompleteDay}
           canCloseDay={canCloseDay}
         />
@@ -99,11 +109,13 @@ export function ActionPanel({
       <p id="close-day-requirements" className="action-hint">
         {gameState.demoComplete
           ? "Demo complete. Reset to replay the seven-day loop."
-          : gameState.dayPhase === "day_start"
-            ? "Choose one helper task or open without help. The choice locks when the day opens."
-            : canCloseDay
-              ? "Core café tasks complete. The day can be closed."
-              : `Before closing: ${formatMissingActions(missingActions)}.`}
+            : gameState.dayPhase === "day_start"
+              ? "Choose one helper task or open without help. The choice locks when the day opens."
+              : gameState.dayManagement.actionPointsRemaining <= 0
+                ? "No action capacity left. Close the day if the required café tasks are done."
+              : canCloseDay
+                ? "Core café tasks complete. The day can be closed."
+                : `Before closing: ${formatMissingActions(missingActions)}.`}
       </p>
 
       <p className="status-message" role="status" aria-live="polite">
@@ -120,6 +132,9 @@ function OpenDayControls({
   onPrepareDrink,
   onCheckSupplies,
   onCleanTables,
+  onAdjustOffer,
+  onRunAdvertising,
+  onConsultKassandra,
   onCompleteDay,
   canCloseDay
 }: {
@@ -129,13 +144,35 @@ function OpenDayControls({
   onPrepareDrink: () => void;
   onCheckSupplies: () => void;
   onCleanTables: () => void;
+  onAdjustOffer: () => void;
+  onRunAdvertising: () => void;
+  onConsultKassandra: () => void;
   onCompleteDay: () => void;
   canCloseDay: boolean;
 }) {
   const products = getAvailableProducts(gameState);
+  const canAct = hasActionCapacity(gameState);
+  const advertisingCanUseBonus = gameState.dayManagement.extraAdvertisingActions > 0;
+  const canUseAdvertisingAction = canAct || advertisingCanUseBonus;
+  const actionLockReason = canAct
+    ? undefined
+    : "No daily action capacity remains for this shift.";
 
   return (
     <>
+      <div className="action-budget" aria-label="Daily action capacity">
+        <span>Actions left</span>
+        <strong>
+          {gameState.dayManagement.actionPointsRemaining} /{" "}
+          {gameState.dayManagement.actionPointsRemaining +
+            gameState.dayManagement.actionPointsSpent}
+        </strong>
+        <small>
+          Serving, cleaning, supply checks, offers, ads, and KASSANDRA checks all
+          compete for the shift.
+        </small>
+      </div>
+
       {gameState.helperAssignment ? (
         <div className="helper-slot" aria-label="Current helper assignment">
           {gameState.helperAssignment.flavorLine}
@@ -143,18 +180,70 @@ function OpenDayControls({
       ) : null}
 
       <div className="button-row">
-        <button type="button" onClick={onTakeOrder}>
+        <button type="button" onClick={onTakeOrder} disabled={!canAct} title={actionLockReason}>
           Take next order
         </button>
-        <button type="button" onClick={onPrepareDrink}>
+        <button
+          type="button"
+          onClick={onPrepareDrink}
+          disabled={!canAct}
+          title={actionLockReason}
+        >
           Prepare suggested product
         </button>
-        <button type="button" onClick={onCleanTables}>
+        <button type="button" onClick={onCleanTables} disabled={!canAct} title={actionLockReason}>
           Clean tables
         </button>
-        <button type="button" onClick={onCheckSupplies}>
+        <button type="button" onClick={onCheckSupplies} disabled={!canAct} title={actionLockReason}>
           Check supplies
         </button>
+        {gameState.unlocks.pricing ? (
+          <button
+            type="button"
+            className="secondary-button"
+            onClick={onAdjustOffer}
+            disabled={!canAct || gameState.dayManagement.offerReviewed}
+            title={
+              gameState.dayManagement.offerReviewed
+                ? "The offer board has already been reviewed today."
+                : actionLockReason
+            }
+          >
+            Review offer board
+          </button>
+        ) : null}
+        {gameState.unlocks.advertising ? (
+          <button
+            type="button"
+            className="secondary-button"
+            onClick={onRunAdvertising}
+            disabled={!canUseAdvertisingAction || gameState.dayManagement.advertisingRun}
+            title={
+              gameState.dayManagement.advertisingRun
+                ? "One small ad has already run today."
+                : canUseAdvertisingAction
+                  ? undefined
+                  : actionLockReason
+            }
+          >
+            Run local ad
+          </button>
+        ) : null}
+        {gameState.unlocks.kassandra ? (
+          <button
+            type="button"
+            className="secondary-button"
+            onClick={onConsultKassandra}
+            disabled={!canAct || gameState.dayManagement.kassandraConsulted}
+            title={
+              gameState.dayManagement.kassandraConsulted
+                ? "KASSANDRA has already been consulted today."
+                : actionLockReason
+            }
+          >
+            Consult KASSANDRA
+          </button>
+        ) : null}
         <button
           type="button"
           onClick={onCompleteDay}
@@ -172,6 +261,8 @@ function OpenDayControls({
             className="secondary-button"
             key={product.id}
             onClick={() => onServeProduct(product.id)}
+            disabled={!canAct}
+            title={actionLockReason}
           >
             {product.name} · €{product.basePrice}
           </button>
