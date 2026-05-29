@@ -41,3 +41,154 @@ Use GitHub Actions as soon as code exists.
 ## Rule
 
 Do not add a third coding AI agent during early MVP development. Prefer clearer issues, better acceptance criteria, and automated checks over more agents.
+
+## Handoff Timing
+
+Do not hand work to Claude Code or Codex too early.
+
+Before implementation starts, the following should be documented clearly:
+
+- MVP scope
+- week-one gameplay structure
+- core data lists
+- main gameplay view
+- technical architecture
+- content tone
+- acceptance criteria for the first vertical slice
+
+Claude Code can be used earlier for documentation and repository structure. Codex should only start implementation once the task is narrow, testable, and tied to a specific issue or file set.
+
+## Preferred Handoff Order
+
+1. ChatGPT develops concept, scope, data lists, and prompts with the user.
+2. Claude Code prepares or updates repository documentation and reviews consistency.
+3. Codex implements focused slices from the agreed documentation.
+4. Claude Code or ChatGPT reviews larger consistency questions.
+5. Codex fixes concrete issues and tests.
+
+## Task Format for Claude Code
+
+Claude Code tasks should be framed as documentation, architecture, or consistency tasks.
+
+Good Claude Code task examples:
+
+- Create or update documentation files from the agreed design notes.
+- Check whether `GAME_DESIGN.md`, `MVP_SCOPE.md`, and `DECISIONS.md` contradict each other.
+- Propose a repository structure that supports the documented MVP.
+- Review whether implementation files follow the documented architecture.
+
+Avoid asking Claude Code to invent major new core mechanics unless explicitly requested.
+
+## Task Format for Codex
+
+Codex tasks should be focused implementation tasks with clear acceptance criteria.
+
+Good Codex task examples:
+
+- Implement the week-one data model from `MVP_SCOPE.md`.
+- Add deterministic game-state transitions for serving a guest.
+- Add localStorage save/load with tests.
+- Build the first café screen using the documented 3/4 pixel-diorama layout.
+- Add tests for advertising effects and staff effects.
+
+Avoid giving Codex broad prompts such as “build the game” without a constrained scope.
+
+## Documentation Rule
+
+Any meaningful change to the game concept, architecture, MVP scope, pacing, content tone, or agent workflow must be reflected in the relevant Markdown documentation.
+
+Recommended destinations:
+
+- `docs/DECISIONS.md` for binding design or technical decisions
+- `docs/GAME_DESIGN.md` for gameplay systems and player experience
+- `docs/MVP_SCOPE.md` for what is included or excluded from the first vertical slice
+- `docs/CONTENT_GUIDE.md` for tone, writing style, character voice, and text examples
+- `docs/TECH_ARCHITECTURE.md` for implementation constraints and structure
+- `docs/WORKFLOW.md` for agent use, handoff rules, and development process
+- `docs/ROADMAP.md` for future phases beyond MVP
+
+Do not overwrite existing notes from other chats without review. Prefer additive updates and short summaries when merging.
+
+## Acceptance Criteria Requirement
+
+Every implementation task should include acceptance criteria before Codex starts.
+
+Acceptance criteria should cover:
+
+- expected player-visible behavior
+- affected data or state
+- expected tests
+- out-of-scope items
+- whether documentation must be updated
+
+Example:
+
+```txt
+Task: Implement temporary staff for week 1.
+
+Acceptance criteria:
+- Jana, Nino, and Mira exist as data entries.
+- Staff can be hired for one day starting day 5.
+- Staff cost is deducted at day start or hire time.
+- Staff effects modify service, cleanliness, reputation, or guest flow.
+- End-of-day flavor lines can appear.
+- Tests cover staff cost and at least one staff effect.
+- Permanent hiring and shift planning remain out of scope.
+```
+
+## Verification Rule
+
+Whenever code exists, implementation changes should be verified before they are considered done.
+
+Preferred checks:
+
+- typecheck
+- tests
+- build
+- lint, if configured
+
+If a check cannot be run, the reason should be documented in the handoff or final summary.
+
+## Git Hygiene
+
+Work should stay reviewable.
+
+Guidelines:
+
+- small commits or clear commit groups
+- one main concern per issue
+- avoid mixing large concept changes with implementation changes
+- avoid unrelated formatting churn
+- keep generated files out of commits unless intentionally required
+- keep `.DS_Store` and other local artifacts out of the repository
+
+## Current Build Strategy
+
+The first target is a playable seven-day vertical slice.
+
+Do not attempt full long-term game systems before the week-one loop works.
+
+Implementation priority:
+
+1. deterministic game state
+2. week-one data
+3. core order/resource loop
+4. day progression
+5. simple café UI
+6. advertising
+7. temporary staff
+8. KASSANDRA update
+9. weirdness reveal and day-7 hook
+10. tests and README polish
+
+## Agent Prompt Storage
+
+Major prompts used for Claude Code or Codex should be saved or summarized in documentation when they define project direction.
+
+Recommended location:
+
+- `docs/WORKFLOW.md` for reusable process prompts
+- `docs/ROADMAP.md` for phase prompts
+- issue descriptions for implementation-specific prompts
+
+This helps keep the project understandable after chats are archived.
