@@ -5,8 +5,9 @@
 This document defines how ChatGPT, Claude Code, Codex and later Claude Cowork should be used for Café Apokalypso.
 
 Current coordination status:
-- The project is already past Prompt 5.
-- Credit tracking baseline after Prompt 4 was 487 remaining credits.
+- The project is past Prompt 5; Prompt 5 has been locally mini-tested and logged.
+- Current known Codex credit state after Prompt 5 review: 411 remaining credits.
+- Prompt 6A and Prompt 6A.1 are documentation/design handoffs; Prompt 6B is the next Codex implementation step after the working tree is clean.
 - All further Claude Code / Codex work must be logged with a run protocol.
 - Results may be discussed in other chats, but this repository documentation and ClickUp remain the durable coordination layer.
 
@@ -155,9 +156,11 @@ Current known progress:
 | Prompt 1 | Done or superseded | Initial documentation/consistency phase complete enough to proceed. |
 | Prompt 2 | Done or superseded | Documentation readiness phase complete enough to proceed. |
 | Prompt 3 | Done | Initial app shell phase has been passed. |
-| Prompt 4 | Done | Credit baseline after this prompt: 487 remaining credits. |
-| Prompt 5 | Done / awaiting logged review | Must be reviewed and logged before further work. |
-| Prompt 6+ | Blocked | Requires Prompt 5 protocol and explicit approval. |
+| Prompt 4 | Done | Earlier credit baseline after this prompt: 487 remaining credits. |
+| Prompt 5 | Done | First 7-day progression loop passed local mini-test and was logged in ClickUp. |
+| Prompt 6A | Done | Management tradeoff design pass completed with Claude Code and logged in ClickUp. |
+| Prompt 6A.1 | Done | Approved management tradeoff design saved to `docs/MANAGEMENT_TRADEOFF_DESIGN.md` and logged in ClickUp. |
+| Prompt 6B | Next | Codex implementation may start after `main` is clean and current credits are confirmed. |
 
 ## Credit Ledger Rule
 
@@ -169,6 +172,7 @@ Required format:
 | Run | Tool | Prompt | Start Credits | End Credits | Delta | Notes |
 | --- | --- | --- | ---: | ---: | ---: | --- |
 | 001 | Codex | Prompt 4 | unknown | 487 | unknown | Baseline recorded after Prompt 4. |
+| 002 | Codex | Prompt 5 | 411 | 411 | 0 | Credit state reported after Prompt 5 review; exact run delta not recorded. |
 ```
 
 After each future run, append one row in the relevant ClickUp task comment or project log. If the repository gains a dedicated run log later, mirror the same table there.
@@ -204,6 +208,14 @@ They do not write directly to the repository and do not make canonical design de
 
 Gemini, Google AI Studio, and Nano Banana may be used to reduce Codex credit usage for visual exploration.
 
+Explorative Google-AI-Studio-/Gemini outputs and raw moodboards are stored outside the code repository. Current external working location:
+
+```text
+/Users/Heineken/Library/Mobile Documents/com~apple~CloudDocs/Claude/Moodboards Apokalypso
+```
+
+This external folder is a working area, not a canonical source for implementation. Only reviewed and curated decisions should be mirrored into repository documentation.
+
 Use them for:
 
 - quick moodboard batches
@@ -224,10 +236,11 @@ Do not use them for:
 Recommended flow:
 
 1. ChatGPT creates the art brief, review sheet, and prompt variants.
-2. Gemini / Google AI Studio / Nano Banana generates visual options.
+2. Gemini / Google AI Studio / Nano Banana generates visual options outside the repo.
 3. The user selects or rejects directions.
-4. Approved decisions are documented in `docs/art/` and, if binding, in `docs/ART_STYLEGUIDE.md`.
-5. Codex only implements placeholders, metadata, rendering, or approved assets.
+4. Raw image batches, prompt experiments, and rejected variants stay in the external moodboard folder.
+5. Approved decisions are summarized in `docs/art/` and, if binding, in `docs/ART_STYLEGUIDE.md` or `docs/ART_PIPELINE.md`.
+6. Codex only implements placeholders, metadata, rendering, or explicitly approved assets.
 
 For now, Google image tools should be treated as moodboard and concept tools, not production tools.
 
@@ -241,6 +254,5 @@ Ask the user before proceeding if a task would:
 - introduce a major dependency
 - require broad rework if wrong
 - start a new prompt/run while the previous run has no protocol
-- continue beyond Prompt 5 without explicit review and approval
 - spend credits without recording start/end credit state
     
