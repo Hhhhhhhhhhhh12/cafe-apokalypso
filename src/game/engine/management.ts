@@ -1,0 +1,277 @@
+import { weekOneProducts, weekOneStaffOptions } from "../data";
+import type { ProductDefinition, ProductId, StaffOptionId } from "../types/content";
+import type {
+  CleanlinessStateLabel,
+  DayManagementState,
+  GameState,
+  HelperAssignment,
+  HelperTaskId,
+  IngredientKey,
+  StressStateLabel,
+  SupplyState
+} from "../types/game";
+
+export const SUPPLY_CAPS: SupplyState = {
+  coffee: 20,
+  milk: 20,
+  pastries: 12
+};
+
+export const SUPPLY_UNIT_COSTS: Record<IngredientKey, number> = {
+  coffee: 0.8,
+  milk: 0.4,
+  pastries: 1.2
+};
+
+export const COMFORTABLE_CAPACITY_BY_DAY: Record<GameState["day"], number> = {
+  1: 5,
+  2: 5,
+  3: 6,
+  4: 6,
+  5: 7,
+  6: 7,
+  7: 8
+};
+
+export const MUNDANE_STRESS_EVENT_LINES = [
+  "PLACEHOLDER STRESS EVENT: The coffee machine made a sound it has not made before. You reset it. The manual did not cover this.",
+  "PLACEHOLDER STRESS EVENT: A guest asked for the bill three times before you noticed. You apologised. They tipped anyway, but less.",
+  "PLACEHOLDER STRESS EVENT: You dropped a cup. It was not your best moment. Nobody said anything, which was worse.",
+  "PLACEHOLDER STRESS EVENT: The milk frother stopped mid-cappuccino. You finished it by hand. The guest left a note: 'Authentic.'",
+  "PLACEHOLDER STRESS EVENT: A queue formed. You managed it. You do not remember how.",
+  "PLACEHOLDER STRESS EVENT: The cash register froze for eleven seconds. Then it continued. No explanation was offered."
+] as const;
+
+export function createInitialDayManagement(
+  reputationAtStart: number
+): DayManagementState {
+  return {
+    customersServed: 0,
+    moneyEarned: 0,
+    moneySpent: 0,
+    cleaningActions: 0,
+    reputationAtStart,
+    cleanlinessStressApplied: false,
+    noCleaningStressApplied: false,
+    emptySupplyStressIngredients: [],
+    slowCleaningStressReductionUsed: false,
+    baristaReputationBonus: 0,
+    helperExtraOrdersRemaining: 0,
+    extraAdvertisingActions: 0
+  };
+}
+
+export function getCleanlinessLabel(value: number): CleanlinessStateLabel {
+  if (value >= 75) {
+    return "Sauber";
+  }
+  if (value >= 50) {
+    return "Ordentlich";
+  }
+  if (value >= 25) {
+    return "Unordentlich";
+  }
+  return "Chaotisch";
+}
+
+export function getStressLabel(value: number): StressStateLabel {
+  if (value >= 81) {
+    return "Überlastet";
+  }
+  if (value >= 61) {
+    return "Angespannt";
+  }
+  if (value >= 41) {
+    return "Geschäftig";
+  }
+  return "Ruhig";
+}
+
+export function clampSupply(ingredient: IngredientKey, value: number): number {
+  return clamp(Math.floor(value), 0, SUPPLY_CAPS[ingredient]);
+}
+
+export function clampResource(value: number): number {
+  return clamp(Math.round(value * 100) / 100, 0, Number.POSITIVE_INFINITY);
+}
+
+export function clampMeter(value: number): number {
+  return clamp(Math.round(value), 0, 100);
+}
+
+export function getProductById(productId: ProductId): ProductDefinition {
+  const product = weekOneProducts.find((candidate) => candidate.id === productId);
+
+  if (!product) {
+    return weekOneProducts[0];
+  }
+
+  return product;
+}
+
+export function getDefaultProductForState(state: GameState): ProductDefinition {
+  const availableProducts = weekOneProducts.filter(
+    (product) => product.firstDay <= state.day
+  );
+  const index = state.dayManagement.customersServed % availableProducts.length;
+
+  return availableProducts[index] ?? weekOneProducts[0];
+}
+
+export function getMissingIngredients(
+  product: ProductDefinition,
+  supplies: SupplyState,
+  assignment: HelperAssignment | null
+): IngredientKey[] {
+  const missingIngredients: IngredientKey[] = [];
+
+  for (const ingredient of Object.keys(SUPPLY_CAPS) as IngredientKey[]) {
+    const required = getIngredientRequirement(product, ingredient, assignment);
+
+    if (required > 0 && supplies[ingredient] < required) {
+      missingIngredients.push(ingredient);
+    }
+  }
+
+  return missingIngredients;
+}
+
+export function findSubstituteProduct(
+  product: ProductDefinition,
+  supplies: SupplyState,
+  assignment: HelperAssignment | null
+): ProductDefinition | null {
+  const substituteIds: ProductId[] =
+    product.id === "cappuccino"
+      ? ["espresso", "filterkaffee"]
+      : product.id === "kaffee-croissant"
+        ? ["filterkaffee", "espresso", "croissant"]
+        : product.id === "croissant"
+          ? []
+          : [];
+
+  for (const substituteId of substituteIds) {
+    const substitute = getProductById(substituteId);
+    if (getMissingIngredients(substitute, supplies, assignment).length === 0) {
+      return substitute;
+    }
+  }
+
+  return null;
+}
+
+export function applyProductConsumption(
+  product: ProductDefinition,
+  supplies: SupplyState,
+  assignment: HelperAssignment | null
+): SupplyState {
+  const nextSupplies = { ...supplies };
+
+  for (const ingredient of Object.keys(SUPPLY_CAPS) as IngredientKey[]) {
+    const required = getIngredientRequirement(product, ingredient, assignment);
+    nextSupplies[ingredient] = clampSupply(ingredient, nextSupplies[ingredient] - required);
+  }
+
+  return nextSupplies;
+}
+
+export function getIngredientRequirement(
+  product: ProductDefinition,
+  ingredient: IngredientKey,
+  assignment: HelperAssignment | null
+): number {
+  const baseRequirement = product.ingredients[ingredient] ?? 0;
+
+  if (
+    ingredient === "milk" &&
+    baseRequirement > 0 &&
+    assignment?.helperId === "nino" &&
+    assignment.taskId === "barista"
+  ) {
+    return Math.floor(baseRequirement * 0.9);
+  }
+
+  return baseRequirement;
+}
+
+export function createHelperAssignment(
+  helperId: StaffOptionId,
+  taskId: HelperTaskId
+): HelperAssignment | null {
+  const staffOption = weekOneStaffOptions.find((candidate) => candidate.id === helperId);
+
+  if (!staffOption || !isValidHelperTask(helperId, taskId)) {
+    return null;
+  }
+
+  return {
+    helperId,
+    taskId,
+    locked: false,
+    dailyCost: staffOption.dailyCost,
+    flavorLine: getHelperFlavorLine(helperId, taskId)
+  };
+}
+
+export function getHelperLabel(assignment: HelperAssignment | null): string {
+  if (!assignment) {
+    return "No helper assigned";
+  }
+
+  const staffOption = weekOneStaffOptions.find(
+    (candidate) => candidate.id === assignment.helperId
+  );
+
+  return `${staffOption?.name ?? assignment.helperId}: ${getHelperTaskLabel(
+    assignment.taskId
+  )}`;
+}
+
+export function getHelperTaskLabel(taskId: HelperTaskId): string {
+  const labels: Record<HelperTaskId, string> = {
+    cleaning: "Cleaning",
+    service: "Service",
+    barista: "Barista",
+    counter: "Counter",
+    marketing: "Marketing"
+  };
+
+  return labels[taskId];
+}
+
+export function getHelperFlavorLine(
+  helperId: StaffOptionId,
+  taskId: HelperTaskId
+): string {
+  if (helperId === "jana" && taskId === "cleaning") {
+    return "Jana cleaned everything. You are not sure when.";
+  }
+  if (helperId === "jana" && taskId === "service") {
+    return "Jana took three orders. She looks mildly confused about the menu but nobody complained.";
+  }
+  if (helperId === "nino" && taskId === "barista") {
+    return "Nino made a latte art. It was a bird. Or possibly a bureaucratic stamp.";
+  }
+  if (helperId === "nino" && taskId === "counter") {
+    return "Nino handled the counter. The queue moved. Stress dropped slightly.";
+  }
+  if (helperId === "mira" && taskId === "marketing") {
+    return "Mira posted something. It got 14 likes and one comment in a language Google says does not exist.";
+  }
+
+  return "Mira called the café 'charmingly precarious.' She meant it as a compliment. Probably.";
+}
+
+function isValidHelperTask(helperId: StaffOptionId, taskId: HelperTaskId): boolean {
+  const validTasks: Record<StaffOptionId, HelperTaskId[]> = {
+    jana: ["cleaning", "service"],
+    nino: ["barista", "counter"],
+    mira: ["marketing", "counter"]
+  };
+
+  return validTasks[helperId].includes(taskId);
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, value));
+}

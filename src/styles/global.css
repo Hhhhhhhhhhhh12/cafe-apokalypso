@@ -299,6 +299,100 @@ h3 {
   gap: 12px;
 }
 
+.product-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  border-top: 2px solid #d5bda5;
+  padding-top: 12px;
+}
+
+.helper-slot {
+  border: 1px solid #c2aaa0;
+  border-radius: 8px;
+  padding: 0.75rem;
+  background: #edf6f7;
+  color: #1d3f46;
+  font-weight: 700;
+}
+
+.helper-picker,
+.restock-panel {
+  display: grid;
+  gap: 12px;
+}
+
+.helper-picker fieldset {
+  min-width: 0;
+  margin: 0;
+  border: 1px solid #d5bda5;
+  border-radius: 8px;
+  padding: 0.75rem;
+  background: #fbeddc;
+}
+
+.helper-picker legend {
+  color: #3d2a23;
+  font-weight: 800;
+}
+
+.radio-row {
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.radio-row label {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 10px;
+  color: #3d2a23;
+  font-weight: 700;
+}
+
+.radio-row input {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.radio-row input:focus-visible {
+  outline: 4px solid #16606c;
+  outline-offset: 3px;
+}
+
+.restock-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  border: 1px solid #d5bda5;
+  border-radius: 8px;
+  padding: 0.65rem;
+  background: #fbeddc;
+  color: #3d2a23;
+  font-weight: 700;
+}
+
+.stepper {
+  display: grid;
+  grid-template-columns: 44px minmax(32px, auto) 44px;
+  gap: 6px;
+  align-items: center;
+}
+
+.stepper button {
+  width: 44px;
+  min-height: 44px;
+  padding: 0;
+}
+
+.stepper output {
+  color: #1f555f;
+  font-weight: 900;
+  text-align: center;
+}
+
 .status-message {
   margin: 0;
   border: 1px solid #c2aaa0;
@@ -349,6 +443,31 @@ h3 {
   color: #1f555f;
   font-weight: 800;
   text-align: right;
+}
+
+.summary-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0.7rem 0 0;
+}
+
+.summary-list div {
+  border: 1px solid #d5bda5;
+  border-radius: 8px;
+  padding: 0.55rem;
+  background: #fff8ed;
+}
+
+.summary-list dt {
+  color: #4b3a32;
+  font-weight: 800;
+}
+
+.summary-list dd {
+  margin: 0.25rem 0 0;
+  color: #1f555f;
+  font-weight: 800;
 }
 
 .data-preview__note {
@@ -454,6 +573,11 @@ h3 {
   }
 
   .data-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .summary-list,
+  .restock-row {
     grid-template-columns: 1fr;
   }
 

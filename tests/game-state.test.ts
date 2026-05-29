@@ -11,7 +11,7 @@ describe("initial game state", () => {
   it("starts as a serializable day-one placeholder shell", () => {
     const state = createInitialGameState();
 
-    expect(state.version).toBe(3);
+    expect(state.version).toBe(4);
     expect(state.contentCatalogVersion).toBe("week-one-v1");
     expect(state.day).toBe(1);
     expect(state.weirdnessVisible).toBe(false);
@@ -29,16 +29,20 @@ describe("initial game state", () => {
     expect(state.eventHistory).toEqual([]);
     expect(state.unlockedAchievements).toEqual([]);
     expect(state.resources.money).toBe(42);
+    expect(state.supplies).toEqual({ coffee: 12, milk: 8, pastries: 6 });
+    expect(state.resources.cleanliness).toBe(80);
+    expect(state.resources.stress).toBe(0);
     expect(() => JSON.stringify(state)).not.toThrow();
   });
 
-  it("applies placeholder actions deterministically", () => {
+  it("applies management actions deterministically", () => {
     const state = createInitialGameState();
     const nextState = gameReducer(state, { type: "prepare_drink" });
 
-    expect(nextState.resources.coffee).toBe(state.resources.coffee - 1);
-    expect(nextState.resources.stress).toBe(state.resources.stress + 1);
-    expect(nextState.completedActions).toContain("prepare_drink");
+    expect(nextState.supplies.coffee).toBe(state.supplies.coffee - 1);
+    expect(nextState.resources.money).toBeGreaterThan(state.resources.money);
+    expect(nextState.resources.cleanliness).toBe(state.resources.cleanliness - 2);
+    expect(nextState.completedActions).toContain("take_order");
   });
 
   it("progresses from Day 1 through Day 7 and then stops", () => {
@@ -93,9 +97,36 @@ describe("initial game state", () => {
 });
 
 function closeCurrentDay(state: GameState): GameState {
-  let workingState = gameReducer(state, { type: "take_order" });
+  let workingState = state;
+
+  if (workingState.dayPhase === "day_start") {
+    workingState = gameReducer(workingState, { type: "open_day" });
+  }
+
+  workingState = gameReducer(workingState, { type: "take_order" });
   workingState = gameReducer(workingState, { type: "prepare_drink" });
   workingState = gameReducer(workingState, { type: "clean_tables" });
+  workingState = gameReducer(workingState, { type: "check_supplies" });
+  workingState = gameReducer(workingState, { type: "complete_day" });
 
-  return gameReducer(workingState, { type: "complete_day" });
+  if (!workingState.demoComplete) {
+    workingState = gameReducer(workingState, {
+      type: "set_supply_purchase",
+      ingredient: "coffee",
+      quantity: 2
+    });
+    workingState = gameReducer(workingState, {
+      type: "set_supply_purchase",
+      ingredient: "milk",
+      quantity: 1
+    });
+    workingState = gameReducer(workingState, {
+      type: "set_supply_purchase",
+      ingredient: "pastries",
+      quantity: 1
+    });
+    workingState = gameReducer(workingState, { type: "confirm_supply_purchase" });
+  }
+
+  return workingState;
 }

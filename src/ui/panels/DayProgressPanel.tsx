@@ -46,7 +46,62 @@ export function DayProgressPanel({ gameState }: DayProgressPanelProps) {
       {staffOptions.length > 0 ? (
         <section className="inline-callout" aria-labelledby="staff-options-title">
           <h3 id="staff-options-title">Temporary help available</h3>
-          <p>{staffOptions.map((staffOption) => staffOption.name).join(", ")}</p>
+          <p>
+            {gameState.helperAssignment
+              ? `${gameState.helperAssignment.flavorLine}`
+              : staffOptions.map((staffOption) => staffOption.name).join(", ")}
+          </p>
+        </section>
+      ) : null}
+
+      {gameState.daySummary ? (
+        <section className="inline-callout" aria-labelledby="day-summary-title">
+          <h3 id="day-summary-title">Day-end management summary</h3>
+          <dl className="summary-list">
+            <div>
+              <dt>Money earned</dt>
+              <dd>€{gameState.daySummary.moneyEarned}</dd>
+            </div>
+            <div>
+              <dt>Money spent</dt>
+              <dd>€{gameState.daySummary.moneySpent}</dd>
+            </div>
+            <div>
+              <dt>Customers served</dt>
+              <dd>{gameState.daySummary.customersServed}</dd>
+            </div>
+            <div>
+              <dt>Supplies left</dt>
+              <dd>
+                Coffee {gameState.daySummary.suppliesRemaining.coffee}, Milk{" "}
+                {gameState.daySummary.suppliesRemaining.milk}, Pastries{" "}
+                {gameState.daySummary.suppliesRemaining.pastries}
+              </dd>
+            </div>
+            <div>
+              <dt>Cleanliness</dt>
+              <dd>{gameState.daySummary.cleanlinessLabel}</dd>
+            </div>
+            <div>
+              <dt>Stress</dt>
+              <dd>{gameState.daySummary.stressLabel}</dd>
+            </div>
+            <div>
+              <dt>Reputation change</dt>
+              <dd>{gameState.daySummary.reputationDelta}</dd>
+            </div>
+            <div>
+              <dt>Helper</dt>
+              <dd>{gameState.daySummary.helperRecap ?? "None"}</dd>
+            </div>
+          </dl>
+          {gameState.daySummary.flavorLines.length > 0 ? (
+            <ul>
+              {gameState.daySummary.flavorLines.map((line) => (
+                <li key={line}>{line}</li>
+              ))}
+            </ul>
+          ) : null}
         </section>
       ) : null}
 
