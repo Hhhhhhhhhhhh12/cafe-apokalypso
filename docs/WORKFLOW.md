@@ -31,12 +31,47 @@ Codex should work issue by issue and keep changes reviewable.
 
 ## GitHub
 
-GitHub is the control layer.
+GitHub is the operational center for Café Apokalypso.
 
-Use Issues for concrete tasks.
+Markdown documentation remains the canonical source of truth for:
+- game design
+- MVP scope
+- architecture
+- art direction
+- content tone
+- workflow decisions
+
+GitHub Issues are used for concrete, actionable work packages.
 Use Projects for planning and status.
-Use Pull Requests or commit groups for reviewable changes.
+Use Pull Requests or commit groups to document reviewable repository changes.
 Use GitHub Actions as soon as code exists.
+
+GitHub is not the place for binding design canon unless the decision is also reflected in the relevant Markdown documentation.
+
+### GitHub Issues
+
+Use Issues for:
+- implementation tasks
+- bugs
+- test coverage
+- accessibility checks
+- security checks
+- art review tasks
+- documentation updates
+- Codex, Claude Code, Antigravity, or other tool handoffs
+
+Broad placeholder issues should be closed once their baseline work is implemented. Follow-up work should be tracked as focused issues with clear acceptance criteria.
+
+New issues should use clear, non-numbered titles and include:
+- goal
+- context
+- acceptance criteria
+- relevant docs
+- verification steps
+- out-of-scope items
+
+Issues that are ready for implementation should be labelled `codex-ready` or `claude-ready`.
+Issues with unresolved design, product, scope, or art decisions should be labelled `needs-decision`.
 
 ## Rule
 
@@ -96,6 +131,8 @@ Avoid giving Codex broad prompts such as “build the game” without a constrai
 ## Documentation Rule
 
 Any meaningful change to the game concept, architecture, MVP scope, pacing, content tone, or agent workflow must be reflected in the relevant Markdown documentation.
+
+When a GitHub Issue leads to a meaningful design, architecture, MVP, art, content, or workflow decision, the related Markdown documentation must be updated before the issue is considered complete.
 
 Recommended destinations:
 
