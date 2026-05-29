@@ -95,8 +95,10 @@ describe("save safety", () => {
     state = gameReducer(state, { type: "prepare_drink" });
     state = gameReducer(state, { type: "clean_tables" });
     state = gameReducer(state, { type: "complete_day" });
+    state = gameReducer(state, { type: "confirm_supply_purchase" });
 
     expect(state.day).toBe(2);
+    expect(state.supplies.coffee).toBeGreaterThanOrEqual(0);
 
     saveGameState(state, storage);
 

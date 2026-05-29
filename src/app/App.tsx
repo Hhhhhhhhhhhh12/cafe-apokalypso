@@ -52,16 +52,25 @@ export function App() {
       </header>
 
       <section className="workspace-grid" aria-label="Game shell workspace">
-        <ResourceHud resources={gameState.resources} />
+        <ResourceHud gameState={gameState} />
         <CafePlaceholder />
         <ActionPanel
           gameState={gameState}
           statusMessage={gameState.statusMessage}
           onTakeOrder={() => dispatch({ type: "take_order" })}
+          onServeProduct={(productId) => dispatch({ type: "serve_product", productId })}
           onPrepareDrink={() => dispatch({ type: "prepare_drink" })}
           onCheckSupplies={() => dispatch({ type: "check_supplies" })}
           onCleanTables={() => dispatch({ type: "clean_tables" })}
+          onSelectHelper={(helperId, taskId) =>
+            dispatch({ type: "select_helper", helperId, taskId })
+          }
+          onOpenDay={() => dispatch({ type: "open_day" })}
           onCompleteDay={() => dispatch({ type: "complete_day" })}
+          onSetSupplyPurchase={(ingredient, quantity) =>
+            dispatch({ type: "set_supply_purchase", ingredient, quantity })
+          }
+          onConfirmSupplyPurchase={() => dispatch({ type: "confirm_supply_purchase" })}
           onResetGame={handleReset}
         />
         <DayProgressPanel gameState={gameState} />
