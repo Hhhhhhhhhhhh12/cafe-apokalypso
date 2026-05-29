@@ -1,0 +1,46 @@
+import { createInitialGameState, isValidGameState } from "./gameState";
+import type { GameState } from "../types/game";
+
+export const SAVE_KEY = "cafe-apokalypso.save.v1";
+
+export type StorageLike = Pick<Storage, "getItem" | "setItem" | "removeItem">;
+
+export function getBrowserStorage(): StorageLike | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  try {
+    return window.localStorage;
+  } catch {
+    return null;
+  }
+}
+
+export function loadGameState(storage: StorageLike): GameState {
+  try {
+    const rawSave = storage.getItem(SAVE_KEY);
+
+    if (!rawSave) {
+      return createInitialGameState();
+    }
+
+    const parsedSave: unknown = JSON.parse(rawSave);
+
+    if (!isValidGameState(parsedSave)) {
+      return createInitialGameState();
+    }
+
+    return parsedSave;
+  } catch {
+    return createInitialGameState();
+  }
+}
+
+export function saveGameState(state: GameState, storage: StorageLike): void {
+  storage.setItem(SAVE_KEY, JSON.stringify(state));
+}
+
+export function resetSavedGameState(storage: StorageLike): void {
+  storage.removeItem(SAVE_KEY);
+}
