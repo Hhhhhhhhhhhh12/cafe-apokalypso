@@ -80,7 +80,7 @@ The repository remains canonical for:
 - technical workflow
 - AI handoffs
 
-A decision or idea that exists only in ClickUp is not canonical yet. It becomes binding only after it is documented in the relevant repository Markdown file, especially `docs/DECISIONS.md`, `docs/MVP_SCOPE.md`, `docs/CONTENT_BIBLE.md`, `docs/WORKFLOW.md`, or `docs/AI_HANDOFFS.md`.
+A decision or idea that exists only in ClickUp is not canonical yet. It becomes binding only after it is documented in the relevant repository Markdown file, especially `docs/DECISIONS.md`, `docs/MVP_SCOPE.md`, `docs/CONTENT_GUIDE.md`, `docs/WORKFLOW.md`, or `docs/AGENT_ORCHESTRATION.md`.
 
 AI tool roles:
 
@@ -206,4 +206,22 @@ After the first official apocalyptic hook, week 2 should introduce stronger sign
 - stronger delegation or staff progression
 - first visible café alteration caused by weirdness or system upgrades
 
-The player should feel that the game is opening up after the first seven days.
+
+### Decision: Art Review Sheets Before Final Asset Production
+
+Café Apokalypso uses visual review sheets before final asset production.
+
+Final visual assets should not be produced directly from loose prompts. Major visual directions must first be documented, reviewed, and approved through the appropriate sheet type.
+
+Required review sheets:
+
+- Character Sheets for major guests, staff, mythological visitors, AI-oracle entities, and authorities
+- Level-/Day-Sheets for the first seven MVP days and later major progression beats
+- UI Sheets for main gameplay screens, panels, popups, and day-end views
+- Asset Sheets for recurring café objects, resource icons, props, and event items
+- Weirdness-Escalation Sheets showing how the café moves from normal to subtly impossible to visibly apocalyptic
+- Moodboard Sheets comparing approved and rejected visual directions
+
+Approved visual decisions are copied into `docs/ART_STYLEGUIDE.md`. Art process and production rules are maintained in `docs/ART_PIPELINE.md`. Review material and sheet drafts live in `docs/art/`.
+
+Claude Code/Codex may implement placeholders, asset metadata, folder structure, and rendering components before final art exists. They must not introduce final artwork, canonical character designs, a different main-view perspective, or major visual direction changes without documented user approval.

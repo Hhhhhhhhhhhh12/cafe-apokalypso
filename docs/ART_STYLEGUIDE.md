@@ -32,6 +32,25 @@ Small, dense, cozy-absurd pixel café in a light 3/4 diorama perspective.
 - weirdness can introduce cold cyan, violet, sickly green, bureaucratic grey
 - apocalypse elements should contrast with cozy café elements
 
+## Required visual guides
+
+The art direction is maintained through several focused visual guides. Approved findings from review sheets should be copied into the relevant guide section here.
+
+### Café Interior Guide
+Defines the 3/4 pixel-diorama café view, room proportions, counter placement, seating, props, lighting, clutter level, and how the café changes over time.
+
+### Character Guide
+Defines guest and staff proportions, silhouettes, face detail, clothing detail, palette use, animation constraints, and how normal guests differ from absurd, mythological, AI-oracle, or authority characters.
+
+### UI Guide
+Defines panels, buttons, resource icons, typography direction, popup style, readability rules, and how the UI stays cozy, clear, and usable.
+
+### Weirdness Escalation Guide
+Defines how the world becomes stranger over time without losing the cozy café foundation. Early MVP days stay mostly normal, with strange hints increasing toward day 7.
+
+### Asset Guide
+Defines object scale, perspective, palette, outlines, animation needs, placeholder rules, naming, and priority for implementation.
+
 ## What Codex may do
 - create CSS-based placeholders
 - arrange asset folders
@@ -39,6 +58,19 @@ Small, dense, cozy-absurd pixel café in a light 3/4 diorama perspective.
 - add typed asset metadata
 - implement rendering components
 - keep naming conventions consistent
+
+## Review and approval rule
+
+Final visual assets should not be produced directly from loose prompts. Larger visual directions require a documented review sheet first.
+
+Required review inputs before final asset production:
+
+- Character Sheet for major character designs
+- Level-/Day-Sheet for day-specific visual progression
+- UI Sheet for new gameplay screens or major UI elements
+- Asset Sheet for recurring objects, icons, props, or event items
+- Weirdness-Escalation Sheet for major tone or atmosphere changes
+- Moodboard Sheet for broad style decisions
 
 ## What Codex may not do without approval
 - generate final art

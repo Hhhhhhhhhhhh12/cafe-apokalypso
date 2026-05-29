@@ -6,7 +6,7 @@ The MVP includes:
 - one café room in a light 3/4 pixel-inspired view
 - seven playable in-game days
 - 6 normal guests
-- 2 subtly strange guests
+- 3 subtly strange guests
 - 5 basic products
 - basic resources: money, coffee, milk, pastries, reputation, cleanliness, stress, hidden weirdness
 - basic order flow
@@ -57,7 +57,7 @@ The MVP is successful if the first seven days already create the feeling of a co
 The MVP data set includes:
 
 - 6 normal guests
-- 2 subtly strange guests
+- 3 subtly strange guests
 - 5 basic products
 - 4 advertising campaigns
 - 3 temporary staff options
@@ -82,6 +82,7 @@ Subtly strange guests:
 
 - Herr Grau
 - Frau mit rotem Regenschirm
+- Meda
 
 ### Week 1 Products
 
@@ -117,6 +118,8 @@ Temporary staff options:
 - Jana: service / cleaning
 - Nino: barista
 - Mira: marketing / counter
+
+Mira is the same character as Freelancerin Mira (normal recurring guest). She is a freelancer-style regular who can also be hired as a day helper starting Day 5. This dual role is intentional and should be reflected in both the guest data entry and the staff data entry.
 
 Each staff option should have a clear gameplay effect, a daily cost, and at least one flavor line.
 
