@@ -262,7 +262,23 @@ Recommended flow:
 5. Approved decisions are summarized in `docs/art/` and, if binding, in `docs/ART_STYLEGUIDE.md` or `docs/ART_PIPELINE.md`.
 6. Codex only implements placeholders, metadata, rendering, or explicitly approved assets.
 
+
 For now, Google image tools should be treated as moodboard and concept tools, not production tools.
+
+## Visual Tool Coordination
+
+Gemini, Google AI Studio, Nano Banana, and moodboard Markdown files are visual exploration inputs. They must not be treated as direct implementation instructions.
+
+Rules:
+- Claude Code may summarize moodboards and extract candidate art-direction decisions, but must mark them as candidates unless they are already reflected in `docs/ART_STYLEGUIDE.md` or `docs/ART_PIPELINE.md`.
+- Codex must not convert Gemini, Google AI Studio, or Nano Banana outputs into final assets.
+- Codex must not mix moodboard Markdown edits with gameplay, UI, engine, data-model, test, or build-system commits.
+- Visual-reference branches should use the `art/*` prefix.
+- Implementation branches should stay separate from visual exploration branches.
+- If a visual decision should affect gameplay UI or implementation, ChatGPT/User must first approve it and the decision must be transferred into the canonical docs.
+- Moodboards can guide placeholder layout and atmosphere only when the relevant rule is also documented in `docs/ART_STYLEGUIDE.md` or `docs/ART_PIPELINE.md`.
+
+
 
 ## Stop Conditions
 
