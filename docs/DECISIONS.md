@@ -111,4 +111,99 @@ The first week starts as a nearly normal café management game. The player learn
 
 The mythological/apocalyptic layer is introduced gradually through subtle anomalies rather than explicit fantasy guests. The first week ends with an official letter stating that the café has been mistakenly registered as apocalyptically relevant caffeine infrastructure.
 
+
 The weirdness value exists internally from the start but only becomes visible after the end-of-week hook.
+
+### Decision: Early Pacing Must Not Feel Slow
+
+Café Apokalypso should not spend too long as a completely normal café simulation.
+
+The first week remains grounded, but every in-game day should introduce at least one meaningful new element:
+
+- a new mechanic
+- a new guest behavior
+- a new management option
+- a new upgrade
+- a new advertising option
+- a first delegation/staff option
+- a narrative anomaly
+- a visible change in how the café feels
+
+The first explicit apocalyptic hook appears by the end of day 7. After week 1, escalation may become faster and more visible.
+
+### Decision: Café View Remains the Emotional Anchor
+
+The café itself should remain the central emotional and visual anchor throughout the game.
+
+Later management systems must grow around the café view rather than replace it. Staff panels, advertising, financial planning, expansion, KASSANDRA forecasts, and apocalyptic systems should be layered onto or accessed from the café, not turn the game into a pure spreadsheet or dashboard.
+
+### Decision: Side View Is Reserved for Special Scenes
+
+Side-view presentation is not used as the default gameplay camera.
+
+It may be used later for special missions, event scenes, basement encounters, backdoor deliveries, dream sequences, or rare apocalyptic incidents where a more staged presentation helps the moment.
+
+### Decision: KASSANDRA Starts as a Cash Register Update
+
+KASSANDRA begins as a seemingly normal cash register / business analytics update, not as an obvious oracle from the start.
+
+Its early behavior should feel plausible enough to belong in a café management tool while being slightly too confident, oddly specific, and increasingly inappropriate.
+
+Early KASSANDRA examples:
+
+- demand prediction
+- automatic offer analysis
+- target group optimization
+- customer classification
+- dry mortality-related observations
+
+KASSANDRA should become stranger over time, eventually connecting the café economy to prophecy, weirdness, and apocalyptic operations.
+
+### Decision: No Real AI API in the MVP
+
+The MVP must not use a real AI API.
+
+All AI-like behavior, including KASSANDRA forecasts, strange classifications, and oracle-style messages, is simulated through authored content, deterministic rules, and controlled randomization.
+
+This keeps the MVP stable, testable, inexpensive, privacy-friendly, and safe to host as a static web app.
+
+### Decision: Data-Driven Content
+
+Guests, products, events, upgrades, advertising campaigns, staff options, achievements, and scripted messages should be data-driven wherever possible.
+
+The goal is to make content easy to extend without rewriting core game logic. Claude, Codex, or future contributors should be able to add a new guest, product, upgrade, or event by editing structured data rather than changing multiple UI components.
+
+### Decision: Later Localization / i18n
+
+Multilingual support is planned for later but is not part of the MVP.
+
+The MVP may initially use direct German or English strings as needed, but the architecture should not block later localization. Before translation work begins, user-facing content should be migrated into i18n keys and language files.
+
+Planned future structure:
+
+- `src/i18n/de.json`
+- `src/i18n/en.json`
+- additional languages later
+
+### Decision: Management Arc
+
+The core management arc is micro to macro.
+
+At the beginning, the player performs direct café work manually. Later, the player increasingly manages systems: staff, roles, shifts, advertising, supply chains, pricing, expansion, strange guest groups, and apocalyptic incidents.
+
+The player should feel this transition through gameplay, not only through story text.
+
+### Decision: Week 2 Escalates Faster
+
+Week 2 should not simply repeat week 1 with more numbers.
+
+After the first official apocalyptic hook, week 2 should introduce stronger signs that the café is changing:
+
+- visible weirdness
+- daily KASSANDRA forecasts
+- at least one clearly strange guest interaction
+- first small apocalyptic incident
+- stronger delegation or staff progression
+- first visible café alteration caused by weirdness or system upgrades
+
+The player should feel that the game is opening up after the first seven days.
