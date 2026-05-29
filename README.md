@@ -126,6 +126,7 @@ Detailed project docs live in `docs/`:
 - `WORKFLOW.md` — AI-assisted development workflow and handoff rules
 - `AGENT_ORCHESTRATION.md` — AI tool roles and orchestration
 - `PROMPTS.md` — canonical source for reusable handoff prompts
+- `MANAGEMENT_TRADEOFF_DESIGN.md` — approved Week-1 management loop design (binding for implementation)
 - `ROADMAP.md` — phases and long-term direction
 
 ## Workflow

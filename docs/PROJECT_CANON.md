@@ -215,7 +215,7 @@ Repository Markdown files are canonical. Historical chat exports, old prompt dra
 
 If historical notes conflict with `docs/PROJECT_CANON.md`, `docs/PROJECT_CANON.md` wins unless the user explicitly decides otherwise.
 
-Downstream design documents must mirror this canon. In particular, `docs/GAME_DESIGN.md`, `docs/CONTENT_GUIDE.md` and `docs/MVP_SCOPE.md` should stay aligned with the current target, core characters, view direction, technical constraints and handoff workflow.
+Downstream design documents must mirror this canon. In particular, `docs/GAME_DESIGN.md`, `docs/CONTENT_GUIDE.md`, `docs/MVP_SCOPE.md` and `docs/MANAGEMENT_TRADEOFF_DESIGN.md` should stay aligned with the current target, core characters, view direction, technical constraints and handoff workflow.
 
 ## Rule for future handoffs
 
