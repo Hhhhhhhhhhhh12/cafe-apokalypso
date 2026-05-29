@@ -85,6 +85,30 @@ Planned MVP stack:
 
 The code should clearly separate game engine logic, structured game data, and React UI.
 
+## Local Development
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Start the local browser app:
+
+```bash
+npm run dev
+```
+
+Run the required checks:
+
+```bash
+npm run typecheck
+npm run test
+npm run build
+```
+
+The current app is an early placeholder shell. It includes a day-one state, resource HUD, placeholder 3/4 café area, action panel, and defensive localStorage reset flow.
+
 ## Documentation
 
 Detailed project docs live in `docs/`:
