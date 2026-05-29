@@ -58,8 +58,8 @@ Local browser save only.
 
 Café Apokalypso uses a split project workflow:
 
-- ClickUp is the human-readable project cockpit.
-- GitHub Issues / Projects are the technical task control layer.
+- GitHub is the operational center for concrete work packages, implementation tracking, review status, and technical task control.
+- ClickUp may remain a human-readable overview layer, but it is not canonical.
 - Repository Markdown files remain the canonical source of truth.
 - GitHub Actions will be used as the quality gate once code exists.
 
@@ -80,7 +80,23 @@ The repository remains canonical for:
 - technical workflow
 - AI handoffs
 
-A decision or idea that exists only in ClickUp is not canonical yet. It becomes binding only after it is documented in the relevant repository Markdown file, especially `docs/DECISIONS.md`, `docs/MVP_SCOPE.md`, `docs/CONTENT_GUIDE.md`, `docs/WORKFLOW.md`, or `docs/AGENT_ORCHESTRATION.md`.
+A decision or idea that exists only in ClickUp, a GitHub Issue, a Pull Request discussion, or a chat is not canonical yet. It becomes binding only after it is documented in the relevant repository Markdown file, especially `docs/DECISIONS.md`, `docs/MVP_SCOPE.md`, `docs/CONTENT_GUIDE.md`, `docs/WORKFLOW.md`, or `docs/AGENT_ORCHESTRATION.md`.
+
+### Decision: GitHub as Operational Center
+
+GitHub is the operative center for Café Apokalypso.
+
+GitHub Issues are used for actionable work packages, including implementation tasks, bugs, test coverage, accessibility checks, security checks, art review tasks, documentation updates, and AI tool handoffs.
+
+GitHub Projects may be used for planning and status. Pull Requests or commit groups document concrete repository changes.
+
+Broad placeholder issues should be closed once their baseline work is implemented. Follow-up work should be tracked as focused issues with clear acceptance criteria.
+
+New GitHub Issues should use clear, non-numbered titles and include goal, context, acceptance criteria, relevant docs, verification steps, and out-of-scope items.
+
+Issues that are ready for implementation should be labelled `codex-ready` or `claude-ready`. Issues with unresolved design, product, scope, or art decisions should be labelled `needs-decision`.
+
+GitHub does not replace the Markdown documentation. If an issue leads to a meaningful design, architecture, MVP, art, content, or workflow decision, the related Markdown documentation must be updated before the issue is considered complete.
 
 AI tool roles:
 
