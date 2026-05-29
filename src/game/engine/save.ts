@@ -1,7 +1,8 @@
 import { createInitialGameState, isValidGameState } from "./gameState";
 import type { GameState } from "../types/game";
 
-export const SAVE_KEY = "cafe-apokalypso.save.v1";
+export const SAVE_KEY = "cafe-apokalypso.save.v2";
+const LEGACY_SAVE_KEYS = ["cafe-apokalypso.save.v1"];
 
 export type StorageLike = Pick<Storage, "getItem" | "setItem" | "removeItem">;
 
@@ -43,4 +44,7 @@ export function saveGameState(state: GameState, storage: StorageLike): void {
 
 export function resetSavedGameState(storage: StorageLike): void {
   storage.removeItem(SAVE_KEY);
+  for (const legacyKey of LEGACY_SAVE_KEYS) {
+    storage.removeItem(legacyKey);
+  }
 }

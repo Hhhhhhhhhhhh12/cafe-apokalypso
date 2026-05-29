@@ -1,3 +1,9 @@
+import {
+  getWeekOneContentSummary,
+  kassandraMessages,
+  weekOneDays
+} from "../../game/data";
+
 interface ActionPanelProps {
   statusMessage: string;
   onPrepareCounter: () => void;
@@ -11,6 +17,10 @@ export function ActionPanel({
   onCleanTables,
   onResetGame
 }: ActionPanelProps) {
+  const contentSummary = getWeekOneContentSummary();
+  const openingDay = weekOneDays[0];
+  const firstKassandraMessage = kassandraMessages[0];
+
   return (
     <section className="panel action-panel" aria-labelledby="actions-title">
       <div className="panel-heading">
@@ -33,6 +43,42 @@ export function ActionPanel({
       <p className="status-message" role="status" aria-live="polite">
         {statusMessage}
       </p>
+
+      <section className="data-preview" aria-labelledby="data-preview-title">
+        <div>
+          <p className="eyebrow">Data model preview</p>
+          <h3 id="data-preview-title">Week-one content loaded</h3>
+        </div>
+
+        <dl className="data-summary-list">
+          <div>
+            <dt>Guests</dt>
+            <dd>
+              {contentSummary.normalGuests} normal /{" "}
+              {contentSummary.subtlyStrangeGuests} strange
+            </dd>
+          </div>
+          <div>
+            <dt>Products</dt>
+            <dd>{contentSummary.products}</dd>
+          </div>
+          <div>
+            <dt>Days</dt>
+            <dd>{contentSummary.days}</dd>
+          </div>
+          <div>
+            <dt>Scripted events</dt>
+            <dd>{contentSummary.scriptedEvents}</dd>
+          </div>
+        </dl>
+
+        <p className="data-preview__note">
+          Day 1 milestone: {openingDay.milestone}
+        </p>
+        <p className="data-preview__note">
+          KASSANDRA is static/simulated: {firstKassandraMessage.text}
+        </p>
+      </section>
     </section>
   );
 }
