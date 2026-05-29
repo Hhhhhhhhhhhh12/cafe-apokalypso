@@ -1,0 +1,173 @@
+# Café Apokalypso – Project Canon
+
+## Purpose
+
+This document is the top-level canonical context for Café Apokalypso. Claude Code, Codex and future contributors should read this first.
+
+## Current target
+
+The immediate goal is a short playable vertical slice demo for portfolio/application review.
+
+It should make visitors spend 15–20 minutes in the game and want to see Day 8.
+
+This is not the full game and not a final production MVP.
+
+## Game concept
+
+Café Apokalypso is a cozy-absurd solo management web game.
+
+The player starts with a seemingly normal small café. Early gameplay focuses on micromanagement: serving guests, prices, ingredients, cleaning and first advertising.
+
+Over time, guests, events and systems become increasingly strange: mythological regulars, AI-oracle hints, bureaucratic apocalypse systems and reality glitches.
+
+The long-term game shifts from micromanagement to macromanagement: staff, delegation, marketing, economy, expansion and delaying world-ending incidents.
+
+## Tone
+
+Cozy, witty, clever, lightly absurd.
+
+Not horror.
+Not grimdark.
+Not random nonsense.
+
+The weirdness should be carefully dosed but impossible to miss by Day 7.
+
+## Demo scope
+
+The demo covers the first 7 in-game days.
+
+The player should be able to:
+- serve guests
+- manage simple resources
+- adjust prices or offers
+- buy basic ingredients
+- clean the café
+- run small ads
+- experience scripted guest/event moments
+- notice escalating weirdness
+- reach a clear Day 7 cliffhanger
+
+## Day 7 goal
+
+By the end of Day 7, the player should understand:
+
+Something is wrong with this café.
+
+The ideal reaction is:
+
+“I want to know what happens on Day 8.”
+
+## Core characters/systems
+
+### Mira
+
+Mira is an early memorable character. She should bring witty, slightly strange dialogue and become one of the first hints that the café world is not entirely normal.
+
+### KASSANDRA
+
+KASSANDRA is not a real AI system in the demo.
+
+For now, KASSANDRA is a scripted oracle/system UI that teases future prediction and apocalypse-management mechanics.
+
+No external AI API is allowed.
+
+## View direction
+
+The main gameplay view is a small, dense pixel-café in a 3/4 diorama perspective.
+
+No side-view as the default gameplay view.
+
+Side-view may only be used later for special missions or event scenes.
+
+## Technical constraints
+
+- Vite
+- React
+- TypeScript
+- static web app
+- no backend
+- no accounts
+- no tracking
+- no real AI API
+- localStorage save only
+- deterministic game logic
+- game engine/state should stay separate from UI components
+
+## Repo and demo visibility
+
+The repo should make the playable demo obvious.
+
+README should include:
+- “Play the demo” link near the top
+- screenshot or GIF
+- “What you can try” section
+- local run instructions
+
+The preferred hosted demo target is GitHub Pages:
+
+https://hhhhhhhhhhhh12.github.io/cafe-apokalypso/
+
+## Agent workflow
+
+### Claude Code
+
+Use Claude Code for:
+- documentation consolidation
+- architecture readiness
+- broad structural planning
+- first implementation planning
+
+Claude Code should ask before broad edits.
+
+### Codex
+
+Use Codex carefully because credits are limited.
+
+Use Codex for:
+- focused implementation tasks
+- code review
+- simplification
+- test/build fixes
+- PR-style review
+
+Do not give Codex broad “build the whole game” prompts.
+
+## First implementation order
+
+1. Documentation sanity check
+2. Technical architecture
+3. Vite React TypeScript app shell
+4. Deterministic game-state skeleton
+5. Data model for guests/resources/days/events
+6. First 7-day loop
+7. Café dashboard with 3/4-inspired placeholder
+8. localStorage save/load
+9. Basic tests
+10. GitHub Pages/readme/demo polish
+
+## Deliberately out of scope for now
+
+- real AI
+- backend
+- accounts
+- multiplayer
+- final pixel art
+- complex staff system
+- complex economy simulation
+- multiple locations
+- full apocalypse-management layer
+- deep balancing
+- production asset pipeline
+
+## Rule for future handoffs
+
+Any agent prompt should include:
+
+- goal
+- context files
+- allowed changes
+- forbidden changes
+- acceptance criteria
+- verification commands
+
+If a decision would cause broad rework, ask the user first.
