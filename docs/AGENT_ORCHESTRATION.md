@@ -86,6 +86,24 @@ Track:
 - status
 - result link or placeholder
 
+## Tool Constraints
+
+### Antigravity
+
+Antigravity may be evaluated later as a coding or code-review tool only.
+
+Antigravity is not part of the art pipeline and does not replace image-generation tools.
+
+It must not be used for art direction, asset generation, moodboards, or character design.
+
+### Image and Art-Direction Tools
+
+Image tools (OpenAI ImageGen, Nano Banana / Gemini image tools, Google AI Studio image experiments) are art-direction tools only.
+
+They are used for moodboards, concept images, visual references, and style experiments.
+
+They do not write directly to the repository and do not make canonical design decisions. Their outputs must be reviewed, curated, and approved before entering the repository or game data.
+
 ## Stop Conditions
 
 Ask the user before proceeding if a task would:

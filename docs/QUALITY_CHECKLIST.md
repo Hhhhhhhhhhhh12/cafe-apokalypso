@@ -1,277 +1,106 @@
 # Quality Checklist
 
+Codex must read this file before any implementation task.
+If a task would violate a requirement here, stop and explain the conflict instead of implementing the change.
+
 ## Accessibility Baseline
+
+- All interactive elements (buttons, inputs, selects) must be reachable by keyboard tab order.
+- All interactive elements must have a visible focus indicator. Do not set `outline: none` without a custom replacement.
+- No critical information may be conveyed by color alone; always pair color with a label, icon, or text.
+- All buttons and controls must have an accessible label (visible text or `aria-label`).
+- Contrast ratio must meet WCAG 2.1 AA: 4.5:1 for normal text, 3:1 for large text and UI components.
+- The action panel and resource HUD must be operable without a mouse.
+- Do not use `dangerouslySetInnerHTML` or equivalent unsafe HTML injection.
+
 ## Security Baseline
+
+- No API keys or secrets may exist in the frontend bundle.
+- No real AI API calls are allowed in the MVP. KASSANDRA is simulated only.
+- No external scripts loaded at runtime (no CDN imports, no runtime eval of user data).
+- No user input may be rendered as raw HTML.
+- No localStorage data may be eval'd or executed.
+- No external tracking, analytics, or telemetry in the MVP.
+
 ## Save-System Safety
+
+- localStorage load must not crash if the key is missing.
+- localStorage load must not crash if the saved data is null, undefined, or malformed JSON.
+- Version mismatches between saved data and current game state must fall back gracefully to a clean new-game state, not a crash.
+- A visible "Reset / New Game" control must be available to the player at all times.
+- Game state written to localStorage must be fully serializable: no circular references, no functions, no class instances.
+- The app must remain playable after a browser reload mid-game (either save loads correctly or resets cleanly).
+
 ## MVP Smoke Test
+
+- Day 1: orders can be taken, drinks prepared, payment accepted, tables cleaned, first coffee-machine flicker appears after closing.
+- Day 2: guest behavior differences are present and the day completes without errors.
+- Day 3: price adjustment and daily offers panel is functional.
+- Day 4: advertising panel appears and at least one advertising action is available; Herr Grau appears.
+- Day 5: at least one temporary staff option (Jana, Nino, or Mira) can be hired; Meda may appear.
+- Day 6: KASSANDRA update appears and displays its first message.
+- Day 7: the official apocalyptic letter is delivered; the demo ends with the Day 7 cliffhanger; Frau mit rotem Regenschirm appears.
+- The hidden weirdness value must not appear in the UI before the Day 7 hook.
+- No JavaScript errors in the browser console during normal play through Days 1–7.
+- The app survives a browser reload mid-game (save persists or resets cleanly without errors).
+
 ## Responsive Baseline
+
+- The game must be playable on a modern desktop browser at 1280×768 or wider.
+- The layout must not overflow or break at 1024px width.
+- A mobile-first layout is not required for the MVP, but the layout must not be actively broken at narrower viewport widths.
+- Touch targets must be at least 44×44px where interactive elements are present.
+- No horizontal scrollbar should appear at the target desktop width.
+
+## Art Review QA
+
+- Codex/Claude Code must read `docs/ART_PIPELINE.md` and `docs/ART_STYLEGUIDE.md` before any task that touches artwork, visual placeholders, asset metadata, UI visuals, or art-related folder structure.
+- Final visual assets must not be added, generated, committed, or treated as canonical without documented user review and approval.
+- Major character designs require a Character Sheet in `docs/art/` before final art production.
+- Day-specific visual progression requires a Level-/Day-Sheet in `docs/art/` before final art production.
+- Major UI screens or visual systems require a UI Sheet in `docs/art/` before final art production.
+- Recurring props, icons, café objects, and event items require an Asset Sheet in `docs/art/` before final art production.
+- Moodboard-driven style decisions and weirdness-escalation changes must be documented before they are implemented as final visuals.
+- CSS placeholders are allowed if clearly marked and named with the `placeholder-` prefix.
+- Claude Code/Codex may implement placeholders, typed asset metadata, folder structure, and rendering components, but must not invent canonical final character designs or change the main 3/4 café view without approval.
+
 ## Content QA
+
+- All 6 normal guests must be present in the data: Pendlerin Paula, Laptop-Lukas, Lieferfahrer Cem, Cappuccino-Christa, Herr Bohn, Freelancerin Mira.
+- All 3 subtly strange guests must be present in the data: Herr Grau, Frau mit rotem Regenschirm, Meda.
+- Mira and Meda must not be merged or confused in data, code, or copy. They are separate characters.
+- All 5 basic products must be present: Filterkaffee, Espresso, Cappuccino, Croissant, Kaffee + Croissant.
+- KASSANDRA messages must follow the documented tone: calm, analytical, slightly wrong, oddly specific. No overt fantasy language in week 1.
+- The Day 7 hook letter text must match the version documented in `docs/GAME_DESIGN.md` and `docs/CONTENT_GUIDE.md`.
+- No guest, product, or event may use final art assets without review and approval by the user. CSS placeholders are allowed if clearly marked.
+- Placeholder assets must be named with the `placeholder-` prefix as documented in `docs/ART_STYLEGUIDE.md`.
+
 ## Demo Release Checklist
-## Out of Scope## docs/GAME_DESIGN.md
 
-### Week 1: The Almost Normal Café
-
-Week 1 teaches the player the core café management loop while establishing the first signs of the larger absurd-apocalyptic premise.
-
-Day 1 introduces direct café interactions: taking orders, preparing coffee, accepting payment, and cleaning tables.
-
-Day 2 introduces guest behavior differences such as patience, spending power, seat time, and quality expectations.
-
-Day 3 introduces basic economy: ingredient purchasing, price adjustment, and daily offers.
-
-Day 4 introduces advertising as a way to influence guest types and demand.
-
-Day 5 introduces temporary staff as the first delegation mechanic.
-
-Day 6 introduces the KASSANDRA cash register update, adding basic demand prediction and the first simulated AI/oracle layer.
-
-Day 7 acts as a small operational stress test and ends with the first explicit apocalyptic hook: an official letter from the Office for Extraordinary Operational Relevance.
-
-### Core Concept
-
-Café Apokalypso is a cozy-absurd solo management game for the web.
-
-The player starts with a seemingly normal small café. Early gameplay focuses on direct micromanagement: taking orders, preparing simple products, accepting payment, cleaning tables, managing basic ingredients, setting prices, and choosing small advertising actions.
-
-As the game progresses, guests, events, business systems, and the café itself become increasingly strange. Normal regulars gradually give way to mythological edge cases, AI-oracle behavior, apocalyptic bureaucracy, and world-ending incidents that are treated with dry business language.
-
-The game should evolve from micromanagement into macromanagement:
-
-- hire staff
-- delegate tasks
-- control advertising
-- stabilize the economy
-- expand the café and later locations
-- manage strange customer groups
-- delay increasingly absurd end-of-world scenarios
-
-The café remains cozy and inviting even as the world around it becomes stranger.
-
-### Main Game View
-
-The main gameplay view is a small, full pixel café shown as a light 3/4 diorama.
-
-The main view should feel like a concrete place the player owns and grows over time. It is not a side view and not a pure management dashboard.
-
-The starting café should visibly include:
-
-- entrance
-- small queue area
-- counter
-- coffee machine
-- cash register
-- two guest tables
-- small storage shelf
-- menu board
-- plant or simple decor
-- window, street, weather, or daylight detail
-
-The café should remain the emotional anchor of the game throughout progression. Management panels, staff systems, advertising, economy, and expansion layers grow around this café view rather than replacing it.
-
-Side-view scenes are reserved for special missions, event scenes, basement encounters, backdoor deliveries, or rare apocalyptic incidents. They are not the default gameplay camera.
-
-### Tag-1 Screen
-
-The first playable screen presents a small, normal-looking café. The goal is to make the player feel ownership and attachment before the absurd mythological/apocalyptic layer becomes explicit.
-
-The HUD should be minimal at first:
-
-- day and time
-- money
-- reputation
-- small task list
-- contextual action bar
-
-Initial direct actions:
-
-- take order
-- prepare simple drink
-- accept payment
-- clean table
-- buy basic ingredients
-- choose a simple daily offer
-
-The first day should feel like normal café management with one tiny anomaly at the end: the coffee machine briefly displays an impossible message after closing.
-
-Example event text:
-
-> The coffee machine briefly displays “Good morning.” It is 14:07.
-
-### Early Progression and Pacing
-
-Café Apokalypso should not develop too slowly. The first seven in-game days must each introduce at least one meaningful new element: a mechanic, guest behavior, management option, upgrade, staff option, advertising option, or narrative anomaly.
-
-Week 1 remains grounded in normal café management, but it should provide a clear sense of escalation by the end of day 7. The first explicit apocalyptic hook appears at the end of week 1 through an official letter registering the café as apocalyptically relevant caffeine infrastructure.
-
-Week 2 should escalate faster with visible weirdness, daily KASSANDRA forecasts, the first clearly strange guest interactions, the first small apocalyptic incident, and stronger delegation systems.
-
-### Week 1 Day Structure
-
-Day 1: New Opening
-
-- basic order flow
-- preparing coffee
-- accepting payment
-- cleaning tables
-- first coffee-machine flicker after closing
-
-Day 2: Regulars Begin to Form
-
-- guest behavior differences
-- patience, spending power, seat time, quality expectations
-- first harmless memory hint through Herr Bohn
-
-Day 3: Prices and Supplies
-
-- ingredient purchasing
-- price adjustment
-- daily offers
-- strange cash-register suggestion
-
-Day 4: Advertising
-
-- flyers in the neighborhood
-- student discount
-- social media post
-- first appearance of Herr Grau
-
-Day 5: First Temporary Help
-
-- Jana, Nino, or Mira can help for one day
-- first delegation mechanic
-- strange wet-table event if Jana works
-
-Day 6: KASSANDRA
-
-- cash register update
-- basic demand prediction
-- automatic audience targeting
-- first mortality analysis
-
-Day 7: The Letter
-
-- slightly busier café day
-- Frau mit rotem Regenschirm
-- official letter from the Office for Extraordinary Operational Relevance
-- weirdness becomes visible
-- apocalypse operations are foreshadowed
-
-### Week 1 Guests
-
-Normal week-one guests:
-
-- Pendlerin Paula: quick coffee customer, wants to survive Monday.
-- Laptop-Lukas: spends little, sits for a long time, blocks tables.
-- Lieferfahrer Cem: impatient, low spend, easy to serve quickly.
-- Cappuccino-Christa: pays better, has high quality expectations.
-- Herr Bohn: older regular with strange memories of the building.
-- Freelancerin Mira: dry humor, sees the café as “authentic,” not necessarily as a compliment.
-
-Subtly strange week-one guests:
-
-- Herr Grau: polite, quiet, pays with a coin that does not fit any accounting category.
-- Frau mit rotem Regenschirm: appears with a red umbrella although it is not raining and asks not to be recognized.
-
-### KASSANDRA
-
-KASSANDRA starts as a normal-looking cash register system update.
-
-It should not immediately behave like a full oracle. Its early humor comes from dry confidence, strange classifications, and increasingly inappropriate business analytics.
-
-Early KASSANDRA tone:
-
-- calm
-- analytical
-- slightly wrong
-- oddly specific
-- not openly magical at first
-
-Example line:
-
-> Good morning. I have analyzed your customer base. Result: 96% mortal, 4% unclear.
-
-KASSANDRA later unlocks forecasts, automatic offer analysis, audience targeting, and apocalyptic warnings.
-
-### Management Progression
-
-The game develops from direct micromanagement to broader macromanagement.
-
-Early game:
-
-- take orders manually
-- prepare drinks manually
-- clean tables
-- buy supplies
-- set prices
-- run simple advertising
-
-Mid game:
-
-- temporary help
-- permanent staff
-- role assignment
-- partial automation
-- marketing control
-- more stable economy
-
-Late game:
-
-- multiple areas or locations
-- shift leads
-- expansion
-- supply chains
-- factions
-- apocalyptic incidents
-- delaying world-ending scenarios
-
-### Tone
-
-Café Apokalypso uses warm, dry, understated absurdity.
-
-The early game should feel like a normal café with tiny cracks in reality. The humor should come from contrast: serious café management language applied to increasingly impossible situations.
-
-Preferred tone:
-
-- calm
-- cozy
-- slightly bureaucratic
-- deadpan
-- observant
-- never random just for the sake of randomness
-
-Avoid:
-
-- loud meme language
-- excessive darkness
-- horror-first framing
-- overexplaining the mystery too early
-- making every line absurd from the beginning
-
-Example tone lines:
-
-> The café is authentic. I am not sure whether that is good.
-
-> The light is good. Slightly existential, but good.
-
-> Herr Grau gives a tip and a coin that smells faintly of cellar.
-
-### Official Week-1 Hook
-
-At the end of day 7, the player receives the first explicit apocalyptic hook:
-
-> Office for Extraordinary Operational Relevance  
-> Department: Caffeine, Threshold Sites, and Minor End Times  
->  
-> Dear management,  
->  
-> Your café has been mistakenly pre-registered as apocalyptically relevant caffeine infrastructure.  
->  
-> Please ignore this letter if you are fully mortal.  
->  
-> If you are not fully mortal, please refer to Appendix 7b:  
-> “Minimum supplies during imminent reality thinning.”  
->  
-> Kind regards,  
-> on behalf of: illegible
-
-After this letter, the hidden weirdness value becomes visible and apocalypse operations are foreshadowed, but the full apocalypse system is not yet active.
+- `npm run build` completes without errors.
+- `npm run test` passes.
+- `npm run typecheck` passes.
+- The deployed app loads on the configured static host (GitHub Pages target) without console errors.
+- The README "Play the Demo" link points to the live demo URL once deployed.
+- The README includes a screenshot or short gameplay GIF once a playable build exists.
+- No secrets, API keys, `.env` files, or local-only config files are committed.
+- The repository website field points to the playable demo URL.
+- `.DS_Store`, `node_modules/`, and build artifacts are excluded by `.gitignore`.
+- The app is distributed as a browser-playable static web app. No desktop app packaging is part of this release.
+
+## Out of Scope
+
+The following are explicitly out of scope for the MVP and demo release. Do not implement them.
+
+- Audio, sound effects, or ambient music (Phase 5)
+- Final production pixel-art assets (Phase 5)
+- Localization / i18n file migration (Phase 5)
+- Mobile-first or mobile-optimized layout (Phase 5)
+- Advanced animations or sprite-sheet animation system (Phase 1+)
+- Backend server, database, user accounts, authentication (never in MVP)
+- Real AI API integration (never in MVP; KASSANDRA is simulated only)
+- External analytics, telemetry, or tracking
+- Payment systems
+- Multiple café locations
+- Full apocalypse-management layer
+- Desktop app packaging (the demo target is browser-playable static web app only)

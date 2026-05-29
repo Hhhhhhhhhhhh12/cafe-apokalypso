@@ -123,6 +123,28 @@ Mira examples:
 
 > I posted a photo. It got 14 likes and one comment in a language Google says does not exist.
 
+### Meda
+
+Meda is a separate character from Mira. Do not merge them.
+
+Meda is the first clearer mythological hint in the demo. She evokes Medusa through visual details and atmosphere, not through explicit labeling.
+
+She should feel calm, still, and quietly unsettling. Her presence creates a small shift in the room without announcing itself.
+
+Visual notes: always wears sunglasses indoors, subtle snake-like hair silhouette, avoids direct eye contact with the player and other guests. Other guests nearby react with mild unease.
+
+Meda's tone: composed, polite, very careful about eye contact. Her lines should feel like entirely normal requests with a barely deniable edge.
+
+Meda examples:
+
+> An espresso. And — please, look at the counter when you bring it.
+
+> Thank you. No receipt. And no photos, please.
+
+> I prefer the corner seat. People look at me less from there.
+
+> Meda pays, nods slightly, and leaves. The guest at the next table forgot what they were saying.
+
 ### Herr Grau
 
 Herr Grau is the first subtly strange guest.

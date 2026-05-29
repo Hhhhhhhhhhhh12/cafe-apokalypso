@@ -16,7 +16,7 @@ Scope:
 - money, reputation, supplies, cleanliness, stress, hidden weirdness
 - simple day progression
 - first advertising options
-- first temporary staff option
+- temporary staff options: Jana (service/cleaning), Nino (barista), Mira (marketing/counter)
 - KASSANDRA update
 - first explicit apocalyptic hook at the end of day 7
 
@@ -215,7 +215,7 @@ Focus:
 - better onboarding
 - mobile/responsive layout
 - deployment polish
-- optional app packaging exploration
+- optional app packaging exploration (post-demo only; does not change the primary browser-playable static demo target)
 
 Possible additions:
 

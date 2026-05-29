@@ -42,6 +42,31 @@ KI-Tools werden genutzt für:
 
 KI-Outputs werden nicht ungeprüft als finale Assets übernommen.
 
+## Review Sheets und Freigabe
+
+Vor der Produktion finaler Spielassets werden visuelle Review-Sheets erstellt und geprüft.
+
+Review-Sheets dienen dazu, Stil, Tonalität, Perspektive, Lesbarkeit und Absurditätsgrad früh sichtbar zu machen. Sie sind keine finale Asset-Produktion, sondern ein Entscheidungswerkzeug.
+
+Pflicht-Review-Sheets:
+
+- Character Sheets für wichtige Gäste, Personal, mythologische Figuren, KI-Orakel und Behördenkontakte
+- Level-/Day-Sheets für die ersten 7 MVP-Tage
+- UI-Sheets für Hauptansicht, Panels, Popups und Tagesabschluss
+- Asset-Sheets für wiederkehrende Café-Objekte, Icons, Props und Event-Objekte
+- Weirdness-Escalation-Sheets für die visuelle Entwicklung von normal zu cozy-absurd zu apokalyptisch
+- Moodboard-Sheets mit akzeptierten und abgelehnten Stilrichtungen
+
+Ablauf:
+
+1. Textuelles Sheet erstellen.
+2. Grobe visuelle Referenz, Moodboard oder Stilvariante erzeugen.
+3. Review durch den User.
+4. Freigegebene Entscheidungen in den passenden Styleguide übernehmen.
+5. Erst danach finale Sprites, Icons oder UI-Grafiken produzieren.
+
+Finale Assets sollen nicht direkt aus losen Einzelprompts entstehen. Jede größere visuelle Richtung braucht vorher eine dokumentierte Freigabe.
+
 ### Pixel-Tools
 
 Für finale Pixelassets werden bevorzugt:

@@ -106,8 +106,27 @@ Recommended destinations:
 - `docs/TECH_ARCHITECTURE.md` for implementation constraints and structure
 - `docs/WORKFLOW.md` for agent use, handoff rules, and development process
 - `docs/ROADMAP.md` for future phases beyond MVP
+- `docs/ART_PIPELINE.md` and `docs/ART_STYLEGUIDE.md` for art process, visual direction, and approval rules
+- `docs/art/` for Character Sheets, Level-/Day-Sheets, UI Sheets, Asset Sheets, Moodboard Sheets, review logs, and visual approval notes
 
 Do not overwrite existing notes from other chats without review. Prefer additive updates and short summaries when merging.
+
+## Art Review and Approval Requirement
+
+Final visual assets should not be produced or committed before the relevant review sheet exists and has been reviewed by the user.
+
+This applies to:
+
+- major character designs
+- new café interior directions
+- major UI screens or visual systems
+- recurring props, icons, and object sets
+- visible changes to the weirdness or apocalypse escalation
+- moodboard-driven style decisions
+
+Review material belongs in `docs/art/`. Binding art-process rules belong in `docs/ART_PIPELINE.md` and `docs/ART_STYLEGUIDE.md`.
+
+Codex may implement placeholders, asset metadata, folder structure, and rendering components before final art exists. Codex should not introduce final artwork, a different main-view perspective, or canonical character designs without documented approval.
 
 ## Acceptance Criteria Requirement
 
@@ -183,12 +202,21 @@ Implementation priority:
 
 ## Agent Prompt Storage
 
-Major prompts used for Claude Code or Codex should be saved or summarized in documentation when they define project direction.
+The canonical source for reusable handoff prompts is `docs/PROMPTS.md`.
 
-Recommended location:
+Do not copy prompts directly from chat when handing them to Claude Code, Codex, or another tool. Use the prompts in `docs/PROMPTS.md` and update that file if a prompt needs to change.
 
-- `docs/WORKFLOW.md` for reusable process prompts
-- `docs/ROADMAP.md` for phase prompts
-- issue descriptions for implementation-specific prompts
+Phase-level notes and context belong in `docs/ROADMAP.md`. Implementation-specific detail belongs in GitHub issue descriptions.
 
-This helps keep the project understandable after chats are archived.
+## ClickUp Tracking Requirement
+
+Every actual prompt handoff to Claude Code, Codex, Antigravity, or another tool must be tracked in ClickUp.
+
+Track:
+- prompt ID (e.g. PROMPT-1, PROMPT-2)
+- tool used
+- related ClickUp task or GitHub issue
+- status (in progress / complete / blocked)
+- result link or placeholder
+
+A handoff that is not tracked in ClickUp is not considered officially handed off. This keeps the project auditable and prevents duplicate or contradictory work across tools.

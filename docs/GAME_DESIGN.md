@@ -131,6 +131,7 @@ Day 5: First Temporary Help
 - Jana, Nino, or Mira can help for one day
 - first delegation mechanic
 - strange wet-table event if Jana works
+- first possible appearance of Meda
 
 Day 6: KASSANDRA
 
@@ -162,6 +163,7 @@ Subtly strange week-one guests:
 
 - Herr Grau: polite, quiet, pays with a coin that does not fit any accounting category.
 - Frau mit rotem Regenschirm: appears with a red umbrella although it is not raining and asks not to be recognized.
+- Meda: appears calm and still, always wears sunglasses indoors, subtle snake-like hair silhouette, avoids direct eye contact. Other guests nearby become slightly uneasy without knowing why. She is the first clearer mythological hint in the demo. Meda is not Mira. Do not merge them.
 
 ### KASSANDRA
 
