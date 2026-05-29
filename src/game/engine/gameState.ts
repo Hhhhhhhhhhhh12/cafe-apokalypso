@@ -1,6 +1,12 @@
-import type { GameState, ResourceState, UnlockState } from "../types/game";
+import type { AchievementId, EventId, GuestId } from "../types/content";
+import type {
+  DayActionId,
+  GameState,
+  ResourceState,
+  UnlockState
+} from "../types/game";
 
-export const CURRENT_GAME_STATE_VERSION = 2;
+export const CURRENT_GAME_STATE_VERSION = 3;
 export const CURRENT_CONTENT_CATALOG_VERSION = "week-one-v1";
 
 const initialResources: ResourceState = {
@@ -32,6 +38,8 @@ export function createInitialGameState(): GameState {
     hiddenWeirdness: 1,
     weirdnessVisible: false,
     kassandraInstalled: false,
+    demoComplete: false,
+    completedActions: [],
     unlocks: { ...initialUnlocks },
     guestHistory: [],
     eventHistory: [],
@@ -51,14 +59,19 @@ export function isValidGameState(value: unknown): value is GameState {
   return (
     candidate.version === CURRENT_GAME_STATE_VERSION &&
     candidate.contentCatalogVersion === CURRENT_CONTENT_CATALOG_VERSION &&
-    candidate.day === 1 &&
+    typeof candidate.day === "number" &&
+    Number.isInteger(candidate.day) &&
+    candidate.day >= 1 &&
+    candidate.day <= 7 &&
     typeof candidate.phaseLabel === "string" &&
     typeof candidate.statusMessage === "string" &&
     typeof candidate.hiddenWeirdness === "number" &&
     typeof candidate.weirdnessVisible === "boolean" &&
     typeof candidate.kassandraInstalled === "boolean" &&
+    typeof candidate.demoComplete === "boolean" &&
     isValidResources(candidate.resources) &&
     isValidUnlocks(candidate.unlocks) &&
+    isStringArray(candidate.completedActions) &&
     isStringArray(candidate.guestHistory) &&
     isStringArray(candidate.eventHistory) &&
     isStringArray(candidate.unlockedAchievements)
@@ -104,4 +117,44 @@ function isValidUnlocks(value: unknown): value is UnlockState {
 
 function isStringArray(value: unknown): value is string[] {
   return Array.isArray(value) && value.every((entry) => typeof entry === "string");
+}
+
+export function addUniqueDayAction(
+  actions: readonly DayActionId[],
+  action: DayActionId
+): DayActionId[] {
+  return actions.includes(action) ? [...actions] : [...actions, action];
+}
+
+export function addUniqueGuestIds(
+  currentIds: readonly GuestId[],
+  idsToAdd: readonly GuestId[]
+): GuestId[] {
+  return addUniqueIds(currentIds, idsToAdd);
+}
+
+export function addUniqueEventIds(
+  currentIds: readonly EventId[],
+  idsToAdd: readonly EventId[]
+): EventId[] {
+  return addUniqueIds(currentIds, idsToAdd);
+}
+
+export function addUniqueAchievementIds(
+  currentIds: readonly AchievementId[],
+  idsToAdd: readonly AchievementId[]
+): AchievementId[] {
+  return addUniqueIds(currentIds, idsToAdd);
+}
+
+function addUniqueIds<T extends string>(currentIds: readonly T[], idsToAdd: readonly T[]): T[] {
+  const result = [...currentIds];
+
+  for (const id of idsToAdd) {
+    if (!result.includes(id)) {
+      result.push(id);
+    }
+  }
+
+  return result;
 }

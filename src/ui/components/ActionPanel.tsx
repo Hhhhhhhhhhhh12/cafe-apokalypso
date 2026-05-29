@@ -1,25 +1,32 @@
 import {
-  getWeekOneContentSummary,
-  kassandraMessages,
-  weekOneDays
-} from "../../game/data";
+  canCompleteCurrentDay,
+  getMissingRequiredActions
+} from "../../game/engine/selectors";
+import type { GameState } from "../../game/types/game";
 
 interface ActionPanelProps {
+  gameState: GameState;
   statusMessage: string;
-  onPrepareCounter: () => void;
+  onTakeOrder: () => void;
+  onPrepareDrink: () => void;
+  onCheckSupplies: () => void;
   onCleanTables: () => void;
+  onCompleteDay: () => void;
   onResetGame: () => void;
 }
 
 export function ActionPanel({
+  gameState,
   statusMessage,
-  onPrepareCounter,
+  onTakeOrder,
+  onPrepareDrink,
+  onCheckSupplies,
   onCleanTables,
+  onCompleteDay,
   onResetGame
 }: ActionPanelProps) {
-  const contentSummary = getWeekOneContentSummary();
-  const openingDay = weekOneDays[0];
-  const firstKassandraMessage = kassandraMessages[0];
+  const canCloseDay = canCompleteCurrentDay(gameState);
+  const missingActions = getMissingRequiredActions(gameState);
 
   return (
     <section className="panel action-panel" aria-labelledby="actions-title">
@@ -29,56 +36,52 @@ export function ActionPanel({
       </div>
 
       <div className="button-row">
-        <button type="button" onClick={onPrepareCounter}>
-          Prepare counter
+        <button type="button" onClick={onTakeOrder}>
+          Take order
+        </button>
+        <button type="button" onClick={onPrepareDrink}>
+          Prepare drink
         </button>
         <button type="button" onClick={onCleanTables}>
           Clean tables
+        </button>
+        <button type="button" onClick={onCheckSupplies}>
+          Check supplies
+        </button>
+        <button
+          type="button"
+          onClick={onCompleteDay}
+          disabled={!canCloseDay}
+          aria-describedby="close-day-requirements"
+        >
+          {gameState.day === 7 ? "Finish Day 7" : "Close day"}
         </button>
         <button type="button" className="secondary-button" onClick={onResetGame}>
           Reset / New Game
         </button>
       </div>
 
+      <p id="close-day-requirements" className="action-hint">
+        {gameState.demoComplete
+          ? "Demo complete. Reset to replay the seven-day loop."
+          : canCloseDay
+            ? "Core café tasks complete. The day can be closed."
+            : `Before closing: ${formatMissingActions(missingActions)}.`}
+      </p>
+
       <p className="status-message" role="status" aria-live="polite">
         {statusMessage}
       </p>
-
-      <section className="data-preview" aria-labelledby="data-preview-title">
-        <div>
-          <p className="eyebrow">Data model preview</p>
-          <h3 id="data-preview-title">Week-one content loaded</h3>
-        </div>
-
-        <dl className="data-summary-list">
-          <div>
-            <dt>Guests</dt>
-            <dd>
-              {contentSummary.normalGuests} normal /{" "}
-              {contentSummary.subtlyStrangeGuests} strange
-            </dd>
-          </div>
-          <div>
-            <dt>Products</dt>
-            <dd>{contentSummary.products}</dd>
-          </div>
-          <div>
-            <dt>Days</dt>
-            <dd>{contentSummary.days}</dd>
-          </div>
-          <div>
-            <dt>Scripted events</dt>
-            <dd>{contentSummary.scriptedEvents}</dd>
-          </div>
-        </dl>
-
-        <p className="data-preview__note">
-          Day 1 milestone: {openingDay.milestone}
-        </p>
-        <p className="data-preview__note">
-          KASSANDRA is static/simulated: {firstKassandraMessage.text}
-        </p>
-      </section>
     </section>
   );
+}
+
+function formatMissingActions(actions: readonly string[]): string {
+  const labels: Record<string, string> = {
+    take_order: "take an order",
+    prepare_drink: "prepare a drink",
+    clean_tables: "clean tables"
+  };
+
+  return actions.map((action) => labels[action] ?? action).join(", ");
 }

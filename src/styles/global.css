@@ -40,6 +40,13 @@ button:hover {
   background: #6c2826;
 }
 
+button:disabled {
+  border-color: #9d8b83;
+  background: #d4c4b8;
+  color: #5f514a;
+  cursor: not-allowed;
+}
+
 button:focus-visible {
   outline: 4px solid #16606c;
   outline-offset: 3px;
@@ -302,6 +309,13 @@ h3 {
   font-weight: 650;
 }
 
+.action-hint {
+  margin: 0;
+  color: #4a3b34;
+  font-size: 0.92rem;
+  font-weight: 650;
+}
+
 .data-preview {
   display: grid;
   gap: 12px;
@@ -343,9 +357,83 @@ h3 {
   font-size: 0.9rem;
 }
 
+.day-progress-panel {
+  grid-column: 1 / -1;
+}
+
+.day-milestone {
+  max-width: 820px;
+  margin: 0 0 18px;
+  color: #4a3b34;
+  font-weight: 650;
+}
+
+.data-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.data-card {
+  border: 1px solid #d5bda5;
+  border-radius: 8px;
+  padding: 0.8rem;
+  background: #fbeddc;
+}
+
+.data-card ul,
+.inline-callout ul {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0.7rem 0 0;
+  padding-left: 1.1rem;
+}
+
+.data-card li,
+.inline-callout li {
+  color: #3d2a23;
+}
+
+.inline-callout,
+.letter-panel {
+  margin-top: 16px;
+  border: 1px solid #c2aaa0;
+  border-radius: 8px;
+  padding: 0.9rem;
+  background: #eef3e7;
+}
+
+.placeholder-kassandra-ui {
+  background: #edf6f7;
+}
+
+.letter-panel {
+  background: #f4efe7;
+}
+
+.inline-callout p,
+.letter-panel p {
+  margin: 0.7rem 0 0;
+}
+
+.letter-panel pre {
+  overflow-x: auto;
+  white-space: pre-wrap;
+  border: 1px solid #d5bda5;
+  border-radius: 8px;
+  padding: 0.85rem;
+  background: #fff8ed;
+  color: #2b201b;
+  font: inherit;
+}
+
 @media (max-width: 1024px) {
   .workspace-grid {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .data-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .cafe-panel {
@@ -362,6 +450,10 @@ h3 {
 
   .hero-bar,
   .workspace-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .data-grid {
     grid-template-columns: 1fr;
   }
 

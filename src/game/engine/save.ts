@@ -1,8 +1,8 @@
 import { createInitialGameState, isValidGameState } from "./gameState";
 import type { GameState } from "../types/game";
 
-export const SAVE_KEY = "cafe-apokalypso.save.v2";
-const LEGACY_SAVE_KEYS = ["cafe-apokalypso.save.v1"];
+export const SAVE_KEY = "cafe-apokalypso.save.v3";
+const LEGACY_SAVE_KEYS = ["cafe-apokalypso.save.v1", "cafe-apokalypso.save.v2"];
 
 export type StorageLike = Pick<Storage, "getItem" | "setItem" | "removeItem">;
 

@@ -7,6 +7,7 @@ import {
   type StorageLike
 } from "../src/game/engine/save";
 import { createInitialGameState } from "../src/game/engine/gameState";
+import { gameReducer } from "../src/game/engine/reducer";
 
 function createMemoryStorage(initialValue?: string): StorageLike {
   const values = new Map<string, string>();
@@ -41,7 +42,7 @@ describe("save safety", () => {
 
   it("falls back to a new game when save data uses an unsupported schema", () => {
     const outdatedSave = JSON.stringify({
-      version: 1,
+      version: 2,
       day: 1,
       phaseLabel: "Opening setup",
       resources: {
@@ -57,6 +58,16 @@ describe("save safety", () => {
       hiddenWeirdness: 1,
       weirdnessVisible: false,
       kassandraInstalled: false,
+      unlocks: {
+        pricing: false,
+        advertising: false,
+        staff: false,
+        kassandra: false,
+        apocalypseOperations: false
+      },
+      guestHistory: [],
+      eventHistory: [],
+      unlockedAchievements: [],
       statusMessage: "Old shell save"
     });
 
@@ -74,5 +85,21 @@ describe("save safety", () => {
 
     resetSavedGameState(storage);
     expect(loadGameState(storage)).toEqual(createInitialGameState());
+  });
+
+  it("preserves valid progress through reload-style save/load", () => {
+    const storage = createMemoryStorage();
+    let state = createInitialGameState();
+
+    state = gameReducer(state, { type: "take_order" });
+    state = gameReducer(state, { type: "prepare_drink" });
+    state = gameReducer(state, { type: "clean_tables" });
+    state = gameReducer(state, { type: "complete_day" });
+
+    expect(state.day).toBe(2);
+
+    saveGameState(state, storage);
+
+    expect(loadGameState(storage)).toEqual(state);
   });
 });
