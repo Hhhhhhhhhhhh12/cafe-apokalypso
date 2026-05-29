@@ -61,7 +61,17 @@ The ideal reaction is:
 
 ### Mira
 
-Mira is an early memorable character. She should bring witty, slightly strange dialogue and become one of the first hints that the café world is not entirely normal.
+Mira is an early memorable recurring guest / freelancer-style regular and tone anchor.
+
+She should feel mostly normal at first: witty, observant and slightly strange, but not obviously mythological. Mira helps establish the café's early everyday rhythm and dry humor.
+
+### Meda
+
+Meda is a separate early strange character who visually evokes Medusa.
+
+She should be one of the first clearer mythological hints, but still carefully dosed for the demo. She may wear sunglasses, avoid direct eye contact, have subtle snake-like hair silhouettes or create small unsettling effects around other guests.
+
+Meda is not Mira. Do not merge them.
 
 ### KASSANDRA
 
@@ -107,7 +117,31 @@ The preferred hosted demo target is GitHub Pages:
 
 https://hhhhhhhhhhhh12.github.io/cafe-apokalypso/
 
+## Art and image tooling
+
+Image tools may be used for art direction, moodboards, concept images, visual reference sheets and early UI experiments.
+
+Allowed art-direction tools include:
+- OpenAI ImageGen
+- Nano Banana / Gemini image tools
+- Google AI Studio for image experiments if useful
+- Figma, Excalidraw, GoodNotes, Aseprite or similar non-coding visual tools
+
+These tools are not coding agents and should not write directly to the repository.
+
+Antigravity may be evaluated later as a coding/review tool, but it is not part of the art pipeline and does not replace image-generation tools.
+
+Generated images are not final production assets by default. They must be reviewed, curated and documented before becoming part of the game or repository.
+
 ## Agent workflow
+
+All agents must read this file first before making changes.
+
+Handoff prompts should not be copied directly from chat when they are actually used.
+
+The canonical source for reusable handoff prompts is `docs/PROMPTS.md`.
+
+Every prompt that is actually handed to Claude Code, Codex or another tool must be tracked in ClickUp.
 
 ### Claude Code
 
@@ -131,6 +165,19 @@ Use Codex for:
 - PR-style review
 
 Do not give Codex broad “build the whole game” prompts.
+
+## Decision Making
+
+Any change that may cause significant rework must be approved by the user before implementation.
+
+Examples:
+- changing game scope
+- changing view direction
+- changing tech stack
+- changing progression structure
+- changing core gameplay loops
+
+When in doubt, ask first.
 
 ## First implementation order
 
@@ -159,15 +206,28 @@ Do not give Codex broad “build the whole game” prompts.
 - deep balancing
 - production asset pipeline
 
+## Source of truth
+
+This file is the first source of truth for the project.
+
+Repository Markdown files are canonical. Historical chat exports, old prompt drafts and external notes are reference material only.
+
+
+If historical notes conflict with `docs/PROJECT_CANON.md`, `docs/PROJECT_CANON.md` wins unless the user explicitly decides otherwise.
+
+Downstream design documents must mirror this canon. In particular, `docs/GAME_DESIGN.md`, `docs/CONTENT_GUIDE.md` and `docs/MVP_SCOPE.md` should stay aligned with the current target, core characters, view direction, technical constraints and handoff workflow.
+
 ## Rule for future handoffs
 
-Any agent prompt should include:
-
+Any agent prompt in `docs/PROMPTS.md` should include:
 - goal
 - context files
 - allowed changes
 - forbidden changes
 - acceptance criteria
 - verification commands
+- ClickUp tracking note / prompt handoff status
+
+ClickUp should show which prompt was handed over, to which tool, for which issue/task, and with what status.
 
 If a decision would cause broad rework, ask the user first.

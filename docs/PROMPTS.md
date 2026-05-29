@@ -4,6 +4,73 @@ Reusable prompts for Café Apokalypso handoffs.
 
 These prompts are intentionally scoped. Do not ask an agent to “build the game” without clear context, allowed changes, forbidden changes, and acceptance criteria.
 
+## Prompt 1: Claude Code Consistency Check Only
+
+Use this first when we want Claude Code to inspect, not edit.
+
+```txt
+You are working in the GitHub repository `cafe-apokalypso`.
+
+Read docs/PROJECT_CANON.md first.
+
+Then read all Markdown documentation:
+- README.md
+- docs/*.md
+
+Do not edit files.
+
+Task:
+Perform a consistency check across the documentation.
+
+Check for:
+- contradictions between README and docs
+- contradictions between MVP scope and roadmap
+- unclear or duplicated decisions
+- missing acceptance criteria for the first implementation tasks
+- missing references to docs/QUALITY_CHECKLIST.md in implementation prompts
+- places where the game direction may have become too broad
+- anything that could cause Claude Code or Codex to overbuild
+- accessibility, save-safety, security, smoke-test, responsive-layout, or demo-release gaps
+- anything that could cause Codex to ignore documented quality gates
+- whether docs/PROJECT_CANON.md is treated as the first source of truth in all handoff guidance
+- whether docs/PROMPTS.md is treated as the canonical source for reusable handoff prompts
+- whether ClickUp tracking is required for every prompt actually handed to Claude Code, Codex, or another tool
+- whether Mira and Meda are consistently represented as separate characters
+- whether Mira stays mostly normal and acts as an early tone anchor
+- whether Meda carries the first clearer Medusa-like mythological hint
+- whether image tools such as OpenAI ImageGen, Nano Banana / Gemini image tools, and Google AI Studio are clearly treated as art-direction tools, not coding agents
+- whether Antigravity is treated only as a possible later coding/review tool, not as an art pipeline replacement
+
+Important fixed decisions:
+- Web app first
+- browser-playable static demo first, not downloadable desktop app
+- Vite + React + TypeScript
+- no backend in MVP
+- no accounts in MVP
+- no real AI API in MVP
+- localStorage save only
+- main gameplay view is a small 3/4 pixel café diorama
+- side view only for special scenes
+- first MVP covers seven in-game days
+- current target is a playable seven-day vertical slice demo for portfolio/application review, not the full game and not a final production MVP
+- handoff prompts used in practice should come from docs/PROMPTS.md, not directly from chat
+- actual prompt handoffs must be tracked in ClickUp
+- Mira and Meda are separate characters
+- Mira is mostly normal and works as an early recurring guest / tone anchor
+- Meda visually evokes Medusa and carries the first clearer mythological hint
+
+Verification:
+- No code commands required.
+- Report whether documentation-only checks were performed.
+
+Output:
+1. Summary of consistency status.
+2. List of contradictions or risks.
+3. Suggested doc edits, but do not apply them.
+4. A short ClickUp handoff tracking recommendation for this prompt, including prompt ID, tool, related issue/task, status, and result link placeholder.
+5. Suggested next implementation task for Codex.
+```
+
 ## Prompt 2: Claude Code Documentation and Architecture Readiness Pass
 
 Use this after Prompt 1 if we want Claude Code to apply documentation-readiness edits and optionally create implementation planning docs.
@@ -48,6 +115,9 @@ Goals:
 7. Treat `docs/QUALITY_CHECKLIST.md` as binding for implementation planning and quality gates.
 8. Do not implement the actual app yet unless explicitly required.
 9. Do not add a backend, real AI API, auth, analytics, payments, or external asset dependencies.
+10. Preserve docs/PROMPTS.md as the canonical source for reusable handoff prompts.
+11. Preserve ClickUp tracking requirements for actual prompt handoffs.
+12. Preserve the split between Mira and Meda.
 
 Allowed changes:
 - README.md
@@ -64,6 +134,9 @@ Do not change:
 - cozy-but-absurd tone
 - repository/demo distribution decision: browser-playable static WebApp first, not downloadable desktop app
 - art direction or main visual style without user approval
+- docs/PROMPTS.md as canonical handoff-prompt source
+- ClickUp prompt handoff tracking requirement
+- Mira/Meda as separate characters
 
 Acceptance criteria:
 - Docs clearly explain what should be built first.
@@ -76,60 +149,16 @@ Acceptance criteria:
 - The repo remains build-code-free unless explicitly needed.
 - Any proposed significant decision is clearly marked as needing user approval.
 
+Verification:
+- No code commands required.
+- Report whether documentation-only checks were performed.
+
 After changes:
 - Show a concise summary of what changed.
 - List files changed.
 - List open questions.
 - Suggest the next best Codex task.
-```
-
-## Prompt 1: Claude Code Consistency Check Only
-
-Use this first when we want Claude Code to inspect, not edit.
-
-```txt
-You are working in the GitHub repository `cafe-apokalypso`.
-
-Read docs/PROJECT_CANON.md first.
-
-Then read all Markdown documentation:
-- README.md
-- docs/*.md
-
-Do not edit files.
-
-Task:
-Perform a consistency check across the documentation.
-
-Check for:
-- contradictions between README and docs
-- contradictions between MVP scope and roadmap
-- unclear or duplicated decisions
-- missing acceptance criteria for the first implementation tasks
-- missing references to docs/QUALITY_CHECKLIST.md in implementation prompts
-- places where the game direction may have become too broad
-- anything that could cause Claude Code or Codex to overbuild
-- accessibility, save-safety, security, smoke-test, responsive-layout, or demo-release gaps
-- anything that could cause Codex to ignore documented quality gates
-
-Important fixed decisions:
-- Web app first
-- browser-playable static demo first, not downloadable desktop app
-- Vite + React + TypeScript
-- no backend in MVP
-- no accounts in MVP
-- no real AI API in MVP
-- localStorage save only
-- main gameplay view is a small 3/4 pixel café diorama
-- side view only for special scenes
-- first MVP covers seven in-game days
-- early progression should not feel too slow
-
-Output:
-1. Summary of consistency status.
-2. List of contradictions or risks.
-3. Suggested doc edits, but do not apply them.
-4. Suggested next implementation task for Codex.
+- Provide the ClickUp handoff status update: prompt ID, tool, related task, status, and result link placeholder.
 ```
 
 ## Prompt 3: Codex Initial App Shell
@@ -226,11 +255,17 @@ Acceptance criteria:
 - no critical information is conveyed only through color
 - localStorage usage, if introduced, handles missing or invalid save data without crashing
 
+Verification:
+- npm run build
+- npm run test
+- npm run typecheck
+
 After finishing:
 - Summarize changed files.
 - Explain how to run locally.
 - Explain the next recommended issue.
 - Note any checks that could not be run.
+- Provide the ClickUp handoff status update: prompt ID, tool, related task, status, and result link placeholder.
 ```
 
 ## Prompt 4: Codex Week-One Data Model
@@ -284,10 +319,16 @@ Acceptance criteria:
 - no UI redesign is included
 - no new game direction is invented
 
+Verification:
+- npm run build
+- npm run test
+- npm run typecheck
+
 After finishing:
 - Summarize changed files.
 - Explain any assumptions.
 - Suggest the next implementation task.
+- Provide the ClickUp handoff status update: prompt ID, tool, related task, status, and result link placeholder.
 ```
 
 ## Prompt 5: Codex Deterministic Day Loop
@@ -303,10 +344,10 @@ Then read:
 - docs/MVP_SCOPE.md
 - docs/GAME_DESIGN.md
 - docs/TECH_ARCHITECTURE.md
-- docs/QUALITY_CHECKLIST.md if it exists
+- docs/QUALITY_CHECKLIST.md
 - existing `src/game/` files
 - existing tests
-- docs/ART_STYLEGUIDE.md if it exists
+- docs/ART_STYLEGUIDE.md
 
 Task:
 Implement a small deterministic day loop for the week-one MVP.
@@ -341,15 +382,21 @@ Acceptance criteria:
 - the app remains playable after browser reload if persistence is implemented
 - build/typecheck/test pass
 
+Verification:
+- npm run build
+- npm run test
+- npm run typecheck
+
 After finishing:
 - Summarize changed files.
 - Explain how the day loop works.
 - Suggest the next implementation task.
+- Provide the ClickUp handoff status update: prompt ID, tool, related task, status, and result link placeholder.
 ```
 
 ## Prompt 6: ClickUp Task Creation Outline
 
-Use only if project-management tracking is desired. ClickUp is optional and should not be introduced before it clearly helps.
+Use only if ClickUp setup or task-list creation is needed. ClickUp prompt handoff tracking is required for actual handoffs, but creating a full task list is optional and should only be introduced when it clearly helps.
 
 ```txt
 Create a ClickUp task list for Café Apokalypso MVP development.
@@ -411,10 +458,35 @@ Default order:
 1. Prompt 1: Claude Code Consistency Check Only
 2. User reviews Claude Code findings with ChatGPT
 3. Prompt 2: Claude Code Documentation and Architecture Readiness Pass, only if edits or planning docs are approved
-4. Prompt 3: Codex Initial App Shell, only after the documentation/readiness result is accepted
+4. Prompt 3: Codex Initial App Shell
 5. Prompt 4: Codex Week-One Data Model
 6. Prompt 5: Codex Deterministic Day Loop
 
 This order is intended to avoid wasting Claude/Codex tokens on reversible broad edits before the user has approved the direction.
 
 ## Local Pre-Handoff Checklist
+
+Before handing any prompt to Claude Code, Codex or another tool:
+
+- [ ] Confirm the prompt is copied from `docs/PROMPTS.md`, not directly from chat.
+- [ ] Confirm the relevant ClickUp task exists.
+- [ ] Add or update the ClickUp prompt handoff entry.
+- [ ] Record prompt ID, target tool, related GitHub issue/task, status and result link placeholder.
+- [ ] Check `git status` before handing off.
+- [ ] Confirm whether the prompt is inspection-only or edit/implementation-authorized.
+- [ ] Confirm broad rework decisions have user approval.
+
+## Decision Gate Rule
+
+Before using Claude Code, Codex, ClickUp, Antigravity, or another tool for broad changes, ask for user approval when any of the following is involved:
+
+- major architecture change
+- new gameplay system
+- change to MVP scope
+- change to main view or art direction
+- change to tone or character voice
+- change to deployment/distribution target
+- large rewrite of documentation
+- broad code generation task
+- new tool or dependency
+- anything likely to require rollback if wrong
