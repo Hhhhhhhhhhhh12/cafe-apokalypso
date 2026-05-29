@@ -39,6 +39,32 @@ describe("save safety", () => {
     expect(state).toEqual(createInitialGameState());
   });
 
+  it("falls back to a new game when save data uses an unsupported schema", () => {
+    const outdatedSave = JSON.stringify({
+      version: 1,
+      day: 1,
+      phaseLabel: "Opening setup",
+      resources: {
+        money: 42,
+        coffee: 12,
+        milk: 8,
+        pastries: 6,
+        reputation: 1,
+        cleanliness: 82,
+        stress: 6,
+        mood: "calm"
+      },
+      hiddenWeirdness: 1,
+      weirdnessVisible: false,
+      kassandraInstalled: false,
+      statusMessage: "Old shell save"
+    });
+
+    const state = loadGameState(createMemoryStorage(outdatedSave));
+
+    expect(state).toEqual(createInitialGameState());
+  });
+
   it("can save and reset the current shell state", () => {
     const storage = createMemoryStorage();
     const state = createInitialGameState();

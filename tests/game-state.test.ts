@@ -6,9 +6,21 @@ describe("initial game state", () => {
   it("starts as a serializable day-one placeholder shell", () => {
     const state = createInitialGameState();
 
+    expect(state.version).toBe(2);
+    expect(state.contentCatalogVersion).toBe("week-one-v1");
     expect(state.day).toBe(1);
     expect(state.weirdnessVisible).toBe(false);
     expect(state.kassandraInstalled).toBe(false);
+    expect(state.unlocks).toEqual({
+      pricing: false,
+      advertising: false,
+      staff: false,
+      kassandra: false,
+      apocalypseOperations: false
+    });
+    expect(state.guestHistory).toEqual([]);
+    expect(state.eventHistory).toEqual([]);
+    expect(state.unlockedAchievements).toEqual([]);
     expect(state.resources.money).toBe(42);
     expect(() => JSON.stringify(state)).not.toThrow();
   });

@@ -78,7 +78,8 @@ button:focus-visible {
 }
 
 h1,
-h2 {
+h2,
+h3 {
   margin: 0;
   letter-spacing: 0;
   line-height: 1.1;
@@ -93,6 +94,11 @@ h1 {
 h2 {
   color: #35241e;
   font-size: 1.2rem;
+}
+
+h3 {
+  color: #35241e;
+  font-size: 1rem;
 }
 
 .intro {
@@ -294,6 +300,47 @@ h2 {
   background: #eef3e7;
   color: #273a2d;
   font-weight: 650;
+}
+
+.data-preview {
+  display: grid;
+  gap: 12px;
+  border-top: 2px solid #d5bda5;
+  padding-top: 16px;
+}
+
+.data-summary-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.data-summary-list div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid #d5bda5;
+  border-radius: 8px;
+  padding: 0.45rem 0.6rem;
+  background: #fbeddc;
+}
+
+.data-summary-list dt {
+  color: #4b3a32;
+  font-weight: 700;
+}
+
+.data-summary-list dd {
+  margin: 0;
+  color: #1f555f;
+  font-weight: 800;
+  text-align: right;
+}
+
+.data-preview__note {
+  margin: 0;
+  color: #4a3b34;
+  font-size: 0.9rem;
 }
 
 @media (max-width: 1024px) {

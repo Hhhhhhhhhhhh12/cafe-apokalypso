@@ -1,4 +1,8 @@
-export type GameStateVersion = 1;
+import type { AchievementId, EventId, GuestId } from "./content";
+
+export type GameStateVersion = 2;
+
+export type ContentCatalogVersion = "week-one-v1";
 
 export type MoodLevel = "calm" | "busy" | "strained";
 
@@ -13,14 +17,27 @@ export interface ResourceState {
   mood: MoodLevel;
 }
 
+export interface UnlockState {
+  pricing: boolean;
+  advertising: boolean;
+  staff: boolean;
+  kassandra: boolean;
+  apocalypseOperations: boolean;
+}
+
 export interface GameState {
   version: GameStateVersion;
+  contentCatalogVersion: ContentCatalogVersion;
   day: number;
   phaseLabel: string;
   resources: ResourceState;
   hiddenWeirdness: number;
   weirdnessVisible: boolean;
   kassandraInstalled: boolean;
+  unlocks: UnlockState;
+  guestHistory: GuestId[];
+  eventHistory: EventId[];
+  unlockedAchievements: AchievementId[];
   statusMessage: string;
 }
 
