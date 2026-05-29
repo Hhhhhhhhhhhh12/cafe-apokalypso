@@ -25,6 +25,42 @@ Die finale Spielgrafik soll konsistent, wiederverwendbar und technisch sauber se
 - Anfang: scheinbar normales kleines Café
 - Progression: zunehmende mythische, bürokratische und apokalyptische Störungen
 
+## Explorative Moodboards und externe Arbeitsdateien
+
+Explorative Moodboards, Google-AI-Studio-/Gemini-Tests, Prompt-Experimente und rohe Bildvarianten werden nicht direkt im Code-Repository versioniert.
+
+Sie liegen außerhalb des Repos im lokalen/iCloud-Arbeitsbereich:
+
+```text
+/Users/Heineken/Library/Mobile Documents/com~apple~CloudDocs/Claude/Moodboards Apokalypso
+```
+
+Dieser Ordner ist ein Arbeits- und Experimentierraum, aber keine kanonische Quelle für Implementierung, Assets oder Codex-Aufgaben.
+
+Für das Repository gilt:
+
+- Rohbilder, Varianten, verworfene Richtungen und große generierte Bilddateien bleiben außerhalb des Repos.
+- Externe Moodboards dürfen die Art Direction inspirieren, sind aber nicht automatisch verbindlich.
+- Eine visuelle Entscheidung wird erst verbindlich, wenn sie als kurze, geprüfte Zusammenfassung in `docs/ART_STYLEGUIDE.md`, `docs/ART_PIPELINE.md` oder einer freigegebenen Datei unter `docs/art/` dokumentiert ist.
+- Generierte Bilder werden nur committed, wenn sie ausdrücklich als freigegebene Referenz oder finales Produktionsasset bestätigt wurden.
+- Codex, Claude Code und andere Coding-Tools dürfen externe Moodboard-Dateien nicht als finale Assets interpretieren.
+- Für Implementierungsaufgaben sollen nur die kuratierten Repo-Dokumente als Quelle verwendet werden.
+
+Zulässig im Repo sind kurze Entscheidungsdokumente, zum Beispiel:
+
+- genehmigte Art-Direction-Zusammenfassungen
+- finale Styleguide-Entscheidungen
+- knappe Verweise auf externe Moodboard-Sammlungen
+- Review-Logs zu akzeptierten oder abgelehnten visuellen Richtungen
+
+Nicht im Repo versioniert werden sollen:
+
+- rohe Google-AI-Studio-/Gemini-Exports
+- große Bildserien
+- ungeprüfte Prompt-Historien
+- Variantenordner aus Experimenten
+- generierte Bilder ohne explizite Freigabe
+
 ## Tool-Rollen
 
 ### KI-Tools
