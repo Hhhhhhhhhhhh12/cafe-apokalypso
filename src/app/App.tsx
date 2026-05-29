@@ -9,6 +9,7 @@ import {
 } from "../game/engine/save";
 import { ActionPanel } from "../ui/components/ActionPanel";
 import { CafePlaceholder } from "../ui/cafe/CafePlaceholder";
+import { DayProgressPanel } from "../ui/panels/DayProgressPanel";
 import { ResourceHud } from "../ui/panels/ResourceHud";
 
 export function App() {
@@ -54,11 +55,16 @@ export function App() {
         <ResourceHud resources={gameState.resources} />
         <CafePlaceholder />
         <ActionPanel
+          gameState={gameState}
           statusMessage={gameState.statusMessage}
-          onPrepareCounter={() => dispatch({ type: "prepare_counter" })}
+          onTakeOrder={() => dispatch({ type: "take_order" })}
+          onPrepareDrink={() => dispatch({ type: "prepare_drink" })}
+          onCheckSupplies={() => dispatch({ type: "check_supplies" })}
           onCleanTables={() => dispatch({ type: "clean_tables" })}
+          onCompleteDay={() => dispatch({ type: "complete_day" })}
           onResetGame={handleReset}
         />
+        <DayProgressPanel gameState={gameState} />
       </section>
     </main>
   );

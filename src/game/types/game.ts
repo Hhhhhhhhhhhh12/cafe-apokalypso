@@ -1,10 +1,17 @@
 import type { AchievementId, EventId, GuestId } from "./content";
+import type { DayNumber } from "./content";
 
-export type GameStateVersion = 2;
+export type GameStateVersion = 3;
 
 export type ContentCatalogVersion = "week-one-v1";
 
 export type MoodLevel = "calm" | "busy" | "strained";
+
+export type DayActionId =
+  | "take_order"
+  | "prepare_drink"
+  | "clean_tables"
+  | "check_supplies";
 
 export interface ResourceState {
   money: number;
@@ -28,12 +35,14 @@ export interface UnlockState {
 export interface GameState {
   version: GameStateVersion;
   contentCatalogVersion: ContentCatalogVersion;
-  day: number;
+  day: DayNumber;
   phaseLabel: string;
   resources: ResourceState;
   hiddenWeirdness: number;
   weirdnessVisible: boolean;
   kassandraInstalled: boolean;
+  demoComplete: boolean;
+  completedActions: DayActionId[];
   unlocks: UnlockState;
   guestHistory: GuestId[];
   eventHistory: EventId[];
@@ -42,6 +51,10 @@ export interface GameState {
 }
 
 export type GameAction =
+  | { type: "take_order" }
+  | { type: "prepare_drink" }
   | { type: "prepare_counter" }
+  | { type: "check_supplies" }
   | { type: "clean_tables" }
+  | { type: "complete_day" }
   | { type: "reset_game" };
