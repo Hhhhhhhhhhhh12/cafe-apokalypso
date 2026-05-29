@@ -111,6 +111,27 @@ Recommended destinations:
 
 Do not overwrite existing notes from other chats without review. Prefer additive updates and short summaries when merging.
 
+
+## Visual Exploration Workflow
+
+Visual exploration with Gemini, Google AI Studio, Nano Banana, image prompts, generated references, and moodboard Markdown files is handled separately from implementation work.
+
+Rules:
+
+- Visual exploration belongs on dedicated `art/*` branches whenever possible.
+- Moodboard Markdown commits must not be mixed with gameplay, UI, engine, test, or build-system commits.
+- Generated images, prompt notes, and tool comparisons are reference material, not canonical game assets.
+- A visual decision becomes binding only when it is transferred into `docs/ART_STYLEGUIDE.md`, `docs/ART_PIPELINE.md`, or another relevant canonical document.
+- Codex implementation prompts must treat moodboards as reference material only, not as direct implementation instructions.
+- Claude Code may summarize moodboards and propose canonical art-rule updates, but must mark them as proposals until the user approves them.
+- Codex must not convert Gemini, Google AI Studio, or Nano Banana outputs into final assets.
+
+Recommended visual exploration branches:
+
+- `art/moodboard-cafe-interior-001`
+- `art/day1-day7-visual-progression`
+- `art/google-ai-studio-gemini-references`
+
 ## Art Review and Approval Requirement
 
 Final visual assets should not be produced or committed before the relevant review sheet exists and has been reviewed by the user.

@@ -61,6 +61,40 @@ Nicht im Repo versioniert werden sollen:
 - Variantenordner aus Experimenten
 - generierte Bilder ohne explizite Freigabe
 
+
+## Moodboards and external AI image tools
+
+Gemini, Google AI Studio, Nano Banana and similar tools may be used for visual exploration, reference generation, style comparison, prompt testing and moodboard work.
+
+Their outputs are not production assets by default.
+
+Moodboard Markdown files may document:
+
+- tested tools
+- prompts
+- reference images
+- review notes
+- preferred visual direction
+- rejected visual directions
+- next art tests
+
+Moodboard Markdown files must not be treated as canonical implementation instructions. They become binding only when their conclusions are explicitly transferred into `docs/ART_STYLEGUIDE.md`, `docs/ART_PIPELINE.md`, or another canonical project document.
+
+Commit discipline:
+
+- Keep moodboard/reference commits separate from code commits.
+- Keep generated-image references separate from gameplay implementation.
+- Do not let Codex mix visual-reference Markdown changes with app-shell, engine, data-model, UI, test or build-system changes.
+- If a visual reference affects implementation, first summarize the approved rule in the canonical docs, then implement it in a separate code commit.
+- Store raw generated image batches, broad prompt histories and large visual experiments outside the code repository unless explicitly approved.
+
+Codex and Claude Code rules:
+
+- Claude Code may summarize moodboards and propose canonical art-rule updates.
+- Codex may use approved canonical art rules for layout and placeholder implementation.
+- Codex must not treat raw Gemini, Google AI Studio or Nano Banana outputs as final assets.
+- Codex must not generate, import, or commit final art assets without explicit approval.
+
 ## Tool-Rollen
 
 ### KI-Tools
