@@ -48,11 +48,15 @@ describe("café diorama view", () => {
     expect(markup).toContain("cafe-weirdness-hint");
   });
 
-  it("uses CSS shapes instead of final image assets", () => {
+  it("renders provisional pilot assets while preserving CSS fallbacks", () => {
     const markup = renderCafe();
 
-    expect(markup).not.toMatch(/<(img|picture|source|svg|canvas)\b/);
-    expect(markup).not.toMatch(/\.(png|jpe?g|gif|webp|avif|svg)/);
+    expect(markup).toContain("placeholder-cafe-coffee-machine.png");
+    expect(markup).toContain("placeholder-kassandra-register.png");
+    expect(markup).toContain("placeholder-guest-paula.png");
+    expect(markup).toContain("cafe-coffee-machine");
+    expect(markup).toContain("cafe-register");
+    expect(markup).toContain("placeholder-guest-normal-01");
   });
 
   it("does not show debug or placeholder wording as player-facing text", () => {

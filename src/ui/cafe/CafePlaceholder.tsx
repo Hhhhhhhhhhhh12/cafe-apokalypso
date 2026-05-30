@@ -1,4 +1,7 @@
 import type { GameState } from "../../game/types/game";
+import coffeeMachineAsset from "../../../assets/sprites/props/placeholder-cafe-coffee-machine.png";
+import kassandraRegisterAsset from "../../../assets/sprites/props/placeholder-kassandra-register.png";
+import paulaGuestAsset from "../../../assets/sprites/guests/placeholder-guest-paula.png";
 
 interface CafePlaceholderProps {
   gameState: GameState;
@@ -84,11 +87,23 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
             <div className="cafe-counter__front" />
             <div className="cafe-counter__ledge" />
             <div className="cafe-coffee-machine">
+              <img
+                className="cafe-pilot-asset cafe-pilot-asset--coffee-machine"
+                src={coffeeMachineAsset}
+                alt=""
+                aria-hidden="true"
+              />
               <span className="cafe-coffee-machine__screen" />
               <span className="cafe-coffee-machine__steam" />
               <span className="cafe-coffee-machine__steam cafe-coffee-machine__steam--soft" />
             </div>
             <div className="cafe-register placeholder-kassandra-ui">
+              <img
+                className="cafe-pilot-asset cafe-pilot-asset--kassandra-register"
+                src={kassandraRegisterAsset}
+                alt=""
+                aria-hidden="true"
+              />
               <span className="cafe-register__screen" />
               <span className="cafe-register__receipt" />
             </div>
@@ -114,7 +129,14 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
           </div>
 
           <div className="cafe-queue" aria-hidden="true">
-            <span className="placeholder-guest placeholder-guest-normal-01" />
+            <span className="placeholder-guest placeholder-guest-normal-01">
+              <img
+                className="cafe-pilot-asset cafe-pilot-asset--paula"
+                src={paulaGuestAsset}
+                alt=""
+                aria-hidden="true"
+              />
+            </span>
             <span className="placeholder-guest placeholder-guest-normal-02" />
             <span className="placeholder-guest placeholder-guest-strange-01" />
           </div>
