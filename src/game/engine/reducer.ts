@@ -6,7 +6,7 @@ import {
   createInitialGameState
 } from "./gameState";
 import { weekOneAchievements } from "../data";
-import { getCurrentDayDefinition } from "./selectors";
+import { getCurrentDayDefinition, getServeLineForCustomer } from "./selectors";
 import { getObjectiveStatus } from "./objectives";
 import {
   applyProductConsumption,
@@ -159,12 +159,9 @@ function serveProduct(state: GameState, productId: ProductId): GameState {
     };
   }
 
-  const servedState = applySuccessfulServe(actionState, requestedProduct);
-
-  return {
-    ...servedState,
-    statusMessage: `${requestedProduct.name} served. Supplies, cleanliness, money, and stress have been updated.`
-  };
+  // applySuccessfulServe already sets the status message to the served guest's
+  // narrative serve line (plus any helper flavor note).
+  return applySuccessfulServe(actionState, requestedProduct);
 }
 
 function applySuccessfulServe(
@@ -254,6 +251,9 @@ function applySuccessfulServe(
     };
   }
 
+  const servedCustomerIndex = Math.max(0, management.customersServed - 1);
+  const serveLine = getServeLineForCustomer(workingState, servedCustomerIndex);
+
   return {
     ...workingState,
     supplies,
@@ -264,7 +264,7 @@ function applySuccessfulServe(
     dayManagement: management,
     completedActions: addUniqueDayAction(workingState.completedActions, "take_order"),
     statusMessage:
-      flavorLines.length > 0 ? flavorLines.join(" ") : workingState.statusMessage
+      flavorLines.length > 0 ? `${serveLine} ${flavorLines.join(" ")}` : serveLine
   };
 }
 

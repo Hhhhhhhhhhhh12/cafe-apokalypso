@@ -5,8 +5,7 @@ export function CafePlaceholder() {
       aria-labelledby="cafe-placeholder-title"
     >
       <div className="panel-heading">
-        <p className="eyebrow">Placeholder view</p>
-        <h2 id="cafe-placeholder-title">3/4 pixel-café diorama</h2>
+        <h2 id="cafe-placeholder-title">Heute im Café</h2>
       </div>
 
       <div

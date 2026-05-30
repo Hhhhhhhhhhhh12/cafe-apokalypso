@@ -20,14 +20,8 @@ export function ResourceHud({ gameState }: ResourceHudProps) {
         <ResourceItem label="Kaffee" value={gameState.supplies.coffee} />
         <ResourceItem label="Milch" value={gameState.supplies.milk} />
         <ResourceItem label="Gebäck" value={gameState.supplies.pastries} />
-        <ResourceItem
-          label="Sauberkeit"
-          value={`${labels.cleanliness} (${gameState.resources.cleanliness})`}
-        />
-        <ResourceItem
-          label="Stress"
-          value={`${labels.stress} (${gameState.resources.stress})`}
-        />
+        <ResourceItem label="Sauberkeit" value={labels.cleanliness} />
+        <ResourceItem label="Stress" value={labels.stress} />
         <ResourceItem
           label="Ruf"
           value={`${labels.reputation} (${gameState.resources.reputation})`}

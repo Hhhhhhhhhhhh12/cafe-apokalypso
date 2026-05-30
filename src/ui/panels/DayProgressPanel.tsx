@@ -1,8 +1,6 @@
 import {
-  getAvailableGuests,
-  getAvailableProducts,
   getCurrentDayDefinition,
-  getCurrentDayEvents,
+  getNarrativeEventCards,
   getVisibleDaySevenLetter,
   getVisibleKassandraMessages,
   getVisibleStaffOptions,
@@ -16,9 +14,7 @@ interface DayProgressPanelProps {
 
 export function DayProgressPanel({ gameState }: DayProgressPanelProps) {
   const currentDay = getCurrentDayDefinition(gameState);
-  const products = getAvailableProducts(gameState);
-  const guests = getAvailableGuests(gameState);
-  const events = getCurrentDayEvents(gameState);
+  const eventCards = getNarrativeEventCards(gameState);
   const staffOptions = getVisibleStaffOptions(gameState);
   const kassandraMessages = getVisibleKassandraMessages(gameState);
   const daySevenLetter = getVisibleDaySevenLetter(gameState);
@@ -26,14 +22,25 @@ export function DayProgressPanel({ gameState }: DayProgressPanelProps) {
 
   return (
     <section className="panel day-progress-panel" aria-labelledby="day-progress-title">
+      {daySevenLetter ? (
+        <section
+          className="letter-panel letter-panel--prominent"
+          aria-labelledby="day-seven-letter-title"
+        >
+          <p className="eyebrow">Official notice</p>
+          <h3 id="day-seven-letter-title">A letter has arrived</h3>
+          <pre>{daySevenLetter}</pre>
+        </section>
+      ) : null}
+
       <div className="panel-heading">
-        <p className="eyebrow">Week-one loop</p>
+        <p className="eyebrow">Tagesablauf</p>
         <h2 id="day-progress-title">
           Day {currentDay.day}: {currentDay.title}
         </h2>
       </div>
 
-      <p className="day-milestone">{currentDay.milestone}</p>
+      <p className="day-opener">{currentDay.dayOpener}</p>
 
       <section className="objective-card" aria-labelledby="daily-objective-title">
         <div>
@@ -47,15 +54,26 @@ export function DayProgressPanel({ gameState }: DayProgressPanelProps) {
         </strong>
       </section>
 
-      <div className="data-grid" aria-label="Current day data">
-        <DataList
-          title="Available products"
-          items={products.map((product) => product.name)}
-        />
-        <DataList title="Possible guests" items={guests.map((guest) => guest.name)} />
-        <DataList title="Scripted beats" items={events.map((event) => event.title)} />
-        <DataList title="Unlocked systems" items={[...currentDay.unlocks]} />
-      </div>
+      <p className="day-milestone">{currentDay.milestone}</p>
+
+      {currentDay.unlockMessage ? (
+        <p className="unlock-message">{currentDay.unlockMessage}</p>
+      ) : null}
+
+      {eventCards.length > 0 ? (
+        <div className="event-card-list" aria-label="Heute im Café">
+          {eventCards.map((event) => (
+            <section
+              className="inline-callout event-card"
+              key={event.id}
+              aria-label={event.title}
+            >
+              <h3>{event.title}</h3>
+              <p>{event.text}</p>
+            </section>
+          ))}
+        </div>
+      ) : null}
 
       {staffOptions.length > 0 ? (
         <section className="inline-callout" aria-labelledby="staff-options-title">
@@ -148,7 +166,10 @@ export function DayProgressPanel({ gameState }: DayProgressPanelProps) {
       ) : null}
 
       {kassandraMessages.length > 0 ? (
-        <section className="inline-callout placeholder-kassandra-ui" aria-labelledby="kassandra-title">
+        <section
+          className="inline-callout placeholder-kassandra-ui"
+          aria-labelledby="kassandra-title"
+        >
           <h3 id="kassandra-title">Day 6 unlock: KASSANDRA update</h3>
           <p>New register panel online. It is authored, simulated, and slightly too confident.</p>
           <ul>
@@ -156,17 +177,6 @@ export function DayProgressPanel({ gameState }: DayProgressPanelProps) {
               <li key={message.id}>{message.text}</li>
             ))}
           </ul>
-        </section>
-      ) : null}
-
-      {daySevenLetter ? (
-        <section className="letter-panel" aria-labelledby="day-seven-letter-title">
-          <h3 id="day-seven-letter-title">Day 7 cliffhanger</h3>
-          <pre>{daySevenLetter}</pre>
-          <p>
-            Visible weirdness: {gameState.hiddenWeirdness}. Full apocalypse
-            operations remain locked for later development.
-          </p>
         </section>
       ) : null}
     </section>
@@ -181,22 +191,4 @@ function formatObjectiveStatus(status: string): string {
     return "Missed";
   }
   return "In progress";
-}
-
-interface DataListProps {
-  title: string;
-  items: readonly string[];
-}
-
-function DataList({ title, items }: DataListProps) {
-  return (
-    <section className="data-card" aria-label={title}>
-      <h3>{title}</h3>
-      <ul>
-        {items.map((item) => (
-          <li key={item}>{item}</li>
-        ))}
-      </ul>
-    </section>
-  );
 }

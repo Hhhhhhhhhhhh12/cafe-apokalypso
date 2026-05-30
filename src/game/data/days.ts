@@ -5,6 +5,8 @@ export const weekOneDays = [
     day: 1,
     title: "New Opening",
     milestone: "Core order flow and first coffee-machine anomaly.",
+    dayOpener:
+      "The café opens for the first time. Everything is where it should be. The first customers will arrive when they decide to.",
     objective: {
       id: "day-1-first-shift",
       day: 1,
@@ -21,6 +23,8 @@ export const weekOneDays = [
     title: "Regulars Begin to Form",
     milestone:
       "Guest behavior differences: patience, spend, seat time, and quality expectations.",
+    dayOpener:
+      "A few faces from yesterday have returned. Each of them seems to have a different idea about what coffee is for. The morning is developing something like a rhythm.",
     objective: {
       id: "day-2-regular-rhythm",
       day: 2,
@@ -42,6 +46,10 @@ export const weekOneDays = [
     day: 3,
     title: "Prices and Supplies",
     milestone: "Ingredient purchasing, price adjustment, and daily offers.",
+    dayOpener:
+      "The offer board now has a slot for a daily suggestion. Supplies are being purchased in quantities that require actual accounting. The register has an opinion about prices, for what that is worth.",
+    unlockMessage:
+      "The offer board is active and the register already has a recommendation.",
     objective: {
       id: "day-3-offer-board",
       day: 3,
@@ -64,6 +72,10 @@ export const weekOneDays = [
     day: 4,
     title: "Advertising",
     milestone: "Small ads begin influencing demand and guest types.",
+    dayOpener:
+      "A small stack of flyers is sitting on the counter. You printed them last night. The neighborhood has not heard from you yet.",
+    unlockMessage:
+      "A small advertising option is now open — the neighborhood has not heard from you yet.",
     objective: {
       id: "day-4-local-ad",
       day: 4,
@@ -87,6 +99,10 @@ export const weekOneDays = [
     day: 5,
     title: "First Temporary Help",
     milestone: "Jana, Nino, or Mira can help for one day.",
+    dayOpener:
+      "Today is the first day you can ask for help, which suggests the café has become real enough to need it. Jana, Nino, and Mira are available. The choice is yours.",
+    unlockMessage:
+      "Temporary help is available from today: one person, one task, one day at a time.",
     objective: {
       id: "day-5-helper-choice",
       day: 5,
@@ -111,6 +127,10 @@ export const weekOneDays = [
     day: 6,
     title: "KASSANDRA",
     milestone: "Cash register update unlocks simulated demand prediction.",
+    dayOpener:
+      "The register update installed overnight without asking. It has issued its first customer analysis. The results are calm, confident, and slightly wrong.",
+    unlockMessage:
+      "KASSANDRA installed overnight and has completed its first customer assessment.",
     objective: {
       id: "day-6-kassandra-check",
       day: 6,
@@ -136,6 +156,8 @@ export const weekOneDays = [
     title: "The Letter",
     milestone:
       "Operational stress test, red umbrella guest, official apocalyptic letter.",
+    dayOpener:
+      "The café is more crowded than usual today. A few of the faces are unfamiliar. The day should close normally.",
     objective: {
       id: "day-7-the-letter",
       day: 7,
