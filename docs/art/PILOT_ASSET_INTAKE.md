@@ -319,3 +319,49 @@ external Google AI Studio working folder and must not be committed.
 - **Fallback reminder:** keep the existing CSS fallbacks intact, including
   `cafe-coffee-machine`, `cafe-register`, `placeholder-guest-*`, `cafe-table`,
   `cafe-chair`, `cafe-cup`, `cafe-counter-props`, and `cafe-service-mat`.
+
+---
+
+## 10. PROMPT-10E-A3 extraction log (Batch 2 café props)
+
+Batch 2 provisional café **prop** assets were extracted from the Google AI Studio
+raw sheet `ca-asset-batch-02-cafe-props-raw-v01.png` (1024×1024). The raw sheet
+lives outside the repository (Google AI Studio working folder) and was **not**
+committed. (The original CloudStorage copy was online-only/dataless and could not
+be read; a local non-CloudStorage copy was used as input. No raw file enters the
+repo.)
+
+- **Status:** provisional pilot assets only; **not final art**. Not yet wired into
+  React/CSS — extraction only.
+- **Source / transparency result:** source PNG was RGBA but **fully opaque**
+  (alpha uniformly 255), so it had **no real alpha** — the background was an
+  **embedded checkerboard** (white `~255` + light gray `~232`, both neutral). The
+  checkerboard was removed via an edge-connected flood fill over neutral+bright
+  pixels, so light asset interiors (cup body, glass-case interior) were preserved.
+  Exported PNGs now use **real transparency**. Resizing used premultiplied alpha to
+  avoid edge halos.
+- **Exported files (exact dimensions):**
+  - `assets/sprites/props/placeholder-table-chair-set.png` — 64×48 px
+  - `assets/sprites/props/placeholder-croissant-display.png` — 64×48 px
+  - `assets/sprites/props/placeholder-cafe-cup.png` — 32×32 px
+  - `assets/sprites/props/placeholder-service-mat.png` — 48×32 px
+  - `assets/sprites/props/placeholder-counter-props.png` — 64×48 px
+  - Each asset was fit (aspect-preserved) inside its target box and centered on a
+    transparent canvas, so the visible art may be slightly narrower/shorter than the
+    canvas — this avoids stretching.
+- **Known caveats:**
+  - **Café cup steam:** the steam was drawn as very faint, near-white wisps. Pure
+    near-white wisp pixels were indistinguishable from the white checker and were
+    removed; only the slightly tinted steam remains, so the steam reads but is
+    **faint and somewhat fragmented**, especially at 32×32. Acceptable for a
+    provisional asset; revisit if stronger steam is wanted.
+  - **Croissant display:** strongest asset; the glass case panels are intentionally
+    see-through (only the frame edges and the pastries inside remain opaque), which
+    reads correctly as a glass display case.
+  - **Table-chair-set:** remains readable and demo-usable at 64×48 (round table,
+    two chairs, pedestal base all distinct); 72×56 was **not** required.
+  - **Counter props / service mat:** clean; secondary assets kept simple.
+  - No checkerboard remnants or visible halos observed on any asset.
+- **Fallback reminder:** keep the existing CSS fallbacks intact (`cafe-table`,
+  `cafe-chair`, `cafe-cup`, `cafe-counter-props`, `cafe-service-mat`); these assets
+  are not yet integrated and the layout must still render without them.
