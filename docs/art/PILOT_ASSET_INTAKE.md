@@ -295,3 +295,27 @@ Explicitly out of scope for this intake plan and for the pilot it governs:
 - Final Meda art before the normal style is locked.
 - Raw AI batches in the repo.
 - UI text baked into images.
+
+---
+
+## 9. PROMPT-10E-A2 extraction log
+
+Batch 1 provisional pilot assets were extracted from the Google AI Studio pilot
+sheet `asset-pilot-v0-1.png`. The raw sheet stays outside the repository in the
+external Google AI Studio working folder and must not be committed.
+
+- **Status:** provisional pilot assets only; not final art.
+- **Transparency result:** source PNG was RGBA but fully opaque, so the
+  checkerboard background was embedded in the pixels. The checkerboard was
+  removed and the exported PNGs use real transparency.
+- **Exported files:**
+  - `assets/sprites/props/placeholder-cafe-coffee-machine.png` — 64×48 px
+  - `assets/sprites/props/placeholder-kassandra-register.png` — 48×32 px
+  - `assets/sprites/guests/placeholder-guest-paula.png` — 40×48 px
+- **Known limitations:** Paula remains 40×48 px for this pilot to preserve the
+  yellow-coat silhouette; do not force her down to 32×32 until the guest style is
+  reviewed. The assets are single-pose static crops and may be replaced after
+  art review.
+- **Fallback reminder:** keep the existing CSS fallbacks intact, including
+  `cafe-coffee-machine`, `cafe-register`, `placeholder-guest-*`, `cafe-table`,
+  `cafe-chair`, `cafe-cup`, `cafe-counter-props`, and `cafe-service-mat`.
