@@ -34,7 +34,7 @@ export function DayProgressPanel({ gameState }: DayProgressPanelProps) {
       ) : null}
 
       <div className="panel-heading">
-        <p className="eyebrow">Tagesablauf</p>
+        <p className="eyebrow">Today</p>
         <h2 id="day-progress-title">
           Day {currentDay.day}: {currentDay.title}
         </h2>
@@ -89,7 +89,7 @@ export function DayProgressPanel({ gameState }: DayProgressPanelProps) {
       ) : null}
 
       {gameState.daySummary ? (
-        <section className="inline-callout" aria-labelledby="day-summary-title">
+        <section className="inline-callout day-result-card" aria-labelledby="day-summary-title">
           <h3 id="day-summary-title">Day-end management summary</h3>
           <p className="rating-line">
             Rating: <strong>{gameState.daySummary.rating}</strong>
