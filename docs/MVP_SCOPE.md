@@ -2,9 +2,9 @@
 
 ### MVP: Seven-Day Vertical Slice
 
-The MVP includes:
 - one café room in a light 3/4 pixel-inspired view
-- seven playable in-game days
+- a limited set of curated pixel-art pilot assets for the vertical slice
+- seven playable in-game days forming the first café week / first soft-roguelite run
 - 6 normal guests
 - 3 subtly strange guests
 - 5 basic products
@@ -17,7 +17,7 @@ The MVP includes:
 - advertising
 - temporary staff
 - KASSANDRA cash register update
-- first visible weirdness unlock after day 7
+- first visible weirdness unlock and soft-roguelite crisis-loop hint after day 7
 - local save
 - achievements
 - deterministic game-state logic
@@ -29,14 +29,74 @@ Out of scope for MVP:
 - accounts
 - payments
 - multiple locations
+- usable bedrooms or upper floors
+- healing / inn-room mechanics
+- overnight guest management
 - full mythology roster
+- full final art pass
+- full 8-direction character sprite sets
+- complete animation system
+- complete Day 1–7 art layering
+- committing raw AI Studio / Gemini / Nano Banana image batches as production assets
 - complex staff scheduling
 - real-time pathfinding
 - advanced animations
 
+### MVP Art Scope
+
+The MVP may include first curated pixel-art pilot assets, but only as a limited vertical-slice proof of direction.
+
+In scope:
+
+- one approved Day-1 café background or background slice
+- 4–6 approved normal guest sprites
+- one approved barista/staff sprite
+- 6–10 approved café props
+- 1–2 approved weirdness overlay props, such as a clock anomaly, tiny portal cup, endless receipt, form stack, or AI-oracle object
+- a small internal/local art review workflow if it helps select, annotate, and export review notes for guest and prop candidates
+
+Out of scope:
+
+- complete final production art
+- all character sprites
+- all guest variants
+- full 8-direction turnarounds for all characters
+- full walking/idle/sitting animation sets for all characters
+- complete art layers for every day from Day 1 to Day 7
+- generated UI text baked into image assets
+- raw AI Studio / Gemini / Nano Banana image sheets committed into the repository as assets
+
+Rules:
+
+- Raw AI-generated sheets remain outside the repository.
+- Only cropped, curated, explicitly approved pilot assets may enter the repository.
+- UI text must remain real HTML/CSS/React text, not baked into generated images.
+- CSS or structured placeholders must remain available as fallback if pilot assets are missing or replaced.
+- Pilot assets are provisional unless later marked as final in the art pipeline documentation.
+
+
+### MVP Implementation Work Order
+
+Recommended implementation order for the current MVP issues:
+
+1. Create the reusable GitHub issue template.
+2. Finalize the management tradeoff design document.
+3. Create the playable Vite + React + TypeScript app shell.
+4. Add the typed MVP data model for guests, products, resources, and days.
+5. Refine the deterministic game-state engine.
+6. Implement the first seven-day MVP loop as data-driven progression.
+7. Build the first café dashboard with the 3/4 diorama placeholder.
+8. Implement local save/load.
+9. Add regression tests for economy, guest flow, staff effects, advertising effects, and event triggers.
+10. Add the accessibility and keyboard baseline.
+11. Add CI verification for lint, typecheck, test, and build.
+12. Improve demo discovery, README guidance, and GitHub Pages readiness.
+
+This order is not a strict dependency chain. It is intended to reduce rework: first clarify reusable project structure and design constraints, then build shell/data/engine, then UI and persistence, then quality gates and public demo presentation.
+
 ### MVP Goal
 
-The MVP should feel like a small but complete vertical slice, not like a static mockup.
+The MVP should feel like a small but complete vertical slice and the first playable café week / first soft-roguelite run, not like a static mockup.
 
 The player should be able to:
 
@@ -47,10 +107,11 @@ The player should be able to:
 - unlock advertising
 - hire temporary help
 - install KASSANDRA
-- receive the first explicit apocalyptic hook
+- receive the first explicit apocalyptic hook and crisis-loop hint
+- notice light hints that the café may later expand into an inn-like space upstairs
 - want to continue into week 2
 
-The MVP is successful if the first seven days already create the feeling of a cozy café management game that is beginning to become strange.
+The MVP is successful if the first seven days already create the feeling of a cozy café management soft-roguelite that is beginning to become strange, while still remaining fully playable as a grounded first café week.
 
 ### Week 1 Data Scope
 
@@ -134,7 +195,7 @@ Each of the seven in-game days should introduce at least one meaningful new elem
 - Day 3: prices, supplies, and daily offers
 - Day 4: advertising and Herr Grau
 - Day 5: temporary staff
-- Day 6: KASSANDRA update
+- Day 6: KASSANDRA update and subtle upstairs-room foreshadowing
 - Day 7: operational stress test, Frau mit rotem Regenschirm, and official apocalyptic letter
 
 ### MVP Technical Constraints
@@ -175,13 +236,37 @@ Before translation work begins, user-facing content should be migrated into stab
 
 ### First Demo Ending
 
-The MVP ends after day 7 with the official apocalyptic letter.
+The MVP ends after day 7 with the official apocalyptic letter and the first hint that this café week may be part of a repeatable soft-roguelite crisis loop.
 
 After the letter:
 
 - hidden weirdness becomes visible
 - apocalypse operations are foreshadowed
+- later upstairs rooms / inn-style healing remain teased but locked
 - the full apocalypse system remains locked for later development
-- week 2 is teased as the next expansion point
+- week 2 / the next café run is teased as the next expansion point
 
-The end of the MVP should create a clear “I want to keep playing” moment.
+The end of the MVP should create a clear “I want to start the next café week / run” moment.
+
+### Locked Future Systems Mentioned in MVP
+
+The MVP may show or mention locked future systems as flavor, provided they are clearly not playable in the first seven days.
+
+Allowed locked-system teasers:
+
+- an inaccessible upper floor
+- a room key labelled "Room 4"
+- guest questions about rooms upstairs
+- KASSANDRA suggesting pillows without explanation
+- save-system copy framed as a guestbook or memory ledger
+
+Not allowed in MVP implementation:
+
+- room construction or room upgrades
+- healing mechanics
+- overnight guests
+- rentable beds
+- upper-floor navigation
+- any playable inn-management loop
+
+These teasers exist only to hint at the later RPG-inn-inspired expansion described in `docs/GAME_DESIGN.md`.

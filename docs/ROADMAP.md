@@ -19,6 +19,8 @@ Scope:
 - temporary staff options: Jana (service/cleaning), Nino (barista), Mira (marketing/counter)
 - KASSANDRA update
 - first explicit apocalyptic hook at the end of day 7
+- light foreshadowing of an inaccessible upper floor / future inn-room system
+- save-system flavor framed as a guestbook or memory ledger
 
 Success criteria:
 
@@ -34,6 +36,9 @@ Out of scope:
 - backend
 - accounts
 - multiple locations
+- usable bedrooms or upper floors
+- healing / inn-room mechanics
+- overnight guest management
 - full mythology roster
 - advanced animations
 - complex pathfinding
@@ -52,6 +57,7 @@ Focus:
 - add stronger feedback for staff, advertising, and pricing
 - polish KASSANDRA’s early behavior
 - improve café layout and visual clarity
+- introduce a limited set of curated pixel-art pilot assets
 - add more satisfying achievements
 - add basic balancing tests
 
@@ -63,6 +69,8 @@ Likely additions:
 - better event presentation
 - more week-one flavor lines
 - first week-two teaser screen
+- first approved pixel-art pilot assets in the café view
+- simple art review flow for selecting/refining guest and prop candidates
 - improved README with screenshots or GIFs
 
 Success criteria:
@@ -70,7 +78,16 @@ Success criteria:
 - the first 7 days are fun enough to replay
 - the management loop is understandable without long explanations
 - the weirdness escalation is noticeable but not too early
+- the café view includes first curated pixel-art pilot assets without losing CSS/placeholder fallbacks
+- raw generated AI image sheets are not committed as production assets
+- UI text remains real HTML/CSS/React text, not baked into generated images
 - the repository looks intentional and well-structured
+
+Art pilot boundaries:
+
+- in scope: first curated Day-1 café background or background slice, 4–6 approved normal guest sprites, one barista/staff sprite, 6–10 café props, and 1–2 weirdness overlay props
+- in scope: local/internal art review tooling if it helps select, annotate, and export review notes for guest and prop candidates
+- out of scope: full final art pass, full 8-direction character sets, complete animation system, all guest sprites, complete Day 1–7 art layering, or committing raw AI Studio / Gemini / Nano Banana image batches
 
 ## Phase 1.5: Week 2 Expansion
 
@@ -87,6 +104,7 @@ Focus:
 - stronger delegation or first permanent staff option
 - first visible café alteration caused by weirdness or KASSANDRA
 - first early apocalypse-operations panel, still limited
+- clearer hints that the café may eventually function like an absurd RPG inn
 
 Possible systems:
 
@@ -175,6 +193,7 @@ Goal: support longer-term play and broader café operations.
 Focus:
 
 - new café areas
+- unlockable upper floor with strange guest rooms
 - possible second location
 - specialized stations
 - expanded staff structure
@@ -187,6 +206,9 @@ Focus:
 Possible systems:
 
 - café rooms or zones
+- RPG-inn-inspired guest rooms
+- absurd healing, recovery, and memory-stabilization services
+- overnight guest requests and room upgrades
 - branch/location management
 - supply chains
 - franchise-like absurd expansion
@@ -247,7 +269,8 @@ The long-term arc is:
 4. apocalyptic bureaucracy
 5. mythological customers
 6. delegation and expansion
-7. macro-management of increasingly impossible café operations
+7. upper-floor inn services and absurd recovery requests
+8. macro-management of increasingly impossible café operations
 
 Every major feature should support at least one of these goals:
 

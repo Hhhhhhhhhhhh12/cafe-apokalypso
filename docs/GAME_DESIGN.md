@@ -20,9 +20,11 @@ Day 7 acts as a small operational stress test and ends with the first explicit a
 
 ### Core Concept
 
-Café Apokalypso is a cozy-absurd solo management game for the web.
+Café Apokalypso is a cozy-absurd café management soft-roguelite for the web.
 
 The player starts with a seemingly normal small café. Early gameplay focuses on direct micromanagement: taking orders, preparing simple products, accepting payment, cleaning tables, managing basic ingredients, setting prices, and choosing small advertising actions.
+
+The long-term structure is built around repeated café weeks. A week functions as a soft run: the player manages several in-game days, responds to guests and events, and reaches an end-of-week pressure point. If the week collapses or becomes unstable, reality may partially reset, while KASSANDRA preserves fragments of memory, guest knowledge, unlocks, forecasts, or start bonuses.
 
 As the game progresses, guests, events, business systems, and the café itself become increasingly strange. Normal regulars gradually give way to mythological edge cases, AI-oracle behavior, apocalyptic bureaucracy, and world-ending incidents that are treated with dry business language.
 
@@ -35,6 +37,8 @@ The game should evolve from micromanagement into macromanagement:
 - expand the café and later locations
 - manage strange customer groups
 - delay increasingly absurd end-of-world scenarios
+
+The roguelite layer should remain soft and cozy rather than punitive. There is no hard permadeath and no full reset of player progress. Failure states should be humorous, useful, and partially productive: a failed week still teaches KASSANDRA something and gives the player a reason to try the next café week with better information.
 
 The café remains cozy and inviting even as the world around it becomes stranger.
 
@@ -88,6 +92,22 @@ Example event text:
 
 > The coffee machine briefly displays “Good morning.” It is 14:07.
 
+### Save System Flavor
+
+The technical save system should remain simple and local-first, using browser storage only.
+
+In-world, saving may be presented as the café's guestbook or memory ledger rather than as a purely technical menu action.
+
+Possible UI copy:
+
+- Save in the Memory Ledger
+- The guestbook remembers.
+- Reality has been checked in.
+- Autosave: the guestbook quietly updates itself.
+- Previous guests successfully remembered.
+
+The save flavor should support the later inn-room fantasy without requiring the room system to exist in the MVP.
+
 ### Early Progression and Pacing
 
 Café Apokalypso should not develop too slowly. The first seven in-game days must each introduce at least one meaningful new element: a mechanic, guest behavior, management option, upgrade, staff option, advertising option, or narrative anomaly.
@@ -95,6 +115,29 @@ Café Apokalypso should not develop too slowly. The first seven in-game days mus
 Week 1 remains grounded in normal café management, but it should provide a clear sense of escalation by the end of day 7. The first explicit apocalyptic hook appears at the end of week 1 through an official letter registering the café as apocalyptically relevant caffeine infrastructure.
 
 Week 2 should escalate faster with visible weirdness, daily KASSANDRA forecasts, the first clearly strange guest interactions, the first small apocalyptic incident, and stronger delegation systems.
+
+### Soft-Roguelite Structure
+
+The game is structured around repeatable café weeks.
+
+- A café week is a run.
+- An in-game day is a management round inside that run.
+- End-of-day summaries show operational results, guest reactions, and strange observations.
+- End-of-week events test how stable the café, economy, guest base, and reality layer have become.
+- KASSANDRA acts as the main meta-progression frame by preserving selected memory fragments between unstable weeks.
+
+Soft-roguelite progression may later include:
+
+- remembered guest files
+- unlocked recipes
+- staff options
+- starting bonuses
+- KASSANDRA forecast modules
+- better audience predictions
+- known omen patterns
+- recurring bureaucratic exceptions
+
+The first seven-day MVP represents the first playable café week / first soft-roguelite run. Day 7 reveals that the café is part of a larger repeating crisis structure, but full meta-progression does not need to be implemented in the MVP.
 
 ### Week 1 Day Structure
 
@@ -147,6 +190,7 @@ Day 7: The Letter
 - official letter from the Office for Extraordinary Operational Relevance
 - weirdness becomes visible
 - apocalypse operations are foreshadowed
+- first hint that the week may be part of a repeatable soft-roguelite crisis loop
 
 ### Week 1 Guests
 
@@ -216,6 +260,39 @@ Late game:
 - factions
 - apocalyptic incidents
 - delaying world-ending scenarios
+
+### Future Expansion: Rooms Above the Café
+
+At a later stage, Café Apokalypso expands beyond food and beverages.
+
+The upper floor eventually becomes accessible and introduces guest rooms, transforming the business into a strange mixture of café, inn, and reality-maintenance service.
+
+Inspired by classic RPG inns, guests may arrive seeking recovery, rest, memory restoration, existential stabilization, or treatment for unusual conditions.
+
+Example future guests:
+
+- an adventurer suffering from sword-related overconfidence
+- a bureaucrat wounded by excessive paperwork
+- a prophet exhausted by spoilers from the future
+- a skeleton requiring structural relaxation
+- a minor deity suffering from temporary mortality
+
+Rooms become an additional management layer involving comfort, reputation, room upgrades, specialized services, and unusual guest requests.
+
+This system is intentionally not part of Week 1 or the MVP demo.
+
+### Week 1 Foreshadowing: Upstairs Rooms
+
+Week 1 may lightly hint at the later inn-room system without making it playable.
+
+Possible foreshadowing details:
+
+- a room key labelled "Room 4" occasionally appears behind the counter
+- guests sometimes ask whether rooms are available upstairs
+- KASSANDRA occasionally recommends purchasing pillows without explanation
+- a staircase seems to continue further upward than the building should allow
+
+These hints should remain optional flavor in the MVP and must not imply that rooms are unlocked during the first seven days.
 
 ### Tone
 

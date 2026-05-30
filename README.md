@@ -1,6 +1,6 @@
 # Café Apokalypso
 
-A cozy-absurd solo management web game about running a small pixel café that slowly becomes relevant to mythological bureaucracy, AI prophecy, and the postponement of minor apocalypses.
+A cozy-absurd café management soft-roguelite about running a small pixel café that slowly becomes relevant to mythological bureaucracy, AI prophecy, reality resets, and the postponement of minor apocalypses.
 
 ## Demo
 
@@ -28,6 +28,8 @@ Over time, the café becomes stranger. Normal regulars give way to mythological 
 
 The game shifts from early micromanagement to later macromanagement: hiring staff, delegating tasks, stabilizing the economy, expanding operations, and delaying the end of the world.
 
+The long-term structure is soft-roguelite: café weeks act as repeatable runs, with KASSANDRA preserving fragments of memory, knowledge, and unlocks between unstable reality resets.
+
 ## Design Pillars
 
 - cozy café first, apocalypse later
@@ -40,7 +42,7 @@ The game shifts from early micromanagement to later macromanagement: hiring staf
 
 ## MVP Scope
 
-The MVP covers the first seven in-game days.
+The MVP covers the first seven in-game days as the first playable café week / first soft-roguelite run.
 
 Included:
 
