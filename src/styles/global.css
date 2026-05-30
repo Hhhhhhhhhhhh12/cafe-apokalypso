@@ -500,6 +500,22 @@ h3 {
   box-shadow: inset -6px 0 0 rgba(38, 50, 47, 0.18);
 }
 
+.cafe-pilot-asset {
+  position: absolute;
+  display: block;
+  image-rendering: pixelated;
+  pointer-events: none;
+  user-select: none;
+}
+
+.cafe-pilot-asset--coffee-machine {
+  inset: -17% -9% -8% -9%;
+  z-index: 2;
+  width: 118%;
+  height: 125%;
+  object-fit: contain;
+}
+
 .cafe-coffee-machine__screen {
   position: absolute;
   top: 16%;
@@ -540,6 +556,14 @@ h3 {
   border-radius: 6px;
   background: #e5e3d8;
   box-shadow: 4px 6px 0 rgba(50, 31, 24, 0.16);
+}
+
+.cafe-pilot-asset--kassandra-register {
+  inset: -38% -30% -18% -30%;
+  z-index: 2;
+  width: 160%;
+  height: 156%;
+  object-fit: contain;
 }
 
 .cafe-register__screen {
@@ -740,6 +764,16 @@ h3 {
 .placeholder-guest-normal-01 {
   right: 35%;
   bottom: 26%;
+}
+
+.cafe-pilot-asset--paula {
+  left: 50%;
+  bottom: -5px;
+  z-index: 2;
+  width: 40px;
+  height: 48px;
+  transform: translateX(-50%);
+  object-fit: contain;
 }
 
 .placeholder-guest-normal-02 {
