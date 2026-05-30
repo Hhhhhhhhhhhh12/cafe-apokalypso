@@ -4,6 +4,7 @@ This folder contains visual review and approval sheets for Café Apokalypso.
 
 Core sheets:
 - [CAFE_DIORAMA_DIRECTION.md](CAFE_DIORAMA_DIRECTION.md) — implementation-facing visual direction for the 3/4 café diorama
+- [PILOT_ASSET_INTAKE.md](PILOT_ASSET_INTAKE.md) — intake plan controlling how the first curated pilot assets enter the repo
 - CHARACTER_SHEETS.md
 - LEVEL_SHEETS.md
 - VISUAL_STYLE_GUIDE.md
