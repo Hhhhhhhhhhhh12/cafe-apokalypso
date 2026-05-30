@@ -66,8 +66,8 @@ export function ActionPanel({
   return (
     <section className="panel action-panel" aria-labelledby="actions-title">
       <div className="panel-heading">
-        <p className="eyebrow">Controls</p>
-        <h2 id="actions-title">Action panel</h2>
+        <p className="eyebrow">Shift</p>
+        <h2 id="actions-title">Actions</h2>
       </div>
 
       {gameState.dayPhase === "day_start" ? (

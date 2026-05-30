@@ -1,6 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
+import { App } from "../src/app/App";
 import { createInitialGameState } from "../src/game/engine/gameState";
 import { CafePlaceholder } from "../src/ui/cafe/CafePlaceholder";
 import type { GameState } from "../src/game/types/game";
@@ -14,9 +15,25 @@ function visibleText(markup: string) {
 }
 
 describe("café diorama view", () => {
+  it("renders the main screen as stage, HUD, actions, and today regions", () => {
+    const markup = renderToStaticMarkup(<App />);
+    const text = visibleText(markup);
+
+    expect(markup).toContain("workspace-grid");
+    expect(markup).toContain("resource-panel");
+    expect(markup).toContain("cafe-stage");
+    expect(markup).toContain("action-panel");
+    expect(markup).toContain("day-progress-panel");
+    expect(text).toContain("Café HUD");
+    expect(text).toContain("Heute im Café");
+    expect(text).toContain("Actions");
+    expect(text).toContain("Day 1:");
+  });
+
   it("renders the café view with the key room zones", () => {
     const markup = renderCafe();
 
+    expect(markup).toContain("cafe-stage");
     expect(markup).toContain("cafe-diorama");
     expect(markup).toContain("cafe-floor");
     expect(markup).toContain("cafe-counter");
@@ -27,6 +44,7 @@ describe("café diorama view", () => {
     expect(markup).toContain("cafe-window");
     expect(markup).toContain("cafe-storage");
     expect(markup).toContain("cafe-menu-board");
+    expect(markup).toContain("cafe-plant");
     expect(markup).toContain("cafe-weirdness-hint");
   });
 

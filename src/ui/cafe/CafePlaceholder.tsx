@@ -33,10 +33,11 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
 
   return (
     <section
-      className="panel cafe-panel"
+      className="panel cafe-panel cafe-stage"
       aria-labelledby="cafe-diorama-title"
     >
       <div className="panel-heading">
+        <p className="eyebrow">Café stage</p>
         <h2 id="cafe-diorama-title">Heute im Café</h2>
       </div>
 
@@ -77,12 +78,15 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
 
         <div className="cafe-floor">
           <div className="cafe-floor__tiles" aria-hidden="true" />
+          <div className="cafe-room-shadow" aria-hidden="true" />
 
           <div className="cafe-counter" aria-hidden="true">
             <div className="cafe-counter__front" />
+            <div className="cafe-counter__ledge" />
             <div className="cafe-coffee-machine">
               <span className="cafe-coffee-machine__screen" />
               <span className="cafe-coffee-machine__steam" />
+              <span className="cafe-coffee-machine__steam cafe-coffee-machine__steam--soft" />
             </div>
             <div className="cafe-register placeholder-kassandra-ui">
               <span className="cafe-register__screen" />
@@ -93,6 +97,7 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
               <span />
               <span />
             </div>
+            <div className="cafe-service-mat" />
           </div>
 
           <div className="cafe-table cafe-table--left" aria-hidden="true">
@@ -112,6 +117,10 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
             <span className="placeholder-guest placeholder-guest-normal-01" />
             <span className="placeholder-guest placeholder-guest-normal-02" />
             <span className="placeholder-guest placeholder-guest-strange-01" />
+          </div>
+
+          <div className="cafe-plant" aria-hidden="true">
+            <span />
           </div>
 
           <span

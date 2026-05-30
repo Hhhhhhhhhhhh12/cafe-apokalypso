@@ -12,7 +12,7 @@ export function ResourceHud({ gameState }: ResourceHudProps) {
     <section className="panel resource-panel" aria-labelledby="resources-title">
       <div className="panel-heading">
         <p className="eyebrow">Status</p>
-        <h2 id="resources-title">Management row</h2>
+        <h2 id="resources-title">Café HUD</h2>
       </div>
 
       <dl className="resource-list">
