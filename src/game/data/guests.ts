@@ -8,7 +8,8 @@ export const weekOneGuests = [
     firstDay: 1,
     behaviorTags: ["fast", "practical", "low-seat-time"],
     summary: "Quick coffee customer who wants to survive Monday.",
-    sampleLines: ["Just coffee. The train already took the rest of my patience."]
+    sampleLines: ["Just coffee. The train already took the rest of my patience."],
+    serveLine: "She takes the coffee without slowing down. The train was already late."
   },
   {
     id: "laptop-lukas",
@@ -17,7 +18,8 @@ export const weekOneGuests = [
     firstDay: 2,
     behaviorTags: ["low-spend", "long-seat-time", "remote-work"],
     summary: "Spends little, sits for a long time, and blocks tables.",
-    sampleLines: ["I only need one small table and the emotional support of Wi-Fi."]
+    sampleLines: ["I only need one small table and the emotional support of Wi-Fi."],
+    serveLine: "He nods and opens another browser tab. He will be here for a while."
   },
   {
     id: "lieferfahrer-cem",
@@ -26,7 +28,8 @@ export const weekOneGuests = [
     firstDay: 2,
     behaviorTags: ["impatient", "low-spend", "quick-service"],
     summary: "Impatient, efficient, and not interested in latte philosophy.",
-    sampleLines: ["Espresso. Fast. I am parked in a place where optimism ends."]
+    sampleLines: ["Espresso. Fast. I am parked in a place where optimism ends."],
+    serveLine: "He is out the door before you finish the sentence. The invoice is correct."
   },
   {
     id: "cappuccino-christa",
@@ -35,7 +38,9 @@ export const weekOneGuests = [
     firstDay: 2,
     behaviorTags: ["quality-expectations", "higher-spend", "foam-precision"],
     summary: "Pays better and has precise expectations for cappuccino foam.",
-    sampleLines: ["The foam was good yesterday. Today I am open to evidence."]
+    sampleLines: ["The foam was good yesterday. Today I am open to evidence."],
+    serveLine:
+      "She holds the cup at a slight angle. After a moment, she nods. This counts as approval."
   },
   {
     id: "herr-bohn",
@@ -44,7 +49,9 @@ export const weekOneGuests = [
     firstDay: 2,
     behaviorTags: ["regular", "patient", "memory-hints"],
     summary: "Older regular with strange memories of the building.",
-    sampleLines: ["This corner used to be quieter. Before it remembered things."]
+    sampleLines: ["This corner used to be quieter. Before it remembered things."],
+    serveLine:
+      "He thanks you as though this has happened many times in many versions of this café."
   },
   {
     id: "freelancerin-mira",
@@ -57,7 +64,9 @@ export const weekOneGuests = [
     sampleLines: [
       "The café is authentic. I am not sure whether that is good.",
       "The light is good. Slightly existential, but good."
-    ]
+    ],
+    serveLine:
+      "She accepts it without looking up. 'Authentic,' she says. You are still not sure if that is good."
   },
   {
     id: "herr-grau",
@@ -70,7 +79,9 @@ export const weekOneGuests = [
     sampleLines: [
       "Black. No sugar. I am only passing through.",
       "Your opening hours are pleasantly mortal."
-    ]
+    ],
+    serveLine:
+      "He pays and thanks you. The coin does not match any denomination you can identify."
   },
   {
     id: "frau-roter-regenschirm",
@@ -83,7 +94,9 @@ export const weekOneGuests = [
     sampleLines: [
       "A cappuccino. Very light. I do not want to be recognized today.",
       "No receipt, please. Paper remembers too well."
-    ]
+    ],
+    serveLine:
+      "She accepts the order quietly and asks you not to mention she was here."
   },
   {
     id: "meda",
@@ -97,6 +110,8 @@ export const weekOneGuests = [
       "An espresso. And please, look at the counter when you bring it.",
       "I prefer the corner seat. People look at me less from there."
     ],
+    serveLine:
+      "She takes the cup without looking at you. The table beside her grows briefly still.",
     visualNotes:
       "Sunglasses indoors, subtle snake-like hair silhouette, careful about direct eye contact."
   }

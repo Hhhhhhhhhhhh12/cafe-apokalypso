@@ -74,6 +74,11 @@ export interface GuestDefinition {
   behaviorTags: readonly string[];
   summary: string;
   sampleLines: readonly string[];
+  /**
+   * Player-facing line shown after this guest is successfully served.
+   * Distinct from sampleLines (which are authoring/reference lines).
+   */
+  serveLine: string;
   visualNotes?: string;
 }
 
@@ -138,6 +143,13 @@ export interface DayDefinition {
   day: DayNumber;
   title: string;
   milestone: string;
+  /** Short scene-setting paragraph shown at the top of the day. */
+  dayOpener: string;
+  /**
+   * One-sentence narrative note shown on the day a new system first unlocks.
+   * Present for Days 3–6; omitted on days with no new unlock.
+   */
+  unlockMessage?: string;
   objective: DayObjectiveDefinition;
   unlocks: readonly string[];
   guestIds: readonly GuestId[];

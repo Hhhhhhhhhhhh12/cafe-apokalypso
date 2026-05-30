@@ -45,7 +45,7 @@ export const weekOneEvents = [
     title: "Herr Bohn Remembers",
     tone: "anomaly",
     trigger: "Herr Bohn visits after guest behavior differences are introduced.",
-    text: "Herr Bohn says the corner used to be quieter before it remembered things.",
+    text: "Herr Bohn mentions that the corner used to be quieter. Before it remembered things.",
     relatedGuestIds: ["herr-bohn"]
   },
   {
@@ -88,7 +88,7 @@ export const weekOneEvents = [
     title: "KASSANDRA Update",
     tone: "kassandra",
     trigger: "The cash register update installs.",
-    text: "KASSANDRA begins with demand prediction and calm customer classification."
+    text: "The register update is complete. KASSANDRA has filed an initial report. It was not asked to."
   },
   {
     id: "day-7-red-umbrella",
@@ -96,7 +96,7 @@ export const weekOneEvents = [
     title: "Red Umbrella",
     tone: "anomaly",
     trigger: "Frau mit rotem Regenschirm appears on the busier Day 7.",
-    text: "A woman arrives with a red umbrella although it is not raining.",
+    text: "A woman arrives with a red umbrella although it is not raining. She asks not to be recognized.",
     relatedGuestIds: ["frau-roter-regenschirm"]
   }
 ] as const satisfies readonly EventDefinition[];

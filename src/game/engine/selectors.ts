@@ -20,6 +20,7 @@ import type {
   DayDefinition,
   EventDefinition,
   GuestDefinition,
+  GuestId,
   KassandraMessageDefinition,
   ProductDefinition,
   StaffOptionDefinition
@@ -54,6 +55,66 @@ export function getCurrentDayEvents(state: GameState): readonly EventDefinition[
   const eventIds = new Set(currentDay.eventIds);
 
   return weekOneEvents.filter((event) => eventIds.has(event.id));
+}
+
+/**
+ * Player-facing narrative event cards for the current day.
+ * Process/structural beats (tone "normal", e.g. day-1-opening-rhythm) are
+ * intentionally excluded — they are authoring metadata, not story moments.
+ */
+export function getNarrativeEventCards(
+  state: GameState
+): readonly EventDefinition[] {
+  return getCurrentDayEvents(state).filter((event) => event.tone !== "normal");
+}
+
+/**
+ * Deterministically selects the serve line for the customer at the given
+ * zero-based index within the current day. Strange guests are preferred once
+ * three customers have already been served (customerIndex >= 3), so the
+ * subtly-strange regulars reliably get a serve-line moment on their days.
+ * No randomness is used.
+ */
+export function getServeLineForCustomer(
+  state: GameState,
+  customerIndex: number
+): string {
+  const guest = getGuestForCustomer(state, customerIndex);
+
+  return guest?.serveLine ?? "The order is served.";
+}
+
+function getGuestForCustomer(
+  state: GameState,
+  customerIndex: number
+): GuestDefinition | undefined {
+  const index = Math.max(0, Math.floor(customerIndex));
+  const currentDay = getCurrentDayDefinition(state);
+  const guestsById = new Map<GuestId, GuestDefinition>(
+    weekOneGuests.map((guest) => [guest.id, guest] as [GuestId, GuestDefinition])
+  );
+  const dayGuests = currentDay.guestIds
+    .map((id) => guestsById.get(id))
+    .filter((guest): guest is GuestDefinition => Boolean(guest));
+
+  if (dayGuests.length === 0) {
+    return undefined;
+  }
+
+  const normalPool = dayGuests.filter((guest) => guest.category === "normal");
+  const strangePool = dayGuests.filter(
+    (guest) => guest.category === "subtly_strange"
+  );
+
+  if (index >= 3 && strangePool.length > 0) {
+    return strangePool[(index - 3) % strangePool.length];
+  }
+
+  if (normalPool.length > 0) {
+    return normalPool[index % normalPool.length];
+  }
+
+  return dayGuests[index % dayGuests.length];
 }
 
 export function getVisibleKassandraMessages(

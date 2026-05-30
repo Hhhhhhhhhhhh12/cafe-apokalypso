@@ -38,10 +38,9 @@ export function App() {
     <main className="app-shell">
       <header className="hero-bar" aria-labelledby="app-title">
         <div>
-          <p className="eyebrow">Early placeholder shell</p>
           <h1 id="app-title">Café Apokalypso</h1>
           <p className="intro">
-            Browser-playable foundation for the seven-day cozy-absurd café demo.
+            A cozy café. Seven days. Something is not quite right.
           </p>
         </div>
         <div className="day-card" aria-label={`Aktueller Status: Tag ${gameState.day}`}>
