@@ -52,7 +52,7 @@ export function App() {
 
       <section className="workspace-grid" aria-label="Game shell workspace">
         <ResourceHud gameState={gameState} />
-        <CafePlaceholder />
+        <CafePlaceholder gameState={gameState} />
         <ActionPanel
           gameState={gameState}
           statusMessage={gameState.statusMessage}
