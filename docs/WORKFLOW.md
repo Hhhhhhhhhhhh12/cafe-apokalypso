@@ -93,6 +93,7 @@ Before implementation starts, the following should be documented clearly:
 
 Claude Code can be used earlier for documentation and repository structure. Codex should only start implementation once the task is narrow, testable, and tied to a specific issue or file set.
 
+
 ## Preferred Handoff Order
 
 1. ChatGPT develops concept, scope, data lists, and prompts with the user.
@@ -100,6 +101,135 @@ Claude Code can be used earlier for documentation and repository structure. Code
 3. Codex implements focused slices from the agreed documentation.
 4. Claude Code or ChatGPT reviews larger consistency questions.
 5. Codex fixes concrete issues and tests.
+
+## Creative-to-Canon Workflow
+
+Use this workflow for major creative, genre, mechanic, MVP, architecture, art-direction, or workflow changes.
+
+The goal is to let ideas stay strange and exploratory at first, while preventing context drift and accidental multi-file repository churn later.
+
+### 1. Creative Sandbox
+
+ChatGPT is the primary place for early ideation.
+
+In this phase:
+
+- explore unusual ideas freely
+- compare directions and genre mixes
+- sharpen tone, player fantasy, mechanics, and scope
+- do not edit repository files directly
+- do not hand work to Codex or Claude Code yet
+
+The expected output is a short Concept Card, not a repository patch.
+
+### 2. Concept Card
+
+Before a major idea becomes actionable, ChatGPT should condense it into a Concept Card.
+
+A Concept Card should include:
+
+- idea title
+- one-paragraph summary
+- why it matters
+- intended player experience
+- MVP impact
+- likely affected documents
+- likely affected code areas
+- open questions
+- explicit out-of-scope items
+
+The Concept Card can become the basis for a GitHub Issue, RFC-style proposal, or Claude Code review prompt.
+
+### 3. Canon Check
+
+Before repository files are changed, Claude Code or ChatGPT should compare the Concept Card against the current project canon.
+
+The Canon Check should read the relevant Markdown files and return:
+
+- compatible areas
+- conflicts or context drift
+- files that would need updates
+- implementation risks
+- unresolved decisions for the user
+- recommendation
+
+Canon Check tasks should not edit files unless explicitly approved.
+
+### 4. Human Decision Gate
+
+If the Canon Check finds conflicts, ambiguity, scope expansion, or competing interpretations, the user decides before implementation begins.
+
+The decision prompt should be short and decision-oriented:
+
+- what conflicts
+- available options
+- tradeoffs
+- recommendation
+- what happens if no decision is made
+
+Research support may be used when the decision depends on genre conventions, tooling, workflow patterns, legal/security questions, accessibility, or other external facts.
+
+### 5. Approved Issue or Handoff Prompt
+
+After the user approves a direction, create one of the following:
+
+- a GitHub Issue for implementation or documentation sync
+- a concise Claude Code prompt for canon/documentation work
+- a concise Codex prompt for focused implementation work
+
+The handoff must include:
+
+- goal
+- context files
+- allowed changes
+- forbidden changes
+- acceptance criteria
+- verification steps
+- stop conditions
+
+Large design changes should normally become GitHub Issues before files are edited.
+
+### 6. Agent Implementation
+
+Claude Code and Codex should work from the approved issue or handoff prompt, not from raw chat brainstorming.
+
+Rules:
+
+- use a branch or reviewable commit group
+- keep docs-only, code-only, and art-pipeline changes separate where possible
+- do not silently resolve major design contradictions
+- stop and ask the user when a decision is needed
+- open or prepare a reviewable Pull Request when appropriate
+
+### 7. Review Translation
+
+Because the user may not want to inspect every diff line manually, every substantial agent result should include a plain-language review translation.
+
+The review translation should explain:
+
+- what changed
+- why it changed
+- what it means for the game
+- what risks remain
+- what should be tested
+- whether merge is recommended
+- follow-up issues, if needed
+
+The user remains the final decision-maker.
+
+### 8. Automation Boundary
+
+Automation tools such as GitHub Actions, n8n, Relevance AI, or similar orchestration systems may be considered later, but they should not be the first layer of governance.
+
+Preferred maturity path:
+
+1. manual Concept Card and Canon Check
+2. reusable prompts in `docs/PROMPTS.md`
+3. GitHub Issue templates
+4. optional `/docs-sync` or `/canon-check` command that prepares prompts or review comments
+5. optional Draft PR creation
+
+Automation must not directly merge changes or make binding design decisions.
 
 ## Task Format for Claude Code
 

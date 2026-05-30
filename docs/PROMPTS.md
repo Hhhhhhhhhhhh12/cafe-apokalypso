@@ -71,6 +71,304 @@ Output:
 5. Suggested next implementation task for Codex.
 ```
 
+
+## Prompt C1: ChatGPT Concept Card
+
+Use this inside ChatGPT after a creative discussion, before creating GitHub Issues or handing work to Claude Code/Codex.
+
+```txt
+You are helping shape a new idea for Café Apokalypso.
+
+Task:
+Condense the discussion into a Concept Card.
+
+Do not write repository patches.
+Do not assume implementation approval.
+Do not broaden the idea beyond what was discussed.
+
+Output:
+1. Idea title
+2. One-paragraph summary
+3. Why it matters
+4. Intended player experience
+5. MVP impact
+6. Likely affected documents
+7. Likely affected code areas
+8. Open questions
+9. Explicit out-of-scope items
+10. Recommendation: park, explore more, canon-check, or create issue
+```
+
+## Prompt C2: Claude Code Canon Check for Concept Card
+
+Use this after a Concept Card exists and before any files are edited.
+
+```txt
+You are working in the GitHub repository `cafe-apokalypso`.
+
+Read docs/PROJECT_CANON.md first.
+
+Then read the Concept Card provided by the user.
+
+Then read the relevant repository documentation, at minimum:
+- README.md
+- docs/DECISIONS.md
+- docs/WORKFLOW.md
+- docs/GAME_DESIGN.md
+- docs/MVP_SCOPE.md
+- docs/DEMO_SCOPE.md if it exists
+- docs/TECH_ARCHITECTURE.md
+- docs/ROADMAP.md
+- docs/CONTENT_GUIDE.md
+- docs/QUALITY_CHECKLIST.md
+- docs/AGENT_ORCHESTRATION.md if it exists
+
+Do not edit files.
+Do not create commits.
+Do not create branches.
+
+Task:
+Compare the Concept Card against the current project canon.
+
+Check for:
+- compatible areas
+- contradictions or context drift
+- MVP scope impact
+- architecture or data-model implications
+- art-direction implications
+- content/tone implications
+- quality, accessibility, save-safety, security, responsive-layout, or demo-release risks
+- files that would need updates if the idea is approved
+- implementation tasks that should be separate from documentation updates
+- decisions that require human approval before implementation
+
+Output:
+1. Short verdict: compatible, compatible with caveats, or conflicting.
+2. Canon alignment summary.
+3. Context drift / contradictions.
+4. Affected files and why.
+5. MVP impact.
+6. Implementation risks.
+7. Human decision questions, phrased as clear options.
+8. Recommendation.
+9. Suggested next handoff: GitHub Issue, docs-only PR, Codex implementation prompt, or park.
+10. ClickUp handoff tracking recommendation with prompt ID, tool, related issue/task, status, and result link placeholder.
+```
+
+## Prompt C3: ChatGPT Human Decision Gate
+
+Use this after a Canon Check finds conflicts, ambiguity, or scope tradeoffs.
+
+```txt
+You are helping the user decide how to proceed with a Café Apokalypso concept change.
+
+Input:
+- Concept Card
+- Canon Check result
+- any relevant user preferences or constraints
+
+Task:
+Create a short decision brief for the user.
+
+Do not write repository patches.
+Do not create a final handoff yet unless the user asks.
+
+For each open decision:
+- state the conflict in plain language
+- give 2–3 options
+- list tradeoffs
+- recommend one option
+- explain what happens if no decision is made
+
+Output:
+1. Executive summary
+2. Decisions needed now
+3. Decisions that can wait
+4. Recommended path
+5. Suggested next artifact: GitHub Issue, ADR/Decision Record, Claude prompt, Codex prompt, or no action
+```
+
+## Prompt C4: ChatGPT Approved Issue Draft
+
+Use this after the user approves a direction and wants a GitHub Issue or RFC-style proposal.
+
+```txt
+Create a GitHub Issue draft for Café Apokalypso.
+
+The issue should be based only on the approved direction below.
+Do not add new scope.
+Do not turn optional ideas into requirements.
+
+Include:
+- Title
+- Labels
+- Summary
+- Context
+- Approved direction
+- Alternatives considered, if known
+- MVP impact
+- Affected docs
+- Affected code areas
+- Out of scope
+- Open questions
+- Acceptance criteria
+- Suggested implementation sequence
+- Stop conditions
+- Review notes for the user
+
+Use labels from this set when appropriate:
+- design-decision
+- docs-sync-needed
+- mvp-scope
+- architecture
+- art-direction
+- content
+- needs-approval
+- approved
+- codex-ready
+- claude-ready
+
+Output the issue in Markdown, ready to paste into GitHub.
+```
+
+## Prompt C5: Claude Code Docs Sync from Approved Issue
+
+Use this after a GitHub Issue or approved decision exists. This prompt allows documentation edits, but only inside the approved scope.
+
+```txt
+You are working in the GitHub repository `cafe-apokalypso`.
+
+Read docs/PROJECT_CANON.md first.
+Read the approved GitHub Issue or approved decision text provided by the user.
+
+Then read only the affected documentation files listed in the issue.
+If the affected files are missing or unclear, stop and ask for clarification.
+
+Task:
+Synchronize the approved decision into the listed documentation files.
+
+Allowed changes:
+- documentation files explicitly listed in the issue
+
+Forbidden changes:
+- code changes
+- asset changes
+- dependency changes
+- broad rewrites outside the approved issue
+- new design decisions not present in the issue
+- changing MVP scope unless the issue explicitly approves it
+
+Rules:
+- make the smallest coherent documentation changes
+- preserve existing document structure where possible
+- keep docs-only, code, and art-pipeline changes separate
+- if a contradiction is found that is not resolved by the issue, stop and report it instead of silently choosing
+- do not invent new features
+
+Acceptance criteria:
+- approved decision is reflected consistently in listed docs
+- no unapproved scope expansion
+- unresolved questions remain marked as open
+- follow-up implementation tasks are listed separately if needed
+
+Verification:
+- no code commands required unless the repo has documentation checks
+- report whether documentation-only checks were performed
+
+After finishing:
+- summarize changed files
+- explain what changed in plain language
+- list unresolved questions
+- list follow-up issues/tasks
+- provide a merge recommendation
+- provide the ClickUp handoff status update: prompt ID, tool, related GitHub issue/task, status, and result link placeholder
+```
+
+## Prompt C6: Codex Implementation Handoff from Approved Issue
+
+Use this after docs are aligned and the implementation scope is clear.
+
+```txt
+You are working in the GitHub repository `cafe-apokalypso`.
+
+Read docs/PROJECT_CANON.md first.
+Read the approved GitHub Issue or implementation brief provided by the user.
+
+Then read the listed context files only. If necessary context is missing, stop and ask for clarification before editing.
+
+Task:
+Implement the approved slice.
+
+Allowed changes:
+- files explicitly listed or clearly required by the approved implementation brief
+
+Forbidden changes:
+- unrelated refactors
+- new dependencies unless explicitly approved
+- backend, accounts, tracking, analytics, payments, or real AI API in the MVP
+- final art assets or generated images
+- broad documentation rewrites
+- new gameplay systems beyond the approved slice
+- changing main view or art direction without explicit approval
+
+Rules:
+- keep the change small and reviewable
+- preserve existing tests and quality gates
+- follow docs/QUALITY_CHECKLIST.md
+- keep game logic separate from presentation where applicable
+- stop if the implementation contradicts the docs or expands MVP scope
+
+Acceptance criteria:
+- all issue acceptance criteria are met
+- tests cover the changed behavior where practical
+- build/typecheck/test pass
+- no critical information is conveyed only through color or image detail
+- localStorage remains defensive and resettable if touched
+
+Verification:
+- npm run build
+- npm run test
+- npm run typecheck
+
+After finishing:
+- summarize changed files
+- explain what changed in plain language
+- list tests/checks run
+- list checks that could not be run
+- list risks and follow-up tasks
+- provide a merge recommendation
+- provide the ClickUp handoff status update: prompt ID, tool, related GitHub issue/task, status, and result link placeholder
+```
+
+## Prompt C7: Review Translation for User
+
+Use this after Claude Code, Codex, or another tool produces a diff, PR, or implementation report.
+
+```txt
+You are helping the user review a Café Apokalypso change without requiring deep diff-reading knowledge.
+
+Input:
+- agent result summary
+- changed files list
+- diff or PR description if available
+- related issue or prompt
+
+Task:
+Translate the result into a plain-language review.
+
+Output:
+1. What changed?
+2. Why was it changed?
+3. What does it mean for the game?
+4. What does it mean technically?
+5. What should the user manually check?
+6. What automated checks passed or are missing?
+7. Risks or possible regressions.
+8. Whether this looks safe to merge.
+9. Follow-up issues/tasks to create.
+10. One-sentence recommendation: merge, request changes, test locally first, or park.
+```
+
 ## Prompt 2: Claude Code Documentation and Architecture Readiness Pass
 
 Use this after Prompt 1 if we want Claude Code to apply documentation-readiness edits and optionally create implementation planning docs.
