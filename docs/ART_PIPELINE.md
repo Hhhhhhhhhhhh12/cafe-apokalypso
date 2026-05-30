@@ -183,6 +183,57 @@ Für die erste spielbare Smoke Demo werden nur wenige, aber charakterstarke Asse
 - Werbe-/Flyer-Icon
 - erste subtile Omen-Assets
 
+Für den Vertical Slice darf zusätzlich ein begrenzter Pixel-Art-Pilot integriert werden. Dieser Pilot dient als Beweis, dass die visuelle Richtung technisch und spielerisch funktioniert. Er ist kein vollständiger Final-Art-Pass.
+
+Pilotumfang:
+
+- ein freigegebener Day-1-Café-Hintergrund oder Hintergrund-Ausschnitt
+- 4–6 freigegebene normale Gast-Sprites
+- ein freigegebener Barista-/Staff-Sprite
+- 6–10 freigegebene Café-Props
+- 1–2 freigegebene Weirdness-Overlay-Props, zum Beispiel Uhr-Anomalie, Tiny-Portal-Cup, endloser Bon, Formularstapel oder KI-Orakel-Objekt
+
+Nicht Teil des Pilots:
+
+- vollständige finale Grafikproduktion
+- rohe AI-Studio-/Gemini-/Nano-Banana-Bildbatches im Repo
+- komplette 8-Richtungs-Character-Sets
+- vollständige Walk-/Idle-/Sitz-Animationen für alle Figuren
+- vollständige Day-1-bis-Day-7-Art-Layer
+- gebackene KI-Schrift als UI oder Spieltext
+
+## Pilot-Asset-Regeln
+
+Der Pixel-Art-Pilot darf erste kuratierte Assets ins Spiel bringen, muss aber jederzeit ersetzbar bleiben.
+
+Regeln:
+
+- Roh generierte Sheets bleiben außerhalb des Repositories.
+- Nur zugeschnittene, kuratierte und ausdrücklich freigegebene Einzelassets dürfen ins Repo.
+- Jedes Pilotasset braucht einen klaren Dateinamen und eine nachvollziehbare Rolle.
+- Pilotassets gelten als vorläufig, sofern sie nicht später explizit als final markiert werden.
+- Falls ein Pilotasset fehlt oder ausgetauscht wird, muss die App weiterhin mit Platzhaltern rendern.
+- UI-Text, Zahlen, Labels, Buttons und Menüs bleiben echte HTML/CSS/React-Texte.
+- Generierte Bildschrift, Gibberish-Labels oder KI-Typografie werden nicht als UI oder Spieltext übernommen.
+- Kritische Information darf nicht ausschließlich über Bilddetails vermittelt werden.
+- Pilotassets dürfen nicht die kanonische 3/4-Café-Hauptansicht verändern.
+
+Empfohlene Pilotkategorien:
+
+- `backgrounds/` für Café-Hintergrund oder Hintergrundteile
+- `sprites/guests/` für normale Gäste
+- `sprites/staff/` für Barista/Personal
+- `sprites/props/` für Café-Objekte
+- `sprites/overlays/` für Weirdness- und Omen-Elemente
+
+Vor der Integration:
+
+1. Externes Moodboard oder Casting-Sheet prüfen.
+2. Kandidaten auswählen und ablehnen/überarbeiten markieren.
+3. Einzelassets zuschneiden oder neu exportieren.
+4. Assetnamen und Rolle dokumentieren.
+5. Erst dann technische Integration starten.
+
 ## Platzhalter
 
 Für frühes Prototyping dürfen Platzhalter verwendet werden.
@@ -197,16 +248,18 @@ Platzhalter sollen später ersetzt oder stilistisch vereinheitlicht werden.
 
 ## Export-Struktur
 
-Empfohlene Struktur:
-
 ```text
 assets/
   concepts/
+  backgrounds/
   sprites/
     guests/
+    staff/
     cafe/
+    props/
+    overlays/
     ui/
     items/
   tiles/
-  backgrounds/
   exports/
+```

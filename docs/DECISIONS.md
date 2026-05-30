@@ -4,6 +4,8 @@
 
 Café Apokalypso is a cozy-absurd solo management game for the web.
 
+It is positioned as a cozy-absurd café management soft-roguelite.
+
 The player starts with a seemingly normal small café. Early gameplay focuses on micromanagement: taking orders, preparing drinks, cleaning tables, buying ingredients, setting prices, and running small advertisements.
 
 Over time, guests, events, and systems become increasingly absurd, mythological, AI-driven, and apocalyptic.
@@ -52,6 +54,27 @@ No backend.
 No accounts.
 No tracking.
 Local browser save only.
+
+
+## Decision: Café Apokalypso as a Soft-Roguelite
+
+Café Apokalypso is positioned as a cozy-absurd café management soft-roguelite.
+
+The core structure is built around repeated café weeks. A week functions as a run: the player manages several in-game days, makes economic and operational decisions, responds to guests and events, and reaches an end-of-week apocalyptic pressure point.
+
+Failure should be soft rather than punitive. A failed or unstable week should not erase all progress. Instead, reality may partially reset while KASSANDRA preserves selected memories, unlocks, guest knowledge, upgrades, or forecasts.
+
+The first seven-day MVP remains valid and is treated as the first playable café week / first run. The Day 7 apocalyptic letter becomes the reveal that the café is part of a larger repeating crisis structure.
+
+Design implications:
+
+- no hard permadeath
+- no full punitive reset
+- repeated weeks with changing conditions
+- persistent KASSANDRA memory as meta-progression
+- unlockable recipes, staff options, guest knowledge, forecasts, and start bonuses
+- humorous failure and reset states
+- management remains the core, roguelite structure provides replayability and escalation
 
 
 ## Decision: Tooling and Project Orchestration Workflow

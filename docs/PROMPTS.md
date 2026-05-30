@@ -394,6 +394,7 @@ After finishing:
 - Provide the ClickUp handoff status update: prompt ID, tool, related task, status, and result link placeholder.
 ```
 
+
 ## Prompt 6: ClickUp Task Creation Outline
 
 Use only if ClickUp setup or task-list creation is needed. ClickUp prompt handoff tracking is required for actual handoffs, but creating a full task list is optional and should only be introduced when it clearly helps.
@@ -419,6 +420,99 @@ For each task include:
 - status: Todo
 
 Do not add tasks for full mythology roster, backend, real AI API, accounts, payments, or multi-location expansion. Those are out of MVP scope.
+```
+
+## Prompt 10D: Pixel-Art Asset Pilot for Vertical Slice
+
+Use after the café layout, week-one loop, and first art-review direction have been approved. This prompt is for a limited asset pilot, not a full art-production pass.
+
+```txt
+You are working in the GitHub repository `cafe-apokalypso`.
+
+Read docs/PROJECT_CANON.md first.
+
+Then read:
+- README.md
+- docs/MVP_SCOPE.md
+- docs/DEMO_SCOPE.md if it exists
+- docs/GAME_DESIGN.md
+- docs/TECH_ARCHITECTURE.md
+- docs/ART_PIPELINE.md
+- docs/ART_STYLEGUIDE.md
+- docs/QUALITY_CHECKLIST.md
+- docs/WORKFLOW.md
+- docs/AGENT_ORCHESTRATION.md
+- docs/art/MOODBOARD_CAFE_INTERIOR_001.md if it exists
+
+Task:
+Prepare and integrate a limited pixel-art asset pilot for the vertical slice.
+
+Goal:
+The vertical slice should not remain purely CSS-placeholder-based. It should contain a small number of reviewed, curated pixel-art pilot assets while keeping fallback placeholders and avoiding a full final-art commitment.
+
+Scope:
+- Add an asset structure for curated pilot assets.
+- Add typed asset metadata for pilot assets.
+- Integrate the first approved pixel-art pilot assets into the café view.
+- Preserve the existing café layout and 3/4 diorama direction.
+- Keep real UI text in HTML/CSS/React, not baked into images.
+- Keep CSS placeholders as fallback if assets are missing.
+
+Allowed pilot asset categories:
+- one approved Day-1 café background or background slice
+- 4–6 approved normal guest sprites
+- one barista/staff sprite
+- 6–10 café props
+- 1–2 weirdness overlay props, such as clock anomaly, tiny portal cup, endless receipt, form stack, or AI-oracle object
+
+Constraints:
+- No full final art pass
+- No 8-direction sprite system
+- No full animation system
+- No complete Day 1–7 art layering
+- No backend
+- No real AI API
+- No accounts
+- No tracking
+- No external asset dependency
+- Do not commit raw AI Studio / Gemini / Nano Banana image batches
+- Do not use images that contain generated gibberish text as UI
+- Do not introduce readable text inside art assets unless explicitly approved
+- Do not change the main 3/4 café view
+- Do not replace the current gameplay scope
+- Do not invent new canonical characters without documented approval
+
+Asset rules:
+- Raw generated sheets remain outside the repository.
+- Only cropped, curated, explicitly approved pilot assets may enter the repository.
+- Use clear filenames.
+- Keep source/reference notes in Markdown or metadata.
+- Treat generated art as provisional pilot art unless the docs explicitly mark it as final.
+- If an asset is missing, the app should still render with placeholders.
+
+Acceptance criteria:
+- First curated pixel-art pilot assets appear in the café view.
+- Raw generated image sheets are not committed.
+- Assets are organized in a predictable folder structure.
+- Asset metadata is typed and easy to replace later.
+- UI text remains actual HTML/CSS/React text, not baked into generated images.
+- CSS placeholders/fallbacks still work.
+- The app remains keyboard-accessible.
+- No critical information is conveyed only through image detail.
+- Build/test/typecheck pass.
+
+Verification:
+- npm run build
+- npm run test
+- npm run typecheck
+
+After finishing:
+- Summarize changed files.
+- List which assets were integrated and where they came from.
+- Confirm that raw generated sheets were not committed.
+- Explain how to replace pilot assets later.
+- Note any checks that could not be run.
+- Provide the ClickUp handoff status update: prompt ID, tool, related GitHub issue/task, status, and result link placeholder.
 ```
 
 ## Asset and Art Safety Rule for Codex

@@ -61,8 +61,15 @@ If a task would violate a requirement here, stop and explain the conflict instea
 - Major UI screens or visual systems require a UI Sheet in `docs/art/` before final art production.
 - Recurring props, icons, café objects, and event items require an Asset Sheet in `docs/art/` before final art production.
 - Moodboard-driven style decisions and weirdness-escalation changes must be documented before they are implemented as final visuals.
+- Raw AI Studio / Gemini / Nano Banana image sheets must not be committed as production assets.
+- Only cropped, curated, explicitly approved pilot assets may enter the repository.
+- Generated gibberish text, AI-made typography, unreadable labels, or baked-in UI text must not be used as game UI.
+- UI text, buttons, values, labels, menus, and status information must remain real HTML/CSS/React text.
 - CSS placeholders are allowed if clearly marked and named with the `placeholder-` prefix.
-- Claude Code/Codex may implement placeholders, typed asset metadata, folder structure, and rendering components, but must not invent canonical final character designs or change the main 3/4 café view without approval.
+- Pilot assets must have clear filenames, documented roles, and typed metadata where they are consumed by the app.
+- Pilot assets must remain replaceable; the app must still render with placeholders or fallback visuals if an asset is missing.
+- No critical gameplay information may rely only on small image details inside art assets.
+- Claude Code/Codex may implement placeholders, typed asset metadata, folder structure, rendering components, a small local art-review workflow, and approved pilot asset integration, but must not invent canonical final character designs or change the main 3/4 café view without approval.
 
 ## Content QA
 
@@ -84,6 +91,8 @@ If a task would violate a requirement here, stop and explain the conflict instea
 - The README "Play the Demo" link points to the live demo URL once deployed.
 - The README includes a screenshot or short gameplay GIF once a playable build exists.
 - No secrets, API keys, `.env` files, or local-only config files are committed.
+- If pilot pixel-art assets are included, raw generated image sheets are excluded and only curated approved assets are committed.
+- If pilot pixel-art assets are included, the app still works when those assets are missing or replaced by placeholders.
 - The repository website field points to the playable demo URL.
 - `.DS_Store`, `node_modules/`, and build artifacts are excluded by `.gitignore`.
 - The app is distributed as a browser-playable static web app. No desktop app packaging is part of this release.
@@ -93,10 +102,10 @@ If a task would violate a requirement here, stop and explain the conflict instea
 The following are explicitly out of scope for the MVP and demo release. Do not implement them.
 
 - Audio, sound effects, or ambient music (Phase 5)
-- Final production pixel-art assets (Phase 5)
+- Full final production pixel-art asset pass (Phase 5); limited curated pilot assets are allowed for the vertical slice
 - Localization / i18n file migration (Phase 5)
 - Mobile-first or mobile-optimized layout (Phase 5)
-- Advanced animations or sprite-sheet animation system (Phase 1+)
+- Advanced animations, full 8-direction character sets, or complete sprite-sheet animation system (Phase 1+)
 - Backend server, database, user accounts, authentication (never in MVP)
 - Real AI API integration (never in MVP; KASSANDRA is simulated only)
 - External analytics, telemetry, or tracking
