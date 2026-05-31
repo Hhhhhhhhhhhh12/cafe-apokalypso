@@ -398,3 +398,101 @@ repo.)
     stage box; the warm diorama gradient shows in the margins.
   - This is a feel test, **not** a final art-direction decision. Projection-correct
     regeneration remains the longer-term path.
+
+---
+
+## Stage Base v04 — front-3/4 generation brief
+
+**Decision context:** the projection question is resolved — Option (A), front-3/4 stays
+canonical, and Stage Base v03 (corner-isometric) is to be **replaced** by a
+projection-correct **Stage Base v04**. See [../DECISIONS.md](../DECISIONS.md) →
+"DECISION: Diorama Projection — Front-3/4 (Stage Base v04)" and
+[CAFE_DIORAMA_DIRECTION.md](CAFE_DIORAMA_DIRECTION.md) §"RESOLVED". This section is the
+generation spec; it does **not** add an asset. v04 enters the repo only after passing the
+§5 approval checklist.
+
+### Intent
+
+An **empty-room** café background painted in the **front-angled 3/4** projection of
+[CAFE_DIORAMA_DIRECTION.md](CAFE_DIORAMA_DIRECTION.md) §2 — camera looking down and
+slightly forward (~30–45° from horizontal), angled from the front-left; rear wall and
+**one** side wall visible; floor shown in perspective. The room is a stage onto which the
+existing front-3/4 CSS props (counter, register, tables, chairs, guests) are layered, so
+the background must **leave those zones empty** and align to the same vanishing-point
+family as the props.
+
+### Specifications
+
+- **Projection:** front-angled 3/4 (NOT corner-isometric / diamond-room). Top **and**
+  front faces of room surfaces read; the floor recedes toward a rear wall, not toward a
+  centered corner.
+- **Orientation:** **landscape** (wider than tall), matching the café stage container.
+- **Suggested dimensions:** target ~**1024×576 px** (16:9-ish), or whatever matches the
+  stage box aspect; pixel-readable at game scale. Final crop sized to the room bounding box.
+- **Empty room:** **no baked-in props or guests** — no counter unit, coffee machine,
+  register, tables, chairs, menu text, or people. Only the room shell: walls, floor,
+  window opening, door opening, and ambient light. (CSS/sprite props provide the
+  furnishings.)
+- **Clean alpha:** **real transparency** around the room silhouette (no embedded
+  checkerboard, no opaque surround), so the CSS diorama gradient/walls show through the
+  margins/corners exactly as v03's transparent surround does.
+- **Text-free:** no labels, signage copy, menu text, prices, or UI text anywhere in the
+  image (per the no-baked-in-text rule).
+- **Palette:** warm cozy café — creams, browns, muted reds, soft yellows; warm morning
+  light through the window. No glossy AI render, no neon, no high-saturation web colors,
+  no horror framing.
+- **Composition (leave these zones clear for props):** counter zone rear-left/center;
+  window rear-right (warm exterior light); door front-right/center; mid/right floor open
+  for tables; small décor corner. Reading order matches §2's spatial diagram.
+- **Status on entry:** provisional pilot art, replaceable; not final until explicitly
+  marked final in [../ART_PIPELINE.md](../ART_PIPELINE.md).
+
+### Tooling
+
+Candidate tool: an **external pixel tool (e.g. PixelLab)** rather than a general image
+model, for cleaner pixel output and easier alpha. Raw output stays in the external asset
+inbox (`/Users/Heineken/Code/cafe-apokalypso-asset-inbox/`, see
+[../ART_PIPELINE.md](../ART_PIPELINE.md)); only the cropped, approved PNG enters the repo.
+
+### Intended repo path (after approval)
+
+```text
+assets/backgrounds/placeholder-cafe-stage-base-v04.png
+```
+
+### Graphics-chat handoff
+
+```text
+STAGE BASE v04 HANDOFF — Café Apokalypso (provisional pilot, NOT final art)
+
+Generate: an EMPTY café room background.
+  - placeholder-cafe-stage-base-v04.png   (~1024×576, landscape)
+
+Projection:
+  - FRONT-angled 3/4 (camera down ~30–45°, from front-left)
+  - rear wall + ONE side wall visible; floor recedes to the rear wall
+  - NOT corner-isometric / NOT a centered diamond room
+
+Room shell only — leave empty:
+  - NO counter, coffee machine, register, tables, chairs, menu, or people
+  - just walls, floor, a window opening (rear-right, warm light), a door opening (front)
+
+Image rules:
+  - transparent PNG, REAL alpha around the room (no checkerboard, no opaque surround)
+  - pixel-art, readable at game scale
+  - warm cozy palette: creams, browns, muted reds, soft yellows
+  - no glossy AI render, no neon, no high-saturation colors
+  - NO baked-in text of any kind
+
+Deliver as a cropped single PNG into the external asset inbox.
+Only the approved crop enters the repo (replaces Stage Base v03).
+```
+
+### Next steps after delivery
+
+1. Approve against the §5 checklist; note source in [ASSET_CATALOG.md](ASSET_CATALOG.md)
+   and approval in [ART_REVIEW_LOG.md](ART_REVIEW_LOG.md).
+2. Extract/clean per [../PROMPTS.md](../PROMPTS.md) → `R-EXTRACT`.
+3. Integrate and replace v03 per [../PROMPTS.md](../PROMPTS.md) → `R-STAGE`
+   (swap the `.cafe-stage-base` image source; keep all CSS fallbacks; re-check alignment;
+   v03 may then be removed).

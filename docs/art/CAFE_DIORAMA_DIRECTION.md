@@ -5,21 +5,17 @@ Implementation target: PROMPT-10C — First Visual Diorama Layout.
 
 ---
 
-## ⚠ OPEN DECISION: Diorama Projection (Front-3/4 vs. Isometric)
+## ✓ RESOLVED: Diorama Projection stays Front-3/4 (Stage Base v04)
 
-**Status: OPEN — not resolved. The front-3/4 direction below remains canonical until the user decides otherwise.**
+**Status: RESOLVED — Option (A), 2026-05-31. Front-3/4 is canonical.**
 
-The integrated **Stage Base v03** background (`assets/backgrounds/placeholder-cafe-stage-base-v03.png`) is **corner-isometric (diamond-room)**, which does **not** match the front-angled 3/4 projection this document and `docs/ART_STYLEGUIDE.md` mandate. The repo currently renders a **provisional isometric background beneath front-3/4 CSS props**, accepted **experimentally** as a feel test only (see `PILOT_ASSET_INTAKE.md`, "Stage Base v03 — experimental/provisional integration"). Alignment is imperfect (painted vs. CSS counter can read as doubled).
+The corner-isometric **Stage Base v03** (`assets/backgrounds/placeholder-cafe-stage-base-v03.png`) does **not** match the front-angled 3/4 projection this document mandates. The user chose to **keep front-3/4 canonical and replace v03 with a projection-correct Stage Base v04**. Re-canonizing to isometric (B) and keeping the hybrid (C) were rejected.
 
-Options — the user decides; none is pre-selected:
+Until v04 is generated, reviewed, and integrated, v03 stays in the repo as a **provisional** placeholder; the front-3/4 description and CSS props/fallbacks below remain authoritative, and the v03↔CSS alignment imperfection is accepted as temporary.
 
-- **(A) Regenerate Stage Base v04 in front-3/4** (keep canonical front-3/4; replace v03).
-- **(B) Re-canonize the main view to isometric** (would change this document + `ART_STYLEGUIDE.md`; needs explicit user approval as a main-view change).
-- **(C) Keep the hybrid** (isometric base under front-3/4 props) for the slice as-is.
+v04 generation brief (specs): see [PILOT_ASSET_INTAKE.md](PILOT_ASSET_INTAKE.md) → "Stage Base v04 — front-3/4 generation brief" — **text-free, landscape, clean alpha, empty room**, front-3/4, via an external pixel tool (e.g. PixelLab). Integration follows `../PROMPTS.md` → `R-EXTRACT` then `R-STAGE`.
 
-For Option A, v04 is a candidate for an **external pixel tool (e.g. PixelLab)**: **text-free, landscape, clean alpha, empty room**, per the `PILOT_ASSET_INTAKE.md` workflow.
-
-The full canonical decision record is in [../DECISIONS.md](../DECISIONS.md) → "OPEN DECISION: Diorama Projection". The 3/4 description in this document stays canonical until A, B, or C is chosen.
+Canonical decision record: [../DECISIONS.md](../DECISIONS.md) → "DECISION: Diorama Projection — Front-3/4 (Stage Base v04)".
 
 ---
 
