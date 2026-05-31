@@ -1,4 +1,5 @@
 import type { GameState } from "../../game/types/game";
+import stageBaseAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v03.png";
 import coffeeMachineAsset from "../../../assets/sprites/props/placeholder-cafe-coffee-machine.png";
 import kassandraRegisterAsset from "../../../assets/sprites/props/placeholder-kassandra-register.png";
 import paulaGuestAsset from "../../../assets/sprites/guests/placeholder-guest-paula.png";
@@ -57,6 +58,13 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
         role="img"
         aria-label={`3/4 café room on Day ${gameState.day}: counter, coffee machine, register, queue, two tables, door, window, storage shelf, menu board, and environmental details.`}
       >
+        <img
+          className="cafe-stage-base"
+          src={stageBaseAsset}
+          alt=""
+          aria-hidden="true"
+        />
+
         <div className="cafe-back-wall" aria-hidden="true">
           <div className="cafe-window">
             <span className="cafe-window__light" />
