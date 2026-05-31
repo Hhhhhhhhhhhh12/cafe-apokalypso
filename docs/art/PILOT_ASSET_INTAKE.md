@@ -365,3 +365,36 @@ repo.)
 - **Fallback reminder:** keep the existing CSS fallbacks intact (`cafe-table`,
   `cafe-chair`, `cafe-cup`, `cafe-counter-props`, `cafe-service-mat`); these assets
   are not yet integrated and the layout must still render without them.
+
+---
+
+## Stage Base v03 — experimental/provisional integration
+
+- **Asset:** `assets/backgrounds/placeholder-cafe-stage-base-v03.png` (892×708 px,
+  transparent surround), derived from the raw Google AI Studio render
+  `ca-asset-batch-03-stage-base-raw-v03.png`. The **raw sheet was NOT committed**
+  — it lives outside the repo in the asset inbox.
+- **Status:** **experimental / provisional, NOT final art.** Integrated to test
+  whether a richer room background makes the café demo more compelling. Subject to
+  replacement/removal without notice.
+- **Derivation:** the square 1024×1024 source had a baked **opaque checkerboard**
+  surround (no real alpha). The exterior checkerboard was removed via an
+  edge-connected flood fill over neutral+bright pixels and the result cropped to the
+  room bounding box, yielding real transparency around the room so the CSS diorama
+  gradient/walls show through the corners.
+- **Integration:** rendered as a low-z-index layer (`.cafe-stage-base`, z-index 2)
+  inside `CafePlaceholder.tsx`, sitting above the CSS wall placeholders and below
+  the `.cafe-floor` stacking context so existing props/guests render on top. The CSS
+  floor surface (`.cafe-floor` fill/border/shadow, `.cafe-floor__tiles`,
+  `.cafe-room-shadow`) had its visual prominence reduced to transparent/0 opacity so
+  the background reads through. **All fallback classes/rules were kept** — none were
+  deleted — so the stage still renders if the image is unavailable.
+- **Known visual caveats (accepted):**
+  - Source is **square** and **corner-isometric** (diamond-room) projection, which
+    does **not** match the front-angled 3/4 CSS stage. Front-3/4 CSS props (counter,
+    tables, chairs) overlay an isometric floor, so alignment is imperfect and the
+    painted vs. CSS counter can read as slightly doubled.
+  - The provisional crop/fit (`object-fit: contain`) letterboxes against the wider
+    stage box; the warm diorama gradient shows in the margins.
+  - This is a feel test, **not** a final art-direction decision. Projection-correct
+    regeneration remains the longer-term path.

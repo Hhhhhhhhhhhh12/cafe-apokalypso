@@ -300,6 +300,26 @@ h3 {
     var(--side-wall);
 }
 
+/*
+ * Experimental provisional Stage Base v03 background layer.
+ * Sits above the CSS wall placeholders (z 0/1) but below the floor
+ * stacking context (z 2) so existing props/guests render on top.
+ * Known caveat: source is a square, corner-isometric render, so it does
+ * not perfectly match the front-angled 3/4 CSS stage. Provisional only.
+ * If this image fails to load, the CSS .cafe-* fallback structure remains.
+ */
+.cafe-stage-base {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+  pointer-events: none;
+  user-select: none;
+}
+
 .cafe-window {
   position: absolute;
   top: 12%;
@@ -426,9 +446,15 @@ h3 {
   z-index: 2;
   height: 65%;
   clip-path: polygon(9% 1%, 100% 15%, 88% 100%, 0 84%);
-  border: 3px solid #624236;
-  background: var(--floor);
-  box-shadow: 0 18px 26px rgba(58, 36, 28, 0.2);
+  /*
+   * Surface fill/border/shadow reduced to transparent so the experimental
+   * Stage Base v03 background reads through. The floor element is kept as the
+   * positioning container for props/guests, and the class/rule remain for
+   * fallback if the background image is unavailable.
+   */
+  border: 3px solid transparent;
+  background: transparent;
+  box-shadow: none;
 }
 
 .cafe-floor__tiles {
@@ -438,7 +464,8 @@ h3 {
     linear-gradient(35deg, transparent 47%, var(--floor-line) 48% 52%, transparent 53%),
     linear-gradient(129deg, transparent 47%, var(--floor-line) 48% 52%, transparent 53%);
   background-size: 52px 48px;
-  opacity: 0.62;
+  /* Reduced from 0.62 so CSS tile lines do not double over the Stage Base. */
+  opacity: 0;
 }
 
 .cafe-room-shadow {
@@ -452,6 +479,8 @@ h3 {
     radial-gradient(ellipse at 34% 32%, rgba(52, 31, 24, 0.2), transparent 36%),
     radial-gradient(ellipse at 72% 66%, rgba(52, 31, 24, 0.18), transparent 33%);
   filter: blur(3px);
+  /* Reduced so the floor shadow does not darken the Stage Base background. */
+  opacity: 0;
 }
 
 .cafe-counter {
