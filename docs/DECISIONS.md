@@ -263,25 +263,33 @@ Required review sheets:
 
 Approved visual decisions are copied into `docs/ART_STYLEGUIDE.md`. Art process and production rules are maintained in `docs/ART_PIPELINE.md`. Review material and sheet drafts live in `docs/art/`.
 
-## OPEN DECISION: Diorama Projection — Front-3/4 vs. Isometric Stage Base
+## DECISION: Diorama Projection — Front-3/4 (Stage Base v04)
 
-**Status: OPEN — not resolved. Do not treat any option below as chosen.**
+**Status: RESOLVED — Option (A) chosen by the user (2026-05-31).**
 
-A conflict exists between the canonical main-view rule and an experimentally integrated background asset:
+The canonical main view stays **front-angled 3/4**. The corner-isometric **Stage Base v03** is to be **replaced** by a projection-correct **Stage Base v04** generated in front-3/4. Until v04 is produced, reviewed, and integrated, v03 remains in the repo as a **provisional** placeholder (the front-3/4 CSS props and fallbacks stay authoritative). Options (B) re-canonize to isometric and (C) keep the hybrid were **not** chosen.
+
+Next steps (tracked):
+- Generate Stage Base v04 to the spec in `docs/art/PILOT_ASSET_INTAKE.md` → "Stage Base v04 — front-3/4 generation brief" (external pixel tool, e.g. PixelLab).
+- Once approved in the asset inbox: extract/clean per `PROMPTS.md` → `R-EXTRACT`, then integrate/replace v03 per `R-STAGE`.
+
+The original conflict and the options considered are preserved below for the record.
+
+---
+
+A conflict existed between the canonical main-view rule and an experimentally integrated background asset:
 
 - `docs/ART_STYLEGUIDE.md` and `docs/art/CAFE_DIORAMA_DIRECTION.md` mandate a **front-angled 3/4 diorama** (camera angled from the front-left; top + front faces of props visible).
 - The integrated **Stage Base v03** (`assets/backgrounds/placeholder-cafe-stage-base-v03.png`) is a **corner-isometric (diamond-room)** projection.
 
 The repository therefore currently renders a **provisional isometric background underneath front-3/4 CSS props**. This was accepted **experimentally** (a feel test only — see `docs/art/PILOT_ASSET_INTAKE.md`, "Stage Base v03 — experimental/provisional integration"). It is not a final art-direction decision and the projection mismatch causes imperfect alignment (the painted vs. CSS counter can read as slightly doubled).
 
-Options (the user decides; none is pre-selected):
+Options considered:
 
-- **(A) Regenerate Stage Base v04 in front-3/4.** Keep the canonical front-3/4 direction; replace v03 with a projection-correct background.
-- **(B) Re-canonize to isometric.** Change the canonical main view to corner-isometric and update `ART_STYLEGUIDE.md` + `CAFE_DIORAMA_DIRECTION.md` (and re-fit the CSS props) accordingly. This would be a main-view direction change and needs explicit user approval.
-- **(C) Keep the hybrid.** Accept the isometric base under front-3/4 props as-is for the slice, acknowledging the alignment imperfection.
+- **(A) Regenerate Stage Base v04 in front-3/4.** Keep the canonical front-3/4 direction; replace v03 with a projection-correct background. — **CHOSEN.**
+- **(B) Re-canonize to isometric.** Change the canonical main view to corner-isometric and update `ART_STYLEGUIDE.md` + `CAFE_DIORAMA_DIRECTION.md` (and re-fit the CSS props) accordingly. This would have been a main-view direction change. — Not chosen.
+- **(C) Keep the hybrid.** Accept the isometric base under front-3/4 props as-is for the slice. — Not chosen.
 
 Note on Option A: v04 generation is a candidate for an **external pixel tool (e.g. PixelLab)** rather than a general image model. Target spec: **text-free, landscape orientation, clean alpha (real transparency), empty room (no baked-in props/guests)**, following the existing intake workflow in `docs/art/PILOT_ASSET_INTAKE.md`.
-
-This decision remains open until the user picks A, B, or C. Until then, the 3/4-diorama main-view principle stays canonical and v03 stays provisional.
 
 Claude Code/Codex may implement placeholders, asset metadata, folder structure, and rendering components before final art exists. They must not introduce final artwork, canonical character designs, a different main-view perspective, or major visual direction changes without documented user approval.
