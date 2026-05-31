@@ -69,7 +69,11 @@ Specifications for every asset in Batch 1 and Batch 2. All pilot assets:
 **transparent PNG · pixel-readable at game scale · static only for MVP**.
 
 The "existing CSS fallback" column names the placeholder element already present in
-`src/ui/cafe/CafePlaceholder.tsx` that must keep rendering if the asset is missing.
+`src/ui/cafe/CafePlaceholder.tsx` whose CSS classes are kept so the diorama layout
+still composes. Note: pilot assets are currently wired via static ESM imports, so
+Vite resolves each PNG at dev/build time — an absent statically-imported file breaks
+the build rather than falling back to CSS. Keep the asset committed (or switch it to
+a truly optional runtime reference) if the app must survive a missing file.
 "Working filename" uses the `placeholder-` prefix per
 [../ART_STYLEGUIDE.md](../ART_STYLEGUIDE.md); a later final asset would be renamed
 to the `sprite-*` convention in [CAFE_DIORAMA_DIRECTION.md](CAFE_DIORAMA_DIRECTION.md) §6.

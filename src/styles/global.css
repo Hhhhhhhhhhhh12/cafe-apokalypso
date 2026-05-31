@@ -609,6 +609,15 @@ h3 {
   box-shadow: none;
 }
 
+/* When the register carries the placeholder-kassandra-ui class the later
+ * .placeholder-kassandra-ui rule (background: #edf6f7) would override the
+ * transparent background above because both selectors have equal specificity.
+ * The compound selector below wins the cascade and keeps the backing invisible
+ * so the sprite reads cleanly against the stage. */
+.cafe-register.placeholder-kassandra-ui {
+  background: transparent;
+}
+
 .cafe-pilot-asset--kassandra-register {
   inset: -38% -30% -18% -30%;
   z-index: 2;

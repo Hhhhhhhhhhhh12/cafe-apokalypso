@@ -786,7 +786,12 @@ Asset rules:
 - Use clear filenames.
 - Keep source/reference notes in Markdown or metadata.
 - Treat generated art as provisional pilot art unless the docs explicitly mark it as final.
-- If an asset is missing, the app should still render with placeholders.
+- Keep the CSS placeholder fallback classes intact. Note: if you wire an asset
+  via a static ESM import (as the current café stage does in
+  src/ui/cafe/CafePlaceholder.tsx), Vite resolves it at dev/build time and a
+  missing file breaks the build rather than falling back to CSS — so commit the
+  asset, or reference it as a truly optional asset (runtime URL / guarded
+  dynamic import) if the app must survive a missing file.
 
 Acceptance criteria:
 - First curated pixel-art pilot assets appear in the café view.
@@ -975,7 +980,14 @@ Critical check — projection:
 
 Rules:
 - no main-view direction change without explicit user approval
-- keep CSS placeholder fallbacks; app must render if the image is absent
+- keep the CSS placeholder fallback classes intact (visual layering and states)
+- note: the café stage wires its PNGs via static ESM imports (see
+  src/ui/cafe/CafePlaceholder.tsx), so Vite resolves each imported asset at
+  dev/build time. A statically-imported file that is absent breaks the build —
+  the CSS fallback does NOT rescue it. So either commit the stage-base asset
+  (so the import resolves) or reference it as a truly optional asset (runtime
+  URL or guarded dynamic import that degrades to the CSS fallback when the file
+  is missing) before relying on absent-asset resilience
 - raw render stays in the external asset inbox; only the cleaned crop enters the repo
 
 Verification: npm run typecheck && npm run test && npm run build.
