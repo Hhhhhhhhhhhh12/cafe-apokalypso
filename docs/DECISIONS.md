@@ -263,4 +263,25 @@ Required review sheets:
 
 Approved visual decisions are copied into `docs/ART_STYLEGUIDE.md`. Art process and production rules are maintained in `docs/ART_PIPELINE.md`. Review material and sheet drafts live in `docs/art/`.
 
+## OPEN DECISION: Diorama Projection — Front-3/4 vs. Isometric Stage Base
+
+**Status: OPEN — not resolved. Do not treat any option below as chosen.**
+
+A conflict exists between the canonical main-view rule and an experimentally integrated background asset:
+
+- `docs/ART_STYLEGUIDE.md` and `docs/art/CAFE_DIORAMA_DIRECTION.md` mandate a **front-angled 3/4 diorama** (camera angled from the front-left; top + front faces of props visible).
+- The integrated **Stage Base v03** (`assets/backgrounds/placeholder-cafe-stage-base-v03.png`) is a **corner-isometric (diamond-room)** projection.
+
+The repository therefore currently renders a **provisional isometric background underneath front-3/4 CSS props**. This was accepted **experimentally** (a feel test only — see `docs/art/PILOT_ASSET_INTAKE.md`, "Stage Base v03 — experimental/provisional integration"). It is not a final art-direction decision and the projection mismatch causes imperfect alignment (the painted vs. CSS counter can read as slightly doubled).
+
+Options (the user decides; none is pre-selected):
+
+- **(A) Regenerate Stage Base v04 in front-3/4.** Keep the canonical front-3/4 direction; replace v03 with a projection-correct background.
+- **(B) Re-canonize to isometric.** Change the canonical main view to corner-isometric and update `ART_STYLEGUIDE.md` + `CAFE_DIORAMA_DIRECTION.md` (and re-fit the CSS props) accordingly. This would be a main-view direction change and needs explicit user approval.
+- **(C) Keep the hybrid.** Accept the isometric base under front-3/4 props as-is for the slice, acknowledging the alignment imperfection.
+
+Note on Option A: v04 generation is a candidate for an **external pixel tool (e.g. PixelLab)** rather than a general image model. Target spec: **text-free, landscape orientation, clean alpha (real transparency), empty room (no baked-in props/guests)**, following the existing intake workflow in `docs/art/PILOT_ASSET_INTAKE.md`.
+
+This decision remains open until the user picks A, B, or C. Until then, the 3/4-diorama main-view principle stays canonical and v03 stays provisional.
+
 Claude Code/Codex may implement placeholders, asset metadata, folder structure, and rendering components before final art exists. They must not introduce final artwork, canonical character designs, a different main-view perspective, or major visual direction changes without documented user approval.

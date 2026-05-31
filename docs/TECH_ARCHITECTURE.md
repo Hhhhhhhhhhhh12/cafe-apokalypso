@@ -152,33 +152,48 @@ tests/
 
 This structure is a guideline. It can be adjusted during implementation if the separation between engine, data, and UI remains clear.
 
+### Asset folder layout (as implemented)
+
+Pilot art assets live at the **repository root** under `assets/`, not under `src/assets/`. Earlier docs proposed a `src/assets/...` location; the real repository layout takes precedence:
+
+```txt
+assets/
+  sprites/
+    props/       # café props (coffee machine, register, table/chair set, cup, etc.)
+    guests/      # guest pilot sprites (e.g. Paula)
+  backgrounds/   # café background / stage base (e.g. stage base v03)
+```
+
+These hold the integrated provisional pilot assets (see `docs/art/PILOT_ASSET_INTAKE.md` and `docs/ART_PIPELINE.md`). They remain provisional and are CSS-placeholder-backed, so the app still renders if an asset is missing.
+
 ## Game State
 
 The MVP game state should be serializable.
 
-Important state fields include:
+The serialized state carries an explicit `version` field. **The current schema version is `5`** (`GameStateVersion = 5`), alongside a `contentCatalogVersion` (`"week-one-v1"`). On load, a save whose `version` or `contentCatalogVersion` does not match the current values is rejected and the game falls back to a fresh initial state (see Save System below).
 
-- day
-- money
-- reputation
-- coffee
-- milk
-- pastries
-- cleanliness
-- stress
-- weirdness
-- weirdnessVisible
-- kassandraInstalled
-- apocalypseModeUnlocked
-- staffUnlocked
-- advertisingUnlocked
-- pricingUnlocked
-- purchasedUpgrades
-- unlockedAchievements
-- guest history
-- event history
+Important state fields (as implemented; the shape is grouped, not flat):
 
-The exact shape can evolve, but the state should remain easy to save and restore.
+- `version` — schema version, currently `5`
+- `contentCatalogVersion` — content catalog version, currently `"week-one-v1"`
+- `day`, `dayPhase`, `phaseLabel`
+- `resources` — `{ money, reputation, cleanliness, stress, mood }`
+- `supplies` — `{ coffee, milk, pastries }` (the three Week-1 ingredients live here as an object, not as flat top-level fields)
+- `helperAssignment` — `{ helperId, taskId, locked, dailyCost, flavorLine }` or `null` when no helper is hired for the day
+- `pendingSupplyPurchase` — per-ingredient quantities staged for the next day
+- `dayManagement` — per-day counters (customers served, money earned/spent, stress sources applied, helper bonuses, etc.)
+- `daySummary`, `objectiveResults`
+- `stressEventLog` — list of stress-event flavor lines fired so far
+- `hiddenWeirdness` — internal weirdness value, updated throughout Days 1–7
+- `weirdnessVisible` — gate controlling whether weirdness may surface in the UI (`false` until the Day-7 letter)
+- `kassandraInstalled`, `demoComplete`
+- `unlocks` — `{ pricing, advertising, staff, kassandra, apocalypseOperations }`
+- `guestHistory`, `eventHistory`, `unlockedAchievements`
+- `statusMessage`
+
+These fields are consistent with `docs/MANAGEMENT_TRADEOFF_DESIGN.md` (Save and Reload Requirements), which is the canonical source for the Week-1 management fields (`cleanliness`, `stress`, `supplies.{coffee,milk,pastries}`, `helperAssignment`, `stressEventLog`, `weirdnessVisible`).
+
+The exact shape can still evolve, but the state should remain easy to save and restore, and any breaking change must bump `GameStateVersion`.
 
 ## Deterministic Logic
 
@@ -192,12 +207,19 @@ This makes the MVP easier to test, debug, and balance.
 
 The MVP uses localStorage.
 
+### Versioning (as implemented)
+
+- The serialized `GameState` carries `version` (currently `5`) and `contentCatalogVersion` (currently `"week-one-v1"`). A save is only accepted if both match the current constants; otherwise the loader returns a fresh initial state instead of crashing.
+- The localStorage **key** is currently `cafe-apokalypso.save.v4`. Earlier keys (`...v1`, `...v2`, `...v3`) are treated as legacy and cleared on reset. Note: the storage-key suffix and the in-state schema `version` are tracked separately and are not required to share the same number.
+- A "Reset / New Game" control removes the current save and the legacy keys.
+
 Requirements:
 
 - save current game state locally
 - load existing save on app start
+- reject mismatched/outdated saves and fall back to a fresh initial state
 - allow reset/new game
-- handle missing or outdated save data gracefully
+- handle missing or malformed save data gracefully (no crash)
 
 Future versions may add export/import, cloud save, or accounts, but these are out of scope for the MVP.
 
@@ -246,6 +268,13 @@ Recommended test areas:
 - achievements trigger correctly
 
 UI tests are optional for the MVP. Engine tests are more important.
+
+## Known Fragilities
+
+Migration and refactor traps observed in this repository. Keep these in mind before declaring a change "green".
+
+- **`as const` on data arrays can silently break type predicates.** Adding `as const` to data arrays (e.g. in `src/game/data/*`) can change the inferred types so that type predicates / narrowing in `src/game/engine/selectors.ts` no longer hold — and this is **not** caught by `npm run test`, because Vitest runs through esbuild, which strips types without type-checking. A run can show all tests green while the build's type layer is broken. **Always run `npm run typecheck`** (not just tests) after touching data shapes or selectors.
+- **Vitest only discovers `tests/**/*.test.ts`.** Test files placed anywhere outside the `tests/` tree (or not matching `*.test.ts`) are **silently not run** — no error, no warning, they simply don't execute. When adding tests, put them under `tests/` with the `.test.ts` suffix, and confirm the run count went up rather than assuming a new file was picked up.
 
 ## Visual Implementation Notes
 

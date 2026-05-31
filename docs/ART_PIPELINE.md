@@ -29,11 +29,15 @@ Die finale Spielgrafik soll konsistent, wiederverwendbar und technisch sauber se
 
 Explorative Moodboards, Google-AI-Studio-/Gemini-Tests, Prompt-Experimente und rohe Bildvarianten werden nicht direkt im Code-Repository versioniert.
 
-Sie liegen außerhalb des Repos im lokalen/iCloud-Arbeitsbereich:
+Der aktuelle kanonische externe Arbeitsbereich ist die lokale Asset-Inbox:
 
 ```text
-/Users/Heineken/Library/Mobile Documents/com~apple~CloudDocs/Claude/Moodboards Apokalypso
+/Users/Heineken/Code/cafe-apokalypso-asset-inbox/
 ```
+
+Der frühere iCloud-Pfad (`.../com~apple~CloudDocs/Claude/Moodboards Apokalypso`) ist **historisch** und nicht mehr maßgeblich.
+
+**Bekanntes Intake-Caveat:** Auf Google Drive (macOS `CloudStorage`) liegende Quelldateien können „online-only" / dataless sein und sind dann nicht lesbar (kein lokaler Inhalt). In diesem Fall muss eine lokale, nicht-CloudStorage-Kopie als Eingabe verwendet werden, bevor ein Asset extrahiert wird. Rohdateien wandern trotzdem nicht ins Repo.
 
 Dieser Ordner ist ein Arbeits- und Experimentierraum, aber keine kanonische Quelle für Implementierung, Assets oder Codex-Aufgaben.
 
@@ -247,6 +251,20 @@ Erlaubt sind:
 Platzhalter sollen später ersetzt oder stilistisch vereinheitlicht werden.
 
 ## Export-Struktur
+
+Assets liegen im **Repo-Root unter `assets/`** (nicht unter `src/assets/`). Stand heute existieren real nur die folgenden Unterordner; der Rest des Baums unten ist geplant/aspirational und wird erst bei Bedarf angelegt.
+
+Real vorhanden (durch den Pilot integriert):
+
+```text
+assets/
+  sprites/
+    props/     # café props (Kaffeemaschine, Registrierkasse, Tisch/Stuhl, Tasse, …)
+    guests/    # Gast-Pilot-Sprites (z. B. Paula)
+  backgrounds/ # Café-Hintergrund / Stage Base (z. B. Stage Base v03)
+```
+
+Geplante volle Struktur (Zielbild, noch nicht vollständig angelegt):
 
 ```text
 assets/

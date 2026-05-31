@@ -141,7 +141,7 @@ Handoff prompts should not be copied directly from chat when they are actually u
 
 The canonical source for reusable handoff prompts is `docs/PROMPTS.md`.
 
-Every prompt that is actually handed to Claude Code, Codex or another tool must be tracked in ClickUp.
+Every prompt that is actually handed to Claude Code, Codex or another tool should be recorded in Git history (branch, commit, or PR). ClickUp is an optional overview layer, not a required gate. GitHub + repository Markdown remain canonical.
 
 ### Claude Code
 
@@ -226,8 +226,8 @@ Any agent prompt in `docs/PROMPTS.md` should include:
 - forbidden changes
 - acceptance criteria
 - verification commands
-- ClickUp tracking note / prompt handoff status
+- handoff record note (branch/PR; ClickUp optional) including the actual model run
 
-ClickUp should show which prompt was handed over, to which tool, for which issue/task, and with what status.
+The handoff record (Git history / PR description, optionally mirrored to ClickUp) should show which prompt was handed over, to which tool, on which model, for which issue/task, and with what status.
 
 If a decision would cause broad rework, ask the user first.

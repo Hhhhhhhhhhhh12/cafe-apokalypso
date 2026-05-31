@@ -5,11 +5,11 @@
 This document defines how ChatGPT, Claude Code, Codex and later Claude Cowork should be used for Café Apokalypso.
 
 Current coordination status:
-- The project is past Prompt 5; Prompt 5 has been locally mini-tested and logged.
-- Current known Codex credit state after Prompt 5 review: 411 remaining credits.
-- Prompt 6A and Prompt 6A.1 are documentation/design handoffs; Prompt 6B is the next Codex implementation step after the working tree is clean.
-- All further Claude Code / Codex work must be logged with a run protocol.
-- Results may be discussed in other chats, but this repository documentation and ClickUp remain the durable coordination layer.
+- The project has advanced well past the early prompts. Prompts through the S-series (S1–S4) plus the C6 pilot-asset integration are merged (PRs #10–#43). The app shell, Week-1 data model, deterministic 7-day loop, management tradeoff system, narrative-voice UI, and the first pixel-art pilot assets are all in `main`.
+- Current frontier: documentation consolidation and reality sync (this pass). The next implementation frontier is art-direction follow-up — notably the Stage Base v04 projection decision (see [DECISIONS.md](DECISIONS.md) and [art/CAFE_DIORAMA_DIRECTION.md](art/CAFE_DIORAMA_DIRECTION.md)).
+- Credit figures recorded in this document are stale/historical. They reflect early Codex usage and are no longer authoritative. Do not rely on them for planning.
+- All further Claude Code / Codex work should still be logged with a run protocol (see Run Protocol below). The protocol can be expressed via Git history and PRs; ClickUp is optional.
+- Results may be discussed in other chats, but this repository documentation (Git + Markdown) is the durable, canonical coordination layer. ClickUp, if used, is an optional human-readable overview only.
 
 ## Roles
 
@@ -82,16 +82,17 @@ Avoid:
 - generate all content
 - create final assets
 
-## ClickUp Tracking
+## Handoff Tracking
 
-Every actual handoff to Claude Code, Codex or another tool must be tracked in ClickUp.
+Every actual handoff to Claude Code, Codex or another tool should be recorded. The canonical record is Git history (branches, commits, PRs) plus the Run Protocol below. ClickUp is an **optional** overview layer; it is no longer a mandatory gate.
 
-Track:
+Track (in the PR/commit description, run protocol, or — optionally — ClickUp):
 - prompt ID
 - tool
-- related task or issue
+- actual model used (the specified model and the model that actually ran may differ; record what actually ran — see note below)
+- related task, issue, or PR
 - status
-- result link or placeholder
+- result link (PR/commit) or placeholder
 - start credits, if the tool consumes credits
 - end credits, if the tool consumes credits
 - credit delta
@@ -99,7 +100,11 @@ Track:
 - tests/checks run
 - whether follow-up approval is required
 
-ClickUp is the human-readable coordination cockpit. It is not the canonical source for rules or game decisions. Binding decisions must still be documented in the repository Markdown files.
+GitHub + repository Markdown are the canonical source. ClickUp, if used, is a human-readable overview cockpit only; it is not the canonical source for rules or game decisions. Binding decisions must be documented in the repository Markdown files.
+
+### Model-mismatch note
+
+A run may execute on a different model than the prompt specifies. Observed example: prompts labelled for "Sonnet 4.6" actually ran on "Opus 4.8". The protocol should record the **actual** model that ran, not only the requested one, so the history stays honest.
 
 ## Run Protocol
 
@@ -111,8 +116,9 @@ Required protocol format:
 ## Agent Run Protocol
 
 Tool:
+Model (actual / requested):
 Prompt ID:
-Related ClickUp task:
+Related issue / PR (ClickUp task optional):
 Start credits:
 End credits:
 Credit delta:
@@ -127,17 +133,18 @@ User/ChatGPT decision:
 ```
 
 Rules:
-- No Prompt 6 or later work may start until Prompt 5 results are reviewed and logged.
 - No new run may start if the previous run has no protocol.
-- If work happens in another chat, its result must be copied into this protocol format or linked from ClickUp.
+- The protocol may be expressed via Git history and the PR description; ClickUp is optional.
+- Record the model that actually ran (which may differ from the requested model).
+- If work happens in another chat, its result must be copied into this protocol format or linked from the relevant PR/commit (or, optionally, ClickUp).
 - If credits were not consumed, write `not applicable` instead of leaving the field blank.
 - If tests were not run, explicitly write `not run` and explain why.
 
 ## Cross-Chat Coordination
 
-Results can be analysed in another chat, but the durable project state must be mirrored here:
+Results can be analysed in another chat, but the durable project state must be mirrored in the repository:
 
-- important run results go into ClickUp
+- important run results go into Git history / the PR description (optionally mirrored to ClickUp)
 - binding decisions go into `docs/DECISIONS.md`
 - workflow changes go into `docs/WORKFLOW.md`
 - prompt changes go into `docs/PROMPTS.md`
@@ -145,37 +152,58 @@ Results can be analysed in another chat, but the durable project state must be m
 - production pipeline decisions go into `docs/ART_PIPELINE.md`
 - quality/security/accessibility decisions go into `docs/QUALITY_CHECKLIST.md`
 
-ChatGPT may help coordinate across chats, but repository documentation and ClickUp are the reliable handoff layer. Do not rely on conversational memory alone.
+ChatGPT may help coordinate across chats, but repository documentation (Git + Markdown) is the reliable, canonical handoff layer; ClickUp, if used, is an optional overview. Do not rely on conversational memory alone.
 
 ## Prompt Progress Ledger
 
-Current known progress:
+Reflects merged work through the S-series / PR #43. All rows below are merged into `main` unless noted.
 
 | Prompt | Status | Notes |
 | --- | --- | --- |
-| Prompt 1 | Done or superseded | Initial documentation/consistency phase complete enough to proceed. |
-| Prompt 2 | Done or superseded | Documentation readiness phase complete enough to proceed. |
-| Prompt 3 | Done | Initial app shell phase has been passed. |
-| Prompt 4 | Done | Earlier credit baseline after this prompt: 487 remaining credits. |
-| Prompt 5 | Done | First 7-day progression loop passed local mini-test and was logged in ClickUp. |
-| Prompt 6A | Done | Management tradeoff design pass completed with Claude Code and logged in ClickUp. |
-| Prompt 6A.1 | Done | Approved management tradeoff design saved to `docs/MANAGEMENT_TRADEOFF_DESIGN.md` and logged in ClickUp. |
-| Prompt 6B | Next | Codex implementation may start after `main` is clean and current credits are confirmed. |
+| Prompt 1 | Done or superseded | Initial documentation/consistency phase. |
+| Prompt 2 | Done or superseded | Documentation readiness phase. |
+| Prompt 3 | Done | Initial Vite + React + TypeScript app shell. |
+| Prompt 4 | Done | Week-one data model. |
+| Prompt 5 | Done | First deterministic 7-day progression loop. |
+| Prompt 6A | Done | Management tradeoff design pass (Claude Code). |
+| Prompt 6A.1 | Done | Approved tradeoff design saved to `docs/MANAGEMENT_TRADEOFF_DESIGN.md`. |
+| Prompt 6B | Done | Week-1 management tradeoff system implemented (supplies, cleanliness, stress, helpers, weirdness gate). Save schema reached v5. |
+| Prompt 7 | Done | UX / visual review pass. |
+| Prompt 8A | Done | Content pass. |
+| Prompt 8B | Done | Content pass (continuation). |
+| Prompt 9A | Done | Narrative-voice UI wiring. |
+| Prompt 10V | Done | Visual/diorama work. |
+| Prompt 10C | Done | First visual diorama layout (`CafeDiorama` / café stage). |
+| Prompt 10D | Done | Pixel-art asset pilot direction + intake. |
+| Prompt 10E-A | Done | Pilot-asset intake / extraction. |
+| Prompt 10E-A2 | Done | Batch 1 pilot asset extraction (see `docs/art/PILOT_ASSET_INTAKE.md` §9). |
+| Prompt 10E-A3 | Done | Batch 2 café-prop extraction (see `docs/art/PILOT_ASSET_INTAKE.md` §10). |
+| C6 | Done | Pilot-asset integration into the café view. |
+| S1 | Done | Stage-base / polish series. |
+| S2 | Done | Stage-base / polish series. |
+| S3 | Done | Stage-base / polish series. |
+| S4 | Done | Stage-base assessment + experimental Stage Base v03 integration (PR #43). **Current frontier.** |
+
+**Current frontier:** documentation reality sync (this pass) and the open Stage Base v04 projection decision (front-3/4 vs. isometric vs. hybrid). See [DECISIONS.md](DECISIONS.md) and [art/CAFE_DIORAMA_DIRECTION.md](art/CAFE_DIORAMA_DIRECTION.md).
+
+> Note: prompts 7 through S4 were executed from chat and may not all have individual reusable entries; recurring patterns are generalized in [PROMPTS.md](PROMPTS.md).
 
 ## Credit Ledger Rule
 
 For all credit-consuming tools, maintain a short ledger.
 
-Required format:
+> **The figures below are stale / historical.** They reflect early Codex usage only (around Prompts 4–5) and are no longer authoritative. Many later runs ran on Claude models and were not credit-tracked here. Treat this table as an archived example of the format, not as current credit state.
+
+Required format (example, historical):
 
 ```md
 | Run | Tool | Prompt | Start Credits | End Credits | Delta | Notes |
 | --- | --- | --- | ---: | ---: | ---: | --- |
-| 001 | Codex | Prompt 4 | unknown | 487 | unknown | Baseline recorded after Prompt 4. |
-| 002 | Codex | Prompt 5 | 411 | 411 | 0 | Credit state reported after Prompt 5 review; exact run delta not recorded. |
+| 001 | Codex | Prompt 4 | unknown | 487 | unknown | Baseline recorded after Prompt 4 (historical). |
+| 002 | Codex | Prompt 5 | 411 | 411 | 0 | Credit state reported after Prompt 5 review (historical). |
 ```
 
-After each future run, append one row in the relevant ClickUp task comment or project log. If the repository gains a dedicated run log later, mirror the same table there.
+After each future credit-consuming run, append one row to the PR/commit description or a dedicated run log (optionally mirrored to ClickUp). Non-credit runs (e.g. Claude models without a credit meter) record `not applicable`.
 
 ## Tool Constraints
 
@@ -228,13 +256,13 @@ This applies to repository edits, not to raw image generation. Raw AI Studio / G
 
 Gemini, Google AI Studio, and Nano Banana may be used to reduce Codex credit usage for visual exploration.
 
-Explorative Google-AI-Studio-/Gemini outputs and raw moodboards are stored outside the code repository. Current external working location:
+Explorative Google-AI-Studio-/Gemini outputs and raw moodboards are stored outside the code repository. The current canonical external working location is the local asset inbox documented in [ART_PIPELINE.md](ART_PIPELINE.md):
 
 ```text
-/Users/Heineken/Library/Mobile Documents/com~apple~CloudDocs/Claude/Moodboards Apokalypso
+/Users/Heineken/Code/cafe-apokalypso-asset-inbox/
 ```
 
-This external folder is a working area, not a canonical source for implementation. Only reviewed and curated decisions should be mirrored into repository documentation.
+The older iCloud Moodboards path is historical. See `docs/ART_PIPELINE.md` for the authoritative external-path definition and the Google Drive CloudStorage online-only caveat. This external folder is a working area, not a canonical source for implementation. Only reviewed and curated decisions should be mirrored into repository documentation.
 
 Use them for:
 
