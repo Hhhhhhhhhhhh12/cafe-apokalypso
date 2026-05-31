@@ -483,6 +483,12 @@ h3 {
   opacity: 0;
 }
 
+/*
+ * Stage Base coherence cleanup: the CSS counter was a bold, dark-red slab that
+ * read as a second counter against the painted Stage Base. It is softened to a
+ * muted, semi-transparent ledge so the pilot sprites still have a surface to sit
+ * on without doubling the painted room. Class/structure retained as fallback.
+ */
 .cafe-counter {
   top: 9%;
   left: 18%;
@@ -490,11 +496,11 @@ h3 {
   width: 52%;
   height: 33%;
   transform: skewY(-5deg);
-  border: 3px solid #35241e;
+  border: 2px solid rgba(53, 36, 30, 0.28);
   border-radius: 7px;
   background:
-    linear-gradient(180deg, #b8774f 0 45%, #7f2f2c 45% 100%);
-  box-shadow: 10px 13px 0 rgba(50, 31, 24, 0.2);
+    linear-gradient(180deg, rgba(150, 100, 68, 0.42) 0 45%, rgba(95, 52, 40, 0.5) 45% 100%);
+  box-shadow: none;
 }
 
 .cafe-counter__front {
@@ -503,6 +509,8 @@ h3 {
   border-top: 3px solid rgba(53, 36, 30, 0.75);
   background:
     linear-gradient(90deg, transparent 22%, rgba(255, 248, 237, 0.12) 22% 25%, transparent 25% 54%, rgba(255, 248, 237, 0.12) 54% 57%, transparent 57%);
+  /* Softened so the counter front does not double the painted counter. */
+  opacity: 0.4;
 }
 
 .cafe-counter__ledge {
@@ -514,19 +522,26 @@ h3 {
   border-top: 3px solid rgba(53, 36, 30, 0.55);
   border-bottom: 3px solid rgba(53, 36, 30, 0.3);
   background: rgba(255, 248, 237, 0.12);
+  /* Softened alongside the counter front. */
+  opacity: 0.4;
 }
 
+/*
+ * Stage Base coherence cleanup: the CSS coffee-machine box backed the pilot
+ * sprite and peeked out as a grey block. Its fill/border/shadow are made
+ * transparent so only the sprite reads; the element stays as the sprite's
+ * positioning container and the class is retained as fallback.
+ */
 .cafe-coffee-machine {
   position: absolute;
   top: -34%;
   left: 10%;
   width: 27%;
   height: 62%;
-  border: 3px solid #26322f;
+  border: 3px solid transparent;
   border-radius: 6px 6px 4px 4px;
-  background:
-    linear-gradient(180deg, #d8d4c8 0 28%, #8d9791 28% 100%);
-  box-shadow: inset -6px 0 0 rgba(38, 50, 47, 0.18);
+  background: transparent;
+  box-shadow: none;
 }
 
 .cafe-pilot-asset {
@@ -574,6 +589,13 @@ h3 {
   opacity: 0.42;
 }
 
+/*
+ * Stage Base coherence cleanup: the CSS register box backed the KASSANDRA pilot
+ * sprite and peeked out as a cream block. Its fill/border/shadow are made
+ * transparent so only the sprite reads; the element stays as the sprite's
+ * positioning container (and host for the KASSANDRA screen/receipt state cues)
+ * and the class is retained as fallback.
+ */
 .cafe-register {
   position: absolute;
   top: -18%;
@@ -581,10 +603,10 @@ h3 {
   width: 21%;
   height: 48%;
   transform: skewY(2deg);
-  border: 3px solid #203639;
+  border: 3px solid transparent;
   border-radius: 6px;
-  background: #e5e3d8;
-  box-shadow: 4px 6px 0 rgba(50, 31, 24, 0.16);
+  background: transparent;
+  box-shadow: none;
 }
 
 .cafe-pilot-asset--kassandra-register {
@@ -633,6 +655,8 @@ h3 {
   border: 2px solid #4d3026;
   border-radius: 4px 4px 2px 2px;
   background: #fff2d8;
+  /* Stage Base coherence cleanup: faded so these props do not look pasted on. */
+  opacity: 0.4;
 }
 
 .cafe-counter-props span:nth-child(1) {
@@ -661,13 +685,21 @@ h3 {
     radial-gradient(circle at 28% 45%, #fff8ed 0 9%, transparent 10%),
     radial-gradient(circle at 62% 45%, #f3d9b8 0 10%, transparent 11%),
     rgba(255, 248, 237, 0.18);
+  /* Stage Base coherence cleanup: faded so the mat does not look pasted on. */
+  opacity: 0.3;
 }
 
+/*
+ * Stage Base coherence cleanup: the CSS round tables (top, chairs, cup, legs)
+ * read as pasted-on furniture over the painted floor. The whole table group is
+ * faded so it reads as a soft placeholder hint. Classes retained as fallback.
+ */
 .cafe-table {
   z-index: 5;
   width: 20%;
   height: 25%;
   transform: skewY(-5deg);
+  opacity: 0.25;
 }
 
 .cafe-table--left {
@@ -754,7 +786,9 @@ h3 {
   border: 2px solid #2f231d;
   border-radius: 12px 12px 6px 6px;
   background: #2d6f58;
-  box-shadow: 4px 6px 0 rgba(50, 31, 24, 0.18);
+  /* Stage Base coherence cleanup: softer shadow so CSS guest blobs (and the
+     backing behind the Paula sprite) look less pasted on the painted room. */
+  box-shadow: 2px 3px 4px rgba(50, 31, 24, 0.16);
 }
 
 .placeholder-guest::before {
@@ -815,6 +849,8 @@ h3 {
   left: 23%;
   bottom: 35%;
   transform: scale(0.86);
+  /* Stage Base coherence cleanup: faded to match the softened tables it sits at. */
+  opacity: 0.4;
 }
 
 .placeholder-guest-strange-01,
@@ -848,6 +884,9 @@ h3 {
   z-index: 4;
   width: 34px;
   height: 48px;
+  /* Stage Base coherence cleanup: faded so the CSS plant does not sit oddly
+     over the painted counter. Class retained as fallback. */
+  opacity: 0.45;
 }
 
 .cafe-plant::before {
