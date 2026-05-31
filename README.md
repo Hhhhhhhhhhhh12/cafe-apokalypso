@@ -123,7 +123,17 @@ Detailed project docs live in `docs/`:
 - `CONTENT_GUIDE.md` — tone, writing style, and example lines
 - `TECH_ARCHITECTURE.md` — technical structure and constraints
 - `ART_STYLEGUIDE.md` / `ART_PIPELINE.md` — visual direction and asset workflow
-- `docs/art/` — character, level/day, UI, asset, moodboard, and weirdness-escalation review sheets for visual approval
+- `docs/art/` — visual review and approval sheets:
+  - [`art/README.md`](docs/art/README.md) — overview of the art review system
+  - [`art/CAFE_DIORAMA_DIRECTION.md`](docs/art/CAFE_DIORAMA_DIRECTION.md) — main 3/4 diorama visual direction
+  - [`art/PILOT_ASSET_INTAKE.md`](docs/art/PILOT_ASSET_INTAKE.md) — pilot-asset intake/extraction plan and logs
+  - [`art/VISUAL_STYLE_GUIDE.md`](docs/art/VISUAL_STYLE_GUIDE.md) — visual style guide
+  - [`art/UI_STYLE_GUIDE.md`](docs/art/UI_STYLE_GUIDE.md) — UI style guide
+  - [`art/CHARACTER_SHEETS.md`](docs/art/CHARACTER_SHEETS.md) — character sheets
+  - [`art/LEVEL_SHEETS.md`](docs/art/LEVEL_SHEETS.md) — level/day sheets
+  - [`art/ASSET_CATALOG.md`](docs/art/ASSET_CATALOG.md) — asset catalog and source notes
+  - [`art/WEIRDNESS_ESCALATION_GUIDE.md`](docs/art/WEIRDNESS_ESCALATION_GUIDE.md) — weirdness escalation guide
+  - [`art/ART_REVIEW_LOG.md`](docs/art/ART_REVIEW_LOG.md) — art review and approval log
 - `QUALITY_CHECKLIST.md` — accessibility, security, save safety, smoke test, and release checks (binding for implementation)
 - `WORKFLOW.md` — AI-assisted development workflow and handoff rules
 - `AGENT_ORCHESTRATION.md` — AI tool roles and orchestration

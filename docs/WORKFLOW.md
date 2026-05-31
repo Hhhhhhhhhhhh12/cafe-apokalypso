@@ -396,15 +396,16 @@ Do not copy prompts directly from chat when handing them to Claude Code, Codex, 
 
 Phase-level notes and context belong in `docs/ROADMAP.md`. Implementation-specific detail belongs in GitHub issue descriptions.
 
-## ClickUp Tracking Requirement
+## Handoff Tracking
 
-Every actual prompt handoff to Claude Code, Codex, Antigravity, or another tool must be tracked in ClickUp.
+Every actual prompt handoff to Claude Code, Codex, Antigravity, or another tool should be recorded. The canonical record is Git history (branch, commit, PR) plus the run protocol in `docs/AGENT_ORCHESTRATION.md`. ClickUp is an **optional** overview layer, not a required gate.
 
-Track:
+Track (in the PR/commit description or run protocol; optionally in ClickUp):
 - prompt ID (e.g. PROMPT-1, PROMPT-2)
 - tool used
-- related ClickUp task or GitHub issue
+- actual model run (may differ from the requested model — record what actually ran)
+- related GitHub issue, PR, or task
 - status (in progress / complete / blocked)
-- result link or placeholder
+- result link (PR/commit) or placeholder
 
-A handoff that is not tracked in ClickUp is not considered officially handed off. This keeps the project auditable and prevents duplicate or contradictory work across tools.
+A handoff that leaves no trace in Git history (branch/commit/PR) is not considered officially handed off. This keeps the project auditable and prevents duplicate or contradictory work across tools. Tracking in ClickUp is welcome but optional.

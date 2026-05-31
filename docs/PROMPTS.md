@@ -813,6 +813,178 @@ After finishing:
 - Provide the ClickUp handoff status update: prompt ID, tool, related GitHub issue/task, status, and result link placeholder.
 ```
 
+---
+
+# Recurring Pattern Prompts
+
+The prompts below generalize patterns that were originally executed ad hoc from chat
+(Prompts 7, 8A, 8B, 9A, 10V, 10C, 10D, 10E-A/A2/A3, S1–S4). They are reusable
+templates — fill in the specifics each time. Record each handoff in Git history / the
+PR description (ClickUp optional) and note the **actual model that ran**.
+
+## Prompt R-UXV: UX / Visual Review Pass
+
+Use when the app runs but needs a structured usability/visual review before more features.
+
+```txt
+You are working in the GitHub repository `cafe-apokalypso`.
+
+Read docs/PROJECT_CANON.md first, then docs/QUALITY_CHECKLIST.md, docs/art/CAFE_DIORAMA_DIRECTION.md, and the relevant UI components.
+
+Task:
+Review the current UI/UX of <screen or flow> against the cozy-absurd direction and the quality checklist. Inspect first; propose before editing.
+
+Check for:
+- readability, hierarchy, contrast, and "no info by color alone"
+- keyboard accessibility and visible focus states
+- layout robustness at the documented target size
+- alignment with the 3/4 diorama direction and tone
+
+Allowed changes (only if explicitly authorized): small CSS/markup polish in the named components. No new mechanics, no scope change, no art-direction change.
+
+After finishing:
+- list findings ranked by severity
+- list any edits made (or proposed if review-only)
+- note checks run (typecheck/test/build) and what could not be run
+- merge recommendation
+```
+
+## Prompt R-CONTENT: Content / Copy Pass
+
+Use to add or refine authored game text (guest lines, events, KASSANDRA, day summaries).
+
+```txt
+You are working in the GitHub repository `cafe-apokalypso`.
+
+Read docs/PROJECT_CANON.md first, then docs/CONTENT_GUIDE.md, docs/MANAGEMENT_TRADEOFF_DESIGN.md, and the relevant data files under src/game/data/.
+
+Task:
+Add/refine authored content for <scope: guests / events / KASSANDRA / day summaries / stress events>.
+
+Constraints:
+- keep the dry, warm, cozy-absurd tone; no horror, no random nonsense
+- no supernatural/weirdness language before the Day-7 hook
+- content is data-driven: edit structured data, not UI logic
+- placeholder lines must stay marked as placeholder until tone-reviewed
+- no new mechanics, no scope change
+
+Verification: npm run typecheck && npm run test (and build if data shapes changed — see Known Fragilities in TECH_ARCHITECTURE.md).
+
+After finishing: summarize what text changed, confirm tone rules held, list checks run, merge recommendation.
+```
+
+## Prompt R-NARR: Narrative-Voice UI Wiring
+
+Use to route authored narrative text into the UI (status lines, summaries, letter screen).
+
+```txt
+You are working in the GitHub repository `cafe-apokalypso`.
+
+Read docs/PROJECT_CANON.md first, then docs/CONTENT_GUIDE.md and the relevant engine + UI files.
+
+Task:
+Wire authored narrative voice into <UI surface>, keeping engine and presentation separate. Text stays real HTML/CSS/React text — never baked into images.
+
+Constraints:
+- keep the weirdness-visibility gate intact (no weirdness UI before weirdnessVisible is true)
+- no new mechanics; presentation-only wiring plus any minimal selector needed
+- preserve accessibility (focus, contrast, no color-only meaning)
+
+Verification: npm run typecheck && npm run test && npm run build.
+
+After finishing: summarize the wiring, confirm the weirdness gate still holds, list checks run, merge recommendation.
+```
+
+## Prompt R-ARTDOC: Art-Direction Document
+
+Use to capture or update an approved visual direction as a doc (no asset production).
+
+```txt
+You are working in the GitHub repository `cafe-apokalypso`.
+
+Read docs/PROJECT_CANON.md first, then docs/ART_STYLEGUIDE.md, docs/ART_PIPELINE.md, and existing docs/art/ sheets.
+
+Task:
+Produce/update an art-direction document for <topic> under docs/art/, consistent with the canonical 3/4 diorama main view and the cozy-absurd tone.
+
+Rules:
+- documentation only; do not generate or commit assets
+- do not change the main-view direction or tone without explicit user approval
+- mark anything not yet approved as a candidate/open decision; keep open questions open
+
+After finishing: summarize the doc, list any open decisions, merge recommendation.
+```
+
+## Prompt R-INTAKE: Pilot-Asset Intake Plan
+
+Use to plan how curated pilot assets will enter the repo (gatekeeping, no integration yet).
+
+```txt
+You are working in the GitHub repository `cafe-apokalypso`.
+
+Read docs/PROJECT_CANON.md first, then docs/ART_PIPELINE.md, docs/art/PILOT_ASSET_INTAKE.md, docs/art/CAFE_DIORAMA_DIRECTION.md, and docs/QUALITY_CHECKLIST.md.
+
+Task:
+Define/extend the intake plan for the next pilot-asset batch: priority order, per-asset specs (dimensions, transparent PNG, no baked-in text), insertion points, CSS fallback to keep, and the approval checklist.
+
+Rules:
+- documentation only; no assets enter the repo in this step
+- raw generated sheets stay in the external asset inbox (see ART_PIPELINE.md for the current path)
+- assets are provisional, replaceable, CSS-fallback-backed; no main-view change
+
+After finishing: summarize the plan/specs, list what a future extraction/integration prompt may and may not do, merge recommendation.
+```
+
+## Prompt R-EXTRACT: Pilot-Asset Extraction
+
+Use to crop/clean approved pilot assets out of a raw sheet into the repo asset folders.
+
+```txt
+You are working in the GitHub repository `cafe-apokalypso`.
+
+Read docs/PROJECT_CANON.md first, then docs/ART_PIPELINE.md and docs/art/PILOT_ASSET_INTAKE.md (asset specs + approval checklist).
+
+Task:
+Extract approved pilot assets from the raw sheet <name> in the external asset inbox into the repo under assets/sprites/props/, assets/sprites/guests/, or assets/backgrounds/ per the intake specs.
+
+Rules:
+- only cropped, curated, approved single PNGs enter the repo; the raw sheet is NOT committed
+- ensure real transparency (raw sheets may be fully opaque with an embedded checkerboard — flood-fill neutral/bright background, use premultiplied alpha on resize to avoid halos)
+- if the source lives on Google Drive CloudStorage and is online-only/dataless, use a local non-CloudStorage copy as input
+- record exact exported filenames + dimensions in PILOT_ASSET_INTAKE.md and source/approval notes in ASSET_CATALOG.md / ART_REVIEW_LOG.md
+- assets stay provisional; keep all CSS fallbacks intact
+
+After finishing: list exported files + dimensions, confirm no raw sheet was committed, note any quality caveats, merge recommendation.
+```
+
+## Prompt R-STAGE: Stage-Base Assessment / Integration
+
+Use to assess and (optionally, experimentally) integrate a richer room-background asset.
+
+```txt
+You are working in the GitHub repository `cafe-apokalypso`.
+
+Read docs/PROJECT_CANON.md first, then docs/art/CAFE_DIORAMA_DIRECTION.md, docs/ART_STYLEGUIDE.md, docs/art/PILOT_ASSET_INTAKE.md, and the café stage component.
+
+Task:
+Assess whether a candidate stage-base background improves the café demo, and if approved, integrate it experimentally as a low-z-index layer beneath the existing CSS props — keeping all fallback classes.
+
+Critical check — projection:
+- the canonical main view is FRONT-3/4. If the candidate is corner-isometric (or otherwise mismatched), this is an OPEN art-direction decision: document it (see DECISIONS.md "OPEN DECISION: Diorama Projection") and do NOT silently re-canonize the main view.
+- mark any integrated mismatched base as experimental/provisional, not final art.
+
+Rules:
+- no main-view direction change without explicit user approval
+- keep CSS placeholder fallbacks; app must render if the image is absent
+- raw render stays in the external asset inbox; only the cleaned crop enters the repo
+
+Verification: npm run typecheck && npm run test && npm run build.
+
+After finishing: summarize the integration, list visual caveats (alignment/letterboxing), flag any open projection decision, merge recommendation.
+```
+
+---
+
 ## Asset and Art Safety Rule for Codex
 
 Codex may implement layout, rendering components, CSS-based placeholders, asset folder structure, typed asset metadata, and references to temporary placeholders.
