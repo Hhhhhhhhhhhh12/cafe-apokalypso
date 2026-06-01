@@ -45,7 +45,8 @@ describe("café diorama view", () => {
     expect(markup).toContain("cafe-storage");
     expect(markup).toContain("cafe-menu-board");
     expect(markup).toContain("cafe-plant");
-    expect(markup).toContain("cafe-weirdness-hint");
+    // Weirdness hint is conditionally rendered — absent on Day 1
+    expect(markup).not.toContain("cafe-weirdness-hint");
   });
 
   it("renders provisional pilot assets while preserving CSS fallbacks", () => {
@@ -66,6 +67,36 @@ describe("café diorama view", () => {
     expect(text).not.toContain("debug");
     expect(text).not.toContain("placeholder");
     expect(text).not.toContain("wireframe");
+  });
+
+  it("shows weirdness-hint on day 7 and hides it on day 1", () => {
+    const day1 = renderCafe(createInitialGameState());
+    const day7 = renderCafe({ ...createInitialGameState(), day: 7, weirdnessVisible: true });
+
+    expect(day1).not.toContain("cafe-weirdness-hint");
+    expect(day7).toContain("cafe-weirdness-hint");
+  });
+
+  it("shows queue guest when day is open with actions, hides when closed", () => {
+    const base = createInitialGameState();
+    const openWithActions = renderCafe({ ...base, dayPhase: "open" });
+    const dayEnd = renderCafe({ ...base, dayPhase: "day_end" });
+
+    expect(openWithActions).toContain("placeholder-guest-normal-01");
+    expect(openWithActions).toContain("placeholder-guest-paula.png");
+    expect(dayEnd).not.toContain("placeholder-guest-paula.png");
+  });
+
+  it("shows seated guests based on customersServed count", () => {
+    const base = createInitialGameState();
+    const none = renderCafe({ ...base, dayPhase: "open", dayManagement: { ...base.dayManagement, customersServed: 0 } });
+    const one = renderCafe({ ...base, dayPhase: "open", dayManagement: { ...base.dayManagement, customersServed: 1 } });
+    const two = renderCafe({ ...base, dayPhase: "open", dayManagement: { ...base.dayManagement, customersServed: 2 } });
+
+    expect(none).not.toContain("placeholder-guest-normal-03");
+    expect(one).toContain("placeholder-guest-normal-03");
+    expect(one).not.toContain("placeholder-guest-normal-04");
+    expect(two).toContain("placeholder-guest-normal-04");
   });
 
   it("keeps the explicit weirdness cue behind the visibility gate", () => {

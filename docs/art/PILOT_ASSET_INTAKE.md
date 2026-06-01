@@ -372,6 +372,44 @@ repo.)
 
 ---
 
+## 11. PROMPT-10E-A4 extraction log (Batch 3 Cem guest sprite)
+
+Cem guest sprite extracted from `ca-asset-batch-03-guest-cem-raw-v01.png` (1024×1024,
+pixel-art batch, 4×3 grid, 12 variants). Raw sheet stays in the external asset inbox
+and was **not** committed.
+
+- **Status:** provisional pilot asset; **not final art**. Not yet wired into
+  React/CSS — extraction only. Awaiting explicit user approval before treating as canonical.
+- **Source:** `ca-asset-batch-03-guest-cem-raw-v01.png` (Pixellab.ai generation,
+  external asset inbox `/Users/Heineken/Code/cafe-apokalypso-asset-inbox/`).
+  Raw batch generated with Paula as style reference, humanoid, front 3/4 view.
+- **Selected frame:** row 1 / col 1 (olive green jacket, shoulder bag, standing
+  3/4-front pose) — cleanest silhouette, distinct from Paula's yellow coat, reads
+  as a regular café guest rather than a delivery worker.
+- **Transparency:** source RGBA was fully opaque (alpha 255 throughout); embedded
+  checkerboard removed via edge-connected flood fill over neutral+bright pixels.
+  Exported PNG uses real transparency (72% transparent pixels).
+- **Exported file:**
+  - `assets/sprites/guests/placeholder-guest-cem.png` — 40×48 px (matches Paula's
+    dimensions; kept at 40×48 per §9 note — do not force to 32×32 until guest style
+    is reviewed).
+- **Seated candidate:** `cem-seated-candidate.png` (56×40 px, row 2/col 1 — orange
+  jacket, sitting at table with coffee) kept in the external asset inbox for later
+  consideration. Not committed.
+- **Approval status:** ⏳ awaiting explicit user approval.
+- **Checklist pre-check:**
+  - [x] Transparent PNG (real alpha)
+  - [x] No baked-in UI text
+  - [x] Dimensions 40×48 px (consistent with Paula pilot precedent)
+  - [x] Pixel-readable at game scale
+  - [x] Warm cozy palette (olive/brown tones, no neon)
+  - [x] Source / batch noted above
+  - [ ] Explicitly approved by user
+  - [x] CSS fallback (`placeholder-guest-normal-02`) still works
+  - [x] No raw sheet committed
+
+---
+
 ## Stage Base v03 — experimental/provisional integration
 
 - **Asset:** `assets/backgrounds/placeholder-cafe-stage-base-v03.png` (892×708 px,
