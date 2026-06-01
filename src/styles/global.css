@@ -168,6 +168,12 @@ h3 {
   font-size: 1.4rem;
 }
 
+.cafe-closed-banner h2:focus {
+  outline: 3px solid #7a2e1a;
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
 .cafe-closed-banner p {
   margin: 0 0 12px;
   max-width: 60ch;

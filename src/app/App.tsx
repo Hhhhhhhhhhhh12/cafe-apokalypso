@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useReducer } from "react";
+import { useEffect, useMemo, useReducer, useRef } from "react";
 import { gameReducer } from "../game/engine/reducer";
 import { createInitialGameState } from "../game/engine/gameState";
 import {
@@ -27,6 +27,15 @@ export function App() {
     }
   }, [gameState, storage]);
 
+  // Move focus to the closure banner when the café closes, so keyboard and
+  // screen-reader users are not stranded on a now-disabled control.
+  const closureHeadingRef = useRef<HTMLHeadingElement>(null);
+  useEffect(() => {
+    if (gameState.cafeClosed) {
+      closureHeadingRef.current?.focus();
+    }
+  }, [gameState.cafeClosed]);
+
   function handleReset() {
     if (storage) {
       resetSavedGameState(storage);
@@ -53,7 +62,7 @@ export function App() {
       {gameState.cafeClosed ? (
         <section className="cafe-closed-banner" role="alert" aria-labelledby="cafe-closed-title">
           <p className="eyebrow">Café closed</p>
-          <h2 id="cafe-closed-title">
+          <h2 id="cafe-closed-title" ref={closureHeadingRef} tabIndex={-1}>
             {gameState.closureReason === "money"
               ? "Out of money"
               : "Out of standing"}
