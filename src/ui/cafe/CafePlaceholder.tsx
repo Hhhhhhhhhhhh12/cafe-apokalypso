@@ -184,8 +184,8 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
           </div>
 
           {/* Queue — customer waiting visible when day is open + actions remain */}
-          <div className="cafe-queue" aria-hidden="true">
-            {showQueueGuest ? (
+          {showQueueGuest && (
+            <div className="cafe-queue" aria-hidden="true">
               <span className="placeholder-guest placeholder-guest-normal-01">
                 <img
                   className="cafe-pilot-asset cafe-pilot-asset--paula"
@@ -194,10 +194,10 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
                   aria-hidden="true"
                 />
               </span>
-            ) : null}
-            {/* Second queue slot — empty placeholder kept for layout */}
-            <span className="placeholder-guest placeholder-guest-normal-02" />
-          </div>
+              {/* Second queue slot — empty placeholder kept for layout */}
+              <span className="placeholder-guest placeholder-guest-normal-02" />
+            </div>
+          )}
 
           {/* Seated guest 1 — appears after first customer served */}
           {showSeated1 && (
