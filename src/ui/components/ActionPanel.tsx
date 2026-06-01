@@ -8,6 +8,7 @@ import {
   hasActionCapacity
 } from "../../game/engine/selectors";
 import {
+  getHelperTaskHint,
   getHelperTaskLabel,
   SUPPLY_CAPS,
   SUPPLY_UNIT_COSTS
@@ -289,6 +290,10 @@ function HelperStartPanel({
 
   return (
     <div className="helper-picker" aria-label="Day-start helper assignment">
+      <p className="helper-picker__intro">
+        From Day 5 you can hire one helper for the day, or open alone. Pick a single
+        task below — the choice locks when the day opens.
+      </p>
       {staffOptions.map((staffOption) => (
         <fieldset key={staffOption.id}>
           <legend>
@@ -297,7 +302,7 @@ function HelperStartPanel({
           </legend>
           <div className="radio-row">
             {helperTasks[staffOption.id].map((taskId) => (
-              <label key={taskId}>
+              <label key={taskId} title={getHelperTaskHint(taskId)}>
                 <input
                   type="radio"
                   name="helper-assignment"
@@ -308,7 +313,10 @@ function HelperStartPanel({
                   }
                   onChange={() => onSelectHelper(staffOption.id, taskId)}
                 />
-                {getHelperTaskLabel(taskId)}
+                <span className="helper-task">
+                  <span className="helper-task__label">{getHelperTaskLabel(taskId)}</span>
+                  <small className="helper-task__hint">{getHelperTaskHint(taskId)}</small>
+                </span>
               </label>
             ))}
           </div>

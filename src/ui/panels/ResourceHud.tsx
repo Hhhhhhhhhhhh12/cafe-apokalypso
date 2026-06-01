@@ -1,9 +1,12 @@
+import { useEffect, useRef, useState } from "react";
 import { getManagementHudLabels } from "../../game/engine/selectors";
 import type { GameState } from "../../game/types/game";
 
 interface ResourceHudProps {
   gameState: GameState;
 }
+
+const LOW_SUPPLY_THRESHOLD = 3;
 
 export function ResourceHud({ gameState }: ResourceHudProps) {
   const labels = getManagementHudLabels(gameState);
@@ -16,15 +19,45 @@ export function ResourceHud({ gameState }: ResourceHudProps) {
       </div>
 
       <dl className="resource-list">
-        <ResourceItem label="Kasse" value={`€${gameState.resources.money}`} />
-        <ResourceItem label="Kaffee" value={gameState.supplies.coffee} />
-        <ResourceItem label="Milch" value={gameState.supplies.milk} />
-        <ResourceItem label="Gebäck" value={gameState.supplies.pastries} />
-        <ResourceItem label="Sauberkeit" value={labels.cleanliness} />
-        <ResourceItem label="Stress" value={labels.stress} />
+        <ResourceItem label="Kasse" value={`€${gameState.resources.money}`} numericValue={gameState.resources.money} />
+        <ResourceItem
+          label="Kaffee"
+          value={gameState.supplies.coffee}
+          numericValue={gameState.supplies.coffee}
+          low={gameState.supplies.coffee <= LOW_SUPPLY_THRESHOLD}
+        />
+        <ResourceItem
+          label="Milch"
+          value={gameState.supplies.milk}
+          numericValue={gameState.supplies.milk}
+          low={gameState.supplies.milk <= LOW_SUPPLY_THRESHOLD}
+        />
+        <ResourceItem
+          label="Gebäck"
+          value={gameState.supplies.pastries}
+          numericValue={gameState.supplies.pastries}
+          low={gameState.supplies.pastries <= LOW_SUPPLY_THRESHOLD}
+        />
+        <ResourceItem
+          label="Sauberkeit"
+          value={labels.cleanliness}
+          numericValue={gameState.resources.cleanliness}
+          meter={gameState.resources.cleanliness}
+          meterTone="positive"
+        />
+        <ResourceItem
+          label="Stress"
+          value={labels.stress}
+          numericValue={gameState.resources.stress}
+          meter={gameState.resources.stress}
+          meterTone="negative"
+        />
         <ResourceItem
           label="Ruf"
           value={`${labels.reputation} (${gameState.resources.reputation})`}
+          numericValue={gameState.resources.reputation}
+          meter={gameState.resources.reputation}
+          meterTone="positive"
         />
         <ResourceItem label="Aktionen" value={labels.actionCapacity} />
       </dl>
@@ -35,13 +68,67 @@ export function ResourceHud({ gameState }: ResourceHudProps) {
 interface ResourceItemProps {
   label: string;
   value: string | number;
+  /** Raw number used to detect increase/decrease for the change-flash. */
+  numericValue?: number;
+  /** When true, the item is flagged as a low/empty supply. */
+  low?: boolean;
+  /** 0-100 meter value; renders a small bar when provided. */
+  meter?: number;
+  meterTone?: "positive" | "negative";
 }
 
-function ResourceItem({ label, value }: ResourceItemProps) {
+function ResourceItem({ label, value, numericValue, low, meter, meterTone }: ResourceItemProps) {
+  const flash = useChangeFlash(numericValue);
+
   return (
-    <div className="resource-item">
+    <div className={`resource-item${low ? " resource-item--low" : ""}`}>
       <dt>{label}</dt>
-      <dd>{value}</dd>
+      <dd>
+        {/* key forces a remount on change so the flash animation replays */}
+        <span key={`${value}-${flash.tick}`} className={`resource-value ${flash.className}`}>
+          {value}
+        </span>
+        {low ? <span className="resource-low-tag" role="status"> · niedrig</span> : null}
+        {typeof meter === "number" ? (
+          <span
+            className={`resource-meter resource-meter--${meterTone ?? "positive"}`}
+            aria-hidden="true"
+          >
+            <span
+              className="resource-meter__fill"
+              style={{ width: `${Math.max(0, Math.min(100, meter))}%` }}
+            />
+          </span>
+        ) : null}
+      </dd>
     </div>
   );
+}
+
+/**
+ * Detects whether a numeric value went up or down since the last render and
+ * returns a one-shot flash className plus a tick that changes on each update
+ * (used as a React key to replay the CSS animation). Deterministic, no timers.
+ */
+function useChangeFlash(value: number | undefined): { className: string; tick: number } {
+  const previous = useRef<number | undefined>(value);
+  const [tick, setTick] = useState(0);
+  const [className, setClassName] = useState("");
+
+  useEffect(() => {
+    if (value === undefined || previous.current === undefined) {
+      previous.current = value;
+      return;
+    }
+    if (value > previous.current) {
+      setClassName("resource-value--up");
+      setTick((t) => t + 1);
+    } else if (value < previous.current) {
+      setClassName("resource-value--down");
+      setTick((t) => t + 1);
+    }
+    previous.current = value;
+  }, [value]);
+
+  return { className, tick };
 }

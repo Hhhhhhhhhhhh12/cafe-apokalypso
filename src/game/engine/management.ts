@@ -282,6 +282,18 @@ export function getHelperTaskLabel(taskId: HelperTaskId): string {
   return labels[taskId];
 }
 
+export function getHelperTaskHint(taskId: HelperTaskId): string {
+  const hints: Record<HelperTaskId, string> = {
+    cleaning: "Keeps the tables tidy — cleanliness stays above 45 without spending an action.",
+    service: "Serves a second guest on each order — more income, faster shift.",
+    barista: "Espresso and cappuccino earn a little extra reputation (up to 3×).",
+    counter: "Steady hands at the till — smooths the shift.",
+    marketing: "Adds an extra advertising action today."
+  };
+
+  return hints[taskId];
+}
+
 export function getHelperFlavorLine(
   helperId: StaffOptionId,
   taskId: HelperTaskId
