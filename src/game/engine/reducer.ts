@@ -563,7 +563,7 @@ function openDay(state: GameState): GameState {
   }
 
   let resources: ResourceState = { ...state.resources };
-  let management = {
+  const management = {
     ...state.dayManagement,
     moneySpent: state.dayManagement.moneySpent + (state.helperAssignment?.dailyCost ?? 0),
     helperExtraOrdersRemaining: getHelperExtraOrders(state),
