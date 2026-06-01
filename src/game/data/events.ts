@@ -49,12 +49,28 @@ export const weekOneEvents = [
     relatedGuestIds: ["herr-bohn"]
   },
   {
+    id: "day-2-rehearsed-rhythm",
+    day: 2,
+    title: "A Rehearsed Rhythm",
+    tone: "anomaly",
+    trigger: "Regulars begin to form and the daily rhythm settles.",
+    text: "By mid-morning the regulars arrive in an order that feels lightly rehearsed. You did not arrange it. You suspect it will happen the same way tomorrow."
+  },
+  {
     id: "day-3-cash-register-suggestion",
     day: 3,
     title: "Strange Cash-Register Suggestion",
     tone: "anomaly",
     trigger: "Prices, supplies, and daily offers become available.",
     text: "The cash register recommends not accepting prophecies as payment today."
+  },
+  {
+    id: "day-3-guest-checks-in",
+    day: 3,
+    title: "Just Passing Through",
+    tone: "anomaly",
+    trigger: "A quiet traveler stops in during the busier midweek.",
+    text: "A quiet traveler asks to sit a while and \"not be anywhere in particular.\" They barely touch the coffee, then leave looking like they got further away than the door should allow."
   },
   {
     id: "day-4-herr-grau-coin",
@@ -64,6 +80,14 @@ export const weekOneEvents = [
     trigger: "Advertising unlocks and Herr Grau can appear.",
     text: "Herr Grau gives a tip and a coin that smells faintly of cellar.",
     relatedGuestIds: ["herr-grau"]
+  },
+  {
+    id: "day-4-poster-before-printed",
+    day: 4,
+    title: "The Poster, Earlier",
+    tone: "anomaly",
+    trigger: "Advertising begins influencing demand.",
+    text: "A guest compliments the new poster by the door. You only print it that afternoon. You decide not to dwell on the order of events."
   },
   {
     id: "day-5-wet-table-jana",
@@ -91,6 +115,14 @@ export const weekOneEvents = [
     text: "The register update is complete. KASSANDRA has filed an initial report. It was not asked to."
   },
   {
+    id: "day-6-returning-guest",
+    day: 6,
+    title: "Returning Guest, Out of Sequence",
+    tone: "kassandra",
+    trigger: "KASSANDRA begins predicting demand.",
+    text: "KASSANDRA flags a \"returning guest, 15:12, slightly out of sequence.\" At 15:12 someone thanks you warmly for last time. You are fairly sure there was no last time."
+  },
+  {
     id: "day-7-red-umbrella",
     day: 7,
     title: "Red Umbrella",
@@ -98,5 +130,13 @@ export const weekOneEvents = [
     trigger: "Frau mit rotem Regenschirm appears on the busier Day 7.",
     text: "A woman arrives with a red umbrella although it is not raining. She asks not to be recognized.",
     relatedGuestIds: ["frau-roter-regenschirm"]
+  },
+  {
+    id: "day-7-back-wall-doorway",
+    day: 7,
+    title: "The Back Wall, Briefly",
+    tone: "anomaly",
+    trigger: "Day 7: the busiest day, just before the letter.",
+    text: "For one breath the back wall reads like a doorway to somewhere with different weather. Then it is a wall again. None of the regulars mention it, which is how you know they noticed too."
   }
 ] as const satisfies readonly EventDefinition[];

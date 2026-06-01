@@ -41,12 +41,17 @@ export type EventId =
   | "day-1-opening-rhythm"
   | "day-1-coffee-machine-flicker"
   | "day-2-herr-bohn-memory"
+  | "day-2-rehearsed-rhythm"
   | "day-3-cash-register-suggestion"
+  | "day-3-guest-checks-in"
   | "day-4-herr-grau-coin"
+  | "day-4-poster-before-printed"
   | "day-5-wet-table-jana"
   | "day-5-meda-corner-seat"
   | "day-6-kassandra-update"
-  | "day-7-red-umbrella";
+  | "day-6-returning-guest"
+  | "day-7-red-umbrella"
+  | "day-7-back-wall-doorway";
 
 export type AchievementId =
   | "first-order"
