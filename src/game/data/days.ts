@@ -40,7 +40,7 @@ export const weekOneDays = [
       "cappuccino-christa",
       "herr-bohn"
     ],
-    eventIds: ["day-2-herr-bohn-memory"]
+    eventIds: ["day-2-herr-bohn-memory", "day-2-rehearsed-rhythm"]
   },
   {
     day: 3,
@@ -66,7 +66,7 @@ export const weekOneDays = [
       "herr-bohn",
       "freelancerin-mira"
     ],
-    eventIds: ["day-3-cash-register-suggestion"]
+    eventIds: ["day-3-cash-register-suggestion", "day-3-guest-checks-in"]
   },
   {
     day: 4,
@@ -93,7 +93,7 @@ export const weekOneDays = [
       "freelancerin-mira",
       "herr-grau"
     ],
-    eventIds: ["day-4-herr-grau-coin"]
+    eventIds: ["day-4-herr-grau-coin", "day-4-poster-before-printed"]
   },
   {
     day: 5,
@@ -149,7 +149,7 @@ export const weekOneDays = [
       "herr-grau",
       "meda"
     ],
-    eventIds: ["day-6-kassandra-update"]
+    eventIds: ["day-6-kassandra-update", "day-6-returning-guest"]
   },
   {
     day: 7,
@@ -177,6 +177,6 @@ export const weekOneDays = [
       "meda",
       "frau-roter-regenschirm"
     ],
-    eventIds: ["day-7-red-umbrella"]
+    eventIds: ["day-7-red-umbrella", "day-7-back-wall-doorway"]
   }
 ] as const satisfies readonly DayDefinition[];

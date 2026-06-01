@@ -73,7 +73,7 @@ describe("week-one content data", () => {
     expect(weekOneAdvertisingCampaigns).toHaveLength(4);
     expect(weekOneUpgrades).toHaveLength(7);
     expect(weekOneAchievements).toHaveLength(7);
-    expect(weekOneEvents).toHaveLength(9);
+    expect(weekOneEvents).toHaveLength(14);
     expect(weekOneDays).toHaveLength(7);
   });
 
@@ -97,6 +97,15 @@ describe("week-one content data", () => {
         guestIds,
         weekOneDays[eventDefinition.day - 1]
       );
+    }
+  });
+
+  it("gives every day at least one visible narrative beat (non-normal tone)", () => {
+    for (let day = 1; day <= 7; day += 1) {
+      const visibleBeats = weekOneEvents.filter(
+        (event) => event.day === day && event.tone !== "normal"
+      );
+      expect(visibleBeats.length).toBeGreaterThanOrEqual(1);
     }
   });
 
