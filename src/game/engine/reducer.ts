@@ -574,7 +574,7 @@ function completeCurrentDay(state: GameState): GameState {
     return {
       ...state,
       statusMessage:
-        "Finish at least one served order and one cleaning action before closing the day."
+        "Serve at least one customer before closing the day."
     };
   }
 
@@ -815,12 +815,15 @@ function applyEmptySupplyStress(
 }
 
 function hasRequiredActions(state: GameState): boolean {
+  // When all action points are spent, the day can always be closed — prevents soft-locks
+  // (depleted supplies, no cleaning, etc.). Missing tasks apply penalties at day end.
+  if (state.dayManagement.actionPointsRemaining <= 0) {
+    return true;
+  }
+  // While actions remain, require at least one served customer.
   return (
     state.dayManagement.customersServed > 0 &&
-    state.completedActions.includes("take_order") &&
-    (state.completedActions.includes("clean_tables") ||
-      (state.helperAssignment?.helperId === "jana" &&
-        state.helperAssignment.taskId === "cleaning"))
+    state.completedActions.includes("take_order")
   );
 }
 

@@ -150,12 +150,17 @@ export function canCompleteCurrentDay(state: GameState): boolean {
     return false;
   }
 
+  // When all action points are spent, the day can always be closed —
+  // this prevents soft-locks (no supplies, no cleaning, etc.).
+  // Any missing tasks (cleaning, serving) apply penalties in applyDayEndConsequences.
+  if (state.dayManagement.actionPointsRemaining <= 0) {
+    return true;
+  }
+
+  // While actions remain, require at least one served customer before closing.
   return (
     state.dayManagement.customersServed > 0 &&
-    state.completedActions.includes("take_order") &&
-    (state.completedActions.includes("clean_tables") ||
-      (state.helperAssignment?.helperId === "jana" &&
-        state.helperAssignment.taskId === "cleaning"))
+    state.completedActions.includes("take_order")
   );
 }
 
@@ -169,15 +174,7 @@ export function getMissingRequiredActions(state: GameState): readonly DayActionI
     missingActions.push("take_order");
   }
 
-  if (
-    !state.completedActions.includes("clean_tables") &&
-    !(
-      state.helperAssignment?.helperId === "jana" &&
-      state.helperAssignment.taskId === "cleaning"
-    )
-  ) {
-    missingActions.push("clean_tables");
-  }
+  // clean_tables is no longer a hard requirement — skipping it applies a penalty at day end.
 
   return missingActions;
 }
