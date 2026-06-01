@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { createInitialGameState } from "../src/game/engine/gameState";
 import { gameReducer } from "../src/game/engine/reducer";
 import {
+  getGuestForCustomer,
   getObjectiveStatus,
   getVisibleDaySevenLetter,
   getVisibleKassandraMessages,
@@ -492,6 +493,44 @@ describe("fail-state and reputation-scaled income", () => {
   it("makes helpers available from Day 3", () => {
     expect(getVisibleStaffOptions(createDayStartState(3)).length).toBeGreaterThan(0);
     expect(getVisibleStaffOptions(createInitialGameState()).length).toBe(0);
+  });
+
+  it("rewards reputation when an appreciated product is served, with a daily cap", () => {
+    // Find a (day, customerIndex) where Cappuccino-Christa is the served guest.
+    let found: { day: number; index: number } | null = null;
+    for (let day = 2; day <= 7 && !found; day += 1) {
+      for (let index = 0; index < 8; index += 1) {
+        const probe: GameState = { ...createInitialGameState(), day: day as DayNumber };
+        if (getGuestForCustomer(probe, index)?.id === "cappuccino-christa") {
+          found = { day, index };
+          break;
+        }
+      }
+    }
+    expect(found).not.toBeNull();
+    const { day, index } = found!;
+
+    const base: GameState = {
+      ...createInitialGameState(),
+      day: day as DayNumber,
+      dayPhase: "open",
+      dayManagement: {
+        ...createInitialGameState().dayManagement,
+        actionPointsRemaining: 10,
+        customersServed: index
+      }
+    };
+
+    // Serving Christa her appreciated cappuccino: +1 reputation + delight line.
+    const delighted = gameReducer(base, { type: "serve_product", productId: "cappuccino" });
+    expect(delighted.resources.reputation).toBe(base.resources.reputation + 1);
+    expect(delighted.dayManagement.appreciationBonusesGiven).toBe(1);
+    expect(delighted.statusMessage).toContain("Ruf +1");
+
+    // Serving her something she does not value: no reputation gain.
+    const letdown = gameReducer(base, { type: "serve_product", productId: "filterkaffee" });
+    expect(letdown.resources.reputation).toBe(base.resources.reputation);
+    expect(letdown.dayManagement.appreciationBonusesGiven).toBe(0);
   });
 
   it("adds a solo-floor stress penalty from Day 4 without a helper", () => {

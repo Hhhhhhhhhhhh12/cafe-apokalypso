@@ -80,6 +80,16 @@ export interface GuestDefinition {
    */
   serveLine: string;
   visualNotes?: string;
+  /**
+   * Products this guest particularly values. Serving one grants a small
+   * reputation bonus (capped per day) — a light, slice-level hint of the
+   * long-term coffee-appreciation system (see GitHub #56). Optional.
+   */
+  appreciatedProductIds?: readonly ProductId[];
+  /** Shown after serving an appreciated product. */
+  delightLine?: string;
+  /** Shown when this guest (who has preferences) is served something they do not value. */
+  letdownLine?: string;
 }
 
 export interface ProductDefinition {

@@ -40,7 +40,10 @@ export const weekOneGuests = [
     summary: "Pays better and has precise expectations for cappuccino foam.",
     sampleLines: ["The foam was good yesterday. Today I am open to evidence."],
     serveLine:
-      "She holds the cup at a slight angle. After a moment, she nods. This counts as approval."
+      "She holds the cup at a slight angle. After a moment, she nods. This counts as approval.",
+    appreciatedProductIds: ["cappuccino"],
+    delightLine: "The foam holds. She actually smiles — word of this will travel. Ruf +1.",
+    letdownLine: "She drinks it, but the angle of her eyebrow files a quiet complaint."
   },
   {
     id: "herr-bohn",
@@ -51,7 +54,11 @@ export const weekOneGuests = [
     summary: "Older regular with strange memories of the building.",
     sampleLines: ["This corner used to be quieter. Before it remembered things."],
     serveLine:
-      "He thanks you as though this has happened many times in many versions of this café."
+      "He thanks you as though this has happened many times in many versions of this café.",
+    appreciatedProductIds: ["filterkaffee"],
+    delightLine:
+      "\"My usual,\" he says, though you never agreed on one. He seems steadier for it. Ruf +1.",
+    letdownLine: "He accepts it kindly, but you sense this was not the version he remembered."
   },
   {
     id: "freelancerin-mira",
