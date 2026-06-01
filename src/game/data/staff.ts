@@ -5,7 +5,7 @@ export const weekOneStaffOptions = [
     id: "jana",
     name: "Jana",
     role: "service_cleaning",
-    unlockDay: 5,
+    unlockDay: 3,
     dailyCost: 18,
     effects: ["Improves table turnover", "Reduces cleaning pressure"],
     flavorLine: "I can help with service. The wet table was already wet."
@@ -14,7 +14,7 @@ export const weekOneStaffOptions = [
     id: "nino",
     name: "Nino",
     role: "barista",
-    unlockDay: 5,
+    unlockDay: 3,
     dailyCost: 22,
     effects: ["Improves drink preparation", "Reduces barista stress"],
     flavorLine: "I make coffee quickly. Philosophy costs extra."
@@ -23,7 +23,7 @@ export const weekOneStaffOptions = [
     id: "mira",
     name: "Mira",
     role: "marketing_counter",
-    unlockDay: 5,
+    unlockDay: 3,
     dailyCost: 20,
     linkedGuestId: "freelancerin-mira",
     effects: ["Improves counter flow", "Supports small marketing choices"],

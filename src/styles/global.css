@@ -148,6 +148,47 @@ h3 {
   align-items: start;
 }
 
+.cafe-closed-banner {
+  margin-bottom: 16px;
+  padding: 18px 20px;
+  border: 3px solid #7a2e1a;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #f6d9cb 0%, #ecc0ad 100%);
+  color: #4a2014;
+  box-shadow: 0 4px 0 #b06a4f;
+}
+
+.cafe-closed-banner .eyebrow {
+  margin: 0 0 2px;
+  color: #a3331a;
+}
+
+.cafe-closed-banner h2 {
+  margin: 0 0 6px;
+  font-size: 1.4rem;
+}
+
+.cafe-closed-banner p {
+  margin: 0 0 12px;
+  max-width: 60ch;
+  line-height: 1.45;
+}
+
+.cafe-closed-banner button {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 8px;
+  background: #7a2e1a;
+  color: #fff4e6;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.cafe-closed-banner button:hover {
+  background: #97401f;
+}
+
 .panel {
   padding: 18px;
 }

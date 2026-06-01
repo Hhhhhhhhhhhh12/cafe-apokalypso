@@ -8,6 +8,7 @@ import {
   getVisibleStaffOptions
 } from "../src/game/engine/selectors";
 import { weekOneDays } from "../src/game/data";
+import { getEarnedPrice, getReputationIncomeFactor } from "../src/game/engine/management";
 import {
   loadGameState,
   SAVE_KEY,
@@ -37,7 +38,9 @@ describe("management tradeoff system", () => {
 
     expect(nextState.supplies.coffee).toBe(state.supplies.coffee - 1);
     expect(nextState.supplies.milk).toBe(state.supplies.milk - 1);
-    expect(nextState.resources.money).toBe(state.resources.money + 3.4);
+    // Income scales with reputation: at the starting reputation (25) the factor
+    // is 0.7, so a €3.40 cappuccino earns €2.38.
+    expect(nextState.resources.money).toBe(state.resources.money + 2.38);
   });
 
   it("substitutes or blocks unavailable products with a reputation penalty", () => {
@@ -52,7 +55,8 @@ describe("management tradeoff system", () => {
 
     expect(nextState.supplies.coffee).toBe(2);
     expect(nextState.supplies.milk).toBe(0);
-    expect(nextState.resources.reputation).toBe(0);
+    // Starting reputation (25) minus the -1 missing-ingredient penalty.
+    expect(nextState.resources.reputation).toBe(24);
     expect(nextState.statusMessage).toContain("No milk");
   });
 
@@ -129,7 +133,8 @@ describe("management tradeoff system", () => {
       }
     });
 
-    expect(messyState.resources.reputation).toBe(0);
+    // Starting reputation (25) minus the -1 messy-room penalty (cleanliness 35).
+    expect(messyState.resources.reputation).toBe(24);
     expect(cleanState.resources.reputation).toBe(11);
   });
 
@@ -292,9 +297,9 @@ describe("management tradeoff system", () => {
     expect(changedState.helperAssignment?.helperId).toBe("jana");
   });
 
-  it("makes Day-5 helper and Day-6 KASSANDRA unlocks visible at the right time", () => {
-    expect(getVisibleStaffOptions(createDayStartState(4))).toHaveLength(0);
-    expect(getVisibleStaffOptions(createDayStartState(5))).toHaveLength(3);
+  it("makes Day-3 helper and Day-6 KASSANDRA unlocks visible at the right time", () => {
+    expect(getVisibleStaffOptions(createDayStartState(2))).toHaveLength(0);
+    expect(getVisibleStaffOptions(createDayStartState(3))).toHaveLength(3);
 
     expect(getVisibleKassandraMessages(createDayStartState(5))).toHaveLength(0);
     const daySixState: GameState = {
@@ -337,7 +342,8 @@ describe("management tradeoff system", () => {
       createOpenHelperState("nino", "barista"),
       { type: "serve_product", productId: "cappuccino" }
     );
-    expect(ninoBaristaState.resources.reputation).toBe(2);
+    // Starting reputation (25) plus the +1 barista bonus on a cappuccino.
+    expect(ninoBaristaState.resources.reputation).toBe(26);
     expect(ninoBaristaState.supplies.milk).toBe(8);
 
     const ninoCounterState = gameReducer(
@@ -421,6 +427,80 @@ describe("management tradeoff system", () => {
   });
 });
 
+describe("fail-state and reputation-scaled income", () => {
+  it("scales income with reputation (60% at 0, 100% at 100)", () => {
+    expect(getReputationIncomeFactor(0)).toBeCloseTo(0.6);
+    expect(getReputationIncomeFactor(100)).toBeCloseTo(1.0);
+    expect(getReputationIncomeFactor(25)).toBeCloseTo(0.7);
+    expect(getEarnedPrice(3.4, 25)).toBe(2.38);
+  });
+
+  it("closes the café immediately when the till hits zero", () => {
+    const dayEndState: GameState = {
+      ...createInitialGameState(),
+      dayPhase: "day_end",
+      resources: { ...createInitialGameState().resources, money: 0.8 },
+      pendingSupplyPurchase: { coffee: 1, milk: 0, pastries: 0 }
+    };
+    const nextState = gameReducer(dayEndState, { type: "confirm_supply_purchase" });
+
+    expect(nextState.resources.money).toBe(0);
+    expect(nextState.cafeClosed).toBe(true);
+    expect(nextState.closureReason).toBe("money");
+  });
+
+  it("blocks all further actions once the café is closed", () => {
+    const closedState: GameState = {
+      ...createInitialGameState(),
+      cafeClosed: true,
+      closureReason: "money"
+    };
+    const afterAction = gameReducer(closedState, { type: "take_order" });
+
+    expect(afterAction.cafeClosed).toBe(true);
+    expect(afterAction.dayManagement.customersServed).toBe(0);
+    expect(afterAction.statusMessage).toContain("closed");
+  });
+
+  it("gives reputation a 2-day grace period before closing", () => {
+    // Day 1 at zero reputation: a warning, not a closure.
+    const firstZeroDay = completePreparedDay({
+      ...createInitialGameState(),
+      resources: { ...createInitialGameState().resources, reputation: 1, cleanliness: 20 }
+    });
+    expect(firstZeroDay.resources.reputation).toBe(0);
+    expect(firstZeroDay.reputationZeroStreak).toBe(1);
+    expect(firstZeroDay.cafeClosed).toBe(false);
+
+    // Second consecutive zero-reputation day: the café closes.
+    const secondZeroDay = completePreparedDay({
+      ...createInitialGameState(),
+      reputationZeroStreak: 1,
+      resources: { ...createInitialGameState().resources, reputation: 1, cleanliness: 20 }
+    });
+    expect(secondZeroDay.reputationZeroStreak).toBe(2);
+    expect(secondZeroDay.cafeClosed).toBe(true);
+    expect(secondZeroDay.closureReason).toBe("reputation");
+  });
+
+  it("makes helpers available from Day 3", () => {
+    expect(getVisibleStaffOptions(createDayStartState(3)).length).toBeGreaterThan(0);
+    expect(getVisibleStaffOptions(createInitialGameState()).length).toBe(0);
+  });
+
+  it("adds a solo-floor stress penalty from Day 4 without a helper", () => {
+    const soloDayFour = completePreparedDay({
+      ...createInitialGameState(),
+      day: 4,
+      helperAssignment: null
+    });
+
+    expect(
+      soloDayFour.daySummary?.flavorLines.some((line) => line.includes("alone"))
+    ).toBe(true);
+  });
+});
+
 function completePreparedDay(state: GameState): GameState {
   return gameReducer(
     {
@@ -468,7 +548,7 @@ function createDayStartState(day: DayNumber): GameState {
     unlocks: {
       pricing: day >= 3,
       advertising: day >= 4,
-      staff: day >= 5,
+      staff: day >= 3,
       kassandra: day >= 6,
       apocalypseOperations: false
     }

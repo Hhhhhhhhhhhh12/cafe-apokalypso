@@ -293,3 +293,31 @@ Options considered:
 Note on Option A: v04 generation is a candidate for an **external pixel tool (e.g. PixelLab)** rather than a general image model. Target spec: **text-free, landscape orientation, clean alpha (real transparency), empty room (no baked-in props/guests)**, following the existing intake workflow in `docs/art/PILOT_ASSET_INTAKE.md`.
 
 Claude Code/Codex may implement placeholders, asset metadata, folder structure, and rendering components before final art exists. They must not introduce final artwork, canonical character designs, a different main-view perspective, or major visual direction changes without documented user approval.
+
+---
+
+## DECISION: Café Fail-State + Reputation-Scaled Income + Earlier Helpers
+
+**Status: DECIDED — user-approved (2026-06-01). Implemented in `feat/fail-state-and-stress-balance`.**
+
+Adds real loss conditions and economic pressure to the week-one loop. These are deliberate gameplay/balance changes (approved by the user before implementation, per `PROJECT_CANON.md` decision-making rule).
+
+### Fail-state
+- **Money reaches 0 → immediate closure.** Checked after every action (the till is empty; the café cannot operate). `closureReason = "money"`.
+- **Reputation reaches 0 → 2-day grace period.** The first day-end at zero reputation is a warning; a second consecutive zero-reputation day-end closes the café. `closureReason = "reputation"`.
+- A closed café blocks all actions except reset; the UI shows a closure banner with a "Start a new café" button.
+- New `GameState` fields: `cafeClosed`, `closureReason`, `reputationZeroStreak`. Save schema bumped **v5 → v6** (old saves start fresh).
+
+### Reputation-scaled income
+- Sale income scales with reputation: `factor = 0.6 + 0.4 * (reputation / 100)` (60% at reputation 0, 100% at reputation 100). Lower reputation → less money per sale, which ties the reputation fail-state to the economy.
+- **Starting reputation raised from 1 → 25** so a fresh café has a small buffer (and starts at ~70% income).
+
+### Earlier helpers + solo-floor stress
+- **Helpers can be hired from Day 3** (was Day 5). They still cost money per day (`dailyCost`), deducted when the day opens.
+- **From Day 4, running a day with no hired helper adds +10 end-of-day stress** (with a flavor line). This makes the helper choice a real tradeoff: money saved vs. steeper stress.
+
+### Tunable values (chosen as sensible defaults; adjust in `management.ts` / `gameState.ts`)
+- `STARTING_REPUTATION = 25`
+- income factor range 0.6–1.0
+- solo-floor stress penalty: +10 from Day 4
+- reputation grace: 2 consecutive zero days

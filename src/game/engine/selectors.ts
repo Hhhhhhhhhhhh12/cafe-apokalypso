@@ -130,7 +130,7 @@ export function getVisibleKassandraMessages(
 export function getVisibleStaffOptions(
   state: GameState
 ): readonly StaffOptionDefinition[] {
-  if (!state.unlocks.staff || state.day < 5) {
+  if (!state.unlocks.staff || state.day < 3) {
     return [];
   }
 

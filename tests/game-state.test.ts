@@ -12,12 +12,16 @@ describe("initial game state", () => {
   it("starts as a serializable day-one placeholder shell", () => {
     const state = createInitialGameState();
 
-    expect(state.version).toBe(5);
+    expect(state.version).toBe(6);
     expect(state.contentCatalogVersion).toBe("week-one-v1");
     expect(state.day).toBe(1);
     expect(state.weirdnessVisible).toBe(false);
     expect(state.kassandraInstalled).toBe(false);
     expect(state.demoComplete).toBe(false);
+    expect(state.cafeClosed).toBe(false);
+    expect(state.closureReason).toBe(null);
+    expect(state.reputationZeroStreak).toBe(0);
+    expect(state.resources.reputation).toBe(25);
     expect(state.completedActions).toEqual([]);
     expect(state.objectiveResults).toEqual([]);
     expect(state.dayManagement.actionPointsRemaining).toBe(3);

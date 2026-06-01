@@ -13,14 +13,14 @@ import type {
   SupplyState,
   UnlockState
 } from "../types/game";
-import { createInitialDayManagement, SUPPLY_CAPS } from "./management";
+import { createInitialDayManagement, STARTING_REPUTATION, SUPPLY_CAPS } from "./management";
 
-export const CURRENT_GAME_STATE_VERSION = 5;
+export const CURRENT_GAME_STATE_VERSION = 6;
 export const CURRENT_CONTENT_CATALOG_VERSION = "week-one-v1";
 
 const initialResources: ResourceState = {
   money: 42,
-  reputation: 1,
+  reputation: STARTING_REPUTATION,
   cleanliness: 80,
   stress: 0,
   mood: "calm"
@@ -65,6 +65,9 @@ export function createInitialGameState(): GameState {
     weirdnessVisible: false,
     kassandraInstalled: false,
     demoComplete: false,
+    cafeClosed: false,
+    closureReason: null,
+    reputationZeroStreak: 0,
     completedActions: [],
     unlocks: { ...initialUnlocks },
     guestHistory: [],
@@ -96,6 +99,11 @@ export function isValidGameState(value: unknown): value is GameState {
     typeof candidate.weirdnessVisible === "boolean" &&
     typeof candidate.kassandraInstalled === "boolean" &&
     typeof candidate.demoComplete === "boolean" &&
+    typeof candidate.cafeClosed === "boolean" &&
+    (candidate.closureReason === null ||
+      candidate.closureReason === "money" ||
+      candidate.closureReason === "reputation") &&
+    typeof candidate.reputationZeroStreak === "number" &&
     isValidResources(candidate.resources) &&
     isValidSupplies(candidate.supplies) &&
     isValidSupplyPurchase(candidate.pendingSupplyPurchase) &&
