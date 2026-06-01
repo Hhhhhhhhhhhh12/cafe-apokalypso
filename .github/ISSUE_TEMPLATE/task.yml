@@ -1,0 +1,73 @@
+name: Task
+description: A scoped implementation, docs, or design task for Café Apokalypso
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use clear, non-numbered titles. Keep one main concern per issue.
+        See `docs/WORKFLOW.md` and `docs/PROJECT_CANON.md` for conventions.
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: What outcome should this task achieve?
+      placeholder: One or two sentences describing the desired end state.
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Why now? Relevant background and links.
+    validations:
+      required: false
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Concrete, checkable conditions for "done".
+      value: |
+        - [ ]
+        - [ ]
+    validations:
+      required: true
+  - type: textarea
+    id: docs
+    attributes:
+      label: Relevant docs
+      description: Which canonical Markdown files apply or must be updated?
+      placeholder: e.g. docs/MVP_SCOPE.md, docs/DECISIONS.md, docs/ART_PIPELINE.md
+    validations:
+      required: false
+  - type: textarea
+    id: verification
+    attributes:
+      label: Verification steps
+      description: How will this be checked?
+      value: |
+        - npm run lint
+        - npm run typecheck
+        - npm run test
+        - npm run build
+    validations:
+      required: false
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Out of scope
+      description: What this task explicitly does NOT include.
+    validations:
+      required: false
+  - type: dropdown
+    id: handoff
+    attributes:
+      label: Intended tool
+      description: Who is expected to pick this up?
+      options:
+        - Claude Code (docs / architecture / cross-file)
+        - Codex (focused implementation)
+        - Either / undecided
+        - Human
+    validations:
+      required: false
