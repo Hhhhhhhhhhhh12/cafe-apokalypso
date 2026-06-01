@@ -109,13 +109,17 @@ export function ActionPanel({
       <p id="close-day-requirements" className="action-hint">
         {gameState.demoComplete
           ? "Demo complete. Reset to replay the seven-day loop."
-            : gameState.dayPhase === "day_start"
-              ? "Choose one helper task or open without help. The choice locks when the day opens."
-              : gameState.dayManagement.actionPointsRemaining <= 0
-                ? "No action capacity left. Close the day if the required café tasks are done."
-              : canCloseDay
-                ? "Core café tasks complete. The day can be closed."
-                : `Before closing: ${formatMissingActions(missingActions)}.`}
+          : gameState.dayPhase === "day_start"
+            ? "Choose one helper task or open without help. The choice locks when the day opens."
+            : !canCloseDay
+              ? `Before closing: ${formatMissingActions(missingActions)}.`
+              : gameState.dayManagement.customersServed === 0
+                ? "No customers served today — closing will cost reputation."
+                : !gameState.completedActions.includes("clean_tables") &&
+                  !(gameState.helperAssignment?.helperId === "jana" &&
+                    gameState.helperAssignment.taskId === "cleaning")
+                  ? "Tables not cleaned — closing now will cost cleanliness and reputation."
+                  : "Core café tasks complete. The day can be closed."}
       </p>
 
       <p className="status-message" role="status" aria-live="polite">
