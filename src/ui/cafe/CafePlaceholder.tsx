@@ -3,6 +3,8 @@ import stageBaseAsset from "../../../assets/backgrounds/placeholder-cafe-stage-b
 import coffeeMachineAsset from "../../../assets/sprites/props/placeholder-cafe-coffee-machine.png";
 import kassandraRegisterAsset from "../../../assets/sprites/props/placeholder-kassandra-register.png";
 import paulaGuestAsset from "../../../assets/sprites/guests/placeholder-guest-paula.png";
+import cemGuestAsset from "../../../assets/sprites/guests/placeholder-guest-cem.png";
+import miraGuestAsset from "../../../assets/sprites/guests/placeholder-guest-mira.png";
 
 interface CafePlaceholderProps {
   gameState: GameState;
@@ -199,20 +201,34 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
             <span className="placeholder-guest placeholder-guest-normal-02" />
           </div>
 
-          {/* Seated guest 1 — appears after first customer served */}
+          {/* Seated guest 1 — Cem, appears after first customer served */}
           {showSeated1 && (
             <span
               className="placeholder-guest placeholder-guest-seated placeholder-guest-normal-03"
               aria-hidden="true"
-            />
+            >
+              <img
+                className="cafe-pilot-asset cafe-pilot-asset--guest"
+                src={cemGuestAsset}
+                alt=""
+                aria-hidden="true"
+              />
+            </span>
           )}
 
-          {/* Seated guest 2 — appears after second customer served */}
+          {/* Seated guest 2 — Mira, appears after second customer served */}
           {showSeated2 && (
             <span
               className="placeholder-guest placeholder-guest-seated placeholder-guest-normal-04"
               aria-hidden="true"
-            />
+            >
+              <img
+                className="cafe-pilot-asset cafe-pilot-asset--guest"
+                src={miraGuestAsset}
+                alt=""
+                aria-hidden="true"
+              />
+            </span>
           )}
 
           {/* Strange guest — day 4+, after 3 customers served */}

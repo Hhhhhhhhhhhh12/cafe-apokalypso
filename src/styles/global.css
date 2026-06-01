@@ -630,8 +630,10 @@ h3 {
   transform: skewY(-5deg);
   border: 2px solid rgba(53, 36, 30, 0.28);
   border-radius: 7px;
-  background:
-    linear-gradient(180deg, rgba(150, 100, 68, 0.42) 0 45%, rgba(95, 52, 40, 0.5) 45% 100%);
+  /* Transparent: the painted Stage Base provides the counter; this element is
+     kept only as the positioning container for the coffee-machine + register
+     sprites. The visible slab is removed so it does not double the painted bar. */
+  background: transparent;
   box-shadow: none;
 }
 
@@ -641,8 +643,8 @@ h3 {
   border-top: 3px solid rgba(53, 36, 30, 0.75);
   background:
     linear-gradient(90deg, transparent 22%, rgba(255, 248, 237, 0.12) 22% 25%, transparent 25% 54%, rgba(255, 248, 237, 0.12) 54% 57%, transparent 57%);
-  /* Softened so the counter front does not double the painted counter. */
-  opacity: 0.4;
+  /* Hidden so the CSS counter front does not double the painted counter. */
+  opacity: 0;
 }
 
 .cafe-counter__ledge {
@@ -654,8 +656,8 @@ h3 {
   border-top: 3px solid rgba(53, 36, 30, 0.55);
   border-bottom: 3px solid rgba(53, 36, 30, 0.3);
   background: rgba(255, 248, 237, 0.12);
-  /* Softened alongside the counter front. */
-  opacity: 0.4;
+  /* Hidden alongside the counter front. */
+  opacity: 0;
 }
 
 /*
@@ -666,10 +668,12 @@ h3 {
  */
 .cafe-coffee-machine {
   position: absolute;
-  top: -34%;
-  left: 10%;
-  width: 27%;
-  height: 62%;
+  /* Sits on the left segment of the painted back-corner ledge (was floating over
+     the left window). Pushed right onto the ledge and up to the shelf line. */
+  top: -6%;
+  left: 38%;
+  width: 22%;
+  height: 52%;
   border: 3px solid transparent;
   border-radius: 6px 6px 4px 4px;
   background: transparent;
@@ -796,8 +800,9 @@ h3 {
   border: 2px solid #4d3026;
   border-radius: 4px 4px 2px 2px;
   background: #fff2d8;
-  /* Stage Base coherence cleanup: faded so these props do not look pasted on. */
-  opacity: 0.4;
+  /* Hidden: the painted Stage Base already shows counter clutter; these read as
+     ghost boxes. Kept as fallback structure. */
+  opacity: 0;
 }
 
 .cafe-counter-props span:nth-child(1) {
@@ -826,8 +831,8 @@ h3 {
     radial-gradient(circle at 28% 45%, #fff8ed 0 9%, transparent 10%),
     radial-gradient(circle at 62% 45%, #f3d9b8 0 10%, transparent 11%),
     rgba(255, 248, 237, 0.18);
-  /* Stage Base coherence cleanup: faded so the mat does not look pasted on. */
-  opacity: 0.3;
+  /* Hidden: reads as a ghost box over the painted floor. Kept as fallback. */
+  opacity: 0;
 }
 
 /*
@@ -840,7 +845,9 @@ h3 {
   width: 20%;
   height: 25%;
   transform: skewY(-5deg);
-  opacity: 0.25;
+  /* Hidden: the painted Stage Base already furnishes the room; the faded CSS
+     tables read as ghost boxes over the floor. Kept as fallback structure. */
+  opacity: 0;
 }
 
 .cafe-table--left {
@@ -926,8 +933,10 @@ h3 {
 
 .cafe-queue {
   position: absolute;
-  right: 6%;
-  bottom: 17%;
+  /* Moved from the cramped bottom-right corner into the open painted floor so
+     the waiting guest stands in the room rather than against the wall. */
+  left: 34%;
+  bottom: 9%;
   z-index: 6;
   width: 16%;
   height: 41%;
@@ -978,20 +987,36 @@ h3 {
 }
 
 .placeholder-guest-normal-01 {
-  right: 35%;
-  bottom: 26%;
+  left: 50%;
+  bottom: 8%;
+  transform: translateX(-50%);
 }
 
-.cafe-pilot-asset--paula {
+.cafe-pilot-asset--paula,
+.cafe-pilot-asset--guest {
   left: 50%;
   bottom: -8px;
   z-index: 2;
-  /* 2× pixel-art scale for legibility at game resolution */
-  width: 64px;
-  height: 64px;
+  /* Pixel-art scale bumped for stronger presence in the large painted room. */
+  width: 108px;
+  height: 108px;
   transform: translateX(-50%);
   object-fit: contain;
   image-rendering: pixelated;
+}
+
+/* When a real guest sprite is present, hide the CSS blob backing (fill, border,
+   head dot) so only the sprite reads. Shadow (::after) is kept as a soft anchor. */
+.placeholder-guest:has(.cafe-pilot-asset--guest),
+.placeholder-guest:has(.cafe-pilot-asset--paula) {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.placeholder-guest:has(.cafe-pilot-asset--guest)::before,
+.placeholder-guest:has(.cafe-pilot-asset--paula)::before {
+  display: none;
 }
 
 .placeholder-guest-normal-02 {
@@ -1045,9 +1070,9 @@ h3 {
   z-index: 4;
   width: 34px;
   height: 48px;
-  /* Stage Base coherence cleanup: faded so the CSS plant does not sit oddly
-     over the painted counter. Class retained as fallback. */
-  opacity: 0.45;
+  /* Hidden: reads oddly over the painted counter. A real plant prop (Pixellab)
+     will replace this. Class retained as fallback. */
+  opacity: 0;
 }
 
 .cafe-plant::before {

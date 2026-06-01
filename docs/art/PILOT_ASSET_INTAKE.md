@@ -410,6 +410,73 @@ and was **not** committed.
 
 ---
 
+## 12. PROMPT-10E-A5 extraction log (Batch 4 Mira guest sprite)
+
+Mira guest sprite extracted from `2026-06-01_mira-teal-v03.png` (Google AI Studio /
+Nano Banana, 1024×1024, 5-pose sheet). Raw sheet stays in the external asset inbox
+`raw/` folder and was **not** committed.
+
+- **Status:** provisional pilot asset; **not final art**. Wired into
+  `CafePlaceholder.tsx` as seated-guest slot 2.
+- **Design decision:** Mira wears a **dark teal coat** with **orange/auburn hair**
+  to read as visually distinct from Paula (yellow coat) when both are on screen.
+  An earlier yellow-coat Mira draft was rejected for being too close to Paula.
+- **Source / style:** generated with Paula + café props as style reference for
+  pixel quality and perspective; clothing/hair colors overridden in the prompt.
+  Known AI-Studio caveat: with a strong yellow-coat reference present, some poses
+  drifted back to yellow — only the consistently-teal **top-middle standing pose**
+  (orange hair, holding coffee) was extracted.
+- **Exported file:**
+  - `assets/sprites/guests/placeholder-guest-mira.png` — 40×48 px (matches Paula/Cem),
+    real transparency (~75%), checkerboard flood-fill removed.
+- **Wiring:** rendered via `.cafe-pilot-asset--guest` in the seated-guest slots; a
+  `:has()` rule hides the CSS blob backing so only the sprite reads.
+- **Approval status:** standing pose approved by user; remaining poses (seated,
+  walking, with-bag) kept in `raw/` for later.
+
+---
+
+## 13. Pixellab prop pipeline — validated (2026-06-01)
+
+Pixellab (MCP, `create_1_direction_object`) was validated for **café props** after
+character generation proved weak. Props are Pixellab's strength.
+
+- **Key technique:** pass an existing warm café asset (e.g. `placeholder-table-chair-set.png`,
+  ≤128 px) as `style_images`. This anchors palette/outline/warmth so output matches
+  the AI-Studio house style instead of generic RPG pixels. **Note:** when `style_images`
+  is set, `size` must be omitted (the largest style image determines output size).
+- **Cost:** each `create_1_direction_object` returns a **16-frame review pack** for
+  **20 generations**; select best frames with `select_object_frames`, discard with
+  `dismiss_review`.
+- **First batch (review packs assessed, best frames saved to inbox `candidates/`):**
+  - Potted plant → `pixellab-plant-lush.png`, `pixellab-plant-classic.png`
+  - Wall clock → `pixellab-clock-round.png` (normal), `pixellab-clock-pendulum.png`
+    (candidate for the Day-7 clock anomaly / weirdness escalation)
+- **Verdict:** style-referenced Pixellab props match the café look well — pipeline is
+  **AI Studio for characters, Pixellab for props/furniture/tiles**.
+- **Status:** all provisional candidates in the external inbox; none committed to the
+  repo yet. They enter `assets/` only after the §5 approval checklist + user sign-off.
+
+---
+
+## 14. Café layout coherence pass (2026-06-01)
+
+CSS cleanup of `CafePlaceholder.tsx` / `global.css` to fix overlaps against the
+painted Stage Base v03 (no asset changes):
+
+- Hidden the faded **ghost furniture** (CSS tables, counter slab/front/ledge,
+  counter-props, service-mat, plant) that read as translucent boxes over the painted
+  floor. All classes/structure retained as fallback (opacity 0 / transparent).
+- Dropped the **coffee-machine** sprite from floating over the left window onto the
+  painted back-corner ledge, beside the register.
+- Moved the **waiting guest (Paula)** out of the cramped bottom-right corner into the
+  open painted floor.
+- Wired real **Cem** + **Mira** sprites into the seated-guest slots (were CSS blobs).
+- All 66 tests pass; `tsc --noEmit` clean. Still provisional — the real fix remains
+  the front-3/4 **Stage Base v04** (see §"Stage Base v04" brief below).
+
+---
+
 ## Stage Base v03 — experimental/provisional integration
 
 - **Asset:** `assets/backgrounds/placeholder-cafe-stage-base-v03.png` (892×708 px,
