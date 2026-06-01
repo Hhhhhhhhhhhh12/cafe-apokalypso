@@ -3,6 +3,7 @@ import {
   getAvailableProducts,
   getIngredientLabel,
   getMissingRequiredActions,
+  getNextGuestPreview,
   getRestockPreview,
   getVisibleStaffOptions,
   hasActionCapacity
@@ -156,6 +157,7 @@ function OpenDayControls({
   canCloseDay: boolean;
 }) {
   const products = getAvailableProducts(gameState);
+  const nextGuest = getNextGuestPreview(gameState);
   const canAct = hasActionCapacity(gameState);
   const advertisingCanUseBonus = gameState.dayManagement.extraAdvertisingActions > 0;
   const canUseAdvertisingAction = canAct || advertisingCanUseBonus;
@@ -258,6 +260,13 @@ function OpenDayControls({
           {gameState.day === 7 ? "Finish Day 7" : "Close day"}
         </button>
       </div>
+
+      {nextGuest ? (
+        <p className="next-guest" role="status">
+          Next in line: <strong>{nextGuest.name}</strong>
+          {nextGuest.wants ? <span> · seems to be hoping for a proper {nextGuest.wants}.</span> : null}
+        </p>
+      ) : null}
 
       <div className="product-grid" aria-label="Serve a specific product">
         {products.map((product) => (
