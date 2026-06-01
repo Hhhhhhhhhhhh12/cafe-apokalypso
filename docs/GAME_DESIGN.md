@@ -42,6 +42,28 @@ The roguelite layer should remain soft and cozy rather than punitive. There is n
 
 The café remains cozy and inviting even as the world around it becomes stranger.
 
+### Narrative North Star: the café as a save point (long-term)
+
+The long-term meta-premise — to be revealed slowly, **not** in the week-1 slice — is that
+Café Apokalypso is a **save point and inn for characters from other (fictional / video-game)
+worlds**. Between their own adventures, these characters drop in to **save their progress and
+heal**, then return to their stories. The café is a quiet checkpoint at the seam between worlds.
+
+This reframes systems that already exist as flavor:
+
+- **Saving** is the "Memory Ledger / guestbook" ("Reality has been checked in.") — see *Save System Flavor* below.
+- **Healing / recovery / memory-stabilization** become the later **inn-room services** (see `docs/ROADMAP.md`, Phase 4 and North Star #7).
+- KASSANDRA's memory preservation across collapsed weeks fits the same seam-between-worlds logic.
+
+**Vertical-slice rule:** week 1 may only *hint* at this (a guest who seems to be "between
+adventures", a save framed as a ledger, an odd "checking in" line). No explicit cross-world
+reveal in the MVP. Full mechanics are post-MVP.
+
+Tracked in GitHub: **#55** (this meta-plot), **#56** (coffee varieties + per-guest appreciation →
+reputation; seed already in `guests.ts` `behaviorTags` like `quality-expectations`), **#57**
+(furniture/décor shop that places new graphics into the café). All three are **long-term**;
+the slice only hints at them.
+
 ### Main Game View
 
 The main gameplay view is a small, full pixel café shown as a light 3/4 diorama.
