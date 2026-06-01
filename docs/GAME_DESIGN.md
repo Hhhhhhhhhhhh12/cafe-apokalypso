@@ -64,6 +64,43 @@ reputation; seed already in `guests.ts` `behaviorTags` like `quality-expectation
 (furniture/décor shop that places new graphics into the café). All three are **long-term**;
 the slice only hints at them.
 
+### Décor economy: shabby start → paid upgrades (refines #57)
+
+The café **starts with the shabbiest possible furniture and props** (wobbly chairs, a
+chipped pot, a bare bulb, a sack with a hole). As the player earns money they **buy
+upgrades** that swap in nicer graphics — the same prop slot, a better tier. This turns
+décor into a visible money sink and a felt progression curve, and it gives the Pixellab
+prop pipeline a clear job: **generate each prop in tiers (shabby → standard → nice)**.
+
+- Each prop slot (plant, lamp, chair/table, counter clutter, clock) has 2–3 visual tiers.
+- Buying a tier is a management action with a cash cost; the swap is purely cosmetic at
+  first, later optionally tied to small comfort/reputation bumps.
+- Slot + fallback structure already exists in `CafePlaceholder.tsx`; an upgrade just
+  changes which asset that slot renders. Provisional assets stay replaceable.
+- Asset implication: when generating props, also keep a deliberately **shabby variant**
+  (worn, mismatched, dim) as the day-1 default.
+
+### Who is the player? (proposed — pending owner confirmation)
+
+Proposed framing to resolve "there is no protagonist avatar in the room": the player is
+**not a physical character**. The player is the café's **disembodied keeper** — the
+"lyrical I" of the game, a non-physical presence that runs the place. This fits the
+save-point-between-worlds north star (the café itself is a seam; its keeper need not be
+a body) and KASSANDRA's habit of classifying everyone ("96% mortal, 4% unclear" — perhaps
+the keeper is the unclear 4%).
+
+Consequences if adopted:
+
+- **Paula becomes the first employee/hand**, not just a guest — the keeper hires Paula so
+  the café has a body on the floor. The slice could start with Paula already working.
+- This is why guest/staff sprites carry the scene while no "player character" is drawn.
+- **Paula's later mission**: she leaves the café on an errand into another world — a
+  natural use of the canon's reserved **side-view special-mission camera**. A first hook
+  for the post-slice arc.
+
+Status: **proposed by owner, not yet binding.** Week-1 slice does not state any of this;
+it only needs to not contradict it. Promote to canon once confirmed.
+
 ### Main Game View
 
 The main gameplay view is a small, full pixel café shown as a light 3/4 diorama.
