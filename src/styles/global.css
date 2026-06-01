@@ -1260,6 +1260,17 @@ h3 {
   line-height: 1;
 }
 
+.next-guest {
+  margin: 10px 0 0;
+  color: #4a3b34;
+  font-size: 0.86rem;
+  line-height: 1.4;
+}
+
+.next-guest strong {
+  color: #1f555f;
+}
+
 .product-grid {
   display: grid;
   grid-template-columns: 1fr;

@@ -11,6 +11,7 @@ import {
   ACTION_BUDGET_BY_DAY,
   getCleanlinessLabel,
   getHelperLabel,
+  getProductById,
   getStressLabel,
   SUPPLY_CAPS,
   SUPPLY_UNIT_COSTS
@@ -115,6 +116,34 @@ export function getGuestForCustomer(
   }
 
   return dayGuests[index % dayGuests.length];
+}
+
+export interface NextGuestPreview {
+  name: string;
+  /** Name of a product this guest particularly values, if any (a light hint). */
+  wants: string | null;
+}
+
+/**
+ * A subtle preview of the next guest the queue will serve, so the player can
+ * choose a drink with some foresight. Deterministic — uses the same guest
+ * selection as the serve flow. Returns null when the café is not actively open.
+ */
+export function getNextGuestPreview(state: GameState): NextGuestPreview | null {
+  if (state.dayPhase !== "open" || state.dayManagement.actionPointsRemaining <= 0) {
+    return null;
+  }
+
+  const guest = getGuestForCustomer(state, state.dayManagement.customersServed);
+  if (!guest) {
+    return null;
+  }
+
+  const wantedProductId = guest.appreciatedProductIds?.[0];
+  return {
+    name: guest.name,
+    wants: wantedProductId ? getProductById(wantedProductId).name : null
+  };
 }
 
 export function getVisibleKassandraMessages(

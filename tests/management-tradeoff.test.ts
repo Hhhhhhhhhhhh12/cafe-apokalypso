@@ -3,6 +3,7 @@ import { createInitialGameState } from "../src/game/engine/gameState";
 import { gameReducer } from "../src/game/engine/reducer";
 import {
   getGuestForCustomer,
+  getNextGuestPreview,
   getObjectiveStatus,
   getVisibleDaySevenLetter,
   getVisibleKassandraMessages,
@@ -531,6 +532,45 @@ describe("fail-state and reputation-scaled income", () => {
     const letdown = gameReducer(base, { type: "serve_product", productId: "filterkaffee" });
     expect(letdown.resources.reputation).toBe(base.resources.reputation);
     expect(letdown.dayManagement.appreciationBonusesGiven).toBe(0);
+  });
+
+  it("previews the next guest (and a wants-hint) only while the café is open", () => {
+    const open = createInitialGameState();
+    const preview = getNextGuestPreview(open);
+    expect(preview?.name).toBe("Pendlerin Paula");
+    expect(preview?.wants).toBeNull();
+
+    // No preview once the day's actions are spent.
+    const spent: GameState = {
+      ...open,
+      dayManagement: { ...open.dayManagement, actionPointsRemaining: 0 }
+    };
+    expect(getNextGuestPreview(spent)).toBeNull();
+
+    // When Cappuccino-Christa is next, her wants-hint names the cappuccino.
+    let target: { day: number; index: number } | null = null;
+    for (let day = 2; day <= 7 && !target; day += 1) {
+      for (let index = 0; index < 8; index += 1) {
+        const probe: GameState = { ...createInitialGameState(), day: day as DayNumber };
+        if (getGuestForCustomer(probe, index)?.id === "cappuccino-christa") {
+          target = { day, index };
+          break;
+        }
+      }
+    }
+    expect(target).not.toBeNull();
+    const christaNext: GameState = {
+      ...createInitialGameState(),
+      day: target!.day as DayNumber,
+      dayPhase: "open",
+      dayManagement: {
+        ...createInitialGameState().dayManagement,
+        actionPointsRemaining: 5,
+        customersServed: target!.index
+      }
+    };
+    expect(getNextGuestPreview(christaNext)?.name).toBe("Cappuccino-Christa");
+    expect(getNextGuestPreview(christaNext)?.wants).toBe("Cappuccino");
   });
 
   it("adds a solo-floor stress penalty from Day 4 without a helper", () => {
