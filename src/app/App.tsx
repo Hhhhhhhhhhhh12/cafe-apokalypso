@@ -50,6 +50,25 @@ export function App() {
         </div>
       </header>
 
+      {gameState.cafeClosed ? (
+        <section className="cafe-closed-banner" role="alert" aria-labelledby="cafe-closed-title">
+          <p className="eyebrow">Café closed</p>
+          <h2 id="cafe-closed-title">
+            {gameState.closureReason === "money"
+              ? "Out of money"
+              : "Out of standing"}
+          </h2>
+          <p>
+            {gameState.closureReason === "money"
+              ? "The till ran dry and the café could no longer cover its day. This run is over."
+              : "Reputation stayed at rock bottom for two days running, and the regulars stopped coming. This run is over."}
+          </p>
+          <button type="button" onClick={handleReset}>
+            Start a new café
+          </button>
+        </section>
+      ) : null}
+
       <section className="workspace-grid" aria-label="Game shell workspace">
         <ResourceHud gameState={gameState} />
         <CafePlaceholder gameState={gameState} />

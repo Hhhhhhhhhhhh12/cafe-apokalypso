@@ -7,7 +7,7 @@ import type {
 } from "./content";
 import type { DayNumber } from "./content";
 
-export type GameStateVersion = 5;
+export type GameStateVersion = 6;
 
 export type ContentCatalogVersion = "week-one-v1";
 
@@ -16,6 +16,7 @@ export type IngredientKey = "coffee" | "milk" | "pastries";
 export type CleanlinessStateLabel = "Sauber" | "Ordentlich" | "Unordentlich" | "Chaotisch";
 export type StressStateLabel = "Ruhig" | "Geschäftig" | "Angespannt" | "Überlastet";
 export type DayPhase = "day_start" | "open" | "day_end";
+export type ClosureReason = "money" | "reputation";
 export type HelperTaskId = "cleaning" | "service" | "barista" | "counter" | "marketing";
 
 export type DayActionId =
@@ -129,6 +130,12 @@ export interface GameState {
   weirdnessVisible: boolean;
   kassandraInstalled: boolean;
   demoComplete: boolean;
+  /** True once the café has permanently closed (money or reputation fail-state). */
+  cafeClosed: boolean;
+  /** Why the café closed, or null if still open. */
+  closureReason: ClosureReason | null;
+  /** Consecutive day-ends with reputation at 0 (drives the 2-day grace period). */
+  reputationZeroStreak: number;
   completedActions: DayActionId[];
   unlocks: UnlockState;
   guestHistory: GuestId[];

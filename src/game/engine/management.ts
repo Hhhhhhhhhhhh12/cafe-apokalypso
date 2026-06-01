@@ -12,11 +12,30 @@ import type {
   SupplyState
 } from "../types/game";
 
+/** Starting reputation for a new game. Higher than the old value (1) so a
+ *  fresh café has a small buffer before the reputation fail-state. */
+export const STARTING_REPUTATION = 25;
+
 export const SUPPLY_CAPS: SupplyState = {
   coffee: 20,
   milk: 20,
   pastries: 12
 };
+
+/**
+ * Income scales with reputation: a well-regarded café earns full price, a
+ * struggling one earns less. Linear from 60% (reputation 0) to 100%
+ * (reputation 100). Deterministic, rounded to cents by the caller.
+ */
+export function getReputationIncomeFactor(reputation: number): number {
+  const clamped = clamp(reputation, 0, 100);
+  return 0.6 + 0.4 * (clamped / 100);
+}
+
+/** Sale price actually earned, after the reputation income factor, in cents-rounded euros. */
+export function getEarnedPrice(basePrice: number, reputation: number): number {
+  return Math.round(basePrice * getReputationIncomeFactor(reputation) * 100) / 100;
+}
 
 export const SUPPLY_UNIT_COSTS: Record<IngredientKey, number> = {
   coffee: 0.8,
@@ -74,7 +93,7 @@ export function createInitialDayManagement(
     offerReviewed: false,
     advertisingRun: false,
     kassandraConsulted: false,
-    helperDecisionMade: day < 5,
+    helperDecisionMade: day < 3,
     reputationAtStart,
     cleanlinessStressApplied: false,
     noCleaningStressApplied: false,

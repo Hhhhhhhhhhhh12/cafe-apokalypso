@@ -21,6 +21,7 @@ import {
   getIngredientRequirement,
   getCleanlinessLabel,
   getDefaultProductForState,
+  getEarnedPrice,
   getHelperLabel,
   getMissingIngredients,
   getProductById,
@@ -42,6 +43,47 @@ import type {
 const ADVERTISING_ACTION_COST = 3;
 
 export function gameReducer(state: GameState, action: GameAction): GameState {
+  if (state.cafeClosed && action.type !== "reset_game") {
+    return {
+      ...state,
+      statusMessage: "The café has closed. Reset to start over."
+    };
+  }
+
+  const nextState = applyAction(state, action);
+
+  if (action.type === "reset_game") {
+    return nextState;
+  }
+
+  // Immediate fail-state: an empty till means the café can no longer operate.
+  return applyImmediateClosure(nextState);
+}
+
+/**
+ * Immediate (per-action) fail-state check. Money is clamped at 0, so "<= 0"
+ * means the till has hit zero. Reputation uses a 2-day grace period handled at
+ * day end (see completeCurrentDay), not here.
+ */
+function applyImmediateClosure(state: GameState): GameState {
+  if (state.cafeClosed) {
+    return state;
+  }
+
+  if (state.resources.money <= 0) {
+    return {
+      ...state,
+      cafeClosed: true,
+      closureReason: "money",
+      statusMessage:
+        "The till is empty. With no money to operate, the café closes its doors."
+    };
+  }
+
+  return state;
+}
+
+function applyAction(state: GameState, action: GameAction): GameState {
   if (state.demoComplete && action.type !== "reset_game") {
     return {
       ...state,
@@ -199,9 +241,11 @@ function applySuccessfulServe(
 
     supplies = applyProductConsumption(product, supplies, workingState.helperAssignment);
     const suppliesUsed = getSuppliesUsedForProduct(product, workingState.helperAssignment);
+    // Income scales with current reputation (lower reputation -> less earned).
+    const earned = getEarnedPrice(product.basePrice, resources.reputation);
     resources = {
       ...resources,
-      money: clampResource(resources.money + product.basePrice),
+      money: clampResource(resources.money + earned),
       cleanliness: clampMeter(resources.cleanliness - 2),
       stress: applyCapacityStress(resources.stress, management.customersServed, workingState.day)
     };
@@ -217,7 +261,7 @@ function applySuccessfulServe(
     management = {
       ...management,
       customersServed: management.customersServed + 1,
-      moneyEarned: clampResource(management.moneyEarned + product.basePrice),
+      moneyEarned: clampResource(management.moneyEarned + earned),
       suppliesUsed: addSupplies(management.suppliesUsed, suppliesUsed)
     };
 
@@ -465,10 +509,10 @@ function selectHelper(
   helperId: StaffOptionId,
   taskId: HelperTaskId
 ): GameState {
-  if (state.day < 5 || !state.unlocks.staff) {
+  if (state.day < 3 || !state.unlocks.staff) {
     return {
       ...state,
-      statusMessage: "Temporary help starts on Day 5."
+      statusMessage: "Temporary help starts on Day 3."
     };
   }
 
@@ -600,6 +644,20 @@ function completeCurrentDay(state: GameState): GameState {
     status: objectiveStatus.completed ? "completed" : "missed"
   } as const;
 
+  // Reputation fail-state with a 2-day grace period: one day at zero is a
+  // warning; a second consecutive day at zero closes the café.
+  const reputationAtZero = closedState.resources.reputation <= 0;
+  const reputationZeroStreak = reputationAtZero ? state.reputationZeroStreak + 1 : 0;
+  const closeForReputation = reputationZeroStreak >= 2;
+
+  const closingMessage = closeForReputation
+    ? "A second day with no standing left in the neighbourhood. The café quietly closes."
+    : daySevenClose
+      ? "Day 7 closed. An official letter has arrived. Something is wrong with this café."
+      : reputationAtZero
+        ? `Day ${state.day} closed. Reputation has bottomed out — one more day like this and the café closes.`
+        : `Day ${state.day} closed. Review the summary, then buy supplies for tomorrow.`;
+
   return {
     ...closedState,
     dayPhase: "day_end",
@@ -616,12 +674,13 @@ function completeCurrentDay(state: GameState): GameState {
     ],
     demoComplete: daySevenClose,
     weirdnessVisible: daySevenClose ? true : false,
+    reputationZeroStreak,
+    cafeClosed: closeForReputation,
+    closureReason: closeForReputation ? "reputation" : closedState.closureReason,
     hiddenWeirdness: daySevenClose
       ? closedState.hiddenWeirdness + 7
       : closedState.hiddenWeirdness + closedState.day,
-    statusMessage: daySevenClose
-      ? "Day 7 closed. An official letter has arrived. Something is wrong with this café."
-      : `Day ${state.day} closed. Review the summary, then buy supplies for tomorrow.`
+    statusMessage: closingMessage
   };
 }
 
@@ -641,6 +700,14 @@ function applyDayEndConsequences(state: GameState): GameState {
   ) {
     resources = { ...resources, stress: clampMeter(resources.stress + 3) };
     management = { ...management, noCleaningStressApplied: true };
+  }
+
+  // From Day 4, running the floor without a hired helper is noticeably harder.
+  // Helpers can be hired from Day 3 (and cost money) — skipping them trades
+  // money saved for a steeper end-of-day stress hit.
+  if (state.day >= 4 && !state.helperAssignment) {
+    resources = { ...resources, stress: clampMeter(resources.stress + 10) };
+    flavorLines.push("You ran the whole floor alone again. It shows. Stress +10.");
   }
 
   if (resources.cleanliness >= 70) {
@@ -770,7 +837,7 @@ function confirmSupplyPurchase(state: GameState): GameState {
   return {
     ...state,
     day: nextDay,
-    dayPhase: nextDay >= 5 ? "day_start" : "open",
+    dayPhase: nextDay >= 3 ? "day_start" : "open",
     phaseLabel: nextDayDefinition.title,
     completedActions: [],
     supplies,
@@ -782,7 +849,7 @@ function confirmSupplyPurchase(state: GameState): GameState {
     unlocks: getUnlocksForDay(nextDay),
     resources: nextResources,
     statusMessage:
-      nextDay >= 5
+      nextDay >= 3
         ? `Restock confirmed. Day ${nextDay} begins with helper choices available.`
         : `Restock confirmed. Day ${nextDay} begins: ${nextDayDefinition.milestone}`
   };
@@ -931,7 +998,7 @@ function getUnlocksForDay(day: DayNumber) {
   return {
     pricing: day >= 3,
     advertising: day >= 4,
-    staff: day >= 5,
+    staff: day >= 3,
     kassandra: day >= 6,
     apocalypseOperations: false
   };
