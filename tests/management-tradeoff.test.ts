@@ -8,6 +8,7 @@ import {
   getVisibleStaffOptions
 } from "../src/game/engine/selectors";
 import { weekOneDays } from "../src/game/data";
+import { MUNDANE_STRESS_EVENT_LINES } from "../src/game/engine/management";
 import {
   loadGameState,
   SAVE_KEY,
@@ -205,9 +206,11 @@ describe("management tradeoff system", () => {
       resources: { ...createInitialGameState().resources, stress: 91 }
     });
 
-    expect(stressedState.daySummary?.stressEvent).toContain(
-      "PLACEHOLDER STRESS EVENT"
-    );
+    // A real mundane stress line is shown (no leftover placeholder text)
+    expect(stressedState.daySummary?.stressEvent).toBeTruthy();
+    expect(stressedState.daySummary?.stressEvent).not.toMatch(/placeholder/i);
+    expect(MUNDANE_STRESS_EVENT_LINES).toContain(stressedState.daySummary?.stressEvent);
+    // Tone stays grounded — no overt weirdness/myth/apocalypse wording yet
     expect(stressedState.daySummary?.stressEvent).not.toMatch(/weirdness|myth|apocalypse/i);
     expect(stressedState.resources.money).toBeLessThan(42);
   });
