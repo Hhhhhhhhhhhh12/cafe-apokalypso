@@ -84,7 +84,7 @@ export function getServeLineForCustomer(
   return guest?.serveLine ?? "The order is served.";
 }
 
-function getGuestForCustomer(
+export function getGuestForCustomer(
   state: GameState,
   customerIndex: number
 ): GuestDefinition | undefined {

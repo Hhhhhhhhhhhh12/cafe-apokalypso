@@ -101,7 +101,8 @@ export function createInitialDayManagement(
     slowCleaningStressReductionUsed: false,
     baristaReputationBonus: 0,
     helperExtraOrdersRemaining: 0,
-    extraAdvertisingActions: 0
+    extraAdvertisingActions: 0,
+    appreciationBonusesGiven: 0
   };
 }
 

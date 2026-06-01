@@ -7,7 +7,7 @@ import type {
 } from "./content";
 import type { DayNumber } from "./content";
 
-export type GameStateVersion = 6;
+export type GameStateVersion = 7;
 
 export type ContentCatalogVersion = "week-one-v1";
 
@@ -68,6 +68,8 @@ export interface DayManagementState {
   baristaReputationBonus: number;
   helperExtraOrdersRemaining: number;
   extraAdvertisingActions: number;
+  /** Per-day count of guest-appreciation reputation bonuses already awarded (capped). */
+  appreciationBonusesGiven: number;
 }
 
 export interface DaySummary {

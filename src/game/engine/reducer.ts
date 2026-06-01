@@ -6,7 +6,11 @@ import {
   createInitialGameState
 } from "./gameState";
 import { weekOneAchievements } from "../data";
-import { getCurrentDayDefinition, getServeLineForCustomer } from "./selectors";
+import {
+  getCurrentDayDefinition,
+  getGuestForCustomer,
+  getServeLineForCustomer
+} from "./selectors";
 import { getObjectiveStatus } from "./objectives";
 import {
   applyProductConsumption,
@@ -41,6 +45,9 @@ import type {
 } from "../types/game";
 
 const ADVERTISING_ACTION_COST = 3;
+
+/** Max guest-appreciation reputation bonuses awarded per day (keeps it a light nudge). */
+const APPRECIATION_DAILY_CAP = 2;
 
 export function gameReducer(state: GameState, action: GameAction): GameState {
   if (state.cafeClosed && action.type !== "reset_game") {
@@ -298,6 +305,32 @@ function applySuccessfulServe(
   const servedCustomerIndex = Math.max(0, management.customersServed - 1);
   const serveLine = getServeLineForCustomer(workingState, servedCustomerIndex);
 
+  // Light guest-appreciation hint: a guest who values the product just served
+  // gives a small reputation bump (capped per day). A wrong choice for a
+  // picky guest only adds a gentle letdown line — no penalty. See GitHub #56.
+  const servedGuest = getGuestForCustomer(workingState, servedCustomerIndex);
+  const guestPreferences = servedGuest?.appreciatedProductIds ?? [];
+  const appreciates = guestPreferences.includes(product.id);
+  let appreciationLine = "";
+
+  if (
+    appreciates &&
+    management.appreciationBonusesGiven < APPRECIATION_DAILY_CAP
+  ) {
+    resources = { ...resources, reputation: clampMeter(resources.reputation + 1) };
+    management = {
+      ...management,
+      appreciationBonusesGiven: management.appreciationBonusesGiven + 1
+    };
+    appreciationLine = servedGuest?.delightLine ?? "";
+  } else if (guestPreferences.length > 0 && !appreciates) {
+    appreciationLine = servedGuest?.letdownLine ?? "";
+  }
+
+  const statusParts = [serveLine, appreciationLine, ...flavorLines].filter(
+    (part) => part.length > 0
+  );
+
   return {
     ...workingState,
     supplies,
@@ -307,8 +340,7 @@ function applySuccessfulServe(
     },
     dayManagement: management,
     completedActions: addUniqueDayAction(workingState.completedActions, "take_order"),
-    statusMessage:
-      flavorLines.length > 0 ? `${serveLine} ${flavorLines.join(" ")}` : serveLine
+    statusMessage: statusParts.join(" ")
   };
 }
 

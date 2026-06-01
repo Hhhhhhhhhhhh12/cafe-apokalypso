@@ -447,6 +447,19 @@ These tests must pass before PROMPT-6B is considered done.
 
 ---
 
+## Guest appreciation (light slice hint — implemented)
+
+A light, slice-level hint of the long-term coffee-appreciation system (GitHub #56):
+
+- Guest data may carry `appreciatedProductIds` plus a `delightLine` / `letdownLine`.
+- Serving a guest a product they appreciate grants **+1 reputation**, capped at
+  **2 bonuses per day** (`dayManagement.appreciationBonusesGiven`), and shows the delight line.
+- Serving a picky guest something they don't value shows the letdown line — **no penalty**.
+- Currently wired for Cappuccino-Christa (cappuccino) and Herr Bohn (filterkaffee).
+- The full coffee-variety / quality-tier system and per-guest taste catalog remain **out of scope** (post-MVP, #56).
+
+---
+
 ## Out of Scope for PROMPT-6B
 
 Do not implement the following. They belong to later phases.

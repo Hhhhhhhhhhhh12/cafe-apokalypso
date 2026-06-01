@@ -15,7 +15,7 @@ import type {
 } from "../types/game";
 import { createInitialDayManagement, STARTING_REPUTATION, SUPPLY_CAPS } from "./management";
 
-export const CURRENT_GAME_STATE_VERSION = 6;
+export const CURRENT_GAME_STATE_VERSION = 7;
 export const CURRENT_CONTENT_CATALOG_VERSION = "week-one-v1";
 
 const initialResources: ResourceState = {
@@ -184,7 +184,8 @@ function isValidDayManagement(value: unknown): value is DayManagementState {
     typeof management.slowCleaningStressReductionUsed === "boolean" &&
     typeof management.baristaReputationBonus === "number" &&
     typeof management.helperExtraOrdersRemaining === "number" &&
-    typeof management.extraAdvertisingActions === "number"
+    typeof management.extraAdvertisingActions === "number" &&
+    typeof management.appreciationBonusesGiven === "number"
   );
 }
 
