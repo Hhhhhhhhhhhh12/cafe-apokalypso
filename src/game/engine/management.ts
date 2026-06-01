@@ -44,13 +44,19 @@ export const ACTION_BUDGET_BY_DAY: Record<GameState["day"], number> = {
   7: 6
 };
 
+/**
+ * Everyday end-of-day strain lines, shown when stress is high (>= 61).
+ * Tone: dry, warm, understated — grounded café mishaps with one small,
+ * deniable thing slightly off. Not horror, not obvious anomalies yet.
+ * See docs/CONTENT_GUIDE.md.
+ */
 export const MUNDANE_STRESS_EVENT_LINES = [
-  "PLACEHOLDER STRESS EVENT: The coffee machine made a sound it has not made before. You reset it. The manual did not cover this.",
-  "PLACEHOLDER STRESS EVENT: A guest asked for the bill three times before you noticed. You apologised. They tipped anyway, but less.",
-  "PLACEHOLDER STRESS EVENT: You dropped a cup. It was not your best moment. Nobody said anything, which was worse.",
-  "PLACEHOLDER STRESS EVENT: The milk frother stopped mid-cappuccino. You finished it by hand. The guest left a note: 'Authentic.'",
-  "PLACEHOLDER STRESS EVENT: A queue formed. You managed it. You do not remember how.",
-  "PLACEHOLDER STRESS EVENT: The cash register froze for eleven seconds. Then it continued. No explanation was offered."
+  "The coffee machine made a sound it has not made before. You reset it. The manual stops one page short of explaining it.",
+  "A guest asked for the bill three times before you noticed. You apologised. They tipped anyway — a little less, and a little kindly.",
+  "You dropped a cup. Not your finest moment. Nobody said anything, which was somehow worse.",
+  "The milk frother quit mid-cappuccino. You finished it by hand. The guest left a note: “Authentic.”",
+  "A queue formed, then cleared. You handled all of it. You cannot quite reconstruct how.",
+  "The register froze for eleven seconds, then carried on as if it hadn’t. It did not offer an explanation, and you did not ask."
 ] as const;
 
 export function createInitialDayManagement(
