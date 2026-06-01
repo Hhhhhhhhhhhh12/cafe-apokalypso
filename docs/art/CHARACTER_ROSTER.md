@@ -114,7 +114,7 @@
 | **Vibe** | Modern · beobachtend · witzig · leicht seltsam ohne erklärlich seltsam zu sein |
 | **Bestellung** | Wechselt durch — merkt wenn sich etwas verändert |
 | **Gameplay** | Reguläre Wiederkehrerin · kommentiert Veränderungen · verankert Normalzustand |
-| **Sprite** | 🎨 ausstehend |
+| **Sprite** | ✅ `placeholder-guest-mira.png` (40×48, **teal Mantel + orange Haare** — bewusst von Paula abgesetzt) |
 | **Erscheint** | Tag 1 · kehrt regelmäßig zurück |
 | **Geheimnis** | Ist nicht offensichtlich übernatürlich — aber bemerkt zu viel |
 
@@ -230,7 +230,7 @@
 | Laptop-Lukas | Normal | 1–3 | 🎨 | — |
 | Cappuccino-Christa | Normal | 2–3 | 🎨 | — |
 | Herr Bohn | Normal | 2–4 | 🎨 | Falsches Gedächtnis |
-| Mira | Ton-Anker | 1+ | 🎨 | Bemerkt zu viel |
+| Mira | Ton-Anker | 1+ | ✅ | Bemerkt zu viel |
 | Herr Grau | Strange (deniable) | 3–5 | 🔒 | Hades |
 | Frau m. Regenschirm | Strange (deniable) | 6–7 | 🔒 | Orakel |
 | Meda | Mythologisch | nach Freigabe | 🔒 | Medusa |

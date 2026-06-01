@@ -26,7 +26,13 @@ import type {
   ProductDefinition,
   StaffOptionDefinition
 } from "../types/content";
-import type { DayActionId, GameState, IngredientKey, SupplyState } from "../types/game";
+import type {
+  DayActionId,
+  DayShiftRating,
+  GameState,
+  IngredientKey,
+  SupplyState
+} from "../types/game";
 
 export { getCurrentObjective, getObjectiveStatus };
 
@@ -206,6 +212,46 @@ export function getMissingRequiredActions(state: GameState): readonly DayActionI
   // clean_tables is no longer a hard requirement — skipping it applies a penalty at day end.
 
   return missingActions;
+}
+
+/**
+ * A short, cozy narrative recap of the closed day, composed deterministically
+ * from the day summary. Voice over numbers (the figures sit in the list below).
+ * Carries a light "the ledger remembers" save-point hint (see #55); Day 7 reads
+ * a touch heavier. Returns "" when there is no day summary.
+ */
+export function getDayEndRecapLine(state: GameState): string {
+  const summary = state.daySummary;
+  if (!summary) {
+    return "";
+  }
+
+  const ratingSentence: Record<DayShiftRating, string> = {
+    "Calm Shift":
+      "A quiet day. The regulars came, drank, and went back to wherever regulars go.",
+    "Busy Shift":
+      "A full day. You kept up — mostly. The queue thinned out before the light did.",
+    "Messy but Profitable":
+      "The till is heavier than the café is tidy. The tables can wait until tomorrow. Probably.",
+    "Barely Held Together":
+      "You held the day together with both hands and a damp cloth. It mostly worked."
+  };
+
+  const reputationClause =
+    summary.reputationDelta > 0
+      ? "Word of the café travelled a little further."
+      : summary.reputationDelta < 0
+        ? "The café's standing took a small dent."
+        : "";
+
+  const ledgerClause =
+    state.day >= 7
+      ? "You close the ledger. For a moment the pages feel heavier than one week should weigh."
+      : "You close the ledger; the café remembers the day so you don't have to.";
+
+  return [ratingSentence[summary.rating], reputationClause, ledgerClause]
+    .filter((part) => part.length > 0)
+    .join(" ");
 }
 
 export function getManagementHudLabels(state: GameState) {
