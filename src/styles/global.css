@@ -1605,6 +1605,14 @@ h3 {
   background: #f7e1db;
 }
 
+.day-recap-line {
+  margin: 0.5rem 0 0;
+  color: #4a3b34;
+  font-size: 0.95rem;
+  font-style: italic;
+  line-height: 1.45;
+}
+
 .rating-line {
   margin: 0.5rem 0 0;
   color: #35241e;

@@ -1,5 +1,6 @@
 import {
   getCurrentDayDefinition,
+  getDayEndRecapLine,
   getNarrativeEventCards,
   getVisibleDaySevenLetter,
   getVisibleKassandraMessages,
@@ -91,6 +92,7 @@ export function DayProgressPanel({ gameState }: DayProgressPanelProps) {
       {gameState.daySummary ? (
         <section className="inline-callout day-result-card" aria-labelledby="day-summary-title">
           <h3 id="day-summary-title">Day-end management summary</h3>
+          <p className="day-recap-line">{getDayEndRecapLine(gameState)}</p>
           <p className="rating-line">
             Rating: <strong>{gameState.daySummary.rating}</strong>
           </p>

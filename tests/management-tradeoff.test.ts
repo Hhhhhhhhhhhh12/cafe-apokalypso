@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { createInitialGameState } from "../src/game/engine/gameState";
 import { gameReducer } from "../src/game/engine/reducer";
 import {
+  getDayEndRecapLine,
   getGuestForCustomer,
   getNextGuestPreview,
   getObjectiveStatus,
@@ -571,6 +572,21 @@ describe("fail-state and reputation-scaled income", () => {
     };
     expect(getNextGuestPreview(christaNext)?.name).toBe("Cappuccino-Christa");
     expect(getNextGuestPreview(christaNext)?.wants).toBe("Cappuccino");
+  });
+
+  it("composes a narrative day-end recap, heavier on Day 7", () => {
+    expect(getDayEndRecapLine(createInitialGameState())).toBe("");
+
+    const calmClose = completePreparedDay(createInitialGameState());
+    const recap = getDayEndRecapLine(calmClose);
+    expect(recap.length).toBeGreaterThan(0);
+    expect(recap).toContain("ledger");
+
+    const daySevenClose = completePreparedDay({
+      ...createInitialGameState(),
+      day: 7
+    });
+    expect(getDayEndRecapLine(daySevenClose)).toContain("heavier");
   });
 
   it("adds a solo-floor stress penalty from Day 4 without a helper", () => {
