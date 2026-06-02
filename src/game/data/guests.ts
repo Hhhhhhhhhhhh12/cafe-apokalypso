@@ -42,7 +42,7 @@ export const weekOneGuests = [
     serveLine:
       "She holds the cup at a slight angle. After a moment, she nods. This counts as approval.",
     appreciatedProductIds: ["cappuccino"],
-    delightLine: "The foam holds. She actually smiles — word of this will travel. Ruf +1.",
+    delightLine: "The foam holds. She actually smiles — word of this will travel. Ruf +2.",
     letdownLine: "She drinks it, but the angle of her eyebrow files a quiet complaint."
   },
   {
@@ -88,7 +88,12 @@ export const weekOneGuests = [
       "Your opening hours are pleasantly mortal."
     ],
     serveLine:
-      "He pays and thanks you. The coin does not match any denomination you can identify."
+      "He pays and thanks you. The coin does not match any denomination you can identify.",
+    appreciatedProductIds: ["handfilter"],
+    delightLine:
+      "He tastes the pour-over slowly. \"This is the one with the long shadow,\" he says, approving. Ruf +2.",
+    letdownLine:
+      "He drinks it without complaint, but you sense he was hoping for something brewed more deliberately."
   },
   {
     id: "frau-roter-regenschirm",

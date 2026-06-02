@@ -47,8 +47,8 @@ import type {
 
 const ADVERTISING_ACTION_COST = 3;
 
-/** Max guest-appreciation reputation bonuses awarded per day (keeps it a light nudge). */
-const APPRECIATION_DAILY_CAP = 2;
+/** Max guest-appreciation reputation points awarded per day (keeps it a light nudge). */
+const APPRECIATION_DAILY_CAP = 4;
 
 export function gameReducer(state: GameState, action: GameAction): GameState {
   if (state.cafeClosed && action.type !== "reset_game") {
@@ -306,25 +306,30 @@ function applySuccessfulServe(
   const servedCustomerIndex = Math.max(0, management.customersServed - 1);
   const serveLine = getServeLineForCustomer(workingState, servedCustomerIndex);
 
-  // Light guest-appreciation hint: a guest who values the product just served
-  // gives a small reputation bump (capped per day). A wrong choice for a
-  // picky guest only adds a gentle letdown line — no penalty. See GitHub #56.
+  // Guest appreciation (#56): a guest who values the product just served gives a
+  // reputation bump that scales with the product's craft quality — a premium
+  // (tier-3) drink earns more than a standard one. The bonus is capped per day.
+  // A wrong choice for a picky guest only adds a gentle letdown line — no penalty.
   const servedGuest = getGuestForCustomer(workingState, servedCustomerIndex);
   const guestPreferences = servedGuest?.appreciatedProductIds ?? [];
   const appreciates = guestPreferences.includes(product.id);
   let appreciationLine = "";
 
-  if (
-    appreciates &&
-    management.appreciationBonusesGiven < APPRECIATION_DAILY_CAP
-  ) {
-    resources = { ...resources, reputation: clampMeter(resources.reputation + 1) };
-    management = {
-      ...management,
-      appreciationBonusesGiven: management.appreciationBonusesGiven + 1
-    };
-    appreciationLine = servedGuest?.delightLine ?? "";
-  } else if (guestPreferences.length > 0 && !appreciates) {
+  if (appreciates) {
+    const qualityTier = product.qualityTier ?? 1;
+    const fullBonus = 1 + Math.max(0, qualityTier - 2); // standard/good +1, premium +2
+    const remainingCap = APPRECIATION_DAILY_CAP - management.appreciationBonusesGiven;
+    const bonus = Math.min(fullBonus, Math.max(0, remainingCap));
+
+    if (bonus > 0) {
+      resources = { ...resources, reputation: clampMeter(resources.reputation + bonus) };
+      management = {
+        ...management,
+        appreciationBonusesGiven: management.appreciationBonusesGiven + bonus
+      };
+      appreciationLine = servedGuest?.delightLine ?? "";
+    }
+  } else if (guestPreferences.length > 0) {
     appreciationLine = servedGuest?.letdownLine ?? "";
   }
 
