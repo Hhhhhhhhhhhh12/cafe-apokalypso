@@ -3,6 +3,7 @@ import { createInitialGameState } from "../src/game/engine/gameState";
 import { gameReducer } from "../src/game/engine/reducer";
 import {
   getDayEndRecapLine,
+  getDecorUpgradeOptions,
   getGuestForCustomer,
   getKassandraConsultLine,
   getNextGuestPreview,
@@ -641,6 +642,42 @@ describe("fail-state and reputation-scaled income", () => {
     const consulted = gameReducer(daySix, { type: "consult_kassandra" });
     expect(consulted.statusMessage.startsWith("KASSANDRA:")).toBe(true);
     expect(consulted.dayManagement.kassandraConsulted).toBe(true);
+  });
+
+  it("upgrades décor at day end: cost, tier, one-time reputation, and caps", () => {
+    const dayEnd: GameState = {
+      ...createInitialGameState(),
+      dayPhase: "day_end",
+      resources: { ...createInitialGameState().resources, money: 42, reputation: 25 }
+    };
+
+    // Plant tier 1 -> 2 costs €12 and grants +1 reputation, once.
+    const upgraded = gameReducer(dayEnd, { type: "upgrade_decor", slot: "plant" });
+    expect(upgraded.decor.plant).toBe(2);
+    expect(upgraded.resources.money).toBe(30);
+    expect(upgraded.resources.reputation).toBe(26);
+
+    // Not enough money is blocked.
+    const broke: GameState = {
+      ...dayEnd,
+      resources: { ...dayEnd.resources, money: 1 }
+    };
+    const blocked = gameReducer(broke, { type: "upgrade_decor", slot: "plant" });
+    expect(blocked.decor.plant).toBe(1);
+    expect(blocked.statusMessage).toContain("Not enough money");
+
+    // Décor cannot be upgraded outside the day-end review.
+    const openState: GameState = { ...dayEnd, dayPhase: "open" };
+    const notNow = gameReducer(openState, { type: "upgrade_decor", slot: "plant" });
+    expect(notNow.decor.plant).toBe(1);
+
+    // Maxed slot is reported as having no next upgrade.
+    const maxed: GameState = {
+      ...dayEnd,
+      decor: { ...dayEnd.decor, plant: 3 }
+    };
+    const plantOption = getDecorUpgradeOptions(maxed).find((o) => o.id === "plant");
+    expect(plantOption?.next).toBeNull();
   });
 
   it("adds a solo-floor stress penalty from Day 4 without a helper", () => {

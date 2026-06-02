@@ -215,6 +215,9 @@ Possible systems:
 - guest collection book
 - recipe collection
 - décor with mechanical effects
+- living plants with vegetation stages (time-driven wilting; cleaning "waters" them;
+  loosely coupled to cleanliness with delay, not 1:1 — see GAME_DESIGN "Living plants").
+  Kumquat (`special`) is exempt: never wilts, optional daily rustle.
 - major recurring mythological arcs
 
 Success criteria:

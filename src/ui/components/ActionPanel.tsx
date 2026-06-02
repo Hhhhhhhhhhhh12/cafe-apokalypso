@@ -1,6 +1,7 @@
 import {
   canCompleteCurrentDay,
   getAvailableProducts,
+  getDecorUpgradeOptions,
   getIngredientLabel,
   getMissingRequiredActions,
   getNextGuestPreview,
@@ -15,7 +16,12 @@ import {
   SUPPLY_UNIT_COSTS
 } from "../../game/engine/management";
 import type { ProductId, StaffOptionId } from "../../game/types/content";
-import type { GameState, HelperTaskId, IngredientKey } from "../../game/types/game";
+import type {
+  DecorSlotId,
+  GameState,
+  HelperTaskId,
+  IngredientKey
+} from "../../game/types/game";
 
 interface ActionPanelProps {
   gameState: GameState;
@@ -33,6 +39,7 @@ interface ActionPanelProps {
   onCompleteDay: () => void;
   onSetSupplyPurchase: (ingredient: IngredientKey, quantity: number) => void;
   onConfirmSupplyPurchase: () => void;
+  onUpgradeDecor: (slot: DecorSlotId) => void;
   onResetGame: () => void;
 }
 
@@ -60,6 +67,7 @@ export function ActionPanel({
   onCompleteDay,
   onSetSupplyPurchase,
   onConfirmSupplyPurchase,
+  onUpgradeDecor,
   onResetGame
 }: ActionPanelProps) {
   const canCloseDay = canCompleteCurrentDay(gameState);
@@ -101,6 +109,7 @@ export function ActionPanel({
           gameState={gameState}
           onSetSupplyPurchase={onSetSupplyPurchase}
           onConfirmSupplyPurchase={onConfirmSupplyPurchase}
+          onUpgradeDecor={onUpgradeDecor}
         />
       ) : null}
 
@@ -353,13 +362,16 @@ function HelperStartPanel({
 function RestockPanel({
   gameState,
   onSetSupplyPurchase,
-  onConfirmSupplyPurchase
+  onConfirmSupplyPurchase,
+  onUpgradeDecor
 }: {
   gameState: GameState;
   onSetSupplyPurchase: (ingredient: IngredientKey, quantity: number) => void;
   onConfirmSupplyPurchase: () => void;
+  onUpgradeDecor: (slot: DecorSlotId) => void;
 }) {
   const preview = getRestockPreview(gameState);
+  const decorOptions = getDecorUpgradeOptions(gameState);
 
   if (gameState.demoComplete) {
     return (
@@ -423,6 +435,30 @@ function RestockPanel({
       >
         Confirm purchases
       </button>
+
+      <div className="decor-shop" aria-label="Café upgrades">
+        <h3>Café upgrades</h3>
+        {decorOptions.map((option) => (
+          <div className="decor-row" key={option.id}>
+            <span className="decor-row__label">
+              {option.label}: <em>{option.currentTierName}</em>
+            </span>
+            {option.next ? (
+              <button
+                type="button"
+                className="secondary-button"
+                disabled={!option.next.affordable}
+                onClick={() => onUpgradeDecor(option.id)}
+              >
+                {option.next.name} · €{option.next.cost}
+                {option.next.reputationBonus > 0 ? ` · Ruf +${option.next.reputationBonus}` : ""}
+              </button>
+            ) : (
+              <span className="decor-row__maxed">Fully upgraded</span>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

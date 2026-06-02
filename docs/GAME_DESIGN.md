@@ -80,6 +80,26 @@ prop pipeline a clear job: **generate each prop in tiers (shabby → standard �
 - Asset implication: when generating props, also keep a deliberately **shabby variant**
   (worn, mismatched, dim) as the day-1 default.
 
+### Living plants: vegetation stages (post-MVP, Phase 4)
+
+Separate axis from the purchase tiers above. Plants have **health/growth stages**
+(e.g. welk → ok → frisch → üppig) that drift on their own:
+
+- **Wilting is time-driven.** Plants slowly decline over days; the decline runs
+  **faster while the café goes uncleaned**.
+- **Cleaning waters them.** A cleaning action is also "watering" — it nudges nearby
+  plants **up** a stage. So care visibly pays off.
+- **Loosely coupled to cleanliness, with a time delay — deliberately NOT 1:1.** A strict
+  cleanliness→plant mapping would feel linear and gamey. Instead cleanliness *biases the
+  drift rate*, while time drives the actual change, with lag. Plants therefore drift
+  semi-independently of the meters → realism and variety (one plant thrives while another
+  sulks).
+- Reuses the décor slot/asset-swap structure; "stage" just selects which sprite a plant
+  slot renders. Needs per-plant stage sprites (welk/ok/frisch).
+- **Kumquat is exempt** (it is `special`): it **never wilts** — "fruits that never run
+  out." Its constancy while everything else drifts is its first subtle *tell*. Optional
+  idle detail: a **light rustle once per day**, even when nothing touches it.
+
 ### Who is the player? (proposed — pending owner confirmation)
 
 Proposed framing to resolve "there is no protagonist avatar in the room": the player is

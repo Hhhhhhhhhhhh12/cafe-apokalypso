@@ -101,6 +101,7 @@ export function App() {
             dispatch({ type: "set_supply_purchase", ingredient, quantity })
           }
           onConfirmSupplyPurchase={() => dispatch({ type: "confirm_supply_purchase" })}
+          onUpgradeDecor={(slot) => dispatch({ type: "upgrade_decor", slot })}
           onResetGame={handleReset}
         />
         <DayProgressPanel gameState={gameState} />

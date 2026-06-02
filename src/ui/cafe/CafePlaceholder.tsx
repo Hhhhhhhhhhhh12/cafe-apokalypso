@@ -104,7 +104,7 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
             <span />
             <span />
           </div>
-          <div className="cafe-storage">
+          <div className={`cafe-storage cafe-decor--tier-${gameState.decor?.shelf ?? 1}`}>
             <span />
             <span />
             <span />
@@ -239,7 +239,7 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
             />
           )}
 
-          <div className="cafe-plant" aria-hidden="true">
+          <div className={`cafe-plant cafe-decor--tier-${gameState.decor?.plant ?? 1}`} aria-hidden="true">
             <span />
           </div>
 

@@ -16,6 +16,7 @@ import {
   SUPPLY_CAPS,
   SUPPLY_UNIT_COSTS
 } from "./management";
+import { decorSlots, getDecorTier, getMaxDecorTier } from "../data/decor";
 import { getCurrentObjective, getObjectiveStatus } from "./objectives";
 import type {
   DayDefinition,
@@ -29,6 +30,7 @@ import type {
 import type {
   DayActionId,
   DayShiftRating,
+  DecorSlotId,
   GameState,
   IngredientKey,
   SupplyState
@@ -266,6 +268,44 @@ export function getDayEndRecapLine(state: GameState): string {
   return [ratingSentence[summary.rating], reputationClause, ledgerClause]
     .filter((part) => part.length > 0)
     .join(" ");
+}
+
+export interface DecorUpgradeOption {
+  id: DecorSlotId;
+  label: string;
+  currentTierName: string;
+  /** The next purchasable tier, or null when the slot is maxed. */
+  next: {
+    name: string;
+    cost: number;
+    reputationBonus: number;
+    affordable: boolean;
+  } | null;
+}
+
+/** Décor shop rows for the day-end review: current look + the next upgrade. */
+export function getDecorUpgradeOptions(state: GameState): DecorUpgradeOption[] {
+  return decorSlots.map((slot) => {
+    const currentTier = state.decor[slot.id];
+    const currentTierName =
+      getDecorTier(slot.id, currentTier)?.name ?? slot.tiers[0].name;
+    const nextTierDef = getDecorTier(slot.id, currentTier + 1);
+
+    return {
+      id: slot.id,
+      label: slot.label,
+      currentTierName,
+      next:
+        nextTierDef && currentTier < getMaxDecorTier(slot.id)
+          ? {
+              name: nextTierDef.name,
+              cost: nextTierDef.cost,
+              reputationBonus: nextTierDef.reputationBonus,
+              affordable: nextTierDef.cost <= state.resources.money
+            }
+          : null
+    };
+  });
 }
 
 export function getManagementHudLabels(state: GameState) {

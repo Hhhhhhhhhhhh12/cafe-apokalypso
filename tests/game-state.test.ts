@@ -12,7 +12,8 @@ describe("initial game state", () => {
   it("starts as a serializable day-one placeholder shell", () => {
     const state = createInitialGameState();
 
-    expect(state.version).toBe(7);
+    expect(state.version).toBe(8);
+    expect(state.decor).toEqual({ plant: 1, shelf: 1 });
     expect(state.contentCatalogVersion).toBe("week-one-v1");
     expect(state.day).toBe(1);
     expect(state.weirdnessVisible).toBe(false);

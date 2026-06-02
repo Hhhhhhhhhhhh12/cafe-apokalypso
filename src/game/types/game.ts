@@ -7,7 +7,7 @@ import type {
 } from "./content";
 import type { DayNumber } from "./content";
 
-export type GameStateVersion = 7;
+export type GameStateVersion = 8;
 
 export type ContentCatalogVersion = "week-one-v1";
 
@@ -17,6 +17,7 @@ export type CleanlinessStateLabel = "Sauber" | "Ordentlich" | "Unordentlich" | "
 export type StressStateLabel = "Ruhig" | "Geschäftig" | "Angespannt" | "Überlastet";
 export type DayPhase = "day_start" | "open" | "day_end";
 export type ClosureReason = "money" | "reputation";
+export type DecorSlotId = "plant" | "shelf";
 export type HelperTaskId = "cleaning" | "service" | "barista" | "counter" | "marketing";
 
 export type DayActionId =
@@ -138,6 +139,8 @@ export interface GameState {
   closureReason: ClosureReason | null;
   /** Consecutive day-ends with reputation at 0 (drives the 2-day grace period). */
   reputationZeroStreak: number;
+  /** Current owned tier per décor slot (1 = shabby default). See #57. */
+  decor: Record<DecorSlotId, number>;
   completedActions: DayActionId[];
   unlocks: UnlockState;
   guestHistory: GuestId[];
@@ -165,4 +168,5 @@ export type GameAction =
   | { type: "complete_day" }
   | { type: "set_supply_purchase"; ingredient: IngredientKey; quantity: number }
   | { type: "confirm_supply_purchase" }
+  | { type: "upgrade_decor"; slot: DecorSlotId }
   | { type: "reset_game" };
