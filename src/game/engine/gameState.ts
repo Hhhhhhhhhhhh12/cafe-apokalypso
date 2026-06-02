@@ -15,7 +15,7 @@ import type {
 } from "../types/game";
 import { createInitialDayManagement, STARTING_REPUTATION, SUPPLY_CAPS } from "./management";
 
-export const CURRENT_GAME_STATE_VERSION = 7;
+export const CURRENT_GAME_STATE_VERSION = 8;
 export const CURRENT_CONTENT_CATALOG_VERSION = "week-one-v1";
 
 const initialResources: ResourceState = {
@@ -68,6 +68,7 @@ export function createInitialGameState(): GameState {
     cafeClosed: false,
     closureReason: null,
     reputationZeroStreak: 0,
+    decor: { plant: 1, shelf: 1 },
     completedActions: [],
     unlocks: { ...initialUnlocks },
     guestHistory: [],
@@ -104,6 +105,7 @@ export function isValidGameState(value: unknown): value is GameState {
       candidate.closureReason === "money" ||
       candidate.closureReason === "reputation") &&
     typeof candidate.reputationZeroStreak === "number" &&
+    isValidDecor(candidate.decor) &&
     isValidResources(candidate.resources) &&
     isValidSupplies(candidate.supplies) &&
     isValidSupplyPurchase(candidate.pendingSupplyPurchase) &&
@@ -286,6 +288,16 @@ function isValidUnlocks(value: unknown): value is UnlockState {
     typeof unlocks.staff === "boolean" &&
     typeof unlocks.kassandra === "boolean" &&
     typeof unlocks.apocalypseOperations === "boolean"
+  );
+}
+
+function isValidDecor(value: unknown): value is Record<"plant" | "shelf", number> {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+  const decor = value as Record<string, unknown>;
+  return (["plant", "shelf"] as const).every(
+    (slot) => typeof decor[slot] === "number" && Number.isInteger(decor[slot]) && (decor[slot] as number) >= 1
   );
 }
 

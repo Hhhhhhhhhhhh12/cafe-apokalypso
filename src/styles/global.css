@@ -1783,3 +1783,52 @@ h3 {
     min-height: 380px;
   }
 }
+
+/* Décor shop (day-end review) */
+.decor-shop {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+  border-top: 2px solid #d5bda5;
+  padding-top: 12px;
+}
+
+.decor-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.decor-row__label {
+  color: #4a3b34;
+  font-size: 0.86rem;
+}
+
+.decor-row__label em {
+  color: #1f555f;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.decor-row__maxed {
+  color: #6b5444;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+/* Décor visual tiers — cosmetic placeholder progression (real sprites later, #57) */
+.cafe-decor--tier-1 {
+  opacity: 0.5;
+  filter: grayscale(0.35) brightness(0.92);
+}
+
+.cafe-decor--tier-2 {
+  opacity: 0.85;
+  filter: none;
+}
+
+.cafe-decor--tier-3 {
+  opacity: 1;
+  filter: saturate(1.18);
+}

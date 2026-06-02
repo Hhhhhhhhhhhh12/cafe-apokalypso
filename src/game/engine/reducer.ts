@@ -6,6 +6,7 @@ import {
   createInitialGameState
 } from "./gameState";
 import { weekOneAchievements } from "../data";
+import { getDecorTier, getMaxDecorTier } from "../data/decor";
 import {
   getCurrentDayDefinition,
   getGuestForCustomer,
@@ -37,6 +38,7 @@ import {
 } from "./management";
 import type { DayNumber, ProductId, StaffOptionId } from "../types/content";
 import type {
+  DecorSlotId,
   GameAction,
   GameState,
   HelperTaskId,
@@ -140,6 +142,9 @@ function applyAction(state: GameState, action: GameAction): GameState {
 
     case "confirm_supply_purchase":
       return confirmSupplyPurchase(state);
+
+    case "upgrade_decor":
+      return upgradeDecor(state, action.slot);
 
     case "reset_game":
       return createInitialGameState();
@@ -889,6 +894,54 @@ function confirmSupplyPurchase(state: GameState): GameState {
       nextDay >= 3
         ? `Restock confirmed. Day ${nextDay} begins with helper choices available.`
         : `Restock confirmed. Day ${nextDay} begins: ${nextDayDefinition.milestone}`
+  };
+}
+
+function upgradeDecor(state: GameState, slot: DecorSlotId): GameState {
+  if (state.demoComplete) {
+    return state;
+  }
+
+  if (state.dayPhase !== "day_end") {
+    return {
+      ...state,
+      statusMessage: "Café upgrades are chosen after closing, while reviewing the day."
+    };
+  }
+
+  const nextTier = state.decor[slot] + 1;
+  const tierDefinition = getDecorTier(slot, nextTier);
+
+  if (!tierDefinition || state.decor[slot] >= getMaxDecorTier(slot)) {
+    return {
+      ...state,
+      statusMessage: "That corner of the café is already as nice as it gets."
+    };
+  }
+
+  if (tierDefinition.cost > state.resources.money) {
+    return {
+      ...state,
+      statusMessage: `Not enough money for ${tierDefinition.name} (€${tierDefinition.cost}).`
+    };
+  }
+
+  return {
+    ...state,
+    decor: { ...state.decor, [slot]: nextTier },
+    resources: {
+      ...state.resources,
+      money: clampResource(state.resources.money - tierDefinition.cost),
+      reputation: clampMeter(state.resources.reputation + tierDefinition.reputationBonus)
+    },
+    dayManagement: {
+      ...state.dayManagement,
+      moneySpent: clampResource(state.dayManagement.moneySpent + tierDefinition.cost)
+    },
+    statusMessage:
+      tierDefinition.reputationBonus > 0
+        ? `New look: ${tierDefinition.name}. The café feels a little warmer. Ruf +${tierDefinition.reputationBonus}.`
+        : `New look: ${tierDefinition.name}.`
   };
 }
 
