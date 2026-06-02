@@ -33,7 +33,8 @@ const requiredProducts = [
   "Espresso",
   "Cappuccino",
   "Croissant",
-  "Kaffee + Croissant"
+  "Kaffee + Croissant",
+  "Handfilter-Spezialität"
 ];
 
 describe("week-one content data", () => {

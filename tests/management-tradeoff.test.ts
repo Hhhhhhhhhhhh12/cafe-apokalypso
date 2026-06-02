@@ -524,16 +524,46 @@ describe("fail-state and reputation-scaled income", () => {
       }
     };
 
-    // Serving Christa her appreciated cappuccino: +1 reputation + delight line.
+    // Serving Christa her appreciated cappuccino (premium, tier 3): +2 reputation.
     const delighted = gameReducer(base, { type: "serve_product", productId: "cappuccino" });
-    expect(delighted.resources.reputation).toBe(base.resources.reputation + 1);
-    expect(delighted.dayManagement.appreciationBonusesGiven).toBe(1);
-    expect(delighted.statusMessage).toContain("Ruf +1");
+    expect(delighted.resources.reputation).toBe(base.resources.reputation + 2);
+    expect(delighted.dayManagement.appreciationBonusesGiven).toBe(2);
+    expect(delighted.statusMessage).toContain("Ruf +2");
 
     // Serving her something she does not value: no reputation gain.
     const letdown = gameReducer(base, { type: "serve_product", productId: "filterkaffee" });
     expect(letdown.resources.reputation).toBe(base.resources.reputation);
     expect(letdown.dayManagement.appreciationBonusesGiven).toBe(0);
+  });
+
+  it("scales appreciation reputation by product quality tier (premium earns more)", () => {
+    // Herr Grau (Day 4+) appreciates the premium pour-over (tier 3 -> +2).
+    let target: { day: number; index: number } | null = null;
+    for (let day = 4; day <= 7 && !target; day += 1) {
+      for (let index = 0; index < 8; index += 1) {
+        const probe: GameState = { ...createInitialGameState(), day: day as DayNumber };
+        if (getGuestForCustomer(probe, index)?.id === "herr-grau") {
+          target = { day, index };
+          break;
+        }
+      }
+    }
+    expect(target).not.toBeNull();
+
+    const base: GameState = {
+      ...createInitialGameState(),
+      day: target!.day as DayNumber,
+      dayPhase: "open",
+      dayManagement: {
+        ...createInitialGameState().dayManagement,
+        actionPointsRemaining: 10,
+        customersServed: target!.index
+      }
+    };
+
+    const premium = gameReducer(base, { type: "serve_product", productId: "handfilter" });
+    expect(premium.resources.reputation).toBe(base.resources.reputation + 2);
+    expect(premium.statusMessage).toContain("Ruf +2");
   });
 
   it("previews the next guest (and a wants-hint) only while the café is open", () => {

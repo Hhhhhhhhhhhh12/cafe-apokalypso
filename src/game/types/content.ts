@@ -18,7 +18,8 @@ export type ProductId =
   | "espresso"
   | "cappuccino"
   | "croissant"
-  | "kaffee-croissant";
+  | "kaffee-croissant"
+  | "handfilter";
 
 export type StaffOptionId = "jana" | "nino" | "mira";
 
@@ -105,6 +106,11 @@ export interface ProductDefinition {
   basePrice: number;
   ingredients: Partial<Record<"coffee" | "milk" | "pastries", number>>;
   summary: string;
+  /**
+   * Craft quality tier: 1 = standard, 2 = good, 3 = premium. Higher tiers earn
+   * more reputation from guests who appreciate them (see #56). Defaults to 1.
+   */
+  qualityTier?: number;
 }
 
 export interface StaffOptionDefinition {
