@@ -152,6 +152,20 @@ export function getNextGuestPreview(state: GameState): NextGuestPreview | null {
   };
 }
 
+/**
+ * The line KASSANDRA speaks when consulted. Deterministically drawn from the
+ * messages unlocked by the current day, varied by how far into the day it is,
+ * so repeated days surface different (and, by Day 7, more ominous) lines.
+ */
+export function getKassandraConsultLine(state: GameState): string {
+  const pool = kassandraMessages.filter((message) => message.day <= state.day);
+  if (pool.length === 0) {
+    return "KASSANDRA hums, then says nothing it is willing to put in writing.";
+  }
+  const index = state.dayManagement.customersServed % pool.length;
+  return pool[index].text;
+}
+
 export function getVisibleKassandraMessages(
   state: GameState
 ): readonly KassandraMessageDefinition[] {

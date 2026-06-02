@@ -129,7 +129,8 @@ describe("week-one content data", () => {
     expect(kassandraMessages.length).toBeGreaterThanOrEqual(4);
 
     for (const message of kassandraMessages) {
-      expect(message.day).toBe(6);
+      // KASSANDRA unlocks on Day 6; escalation lines arrive on Day 7.
+      expect([6, 7]).toContain(message.day);
       expect(message.source).toBe("authored_static");
       expect(message.simulated).toBe(true);
       expect(message.text).not.toMatch(/api|endpoint|model/i);

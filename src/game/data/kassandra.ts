@@ -28,5 +28,26 @@ export const kassandraMessages = [
     text: "Target group optimization complete. Some targets dispute the term \"group.\"",
     source: "authored_static",
     simulated: true
+  },
+  {
+    id: "kassandra-threshold-stability",
+    day: 7,
+    text: "Demand forecast: high. Threshold stability: provisional. Please keep milk above zero during reality thinning.",
+    source: "authored_static",
+    simulated: true
+  },
+  {
+    id: "kassandra-prefilled-form",
+    day: 7,
+    text: "I have pre-filled a form you have not received yet. Apologies, or congratulations. The field was ambiguous.",
+    source: "authored_static",
+    simulated: true
+  },
+  {
+    id: "kassandra-returning-directions",
+    day: 7,
+    text: "Returning guests today: several. A few are returning from directions that are not days.",
+    source: "authored_static",
+    simulated: true
   }
 ] as const satisfies readonly KassandraMessageDefinition[];

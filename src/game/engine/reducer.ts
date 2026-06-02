@@ -9,6 +9,7 @@ import { weekOneAchievements } from "../data";
 import {
   getCurrentDayDefinition,
   getGuestForCustomer,
+  getKassandraConsultLine,
   getServeLineForCustomer
 } from "./selectors";
 import { getObjectiveStatus } from "./objectives";
@@ -531,8 +532,7 @@ function consultKassandra(state: GameState): GameState {
       ...actionState.dayManagement,
       kassandraConsulted: true
     },
-    statusMessage:
-      "KASSANDRA update reviewed. Demand forecast: medium. Emotional volatility: locally elevated."
+    statusMessage: `KASSANDRA: ${getKassandraConsultLine(actionState)}`
   };
 }
 
