@@ -235,7 +235,7 @@ Focus:
 - localization/i18n
 - visual polish
 - audio/music direction
-- accessibility improvements
+- accessibility improvements (tracked under the `accessibility` label on GitHub: options/display menu, colour-blind palette, WCAG AA contrast audit, screen-reader flow, UI language consistency). Not blocking the vertical slice; an in-app footer hints these are planned.
 - performance
 - better onboarding
 - mobile/responsive layout
