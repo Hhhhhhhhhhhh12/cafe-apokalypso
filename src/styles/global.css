@@ -1355,6 +1355,17 @@ h3 {
   line-height: 1.4;
 }
 
+.helper-picker__warn {
+  margin: 0;
+  padding: 8px 10px;
+  border: 1px solid #c2603a;
+  border-radius: 6px;
+  background: #fbe3d5;
+  color: #7a3318;
+  font-size: 0.84rem;
+  line-height: 1.4;
+}
+
 .helper-task {
   display: grid;
   gap: 2px;
