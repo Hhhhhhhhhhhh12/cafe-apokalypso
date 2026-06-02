@@ -4,6 +4,7 @@ import { gameReducer } from "../src/game/engine/reducer";
 import {
   getDayEndRecapLine,
   getGuestForCustomer,
+  getKassandraConsultLine,
   getNextGuestPreview,
   getObjectiveStatus,
   getVisibleDaySevenLetter,
@@ -587,6 +588,29 @@ describe("fail-state and reputation-scaled income", () => {
       day: 7
     });
     expect(getDayEndRecapLine(daySevenClose)).toContain("heavier");
+  });
+
+  it("voices KASSANDRA with day-scaled, deterministic consult lines", () => {
+    const daySix: GameState = {
+      ...createInitialGameState(),
+      day: 6,
+      dayPhase: "open",
+      kassandraInstalled: true,
+      unlocks: { ...createInitialGameState().unlocks, kassandra: true }
+    };
+    const daySeven: GameState = { ...daySix, day: 7 };
+
+    // A real, non-empty line is drawn from the unlocked pool.
+    expect(getKassandraConsultLine(daySix).length).toBeGreaterThan(0);
+    // Day 7 unlocks strictly more lines than Day 6 (escalation).
+    const poolSix = getVisibleKassandraMessages(daySix).length;
+    const poolSeven = getVisibleKassandraMessages(daySeven).length;
+    expect(poolSeven).toBeGreaterThan(poolSix);
+
+    // Consulting surfaces a voiced KASSANDRA line.
+    const consulted = gameReducer(daySix, { type: "consult_kassandra" });
+    expect(consulted.statusMessage.startsWith("KASSANDRA:")).toBe(true);
+    expect(consulted.dayManagement.kassandraConsulted).toBe(true);
   });
 
   it("adds a solo-floor stress penalty from Day 4 without a helper", () => {
