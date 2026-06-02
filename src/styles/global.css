@@ -1784,6 +1784,22 @@ h3 {
   }
 }
 
+/* Footer hint: accessibility options are planned (let it shine through) */
+.app-footer {
+  margin-top: 20px;
+  padding-top: 12px;
+  border-top: 1px solid #d5bda5;
+}
+
+.app-footer p {
+  margin: 0;
+  max-width: 70ch;
+  color: #6b5444;
+  font-size: 0.8rem;
+  font-style: italic;
+  line-height: 1.45;
+}
+
 /* Décor shop (day-end review) */
 .decor-shop {
   display: grid;

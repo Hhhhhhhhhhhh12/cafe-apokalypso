@@ -106,6 +106,14 @@ export function App() {
         />
         <DayProgressPanel gameState={gameState} />
       </section>
+
+      <footer className="app-footer">
+        <p>
+          Display &amp; accessibility options — including a colour-blind-friendly
+          palette — are on the way. The café would like everyone to be able to read
+          the menu.
+        </p>
+      </footer>
     </main>
   );
 }
