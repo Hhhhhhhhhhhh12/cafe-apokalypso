@@ -296,13 +296,21 @@ function HelperStartPanel({
   onOpenDay: () => void;
 }) {
   const staffOptions = getVisibleStaffOptions(gameState);
+  const soloPenaltyActive = gameState.day >= 4;
+  const hasHelper = Boolean(gameState.helperAssignment);
 
   return (
     <div className="helper-picker" aria-label="Day-start helper assignment">
       <p className="helper-picker__intro">
-        From Day 5 you can hire one helper for the day, or open alone. Pick a single
+        From Day 3 you can hire one helper for the day, or open alone. Pick a single
         task below — the choice locks when the day opens.
       </p>
+      {soloPenaltyActive ? (
+        <p className="helper-picker__warn">
+          The dilemma: a helper costs money up front, but opening alone from Day 4 wears
+          on you — expect about <strong>+10 stress</strong> by closing.
+        </p>
+      ) : null}
       {staffOptions.map((staffOption) => (
         <fieldset key={staffOption.id}>
           <legend>
@@ -332,7 +340,11 @@ function HelperStartPanel({
         </fieldset>
       ))}
       <button type="button" onClick={onOpenDay}>
-        {gameState.helperAssignment ? "Open with selected help" : "Open without help"}
+        {hasHelper
+          ? "Open with selected help"
+          : soloPenaltyActive
+            ? "Open without help (a harder solo day)"
+            : "Open without help"}
       </button>
     </div>
   );
