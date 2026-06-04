@@ -1,5 +1,35 @@
 # Decisions
 
+## DECISION: Freelancerin Mira renamed to Nele + save-state-persistent character concept
+
+**Status: RESOLVED — user-approved (2026-06-03).**
+
+The character previously named "Mira" is renamed to **Nele** across all docs and code. Reasons:
+
+- "Mira" and "Meda" are phonetically too close. The docs already warned "do not merge them" repeatedly; a name change removes the confusion risk permanently.
+- Nele is deliberately unremarkable — fitting for a character whose nature is anything but.
+
+**Nele's canonical concept (approved):**
+
+Nele is a **save-state-persistent** character. Where all other guests are re-initialized each café week, Nele persists across runs. She has been here before — in previous weeks, previous collapses, previous versions of Day 1. Her dry humor about the café being "authentic" is recognition, not observation.
+
+- KASSANDRA does not classify her. Her entry is blank, missing, or produces an error. This is intentional and must not be "fixed."
+- Her line *"The café is authentic. I am not sure whether that is good."* has a double meaning: she has seen many versions of this café.
+- Long-term: what KASSANDRA marks as `[REDACTED]` in its boot sequence may be Nele.
+- Nele may appear from **Day 1** as a regular guest (not only Day 5 as temp help). Her early presence is low-key; no meta-reveal in Week 1.
+
+**KASSANDRA boot hook (approved):**
+
+The KASSANDRA boot screen shown before Day 1 gameplay includes the line:
+
+> Previous runs: [REDACTED]
+
+This is the earliest "not another idle game" signal. It costs nothing, requires no explanation, and immediately establishes the roguelite/meta layer. No further context is given on Day 1.
+
+**First autosave toast (approved direction):**
+
+The first autosave should read *"Reality has been checked in."* rather than a generic "Game saved." This supports the Memory Ledger flavor established in `GAME_DESIGN.md` and signals the game's tone before the player has done anything unusual.
+
 ## Core Concept
 
 Café Apokalypso is a cozy-absurd solo management game for the web.

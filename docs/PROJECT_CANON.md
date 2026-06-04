@@ -59,11 +59,13 @@ The ideal reaction is:
 
 ## Core characters/systems
 
-### Mira
+### Nele
 
-Mira is an early memorable recurring guest / freelancer-style regular and tone anchor.
+Nele is an early recurring guest, tone anchor, and save-state-persistent character. She appears from Day 1. Unlike all other guests, she persists across runs — she has been here in previous weeks and previous collapses. Her dry humor is recognition, not observation.
 
-She should feel mostly normal at first: witty, observant and slightly strange, but not obviously mythological. Mira helps establish the café's early everyday rhythm and dry humor.
+KASSANDRA does not classify her. Her entry is blank or absent. This is intentional and must not be fixed.
+
+She should feel grounded, dry, and slightly too at-ease with how strange things are. Not obviously mythological. Not Meda.
 
 ### Meda
 
@@ -71,7 +73,7 @@ Meda is a separate early strange character who visually evokes Medusa.
 
 She should be one of the first clearer mythological hints, but still carefully dosed for the demo. She may wear sunglasses, avoid direct eye contact, have subtle snake-like hair silhouettes or create small unsettling effects around other guests.
 
-Meda is not Mira. Do not merge them.
+Meda is not Nele. Do not merge them.
 
 ### KASSANDRA
 

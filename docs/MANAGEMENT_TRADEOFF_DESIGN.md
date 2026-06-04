@@ -164,7 +164,7 @@ Customers within capacity add no stress.
 |---|---|
 | Overnight rest (end of every day) | −20 (partial reset; never below 0) |
 | Nino on counter duty | −8 during the day |
-| Mira on counter support | −5 during the day |
+| Nele on counter support | −5 during the day |
 | Manual cleaning action during a slow window | −5 (once per day, only if < comfortable capacity served at that point) |
 | Slow day: fewer than 4 customers total | −10 bonus at day end |
 
@@ -238,17 +238,17 @@ The weirdness event list is locked and must not be drawn from until after
 | Barista | Cappuccino and espresso orders grant +1 reputation each (capped at 3 per day); milk consumed 10% more efficiently (round down) | "Nino made a latte art. It was a bird. Or possibly a bureaucratic stamp." |
 | Counter service | Stress reduced by −8 during the day; one extra order slot | "Nino handled the counter. The queue moved. Stress dropped slightly." |
 
-**Mira**
+**Nele**
 
-Mira is the same character as Freelancerin Mira (normal recurring guest). She
+Nele is the same character as Freelancerin Nele (normal recurring guest). She
 is a freelancer-style regular who can also be hired as a day helper starting
 Day 5. Her dual role is intentional. Both the guest data entry and the staff
-data entry should reference the same character identity. Mira is not Meda.
+data entry should reference the same character identity. Nele is not Meda.
 
 | Task | Mechanical effect | Flavor note |
 |---|---|---|
-| Marketing / counter | Unlocks one extra advertising action for the day; also handles one order | "Mira posted something. It got 14 likes and one comment in a language Google says does not exist." |
-| Counter support | Stress reduced by −5 during the day; one extra order slot | "Mira called the café 'charmingly precarious.' She meant it as a compliment. Probably." |
+| Marketing / counter | Unlocks one extra advertising action for the day; also handles one order | "Nele posted something. It got 14 likes and one comment in a language Google says does not exist." |
+| Counter support | Stress reduced by −5 during the day; one extra order slot | "Nele called the café 'charmingly precarious.' She meant it as a compliment. Probably." |
 
 ### Day-start assignment UI
 
@@ -257,7 +257,7 @@ Before opening — Day 5, 6, 7:
 
 [ Hire Jana ]   Cleaning  ○   Service  ○
 [ Hire Nino ]   Barista   ○   Counter  ○
-[ Hire Mira ]   Marketing ○   Counter  ○
+[ Hire Nele ]   Marketing ○   Counter  ○
 
 [ Open without help ]
 ```
@@ -413,7 +413,7 @@ These tests must pass before PROMPT-6B is considered done.
 - Any supply reaching 0 during a serving attempt adds 5 stress (once per ingredient per day).
 - Overnight rest reduces stress by 20, minimum 0.
 - Nino on counter duty reduces stress by 8.
-- Mira on counter support reduces stress by 5.
+- Nele on counter support reduces stress by 5.
 - Stress at 81+ triggers a guaranteed end-of-day event with non-empty flavor text.
 - Stress event flavor text is drawn from the mundane list, not the weirdness list, in Days 1–6.
 
@@ -426,8 +426,8 @@ These tests must pass before PROMPT-6B is considered done.
 - Jana service: one extra order processed without consuming a player action.
 - Nino barista: reputation bonus correctly applied per qualifying order (max +3/day).
 - Nino counter: stress reduction of 8 applied during the day.
-- Mira marketing: extra advertising slot available.
-- Mira counter: stress reduction of 5 applied; one extra order slot.
+- Nele marketing: extra advertising slot available.
+- Nele counter: stress reduction of 5 applied; one extra order slot.
 - Hire cost deducted at day start; hire blocked if balance insufficient.
 
 ### Weirdness gate tests

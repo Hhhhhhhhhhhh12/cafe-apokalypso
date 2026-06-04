@@ -22,6 +22,7 @@ import {
   COMFORTABLE_CAPACITY_BY_DAY,
   createHelperAssignment,
   createInitialDayManagement,
+  DAILY_FIXED_COST,
   findSubstituteProduct,
   getDayShiftRating,
   getIngredientRequirement,
@@ -610,7 +611,7 @@ function openDay(state: GameState): GameState {
     moneySpent: state.dayManagement.moneySpent + (state.helperAssignment?.dailyCost ?? 0),
     helperExtraOrdersRemaining: getHelperExtraOrders(state),
     extraAdvertisingActions:
-      state.helperAssignment?.helperId === "mira" &&
+      state.helperAssignment?.helperId === "nele" &&
       state.helperAssignment.taskId === "marketing"
         ? 1
         : 0,
@@ -626,7 +627,7 @@ function openDay(state: GameState): GameState {
     if (state.helperAssignment.helperId === "nino" && state.helperAssignment.taskId === "counter") {
       resources = { ...resources, stress: clampMeter(resources.stress - 8) };
     }
-    if (state.helperAssignment.helperId === "mira" && state.helperAssignment.taskId === "counter") {
+    if (state.helperAssignment.helperId === "nele" && state.helperAssignment.taskId === "counter") {
       resources = { ...resources, stress: clampMeter(resources.stress - 5) };
     }
   }
@@ -779,6 +780,10 @@ function applyDayEndConsequences(state: GameState): GameState {
     flavorLines.push(state.helperAssignment.flavorLine);
   }
 
+  // Fixed daily overhead — rent, utilities, baseline costs every café day.
+  resources = { ...resources, money: clampResource(resources.money - DAILY_FIXED_COST) };
+  flavorLines.push(`Tageskosten (Miete, Betrieb): -€${DAILY_FIXED_COST}.`);
+
   const stressEvent = getStressEvent(resources.stress, state.stressEventLog.length);
 
   if (stressEvent && resources.stress >= 81) {
@@ -789,6 +794,8 @@ function applyDayEndConsequences(state: GameState): GameState {
   if (stressEvent) {
     flavorLines.push(stressEvent);
   }
+
+  const dailyOverhead = DAILY_FIXED_COST;
 
   return {
     ...state,
@@ -802,6 +809,7 @@ function applyDayEndConsequences(state: GameState): GameState {
       rating: getDayShiftRating({ ...state, resources, dayManagement: management }),
       moneyEarned: management.moneyEarned,
       moneySpent: management.moneySpent,
+      dailyOverhead,
       customersServed: management.customersServed,
       suppliesUsed: { ...management.suppliesUsed },
       suppliesRestocked: { coffee: 0, milk: 0, pastries: 0 },
@@ -1034,7 +1042,7 @@ function getHelperExtraOrders(state: GameState): number {
     return 1;
   }
 
-  if (state.helperAssignment.helperId === "mira" && state.helperAssignment.taskId === "marketing") {
+  if (state.helperAssignment.helperId === "nele" && state.helperAssignment.taskId === "marketing") {
     return 1;
   }
 

@@ -20,12 +20,12 @@ export const weekOneStaffOptions = [
     flavorLine: "I make coffee quickly. Philosophy costs extra."
   },
   {
-    id: "mira",
-    name: "Mira",
+    id: "nele",
+    name: "Nele",
     role: "marketing_counter",
     unlockDay: 3,
     dailyCost: 20,
-    linkedGuestId: "freelancerin-mira",
+    linkedGuestId: "freelancerin-nele",
     effects: ["Improves counter flow", "Supports small marketing choices"],
     flavorLine:
       "I posted a photo. It got 14 likes and one comment in a language Google says does not exist."

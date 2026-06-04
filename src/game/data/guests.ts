@@ -61,13 +61,13 @@ export const weekOneGuests = [
     letdownLine: "He accepts it kindly, but you sense this was not the version he remembered."
   },
   {
-    id: "freelancerin-mira",
-    name: "Freelancerin Mira",
+    id: "freelancerin-nele",
+    name: "Freelancerin Nele",
     category: "normal",
-    firstDay: 3,
-    behaviorTags: ["dry-humor", "observant", "freelancer"],
+    firstDay: 1,
+    behaviorTags: ["dry-humor", "observant", "freelancer", "persistent"],
     summary:
-      "Dry, observant recurring guest and early tone anchor. She is not Meda.",
+      "Dry, observant recurring guest and early tone anchor. Persists across runs. She is not Meda. KASSANDRA does not classify her.",
     sampleLines: [
       "The café is authentic. I am not sure whether that is good.",
       "The light is good. Slightly existential, but good."
@@ -117,7 +117,7 @@ export const weekOneGuests = [
     firstDay: 5,
     behaviorTags: ["calm", "still", "mythological-hint"],
     summary:
-      "The first clearer mythological hint. Meda is separate from Mira and must not be merged.",
+      "The first clearer mythological hint. Meda is separate from Nele and must not be merged.",
     sampleLines: [
       "An espresso. And please, look at the counter when you bring it.",
       "I prefer the corner seat. People look at me less from there."

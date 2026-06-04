@@ -7,7 +7,7 @@ import type {
 } from "./content";
 import type { DayNumber } from "./content";
 
-export type GameStateVersion = 8;
+export type GameStateVersion = 9;
 
 export type ContentCatalogVersion = "week-one-v1";
 
@@ -78,6 +78,8 @@ export interface DaySummary {
   rating: DayShiftRating;
   moneyEarned: number;
   moneySpent: number;
+  /** Fixed daily overhead (rent, utilities) deducted at day end. */
+  dailyOverhead: number;
   customersServed: number;
   suppliesUsed: SupplyState;
   suppliesRestocked: SupplyState;

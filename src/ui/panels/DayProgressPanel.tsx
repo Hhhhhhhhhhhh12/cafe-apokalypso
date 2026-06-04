@@ -113,6 +113,24 @@ export function DayProgressPanel({ gameState }: DayProgressPanelProps) {
               <dd>€{gameState.daySummary.moneySpent}</dd>
             </div>
             <div>
+              <dt>Daily overhead</dt>
+              <dd>-€{gameState.daySummary.dailyOverhead}</dd>
+            </div>
+            <div>
+              <dt>Net profit / loss</dt>
+              <dd>
+                {(() => {
+                  const net = Math.round(
+                    (gameState.daySummary.moneyEarned -
+                      gameState.daySummary.moneySpent -
+                      gameState.daySummary.dailyOverhead) *
+                      100
+                  ) / 100;
+                  return net >= 0 ? `+€${net}` : `-€${Math.abs(net)}`;
+                })()}
+              </dd>
+            </div>
+            <div>
               <dt>Customers served</dt>
               <dd>{gameState.daySummary.customersServed}</dd>
             </div>

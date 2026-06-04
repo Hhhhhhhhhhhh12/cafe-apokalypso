@@ -137,7 +137,7 @@ Normal guests:
 - Lieferfahrer Cem
 - Cappuccino-Christa
 - Herr Bohn
-- Freelancerin Mira
+- Freelancerin Nele
 
 Subtly strange guests:
 
@@ -178,9 +178,9 @@ Temporary staff options:
 
 - Jana: service / cleaning
 - Nino: barista
-- Mira: marketing / counter
+- Nele: marketing / counter
 
-Mira is the same character as Freelancerin Mira (normal recurring guest). She is a freelancer-style regular who can also be hired as a day helper starting Day 5. This dual role is intentional and should be reflected in both the guest data entry and the staff data entry.
+Nele is the same character as Freelancerin Nele (normal recurring guest). She is a freelancer-style regular who can also be hired as a day helper starting Day 5. This dual role is intentional and should be reflected in both the guest data entry and the staff data entry.
 
 Each staff option should have a clear gameplay effect, a daily cost, and at least one flavor line.
 

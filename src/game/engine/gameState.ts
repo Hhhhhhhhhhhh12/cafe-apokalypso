@@ -15,7 +15,7 @@ import type {
 } from "../types/game";
 import { createInitialDayManagement, STARTING_REPUTATION, SUPPLY_CAPS } from "./management";
 
-export const CURRENT_GAME_STATE_VERSION = 8;
+export const CURRENT_GAME_STATE_VERSION = 9;
 export const CURRENT_CONTENT_CATALOG_VERSION = "week-one-v1";
 
 const initialResources: ResourceState = {
@@ -204,7 +204,7 @@ function isValidHelperAssignment(value: unknown): value is HelperAssignment | nu
 
   return (
     typeof assignment.helperId === "string" &&
-    ["jana", "nino", "mira"].includes(assignment.helperId) &&
+    ["jana", "nino", "nele"].includes(assignment.helperId) &&
     typeof assignment.taskId === "string" &&
     ["cleaning", "service", "barista", "counter", "marketing"].includes(
       assignment.taskId
@@ -240,6 +240,7 @@ function isValidDaySummary(value: unknown): value is DaySummary | null {
     typeof summary.reputationDelta === "number" &&
     typeof summary.objectiveTitle === "string" &&
     typeof summary.objectiveCompleted === "boolean" &&
+    typeof summary.dailyOverhead === "number" &&
     (summary.helperRecap === null || typeof summary.helperRecap === "string") &&
     (summary.stressEvent === null || typeof summary.stressEvent === "string") &&
     isStringArray(summary.flavorLines)
