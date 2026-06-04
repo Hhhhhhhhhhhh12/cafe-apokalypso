@@ -25,20 +25,47 @@ export interface DecorSlotDefinition {
 export const decorSlots = [
   {
     id: "plant",
-    label: "Plant",
+    label: "Pflanze",
     tiers: [
-      { tier: 1, name: "Wilting pot plant", cost: 0, reputationBonus: 0 },
-      { tier: 2, name: "Healthy greenery", cost: 12, reputationBonus: 1 },
-      { tier: 3, name: "Lush monstera", cost: 24, reputationBonus: 2 }
+      { tier: 1, name: "Hängendes Topfgewächs", cost: 0, reputationBonus: 0 },
+      { tier: 2, name: "Kräftiges Grün", cost: 12, reputationBonus: 1 },
+      { tier: 3, name: "Üppige Monstera", cost: 24, reputationBonus: 2 }
     ]
   },
   {
     id: "shelf",
-    label: "Shelf",
+    label: "Regal",
     tiers: [
-      { tier: 1, name: "Wobbly shelf", cost: 0, reputationBonus: 0 },
-      { tier: 2, name: "Solid wood shelf", cost: 14, reputationBonus: 1 },
-      { tier: 3, name: "Curated display", cost: 28, reputationBonus: 2 }
+      { tier: 1, name: "Wackeliges Brettregal", cost: 0, reputationBonus: 0 },
+      { tier: 2, name: "Solides Holzregal", cost: 14, reputationBonus: 1 },
+      { tier: 3, name: "Kuratiertes Wandregal", cost: 28, reputationBonus: 2 }
+    ]
+  },
+  {
+    id: "clock",
+    label: "Wanduhr",
+    tiers: [
+      { tier: 1, name: "Schiefe Wanduhr", cost: 0, reputationBonus: 0 },
+      { tier: 2, name: "Holzrahmenuhr", cost: 10, reputationBonus: 1 },
+      { tier: 3, name: "Messingpendel-Uhr", cost: 22, reputationBonus: 2 }
+    ]
+  },
+  {
+    id: "lamp",
+    label: "Stehlampe",
+    tiers: [
+      { tier: 1, name: "Glühbirne am Stab", cost: 0, reputationBonus: 0 },
+      { tier: 2, name: "Stoffschirmlampe", cost: 12, reputationBonus: 1 },
+      { tier: 3, name: "Warme Bogenlampe", cost: 26, reputationBonus: 2 }
+    ]
+  },
+  {
+    id: "cups",
+    label: "Thekentassen",
+    tiers: [
+      { tier: 1, name: "Zusammengewürfelte Tassen", cost: 0, reputationBonus: 0 },
+      { tier: 2, name: "Passendes Set", cost: 8, reputationBonus: 1 },
+      { tier: 3, name: "Handgefertigte Keramik", cost: 18, reputationBonus: 1 }
     ]
   }
 ] as const satisfies readonly DecorSlotDefinition[];

@@ -1064,62 +1064,114 @@ h3 {
   bottom: 31%;
 }
 
+/*
+ * Real plant prop (Pixellab, shabby tier-1 default). The engine applies the décor
+ * tier treatment via .cafe-decor--tier-N (opacity/filter); art just renders the
+ * sprite here as a background image. Sits on the open floor, front-right.
+ * The CSS-drawn pot/leaves below are hidden but kept as fallback structure.
+ */
 .cafe-plant {
-  right: 11%;
-  bottom: 39%;
-  z-index: 4;
-  width: 34px;
-  height: 48px;
-  /* Hidden: reads oddly over the painted counter. A real plant prop (Pixellab)
-     will replace this. Class retained as fallback. */
-  opacity: 0;
+  right: 13%;
+  bottom: 16%;
+  z-index: 5;
+  width: 68px;
+  height: 80px;
+  background: url("../../assets/sprites/props/placeholder-cafe-plant.png") center bottom / contain no-repeat;
+  image-rendering: pixelated;
 }
 
-.cafe-plant::before {
-  position: absolute;
-  right: 5px;
-  bottom: 0;
-  width: 21px;
-  height: 18px;
-  border: 2px solid #3d2a23;
-  border-radius: 4px 4px 7px 7px;
-  background: #a46642;
-  content: "";
-}
-
+/* Hidden: replaced by the sprite above. Kept as fallback if the image is absent. */
+.cafe-plant::before,
 .cafe-plant span,
 .cafe-plant span::before,
 .cafe-plant span::after {
-  position: absolute;
-  display: block;
-  border: 2px solid #23452e;
-  border-radius: 70% 30% 70% 30%;
-  background: #2d6f58;
-  content: "";
+  display: none;
 }
 
-.cafe-plant span {
-  right: 8px;
-  bottom: 16px;
-  width: 18px;
-  height: 26px;
-  transform: rotate(-20deg);
+/*
+ * Real-sprite décor tiers keep readable opacity (the generic .cafe-decor--tier-1
+ * dims to 0.5, which makes a real sprite look broken rather than shabby). The
+ * desaturating grayscale filter from the generic rule still applies, so tier-1
+ * reads as a sad, faded plant — not a ghost. NOTE for engine session: once every
+ * décor slot uses real per-tier sprites, the generic opacity dimming can be dropped.
+ */
+.cafe-plant.cafe-decor--tier-1 {
+  opacity: 0.95;
 }
 
-.cafe-plant span::before {
-  right: -9px;
-  bottom: 1px;
-  width: 16px;
-  height: 24px;
-  transform: rotate(45deg);
+.cafe-plant.cafe-decor--tier-2,
+.cafe-plant.cafe-decor--tier-3 {
+  opacity: 1;
 }
 
-.cafe-plant span::after {
-  right: 6px;
-  bottom: 7px;
-  width: 14px;
-  height: 22px;
-  transform: rotate(-52deg);
+/*
+ * Wall clock (Pixellab shabby tier-1). Hangs on the back wall between the
+ * window and menu board. The weirdness-hint .cafe-clock CSS below is separate
+ * and untouched — that's the overlay omen; this is the real décor prop.
+ */
+.cafe-decor-clock {
+  left: 38%;
+  top: 22%;
+  z-index: 4;
+  width: 52px;
+  height: 52px;
+  background: url("../../assets/sprites/props/placeholder-cafe-clock.png") center / contain no-repeat;
+  image-rendering: pixelated;
+}
+
+.cafe-decor-clock.cafe-decor--tier-1 {
+  opacity: 0.92;
+}
+
+.cafe-decor-clock.cafe-decor--tier-2,
+.cafe-decor-clock.cafe-decor--tier-3 {
+  opacity: 1;
+}
+
+/*
+ * Floor lamp (Pixellab shabby tier-1). Positioned near the left table area,
+ * giving the seating corner some warmth even in the starter state.
+ */
+.cafe-decor-lamp {
+  left: 8%;
+  bottom: 28%;
+  z-index: 4;
+  width: 40px;
+  height: 64px;
+  background: url("../../assets/sprites/props/placeholder-cafe-lamp.png") center bottom / contain no-repeat;
+  image-rendering: pixelated;
+}
+
+.cafe-decor-lamp.cafe-decor--tier-1 {
+  opacity: 0.90;
+}
+
+.cafe-decor-lamp.cafe-decor--tier-2,
+.cafe-decor-lamp.cafe-decor--tier-3 {
+  opacity: 1;
+}
+
+/*
+ * Counter cups (Pixellab shabby tier-1). A stack of mismatched cups sitting
+ * on the counter clutter area. Small accent, adds life to the counter.
+ */
+.cafe-decor-cups {
+  left: 54%;
+  bottom: 50%;
+  z-index: 6;
+  width: 44px;
+  height: 36px;
+  background: url("../../assets/sprites/props/placeholder-cafe-cups.png") center bottom / contain no-repeat;
+  image-rendering: pixelated;
+}
+
+.cafe-decor-cups.cafe-decor--tier-1 {
+  opacity: 0.90;
+}
+
+.cafe-decor-cups.cafe-decor--tier-2,
+.cafe-decor-cups.cafe-decor--tier-3 {
+  opacity: 1;
 }
 
 .cafe-diorama--busy .placeholder-guest-normal-02,
@@ -1803,34 +1855,63 @@ h3 {
 /* Décor shop (day-end review) */
 .decor-shop {
   display: grid;
-  gap: 8px;
+  gap: 6px;
   margin-top: 14px;
   border-top: 2px solid #d5bda5;
   padding-top: 12px;
 }
 
+.decor-shop h3 {
+  margin: 0 0 4px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #7a5c47;
+}
+
 .decor-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  gap: 8px;
+  padding: 5px 8px;
+  border-radius: 6px;
+  background: rgba(255, 248, 237, 0.6);
+  border: 1px solid #e8d5bc;
 }
 
 .decor-row__label {
   color: #4a3b34;
-  font-size: 0.86rem;
+  font-size: 0.82rem;
+  line-height: 1.3;
+}
+
+.decor-row__label strong {
+  display: block;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #7a5c47;
 }
 
 .decor-row__label em {
   color: #1f555f;
   font-style: normal;
-  font-weight: 700;
 }
 
 .decor-row__maxed {
-  color: #6b5444;
-  font-size: 0.8rem;
-  font-weight: 700;
+  color: #8a7060;
+  font-size: 0.75rem;
+  font-style: italic;
+}
+
+/* Upgrade button inside shop rows */
+.decor-row .secondary-button {
+  font-size: 0.78rem;
+  padding: 4px 10px;
+  white-space: nowrap;
 }
 
 /* Décor visual tiers — cosmetic placeholder progression (real sprites later, #57) */
