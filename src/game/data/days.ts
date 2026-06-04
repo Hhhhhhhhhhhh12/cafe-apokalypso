@@ -15,7 +15,7 @@ export const weekOneDays = [
       completionHint: "Serve 2 customers and clean the tables before closing."
     },
     unlocks: ["take order", "prepare coffee", "accept payment", "clean tables"],
-    guestIds: ["pendlerin-paula"],
+    guestIds: ["pendlerin-paula", "freelancerin-nele"],
     eventIds: ["day-1-opening-rhythm", "day-1-coffee-machine-flicker"]
   },
   {
@@ -38,7 +38,8 @@ export const weekOneDays = [
       "laptop-lukas",
       "lieferfahrer-cem",
       "cappuccino-christa",
-      "herr-bohn"
+      "herr-bohn",
+      "freelancerin-nele"
     ],
     eventIds: ["day-2-herr-bohn-memory", "day-2-rehearsed-rhythm"]
   },
