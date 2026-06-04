@@ -1064,62 +1064,44 @@ h3 {
   bottom: 31%;
 }
 
+/*
+ * Real plant prop (Pixellab, shabby tier-1 default). The engine applies the décor
+ * tier treatment via .cafe-decor--tier-N (opacity/filter); art just renders the
+ * sprite here as a background image. Sits on the open floor, front-right.
+ * The CSS-drawn pot/leaves below are hidden but kept as fallback structure.
+ */
 .cafe-plant {
-  right: 11%;
-  bottom: 39%;
-  z-index: 4;
-  width: 34px;
-  height: 48px;
-  /* Hidden: reads oddly over the painted counter. A real plant prop (Pixellab)
-     will replace this. Class retained as fallback. */
-  opacity: 0;
+  right: 13%;
+  bottom: 16%;
+  z-index: 5;
+  width: 68px;
+  height: 80px;
+  background: url("../../assets/sprites/props/placeholder-cafe-plant.png") center bottom / contain no-repeat;
+  image-rendering: pixelated;
 }
 
-.cafe-plant::before {
-  position: absolute;
-  right: 5px;
-  bottom: 0;
-  width: 21px;
-  height: 18px;
-  border: 2px solid #3d2a23;
-  border-radius: 4px 4px 7px 7px;
-  background: #a46642;
-  content: "";
-}
-
+/* Hidden: replaced by the sprite above. Kept as fallback if the image is absent. */
+.cafe-plant::before,
 .cafe-plant span,
 .cafe-plant span::before,
 .cafe-plant span::after {
-  position: absolute;
-  display: block;
-  border: 2px solid #23452e;
-  border-radius: 70% 30% 70% 30%;
-  background: #2d6f58;
-  content: "";
+  display: none;
 }
 
-.cafe-plant span {
-  right: 8px;
-  bottom: 16px;
-  width: 18px;
-  height: 26px;
-  transform: rotate(-20deg);
+/*
+ * Real-sprite décor tiers keep readable opacity (the generic .cafe-decor--tier-1
+ * dims to 0.5, which makes a real sprite look broken rather than shabby). The
+ * desaturating grayscale filter from the generic rule still applies, so tier-1
+ * reads as a sad, faded plant — not a ghost. NOTE for engine session: once every
+ * décor slot uses real per-tier sprites, the generic opacity dimming can be dropped.
+ */
+.cafe-plant.cafe-decor--tier-1 {
+  opacity: 0.95;
 }
 
-.cafe-plant span::before {
-  right: -9px;
-  bottom: 1px;
-  width: 16px;
-  height: 24px;
-  transform: rotate(45deg);
-}
-
-.cafe-plant span::after {
-  right: 6px;
-  bottom: 7px;
-  width: 14px;
-  height: 22px;
-  transform: rotate(-52deg);
+.cafe-plant.cafe-decor--tier-2,
+.cafe-plant.cafe-decor--tier-3 {
+  opacity: 1;
 }
 
 .cafe-diorama--busy .placeholder-guest-normal-02,
