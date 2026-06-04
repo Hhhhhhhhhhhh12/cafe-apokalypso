@@ -436,12 +436,13 @@ function RestockPanel({
         Confirm purchases
       </button>
 
-      <div className="decor-shop" aria-label="Café upgrades">
-        <h3>Café upgrades</h3>
+      <div className="decor-shop" aria-label="Café-Einrichtung aufwerten">
+        <h3>Einrichtung</h3>
         {decorOptions.map((option) => (
           <div className="decor-row" key={option.id}>
             <span className="decor-row__label">
-              {option.label}: <em>{option.currentTierName}</em>
+              <strong>{option.label}</strong>
+              <em>{option.currentTierName}</em>
             </span>
             {option.next ? (
               <button
@@ -449,12 +450,13 @@ function RestockPanel({
                 className="secondary-button"
                 disabled={!option.next.affordable}
                 onClick={() => onUpgradeDecor(option.id)}
+                title={option.next.reputationBonus > 0 ? `Ruf +${option.next.reputationBonus}` : undefined}
               >
                 {option.next.name} · €{option.next.cost}
-                {option.next.reputationBonus > 0 ? ` · Ruf +${option.next.reputationBonus}` : ""}
+                {option.next.reputationBonus > 0 ? ` · ★${option.next.reputationBonus}` : ""}
               </button>
             ) : (
-              <span className="decor-row__maxed">Fully upgraded</span>
+              <span className="decor-row__maxed">Bestmöglich</span>
             )}
           </div>
         ))}
