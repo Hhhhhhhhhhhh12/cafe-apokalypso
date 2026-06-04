@@ -17,7 +17,7 @@ export type CleanlinessStateLabel = "Sauber" | "Ordentlich" | "Unordentlich" | "
 export type StressStateLabel = "Ruhig" | "Geschäftig" | "Angespannt" | "Überlastet";
 export type DayPhase = "day_start" | "open" | "day_end";
 export type ClosureReason = "money" | "reputation";
-export type DecorSlotId = "plant" | "shelf";
+export type DecorSlotId = "plant" | "shelf" | "clock" | "lamp" | "cups";
 export type HelperTaskId = "cleaning" | "service" | "barista" | "counter" | "marketing";
 
 export type DayActionId =

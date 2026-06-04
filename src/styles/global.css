@@ -1104,6 +1104,76 @@ h3 {
   opacity: 1;
 }
 
+/*
+ * Wall clock (Pixellab shabby tier-1). Hangs on the back wall between the
+ * window and menu board. The weirdness-hint .cafe-clock CSS below is separate
+ * and untouched — that's the overlay omen; this is the real décor prop.
+ */
+.cafe-decor-clock {
+  left: 38%;
+  top: 22%;
+  z-index: 4;
+  width: 52px;
+  height: 52px;
+  background: url("../../assets/sprites/props/placeholder-cafe-clock.png") center / contain no-repeat;
+  image-rendering: pixelated;
+}
+
+.cafe-decor-clock.cafe-decor--tier-1 {
+  opacity: 0.92;
+}
+
+.cafe-decor-clock.cafe-decor--tier-2,
+.cafe-decor-clock.cafe-decor--tier-3 {
+  opacity: 1;
+}
+
+/*
+ * Floor lamp (Pixellab shabby tier-1). Positioned near the left table area,
+ * giving the seating corner some warmth even in the starter state.
+ */
+.cafe-decor-lamp {
+  left: 8%;
+  bottom: 28%;
+  z-index: 4;
+  width: 40px;
+  height: 64px;
+  background: url("../../assets/sprites/props/placeholder-cafe-lamp.png") center bottom / contain no-repeat;
+  image-rendering: pixelated;
+}
+
+.cafe-decor-lamp.cafe-decor--tier-1 {
+  opacity: 0.90;
+}
+
+.cafe-decor-lamp.cafe-decor--tier-2,
+.cafe-decor-lamp.cafe-decor--tier-3 {
+  opacity: 1;
+}
+
+/*
+ * Counter cups (Pixellab shabby tier-1). A stack of mismatched cups sitting
+ * on the counter clutter area. Small accent, adds life to the counter.
+ */
+.cafe-decor-cups {
+  left: 54%;
+  bottom: 50%;
+  z-index: 6;
+  width: 44px;
+  height: 36px;
+  background: url("../../assets/sprites/props/placeholder-cafe-cups.png") center bottom / contain no-repeat;
+  image-rendering: pixelated;
+}
+
+.cafe-decor-cups.cafe-decor--tier-1 {
+  opacity: 0.90;
+}
+
+.cafe-decor-cups.cafe-decor--tier-2,
+.cafe-decor-cups.cafe-decor--tier-3 {
+  opacity: 1;
+}
+
 .cafe-diorama--busy .placeholder-guest-normal-02,
 .cafe-diorama--strained .placeholder-guest-normal-02 {
   opacity: 1;

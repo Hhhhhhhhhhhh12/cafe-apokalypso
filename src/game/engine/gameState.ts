@@ -68,7 +68,7 @@ export function createInitialGameState(): GameState {
     cafeClosed: false,
     closureReason: null,
     reputationZeroStreak: 0,
-    decor: { plant: 1, shelf: 1 },
+    decor: { plant: 1, shelf: 1, clock: 1, lamp: 1, cups: 1 },
     completedActions: [],
     unlocks: { ...initialUnlocks },
     guestHistory: [],

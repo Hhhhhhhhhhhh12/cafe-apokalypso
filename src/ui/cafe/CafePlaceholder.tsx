@@ -243,6 +243,15 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
             <span />
           </div>
 
+          {/* Wall clock — back wall, tier-wired décor slot */}
+          <div className={`cafe-decor-clock cafe-decor--tier-${gameState.decor?.clock ?? 1}`} aria-hidden="true" />
+
+          {/* Floor lamp — near seating area, tier-wired décor slot */}
+          <div className={`cafe-decor-lamp cafe-decor--tier-${gameState.decor?.lamp ?? 1}`} aria-hidden="true" />
+
+          {/* Counter cups — on counter clutter area, tier-wired décor slot */}
+          <div className={`cafe-decor-cups cafe-decor--tier-${gameState.decor?.cups ?? 1}`} aria-hidden="true" />
+
           {/* Weirdness overlays — day 7 / weirdness flag */}
           {showWeirdness && (
             <div className="cafe-weirdness-hint" aria-hidden="true">

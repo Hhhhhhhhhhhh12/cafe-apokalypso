@@ -40,6 +40,33 @@ export const decorSlots = [
       { tier: 2, name: "Solid wood shelf", cost: 14, reputationBonus: 1 },
       { tier: 3, name: "Curated display", cost: 28, reputationBonus: 2 }
     ]
+  },
+  {
+    id: "clock",
+    label: "Wall clock",
+    tiers: [
+      { tier: 1, name: "Crooked wall clock", cost: 0, reputationBonus: 0 },
+      { tier: 2, name: "Wooden wall clock", cost: 10, reputationBonus: 1 },
+      { tier: 3, name: "Vintage brass clock", cost: 22, reputationBonus: 2 }
+    ]
+  },
+  {
+    id: "lamp",
+    label: "Floor lamp",
+    tiers: [
+      { tier: 1, name: "Bare bulb on a stick", cost: 0, reputationBonus: 0 },
+      { tier: 2, name: "Fabric shade lamp", cost: 12, reputationBonus: 1 },
+      { tier: 3, name: "Warm arc lamp", cost: 26, reputationBonus: 2 }
+    ]
+  },
+  {
+    id: "cups",
+    label: "Counter cups",
+    tiers: [
+      { tier: 1, name: "Mismatched mugs", cost: 0, reputationBonus: 0 },
+      { tier: 2, name: "Matching cups", cost: 8, reputationBonus: 1 },
+      { tier: 3, name: "Artisan ceramics", cost: 18, reputationBonus: 1 }
+    ]
   }
 ] as const satisfies readonly DecorSlotDefinition[];
 
