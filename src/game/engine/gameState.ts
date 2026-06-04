@@ -291,14 +291,41 @@ function isValidUnlocks(value: unknown): value is UnlockState {
   );
 }
 
-function isValidDecor(value: unknown): value is Record<"plant" | "shelf", number> {
+/** All décor slot keys that must exist in a valid save. */
+const DECOR_SLOT_KEYS = ["plant", "shelf", "clock", "lamp", "cups"] as const;
+
+function isValidDecor(value: unknown): value is Record<typeof DECOR_SLOT_KEYS[number], number> {
   if (!value || typeof value !== "object") {
     return false;
   }
   const decor = value as Record<string, unknown>;
-  return (["plant", "shelf"] as const).every(
+  return DECOR_SLOT_KEYS.every(
     (slot) => typeof decor[slot] === "number" && Number.isInteger(decor[slot]) && (decor[slot] as number) >= 1
   );
+}
+
+/**
+ * Patch a raw parsed save to fill in décor slots added after a save was written.
+ * Called by loadGameState before isValidGameState so existing saves aren't wiped.
+ * Only runs if the raw value looks like an object; does nothing otherwise.
+ */
+export function migrateRawSave(raw: unknown): unknown {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
+    return raw;
+  }
+  const obj = raw as Record<string, unknown>;
+  if (!obj.decor || typeof obj.decor !== "object" || Array.isArray(obj.decor)) {
+    return raw;
+  }
+  const decor = { ...(obj.decor as Record<string, unknown>) };
+  let patched = false;
+  for (const slot of DECOR_SLOT_KEYS) {
+    if (typeof decor[slot] !== "number") {
+      decor[slot] = 1;
+      patched = true;
+    }
+  }
+  return patched ? { ...obj, decor } : raw;
 }
 
 function isStringArray(value: unknown): value is string[] {

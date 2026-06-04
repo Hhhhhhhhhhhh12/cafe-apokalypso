@@ -6,7 +6,12 @@ import {
   saveGameState,
   type StorageLike
 } from "../src/game/engine/save";
-import { createInitialGameState } from "../src/game/engine/gameState";
+import {
+  createInitialGameState,
+  migrateRawSave,
+  CURRENT_GAME_STATE_VERSION,
+  CURRENT_CONTENT_CATALOG_VERSION
+} from "../src/game/engine/gameState";
 import { gameReducer } from "../src/game/engine/reducer";
 
 function createMemoryStorage(initialValue?: string): StorageLike {
@@ -103,5 +108,57 @@ describe("save safety", () => {
     saveGameState(state, storage);
 
     expect(loadGameState(storage)).toEqual(state);
+  });
+});
+
+describe("decor save migration", () => {
+  /** Minimal valid v8 save with only the original two décor slots. */
+  function makeV8SaveWithOldDecor(day = 1) {
+    const base = createInitialGameState();
+    return JSON.stringify({
+      ...base,
+      version: CURRENT_GAME_STATE_VERSION,
+      contentCatalogVersion: CURRENT_CONTENT_CATALOG_VERSION,
+      day,
+      decor: { plant: 1, shelf: 1 } // old save: missing clock / lamp / cups
+    });
+  }
+
+  it("migrateRawSave fills in missing décor slots with tier 1", () => {
+    const raw = JSON.parse(makeV8SaveWithOldDecor());
+    const migrated = migrateRawSave(raw) as { decor: Record<string, number> };
+
+    expect(migrated.decor.plant).toBe(1);
+    expect(migrated.decor.shelf).toBe(1);
+    expect(migrated.decor.clock).toBe(1);
+    expect(migrated.decor.lamp).toBe(1);
+    expect(migrated.decor.cups).toBe(1);
+  });
+
+  it("migrateRawSave does not overwrite existing décor values", () => {
+    const raw = JSON.parse(makeV8SaveWithOldDecor());
+    (raw as Record<string, unknown>).decor = { plant: 2, shelf: 3, clock: 2 };
+    const migrated = migrateRawSave(raw) as { decor: Record<string, number> };
+
+    expect(migrated.decor.plant).toBe(2);
+    expect(migrated.decor.shelf).toBe(3);
+    expect(migrated.decor.clock).toBe(2);
+    expect(migrated.decor.lamp).toBe(1);  // patched
+    expect(migrated.decor.cups).toBe(1);  // patched
+  });
+
+  it("loadGameState migrates an old v8 save instead of resetting to a new game", () => {
+    const storage = createMemoryStorage(makeV8SaveWithOldDecor(3));
+    const state = loadGameState(storage);
+
+    // Should have kept day 3, not reset to day 1 fresh game
+    expect(state.day).toBe(3);
+    expect(state.decor).toEqual({ plant: 1, shelf: 1, clock: 1, lamp: 1, cups: 1 });
+  });
+
+  it("migrateRawSave is a no-op for non-objects", () => {
+    expect(migrateRawSave(null)).toBeNull();
+    expect(migrateRawSave("string")).toBe("string");
+    expect(migrateRawSave(42)).toBe(42);
   });
 });
