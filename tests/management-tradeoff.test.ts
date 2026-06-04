@@ -327,7 +327,7 @@ describe("management tradeoff system", () => {
     };
     const selectedState = gameReducer(poorDayFive, {
       type: "select_helper",
-      helperId: "mira",
+      helperId: "nele",
       taskId: "counter"
     });
     const blockedState = gameReducer(selectedState, { type: "open_day" });
@@ -336,7 +336,7 @@ describe("management tradeoff system", () => {
     expect(blockedState.statusMessage).toContain("Not enough money");
   });
 
-  it("applies representative Jana, Nino, and Mira helper effects", () => {
+  it("applies representative Jana, Nino, and Nele helper effects", () => {
     const janaState = completePreparedDay({
       ...createOpenHelperState("jana", "cleaning"),
       resources: { ...createInitialGameState().resources, cleanliness: 20 },
@@ -369,7 +369,7 @@ describe("management tradeoff system", () => {
     );
 
     const miraState = gameReducer(
-      createOpenHelperState("mira", "marketing"),
+      createOpenHelperState("nele", "marketing"),
       { type: "serve_product", productId: "filterkaffee" }
     );
     expect(miraState.dayManagement.extraAdvertisingActions).toBe(1);
@@ -399,7 +399,7 @@ describe("management tradeoff system", () => {
     expect(loadGameState(malformedStorage)).toEqual(createInitialGameState());
 
     const storage = createMemoryStorage();
-    const savedState = gameReducer(createOpenHelperState("mira", "counter"), {
+    const savedState = gameReducer(createOpenHelperState("nele", "counter"), {
       type: "serve_product",
       productId: "filterkaffee"
     });
@@ -748,7 +748,7 @@ function createDayStartState(day: DayNumber): GameState {
 }
 
 function createOpenHelperState(
-  helperId: "jana" | "nino" | "mira",
+  helperId: "jana" | "nino" | "nele",
   taskId: "cleaning" | "service" | "barista" | "counter" | "marketing"
 ): GameState {
   const selectedState = gameReducer(createDayStartState(5), {

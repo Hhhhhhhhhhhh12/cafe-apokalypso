@@ -250,7 +250,7 @@ Day 4: Advertising
 
 Day 5: First Temporary Help
 
-- Jana, Nino, or Mira can help for one day
+- Jana, Nino, or Nele can help for one day
 - first delegation mechanic
 - strange wet-table event if Jana works
 - first possible appearance of Meda
@@ -280,13 +280,13 @@ Normal week-one guests:
 - Lieferfahrer Cem: impatient, low spend, easy to serve quickly.
 - Cappuccino-Christa: pays better, has high quality expectations.
 - Herr Bohn: older regular with strange memories of the building.
-- Freelancerin Mira: dry humor, sees the café as “authentic,” not necessarily as a compliment.
+- Freelancerin Nele: dry humor, sees the café as “authentic,” not necessarily as a compliment.
 
 Subtly strange week-one guests:
 
 - Herr Grau: polite, quiet, pays with a coin that does not fit any accounting category.
 - Frau mit rotem Regenschirm: appears with a red umbrella although it is not raining and asks not to be recognized.
-- Meda: appears calm and still, always wears sunglasses indoors, subtle snake-like hair silhouette, avoids direct eye contact. Other guests nearby become slightly uneasy without knowing why. She is the first clearer mythological hint in the demo. Meda is not Mira. Do not merge them.
+- Meda: appears calm and still, always wears sunglasses indoors, subtle snake-like hair silhouette, avoids direct eye contact. Other guests nearby become slightly uneasy without knowing why. She is the first clearer mythological hint in the demo. Meda is not Nele. Do not merge them.
 
 ### KASSANDRA
 

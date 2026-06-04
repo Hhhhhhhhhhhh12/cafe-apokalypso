@@ -8,7 +8,7 @@ export type GuestId =
   | "lieferfahrer-cem"
   | "cappuccino-christa"
   | "herr-bohn"
-  | "freelancerin-mira"
+  | "freelancerin-nele"
   | "herr-grau"
   | "frau-roter-regenschirm"
   | "meda";
@@ -21,7 +21,7 @@ export type ProductId =
   | "kaffee-croissant"
   | "handfilter";
 
-export type StaffOptionId = "jana" | "nino" | "mira";
+export type StaffOptionId = "jana" | "nino" | "nele";
 
 export type AdvertisingCampaignId =
   | "flyer-nachbarschaft"

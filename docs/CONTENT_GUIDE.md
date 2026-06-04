@@ -107,13 +107,15 @@ Early KASSANDRA examples:
 
 KASSANDRA should become stranger over time, eventually connecting café operations to prophecy, weirdness, and apocalyptic logistics.
 
-### Mira
+### Nele
 
-Mira is an important early tone reference.
+Nele is the early tone anchor and a save-state-persistent character. She appears from Day 1 and persists across runs where all other guests are re-initialized. She has been here before — in previous weeks, previous collapses, previous versions of this café. Her dry humor reads as observation; it is actually recognition.
 
-She should feel modern, dry, observant, and slightly too good at noticing the café’s unsettling qualities. She is not openly supernatural in week 1, but her lines can frame the café’s atmosphere in a funny way.
+KASSANDRA does not classify her. Her entry is blank or missing. This is intentional.
 
-Mira examples:
+She should feel modern, grounded, and slightly too comfortable with how strange things are. She is not openly supernatural in week 1. Her lines should work on two levels: wry café observation on the surface, quiet familiarity underneath.
+
+Nele examples:
 
 > The café is authentic. I am not sure whether that is good.
 
@@ -125,7 +127,7 @@ Mira examples:
 
 ### Meda
 
-Meda is a separate character from Mira. Do not merge them.
+Meda is a separate character from Nele. Do not merge them.
 
 Meda is the first clearer mythological hint in the demo. She evokes Medusa through visual details and atmosphere, not through explicit labeling.
 
@@ -209,7 +211,7 @@ Early guest writing should give each guest a small behavioral identity:
 - Lieferfahrer Cem: impatient, efficient, no interest in latte philosophy
 - Cappuccino-Christa: quality expectations, foam precision
 - Herr Bohn: older regular, strange memories of the building
-- Freelancerin Mira: dry observational humor
+- Freelancerin Nele: dry observational humor
 
 ### Product Naming
 

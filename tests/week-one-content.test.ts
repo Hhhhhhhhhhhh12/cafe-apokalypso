@@ -19,7 +19,7 @@ const requiredNormalGuests = [
   "Lieferfahrer Cem",
   "Cappuccino-Christa",
   "Herr Bohn",
-  "Freelancerin Mira"
+  "Freelancerin Nele"
 ];
 
 const requiredStrangeGuests = [
@@ -50,17 +50,17 @@ describe("week-one content data", () => {
     expect(strangeGuests.map((guest) => guest.name)).toEqual(requiredStrangeGuests);
   });
 
-  it("keeps Mira and Meda as separate entities", () => {
-    const mira = weekOneGuests.find((guest) => guest.id === "freelancerin-mira");
+  it("keeps Nele and Meda as separate entities", () => {
+    const nele = weekOneGuests.find((guest) => guest.id === "freelancerin-nele");
     const meda = weekOneGuests.find((guest) => guest.id === "meda");
 
-    expect(mira).toBeDefined();
+    expect(nele).toBeDefined();
     expect(meda).toBeDefined();
-    expect(mira?.id).not.toBe(meda?.id);
-    expect(mira?.category).toBe("normal");
+    expect(nele?.id).not.toBe(meda?.id);
+    expect(nele?.category).toBe("normal");
     expect(meda?.category).toBe("subtly_strange");
-    expect(weekOneStaffOptions.find((staff) => staff.id === "mira")?.linkedGuestId).toBe(
-      "freelancerin-mira"
+    expect(weekOneStaffOptions.find((staff) => staff.id === "nele")?.linkedGuestId).toBe(
+      "freelancerin-nele"
     );
   });
 
@@ -69,7 +69,7 @@ describe("week-one content data", () => {
     expect(weekOneStaffOptions.map((staff) => staff.name)).toEqual([
       "Jana",
       "Nino",
-      "Mira"
+      "Nele"
     ]);
     expect(weekOneAdvertisingCampaigns).toHaveLength(4);
     expect(weekOneUpgrades).toHaveLength(7);

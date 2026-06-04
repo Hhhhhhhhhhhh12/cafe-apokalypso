@@ -16,7 +16,7 @@ Scope:
 - money, reputation, supplies, cleanliness, stress, hidden weirdness
 - simple day progression
 - first advertising options
-- temporary staff options: Jana (service/cleaning), Nino (barista), Mira (marketing/counter)
+- temporary staff options: Jana (service/cleaning), Nino (barista), Nele (marketing/counter)
 - KASSANDRA update
 - first explicit apocalyptic hook at the end of day 7
 - light foreshadowing of an inaccessible upper floor / future inn-room system

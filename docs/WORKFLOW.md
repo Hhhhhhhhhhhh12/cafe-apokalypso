@@ -334,7 +334,7 @@ Example:
 Task: Implement temporary staff for week 1.
 
 Acceptance criteria:
-- Jana, Nino, and Mira exist as data entries.
+- Jana, Nino, and Nele exist as data entries.
 - Staff can be hired for one day starting day 5.
 - Staff cost is deducted at day start or hire time.
 - Staff effects modify service, cleanliness, reputation, or guest flow.

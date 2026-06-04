@@ -37,6 +37,9 @@ export function getEarnedPrice(basePrice: number, reputation: number): number {
   return Math.round(basePrice * getReputationIncomeFactor(reputation) * 100) / 100;
 }
 
+/** Fixed daily overhead (rent, utilities) deducted every day at closing. */
+export const DAILY_FIXED_COST = 6;
+
 export const SUPPLY_UNIT_COSTS: Record<IngredientKey, number> = {
   coffee: 0.8,
   milk: 0.4,
@@ -330,18 +333,18 @@ export function getHelperFlavorLine(
   if (helperId === "nino" && taskId === "counter") {
     return "Nino handled the counter. The queue moved. Stress dropped slightly.";
   }
-  if (helperId === "mira" && taskId === "marketing") {
-    return "Mira posted something. It got 14 likes and one comment in a language Google says does not exist.";
+  if (helperId === "nele" && taskId === "marketing") {
+    return "Nele posted something. It got 14 likes and one comment in a language Google says does not exist.";
   }
 
-  return "Mira called the café 'charmingly precarious.' She meant it as a compliment. Probably.";
+  return "Nele called the café 'charmingly precarious.' She meant it as a compliment. Probably.";
 }
 
 function isValidHelperTask(helperId: StaffOptionId, taskId: HelperTaskId): boolean {
   const validTasks: Record<StaffOptionId, HelperTaskId[]> = {
     jana: ["cleaning", "service"],
     nino: ["barista", "counter"],
-    mira: ["marketing", "counter"]
+    nele: ["marketing", "counter"]
   };
 
   return validTasks[helperId].includes(taskId);

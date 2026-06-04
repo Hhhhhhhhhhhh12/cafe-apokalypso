@@ -35,8 +35,8 @@ Check for:
 - whether docs/PROJECT_CANON.md is treated as the first source of truth in all handoff guidance
 - whether docs/PROMPTS.md is treated as the canonical source for reusable handoff prompts
 - whether ClickUp tracking is required for every prompt actually handed to Claude Code, Codex, or another tool
-- whether Mira and Meda are consistently represented as separate characters
-- whether Mira stays mostly normal and acts as an early tone anchor
+- whether Nele and Meda are consistently represented as separate characters
+- whether Nele stays mostly normal and acts as an early tone anchor
 - whether Meda carries the first clearer Medusa-like mythological hint
 - whether image tools such as OpenAI ImageGen, Nano Banana / Gemini image tools, and Google AI Studio are clearly treated as art-direction tools, not coding agents
 - whether Antigravity is treated only as a possible later coding/review tool, not as an art pipeline replacement
@@ -55,8 +55,8 @@ Important fixed decisions:
 - current target is a playable seven-day vertical slice demo for portfolio/application review, not the full game and not a final production MVP
 - handoff prompts used in practice should come from docs/PROMPTS.md, not directly from chat
 - actual prompt handoffs must be tracked in ClickUp
-- Mira and Meda are separate characters
-- Mira is mostly normal and works as an early recurring guest / tone anchor
+- Nele and Meda are separate characters
+- Nele is mostly normal and works as an early recurring guest / tone anchor
 - Meda visually evokes Medusa and carries the first clearer mythological hint
 
 Verification:
@@ -415,7 +415,7 @@ Goals:
 9. Do not add a backend, real AI API, auth, analytics, payments, or external asset dependencies.
 10. Preserve docs/PROMPTS.md as the canonical source for reusable handoff prompts.
 11. Preserve ClickUp tracking requirements for actual prompt handoffs.
-12. Preserve the split between Mira and Meda.
+12. Preserve the split between Nele and Meda.
 
 Allowed changes:
 - README.md
@@ -434,7 +434,7 @@ Do not change:
 - art direction or main visual style without user approval
 - docs/PROMPTS.md as canonical handoff-prompt source
 - ClickUp prompt handoff tracking requirement
-- Mira/Meda as separate characters
+- Nele/Meda as separate characters
 
 Acceptance criteria:
 - Docs clearly explain what should be built first.

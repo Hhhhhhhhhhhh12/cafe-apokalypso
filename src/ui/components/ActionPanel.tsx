@@ -46,7 +46,7 @@ interface ActionPanelProps {
 const helperTasks: Record<StaffOptionId, HelperTaskId[]> = {
   jana: ["cleaning", "service"],
   nino: ["barista", "counter"],
-  mira: ["marketing", "counter"]
+  nele: ["marketing", "counter"]
 };
 
 const restockIngredients: IngredientKey[] = ["coffee", "milk", "pastries"];

@@ -47,10 +47,12 @@ describe("guest serve lines", () => {
 
   it("stays in the normal pool when no strange guests are present that day", () => {
     const dayOne = stateForDay(1);
-    const paula = weekOneGuests.find((guest) => guest.id === "pendlerin-paula");
+    // Day 1 has only normal guests (Paula, Nele), so even index >= 3 stays normal.
+    const dayOneNormalLines = weekOneGuests
+      .filter((g) => g.category === "normal" && ["pendlerin-paula", "freelancerin-nele"].includes(g.id))
+      .map((g) => g.serveLine);
 
-    // Day 1 has only normal guests, so even index >= 3 stays normal.
-    expect(getServeLineForCustomer(dayOne, 5)).toBe(paula?.serveLine);
+    expect(dayOneNormalLines).toContain(getServeLineForCustomer(dayOne, 5));
   });
 });
 

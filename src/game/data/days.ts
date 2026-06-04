@@ -15,7 +15,7 @@ export const weekOneDays = [
       completionHint: "Serve 2 customers and clean the tables before closing."
     },
     unlocks: ["take order", "prepare coffee", "accept payment", "clean tables"],
-    guestIds: ["pendlerin-paula"],
+    guestIds: ["pendlerin-paula", "freelancerin-nele"],
     eventIds: ["day-1-opening-rhythm", "day-1-coffee-machine-flicker"]
   },
   {
@@ -38,7 +38,8 @@ export const weekOneDays = [
       "laptop-lukas",
       "lieferfahrer-cem",
       "cappuccino-christa",
-      "herr-bohn"
+      "herr-bohn",
+      "freelancerin-nele"
     ],
     eventIds: ["day-2-herr-bohn-memory", "day-2-rehearsed-rhythm"]
   },
@@ -64,7 +65,7 @@ export const weekOneDays = [
       "lieferfahrer-cem",
       "cappuccino-christa",
       "herr-bohn",
-      "freelancerin-mira"
+      "freelancerin-nele"
     ],
     eventIds: ["day-3-cash-register-suggestion", "day-3-guest-checks-in"]
   },
@@ -90,7 +91,7 @@ export const weekOneDays = [
       "lieferfahrer-cem",
       "cappuccino-christa",
       "herr-bohn",
-      "freelancerin-mira",
+      "freelancerin-nele",
       "herr-grau"
     ],
     eventIds: ["day-4-herr-grau-coin", "day-4-poster-before-printed"]
@@ -98,9 +99,9 @@ export const weekOneDays = [
   {
     day: 5,
     title: "First Temporary Help",
-    milestone: "Jana, Nino, or Mira can help for one day.",
+    milestone: "Jana, Nino, or Nele can help for one day.",
     dayOpener:
-      "Today is the first day you can ask for help, which suggests the café has become real enough to need it. Jana, Nino, and Mira are available. The choice is yours.",
+      "Today is the first day you can ask for help, which suggests the café has become real enough to need it. Jana, Nino, and Nele are available. The choice is yours.",
     unlockMessage:
       "Temporary help is available from today: one person, one task, one day at a time.",
     objective: {
@@ -117,7 +118,7 @@ export const weekOneDays = [
       "lieferfahrer-cem",
       "cappuccino-christa",
       "herr-bohn",
-      "freelancerin-mira",
+      "freelancerin-nele",
       "herr-grau",
       "meda"
     ],
@@ -145,7 +146,7 @@ export const weekOneDays = [
       "lieferfahrer-cem",
       "cappuccino-christa",
       "herr-bohn",
-      "freelancerin-mira",
+      "freelancerin-nele",
       "herr-grau",
       "meda"
     ],
@@ -172,7 +173,7 @@ export const weekOneDays = [
       "lieferfahrer-cem",
       "cappuccino-christa",
       "herr-bohn",
-      "freelancerin-mira",
+      "freelancerin-nele",
       "herr-grau",
       "meda",
       "frau-roter-regenschirm"

@@ -216,7 +216,7 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
             </span>
           )}
 
-          {/* Seated guest 2 — Mira, appears after second customer served */}
+          {/* Seated guest 2 — Nele, appears after second customer served */}
           {showSeated2 && (
             <span
               className="placeholder-guest placeholder-guest-seated placeholder-guest-normal-04"
