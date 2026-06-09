@@ -5,6 +5,7 @@ import kassandraRegisterAsset from "../../../assets/sprites/props/placeholder-ka
 import paulaGuestAsset from "../../../assets/sprites/guests/placeholder-guest-paula.png";
 import cemGuestAsset from "../../../assets/sprites/guests/placeholder-guest-cem.png";
 import miraGuestAsset from "../../../assets/sprites/guests/placeholder-guest-mira.png";
+import lukasGuestAsset from "../../../assets/sprites/guests/placeholder-guest-lukas.png";
 
 interface CafePlaceholderProps {
   gameState: GameState;
@@ -49,6 +50,7 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
   // Seated guests accumulate as customers are served during the day
   const showSeated1 = customersServed >= 1;
   const showSeated2 = customersServed >= 2;
+  const showSeated3 = customersServed >= 3;
 
   // Strange guest appears day 4+, after 3 customers have been served
   const showStrangeGuest = gameState.day >= 4 && customersServed >= 3;
@@ -225,6 +227,21 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
               <img
                 className="cafe-pilot-asset cafe-pilot-asset--guest"
                 src={miraGuestAsset}
+                alt=""
+                aria-hidden="true"
+              />
+            </span>
+          )}
+
+          {/* Seated guest 3 — Lukas, appears after third customer served */}
+          {showSeated3 && (
+            <span
+              className="placeholder-guest placeholder-guest-seated placeholder-guest-normal-05"
+              aria-hidden="true"
+            >
+              <img
+                className="cafe-pilot-asset cafe-pilot-asset--guest"
+                src={lukasGuestAsset}
                 alt=""
                 aria-hidden="true"
               />

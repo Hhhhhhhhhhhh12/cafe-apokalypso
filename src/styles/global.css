@@ -1041,6 +1041,12 @@ h3 {
   background: #d9a47d;
 }
 
+/* Third seated guest — Lukas, left side near window */
+.placeholder-guest-normal-05 {
+  left: 10%;
+  bottom: 35%;
+}
+
 .placeholder-guest-strange-01,
 .placeholder-guest-strange-02 {
   background: #5d3b78;
