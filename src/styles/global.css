@@ -1996,3 +1996,173 @@ h3 {
   opacity: 1;
   filter: saturate(1.18);
 }
+
+/* ── Ambient motion ─────────────────────────────────────────────────────
+   Subtle life in the diorama: drifting dust (days 1-2, dusty v04 base),
+   rising steam, swinging T3 pendulum, breathing lamp light. Everything
+   lives behind prefers-reduced-motion so the scene stays static for
+   users who ask for it. */
+
+.cafe-dust {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.cafe-dust::before,
+.cafe-dust::after {
+  position: absolute;
+  top: 24%;
+  left: 32%;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(255, 244, 214, 0.5);
+  box-shadow:
+    110px 40px 0 rgba(255, 244, 214, 0.4),
+    230px 110px 0 rgba(255, 240, 205, 0.35),
+    340px 20px 0 rgba(255, 244, 214, 0.45),
+    60px 150px 0 rgba(255, 240, 205, 0.3);
+  content: "";
+}
+
+.cafe-dust::after {
+  top: 46%;
+  left: 18%;
+  width: 2px;
+  height: 2px;
+  box-shadow:
+    150px -30px 0 rgba(255, 244, 214, 0.35),
+    300px 60px 0 rgba(255, 240, 205, 0.4),
+    430px -10px 0 rgba(255, 244, 214, 0.3);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Dust motes drift slowly through the light shafts */
+  .cafe-dust::before {
+    animation: cafe-dust-drift 14s ease-in-out infinite;
+  }
+
+  .cafe-dust::after {
+    animation: cafe-dust-drift 18s ease-in-out 4s infinite reverse;
+  }
+
+  /* Steam rises and fades from the coffee machine (visible at stress >= 35) */
+  .cafe-coffee-machine__steam {
+    animation: cafe-steam-rise 2.8s ease-out infinite;
+  }
+
+  .cafe-coffee-machine__steam--soft {
+    animation-duration: 3.6s;
+    animation-delay: 1.1s;
+  }
+
+  /* T3 pendulum clock sways gently from its mount */
+  .cafe-decor-clock.cafe-decor--tier-3 {
+    transform-origin: 50% 8%;
+    animation: cafe-clock-sway 2.6s ease-in-out infinite alternate;
+  }
+
+  /* Lamp light breathes; opacity (not filter) so tier looks stay intact */
+  .cafe-decor-lamp {
+    animation: cafe-lamp-breathe 6s ease-in-out infinite alternate;
+  }
+
+  /* Once the weirdness shows, the lamp flickers nervously */
+  .cafe-diorama--weirdness-visible .cafe-decor-lamp {
+    animation: cafe-lamp-flicker 4.5s steps(1, end) infinite;
+  }
+}
+
+@keyframes cafe-dust-drift {
+  0% {
+    transform: translate3d(0, 0, 0);
+    opacity: 0;
+  }
+
+  12% {
+    opacity: 1;
+  }
+
+  50% {
+    transform: translate3d(16px, -20px, 0);
+  }
+
+  88% {
+    opacity: 0.7;
+  }
+
+  100% {
+    transform: translate3d(-12px, -42px, 0);
+    opacity: 0;
+  }
+}
+
+@keyframes cafe-steam-rise {
+  0% {
+    transform: translateY(2px) scaleY(0.9);
+    opacity: 0;
+  }
+
+  25% {
+    opacity: 0.7;
+  }
+
+  100% {
+    transform: translateY(-14px) scaleY(1.15);
+    opacity: 0;
+  }
+}
+
+@keyframes cafe-clock-sway {
+  from {
+    transform: rotate(-1.6deg);
+  }
+
+  to {
+    transform: rotate(1.6deg);
+  }
+}
+
+@keyframes cafe-lamp-breathe {
+  from {
+    opacity: 0.88;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes cafe-lamp-flicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  6% {
+    opacity: 0.7;
+  }
+
+  9% {
+    opacity: 1;
+  }
+
+  38% {
+    opacity: 0.82;
+  }
+
+  41% {
+    opacity: 1;
+  }
+
+  73% {
+    opacity: 0.65;
+  }
+
+  76% {
+    opacity: 1;
+  }
+}

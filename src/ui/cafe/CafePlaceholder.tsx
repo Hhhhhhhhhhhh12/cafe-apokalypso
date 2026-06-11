@@ -1,5 +1,6 @@
 import type { GameState } from "../../game/types/game";
 import stageBaseAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v03.png";
+import stageBaseDustyAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v04.png";
 import coffeeMachineAsset from "../../../assets/sprites/props/placeholder-cafe-coffee-machine.png";
 import kassandraRegisterAsset from "../../../assets/sprites/props/placeholder-kassandra-register.png";
 import paulaGuestAsset from "../../../assets/sprites/guests/placeholder-guest-paula.png";
@@ -73,6 +74,11 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
   // KASSANDRA screen glows when installed / awake
   const kassandraAwake = gameState.kassandraInstalled || gameState.day >= 6;
 
+  // Days 1-2 use the dusty, slightly enchanted stage base (v04) — the café has
+  // been closed for a long time. From day 3 the warmer lived-in v03 takes over.
+  const isDusty = gameState.day <= 2;
+  const stageBase = isDusty ? stageBaseDustyAsset : stageBaseAsset;
+
   return (
     <section
       className="panel cafe-panel cafe-stage"
@@ -99,10 +105,13 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
         {/* Stage base background image */}
         <img
           className="cafe-stage-base"
-          src={stageBaseAsset}
+          src={stageBase}
           alt=""
           aria-hidden="true"
         />
+
+        {/* Drifting dust motes — only while the café still feels long-closed */}
+        {isDusty && <div className="cafe-dust" aria-hidden="true" />}
 
         {/* CSS wall fallbacks — mostly transparent when stage base is present */}
         <div className="cafe-back-wall" aria-hidden="true">
