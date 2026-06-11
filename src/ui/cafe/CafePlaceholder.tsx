@@ -6,6 +6,8 @@ import paulaGuestAsset from "../../../assets/sprites/guests/placeholder-guest-pa
 import cemGuestAsset from "../../../assets/sprites/guests/placeholder-guest-cem.png";
 import miraGuestAsset from "../../../assets/sprites/guests/placeholder-guest-mira.png";
 import lukasGuestAsset from "../../../assets/sprites/guests/placeholder-guest-lukas.png";
+import christaGuestAsset from "../../../assets/sprites/guests/placeholder-guest-christa.png";
+import bohnGuestAsset from "../../../assets/sprites/guests/placeholder-guest-bohn.png";
 
 interface CafePlaceholderProps {
   gameState: GameState;
@@ -51,6 +53,12 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
   const showSeated1 = customersServed >= 1;
   const showSeated2 = customersServed >= 2;
   const showSeated3 = customersServed >= 3;
+
+  // Christa — regular, appears from day 2 once the second customer is served
+  const showChrista = gameState.day >= 2 && customersServed >= 2;
+
+  // Herr Bohn — regular, appears from day 3 once the café gets going
+  const showBohn = gameState.day >= 3 && customersServed >= 1;
 
   // Strange guest appears day 4+, after 3 customers have been served
   const showStrangeGuest = gameState.day >= 4 && customersServed >= 3;
@@ -248,6 +256,36 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
             </span>
           )}
 
+          {/* Christa — day 2+, right table area */}
+          {showChrista && (
+            <span
+              className="placeholder-guest placeholder-guest-seated placeholder-guest-normal-06"
+              aria-hidden="true"
+            >
+              <img
+                className="cafe-pilot-asset cafe-pilot-asset--guest"
+                src={christaGuestAsset}
+                alt=""
+                aria-hidden="true"
+              />
+            </span>
+          )}
+
+          {/* Herr Bohn — day 3+, mid-back near storage */}
+          {showBohn && (
+            <span
+              className="placeholder-guest placeholder-guest-seated placeholder-guest-normal-07"
+              aria-hidden="true"
+            >
+              <img
+                className="cafe-pilot-asset cafe-pilot-asset--guest"
+                src={bohnGuestAsset}
+                alt=""
+                aria-hidden="true"
+              />
+            </span>
+          )}
+
           {/* Strange guest — day 4+, after 3 customers served */}
           {showStrangeGuest && (
             <span
@@ -260,15 +298,6 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
             <span />
           </div>
 
-          {/* Wall clock — back wall, tier-wired décor slot */}
-          <div className={`cafe-decor-clock cafe-decor--tier-${gameState.decor?.clock ?? 1}`} aria-hidden="true" />
-
-          {/* Floor lamp — near seating area, tier-wired décor slot */}
-          <div className={`cafe-decor-lamp cafe-decor--tier-${gameState.decor?.lamp ?? 1}`} aria-hidden="true" />
-
-          {/* Counter cups — on counter clutter area, tier-wired décor slot */}
-          <div className={`cafe-decor-cups cafe-decor--tier-${gameState.decor?.cups ?? 1}`} aria-hidden="true" />
-
           {/* Weirdness overlays — day 7 / weirdness flag */}
           {showWeirdness && (
             <div className="cafe-weirdness-hint" aria-hidden="true">
@@ -278,6 +307,14 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
             </div>
           )}
         </div>
+
+        {/* ── Décor props ──────────────────────────────────────────────────
+            Positioned relative to .cafe-diorama (not .cafe-floor) so they
+            can sit on the back wall and ceiling of the painted room image,
+            which are above the .cafe-floor div's coordinate space.        */}
+        <div className={`cafe-decor-clock cafe-decor--tier-${gameState.decor?.clock ?? 1}`} aria-hidden="true" />
+        <div className={`cafe-decor-lamp cafe-decor--tier-${gameState.decor?.lamp ?? 1}`} aria-hidden="true" />
+        <div className={`cafe-decor-cups cafe-decor--tier-${gameState.decor?.cups ?? 1}`} aria-hidden="true" />
       </div>
     </section>
   );

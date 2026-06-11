@@ -413,7 +413,14 @@ h3 {
   position: absolute;
 }
 
+/* Hidden entirely: the painted Stage Base provides walls, window, door, menu
+   board, and shelf. The CSS structure used to sit beneath the image (z 0/1),
+   but the PNG has transparent corners outside the room shape, so these
+   elements bled through as graphic garbage (yellow window box top-left).
+   display:none also disables the .cafe-storage shelf-tier visual — the shelf
+   slot has no per-tier sprites yet, so nothing meaningful is lost. */
 .cafe-back-wall {
+  display: none;
   inset: 0 20% 39% 0;
   z-index: 0;
   background:
@@ -423,6 +430,7 @@ h3 {
 }
 
 .cafe-side-wall {
+  display: none; /* see .cafe-back-wall note above */
   inset: 0 0 31% auto;
   z-index: 1;
   width: 29%;
@@ -446,8 +454,7 @@ h3 {
   z-index: 2;
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  object-position: center bottom;
+  object-fit: fill;
   pointer-events: none;
   user-select: none;
 }
@@ -622,13 +629,16 @@ h3 {
  * on without doubling the painted room. Class/structure retained as fallback.
  */
 .cafe-counter {
-  top: 9%;
-  left: 18%;
+  /* Overlays the painted L-counter of the Stage Base (diorama x 58-97%,
+     y 66-88%), expressed in .cafe-floor coordinates. The skew is removed so
+     the machine/register sprites stand upright on the painted worktop. */
+  top: 53.8%;
+  left: 59.6%;
   z-index: 4;
-  width: 52%;
-  height: 33%;
-  transform: skewY(-5deg);
-  border: 2px solid rgba(53, 36, 30, 0.28);
+  width: 43.8%;
+  height: 33.8%;
+  /* Border transparent: a visible outline doubled the painted counter edges. */
+  border: 2px solid transparent;
   border-radius: 7px;
   /* Transparent: the painted Stage Base provides the counter; this element is
      kept only as the positioning container for the coffee-machine + register
@@ -668,10 +678,9 @@ h3 {
  */
 .cafe-coffee-machine {
   position: absolute;
-  /* Sits on the left segment of the painted back-corner ledge (was floating over
-     the left window). Pushed right onto the ledge and up to the shelf line. */
-  top: -6%;
-  left: 38%;
+  /* Stands on the painted counter top at the L-junction (left end of the bar). */
+  top: -28%;
+  left: 7%;
   width: 22%;
   height: 52%;
   border: 3px solid transparent;
@@ -734,8 +743,9 @@ h3 {
  */
 .cafe-register {
   position: absolute;
-  top: -18%;
-  right: 11%;
+  /* Stands on the right end of the painted counter top. */
+  top: -16%;
+  right: 16%;
   width: 21%;
   height: 48%;
   transform: skewY(2deg);
@@ -1047,6 +1057,18 @@ h3 {
   bottom: 35%;
 }
 
+/* Christa — right side, near second table (day 2+) */
+.placeholder-guest-normal-06 {
+  right: 14%;
+  bottom: 30%;
+}
+
+/* Herr Bohn — mid-back, near storage shelf (day 3+) */
+.placeholder-guest-normal-07 {
+  left: 38%;
+  bottom: 42%;
+}
+
 .placeholder-guest-strange-01,
 .placeholder-guest-strange-02 {
   background: #5d3b78;
@@ -1105,9 +1127,16 @@ h3 {
   opacity: 0.95;
 }
 
-.cafe-plant.cafe-decor--tier-2,
+.cafe-plant.cafe-decor--tier-2 {
+  opacity: 1;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-plant-t2.png");
+}
+
 .cafe-plant.cafe-decor--tier-3 {
   opacity: 1;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-plant-t3.png");
+  width: 60px;
+  height: 80px;
 }
 
 /*
@@ -1115,12 +1144,19 @@ h3 {
  * window and menu board. The weirdness-hint .cafe-clock CSS below is separate
  * and untouched — that's the overlay omen; this is the real décor prop.
  */
+/* ── Décor props: positioned relative to .cafe-diorama ──────────────────
+   The stage base fills the diorama at object-fit:fill (987×619 rendered).
+   Percentages here are of the diorama box (≈993×625).
+   ── */
 .cafe-decor-clock {
-  left: 38%;
-  top: 22%;
+  position: absolute;
+  /* On the right-wall segment between the corner seam and the right window
+     (left:48% put it straddling the corner seam, which read as floating). */
+  left: 53.5%;
+  top: 23%;
   z-index: 4;
-  width: 52px;
-  height: 52px;
+  width: 56px;
+  height: 56px;
   background: url("../../assets/sprites/props/placeholder-cafe-clock.png") center / contain no-repeat;
   image-rendering: pixelated;
 }
@@ -1129,9 +1165,16 @@ h3 {
   opacity: 0.92;
 }
 
-.cafe-decor-clock.cafe-decor--tier-2,
+.cafe-decor-clock.cafe-decor--tier-2 {
+  opacity: 1;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-clock-t2.png");
+}
+
 .cafe-decor-clock.cafe-decor--tier-3 {
   opacity: 1;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-clock-t3.png");
+  width: 52px;
+  height: 68px; /* pendulum clock is taller */
 }
 
 /*
@@ -1139,12 +1182,13 @@ h3 {
  * giving the seating corner some warmth even in the starter state.
  */
 .cafe-decor-lamp {
-  left: 8%;
-  bottom: 28%;
+  position: absolute;
+  left: 36%;
+  top: 17%;
   z-index: 4;
-  width: 40px;
+  width: 48px;
   height: 64px;
-  background: url("../../assets/sprites/props/placeholder-cafe-lamp.png") center bottom / contain no-repeat;
+  background: url("../../assets/sprites/props/placeholder-cafe-lamp.png") center top / contain no-repeat;
   image-rendering: pixelated;
 }
 
@@ -1152,9 +1196,15 @@ h3 {
   opacity: 0.90;
 }
 
-.cafe-decor-lamp.cafe-decor--tier-2,
+.cafe-decor-lamp.cafe-decor--tier-2 {
+  opacity: 1;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-lamp-t2.png");
+}
+
 .cafe-decor-lamp.cafe-decor--tier-3 {
   opacity: 1;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-lamp-t3.png");
+  width: 56px;
 }
 
 /*
@@ -1162,12 +1212,14 @@ h3 {
  * on the counter clutter area. Small accent, adds life to the counter.
  */
 .cafe-decor-cups {
-  left: 54%;
-  bottom: 50%;
+  position: absolute;
+  /* Rests on the painted upper wall shelf right of the right window. */
+  left: 80%;
+  top: 40.5%;
   z-index: 6;
-  width: 44px;
-  height: 36px;
-  background: url("../../assets/sprites/props/placeholder-cafe-cups.png") center bottom / contain no-repeat;
+  width: 48px;
+  height: 40px;
+  background: url("../../assets/sprites/props/placeholder-cafe-cups.png") center / contain no-repeat;
   image-rendering: pixelated;
 }
 
@@ -1175,9 +1227,18 @@ h3 {
   opacity: 0.90;
 }
 
-.cafe-decor-cups.cafe-decor--tier-2,
+.cafe-decor-cups.cafe-decor--tier-2 {
+  opacity: 1;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-cups-t2.png");
+  width: 52px;
+  height: 44px;
+}
+
 .cafe-decor-cups.cafe-decor--tier-3 {
   opacity: 1;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-cups-t3.png");
+  width: 44px;
+  height: 52px;
 }
 
 .cafe-diorama--busy .placeholder-guest-normal-02,
