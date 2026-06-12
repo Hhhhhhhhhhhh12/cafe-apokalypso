@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import type { GameState } from "../../game/types/game";
-import stageBaseAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v03.png";
-import stageBaseDustyAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v04.png";
+import stageBaseAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v03-px.png";
+import stageBaseDustyAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v04-px.png";
 import coffeeMachineAsset from "../../../assets/sprites/props/placeholder-cafe-coffee-machine.png";
 import kassandraRegisterAsset from "../../../assets/sprites/props/placeholder-kassandra-register.png";
 import bohnGuestAsset from "../../../assets/sprites/guests/placeholder-guest-bohn.png";
+import grauGuestAsset from "../../../assets/sprites/guests/placeholder-guest-grau.png";
 
 interface CafePlaceholderProps {
   gameState: GameState;
@@ -329,7 +330,14 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
             <span
               className="placeholder-guest placeholder-guest-seated placeholder-guest-strange-01"
               aria-hidden="true"
-            />
+            >
+              <img
+                className="cafe-pilot-asset cafe-pilot-asset--guest"
+                src={grauGuestAsset}
+                alt=""
+                aria-hidden="true"
+              />
+            </span>
           )}
 
           <div className={`cafe-plant cafe-decor--tier-${gameState.decor?.plant ?? 1}`} aria-hidden="true">
@@ -353,6 +361,7 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
         <div className={`cafe-decor-clock cafe-decor--tier-${gameState.decor?.clock ?? 1}`} aria-hidden="true" />
         <div className={`cafe-decor-lamp cafe-decor--tier-${gameState.decor?.lamp ?? 1}`} aria-hidden="true" />
         <div className={`cafe-decor-cups cafe-decor--tier-${gameState.decor?.cups ?? 1}`} aria-hidden="true" />
+        <div className={`cafe-decor-shelf cafe-decor--tier-${gameState.decor?.shelf ?? 1}`} aria-hidden="true" />
       </div>
     </section>
   );
