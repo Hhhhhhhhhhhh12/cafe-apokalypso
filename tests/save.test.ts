@@ -167,7 +167,6 @@ describe("save migration", () => {
   });
 
   it("loadGameState keeps a v8 day-end save lacking dailyOverhead", () => {
-    const base = createInitialGameState();
     const summary = {
       day: 2,
       rating: "Solide",
