@@ -306,27 +306,55 @@ function isValidDecor(value: unknown): value is Record<typeof DECOR_SLOT_KEYS[nu
 }
 
 /**
- * Patch a raw parsed save to fill in décor slots added after a save was written.
- * Called by loadGameState before isValidGameState so existing saves aren't wiped.
- * Only runs if the raw value looks like an object; does nothing otherwise.
+ * Migrate a raw parsed save written by an older release so it passes
+ * isValidGameState. Called by loadGameState before validation so existing
+ * localStorage saves are not wiped. Only runs if the raw value looks like
+ * an object; does nothing otherwise.
+ *
+ * v8 -> v9: day summaries gained the required `dailyOverhead` field and the
+ * helper "mira" was renamed to "nele". Both versions may also lack décor
+ * slots that were added after the save was written (clock/lamp/cups).
  */
 export function migrateRawSave(raw: unknown): unknown {
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
     return raw;
   }
-  const obj = raw as Record<string, unknown>;
-  if (!obj.decor || typeof obj.decor !== "object" || Array.isArray(obj.decor)) {
-    return raw;
-  }
-  const decor = { ...(obj.decor as Record<string, unknown>) };
+  const obj = { ...(raw as Record<string, unknown>) };
   let patched = false;
-  for (const slot of DECOR_SLOT_KEYS) {
-    if (typeof decor[slot] !== "number") {
-      decor[slot] = 1;
-      patched = true;
+
+  if (obj.version === 8) {
+    obj.version = 9;
+    patched = true;
+
+    const summary = obj.daySummary;
+    if (summary && typeof summary === "object" && !Array.isArray(summary)) {
+      const s = summary as Record<string, unknown>;
+      if (typeof s.dailyOverhead !== "number") {
+        obj.daySummary = { ...s, dailyOverhead: 0 };
+      }
+    }
+
+    const assignment = obj.helperAssignment;
+    if (assignment && typeof assignment === "object" && !Array.isArray(assignment)) {
+      const a = assignment as Record<string, unknown>;
+      if (a.helperId === "mira") {
+        obj.helperAssignment = { ...a, helperId: "nele" };
+      }
     }
   }
-  return patched ? { ...obj, decor } : raw;
+
+  if (obj.decor && typeof obj.decor === "object" && !Array.isArray(obj.decor)) {
+    const decor = { ...(obj.decor as Record<string, unknown>) };
+    for (const slot of DECOR_SLOT_KEYS) {
+      if (typeof decor[slot] !== "number") {
+        decor[slot] = 1;
+        patched = true;
+      }
+    }
+    obj.decor = decor;
+  }
+
+  return patched ? obj : raw;
 }
 
 function isStringArray(value: unknown): value is string[] {

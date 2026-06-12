@@ -6,7 +6,7 @@ KRITISCHE Regel: Immer auf gescheite Diversität der Figuren achten (Hauttöne, 
 ## Befehle
 
 - Dev-Server: `preview_start` mit Name `cafe-apokalypso` (Port 5173, definiert in `.claude/launch.json`)
-- Tests: `npx vitest run` (76 Tests, müssen grün bleiben)
+- Tests: `npx vitest run` (79 Tests, müssen grün bleiben)
 - Für Preview-/Kalibrier-Arbeit: Skill `.claude/skills/cafe-preview/SKILL.md` lesen und befolgen
 
 ## Token-Arbeitsregeln
