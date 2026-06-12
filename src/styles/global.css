@@ -369,6 +369,9 @@ h3 {
   --cream: #fff2d8;
   --teal: #16606c;
   --shadow: rgba(43, 32, 27, 0.28);
+  /* Zoom and pan — change via JS style attribute for room expansion */
+  --cafe-zoom: 1.35;
+  --cafe-pan-x: 0%;
   position: relative;
   min-height: 625px;
   overflow: hidden;
@@ -378,6 +381,17 @@ h3 {
     radial-gradient(circle at 22% 18%, rgba(255, 248, 237, 0.68), transparent 30%),
     linear-gradient(135deg, #e4bb90 0 52%, #c49375 52% 100%);
   isolation: isolate;
+}
+
+/* The zoomable/pannable world inside the viewport.
+   Scale and pan the entire scene without moving the clip/overlay layers. */
+.cafe-world {
+  position: absolute;
+  inset: 0;
+  transform-origin: center 58%;
+  transform: scale(var(--cafe-zoom)) translateX(var(--cafe-pan-x));
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
 }
 
 .cafe-diorama::before,

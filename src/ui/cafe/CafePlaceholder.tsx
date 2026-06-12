@@ -115,6 +115,8 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
         role="img"
         aria-label={`3/4 café room on Day ${gameState.day}: counter, coffee machine, register, queue, two tables, door, window, storage shelf, menu board, and environmental details.`}
       >
+        {/* Scrollable / zoomable world — scale via --cafe-zoom, pan via --cafe-pan-x */}
+        <div className="cafe-world">
         {/* Stage base background image */}
         <img
           className="cafe-stage-base"
@@ -350,6 +352,7 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
         <div className={`cafe-decor-lamp cafe-decor--tier-${gameState.decor?.lamp ?? 1}`} aria-hidden="true" />
         <div className={`cafe-decor-cups cafe-decor--tier-${gameState.decor?.cups ?? 1}`} aria-hidden="true" />
         <div className={`cafe-decor-shelf cafe-decor--tier-${gameState.decor?.shelf ?? 1}`} aria-hidden="true" />
+        </div>{/* /cafe-world */}
       </div>
     </section>
   );
