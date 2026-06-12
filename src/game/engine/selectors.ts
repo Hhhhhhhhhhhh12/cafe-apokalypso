@@ -188,6 +188,30 @@ export function getVisibleStaffOptions(
   return weekOneStaffOptions.filter((staffOption) => staffOption.unlockDay <= state.day);
 }
 
+export interface DioramaGuestVisibility {
+  cem: boolean;
+  mira: boolean;
+  lukas: boolean;
+  christa: boolean;
+  bohn: boolean;
+  strange: boolean;
+}
+
+export function getDioramaGuestVisibility(
+  state: GameState
+): DioramaGuestVisibility {
+  const { customersServed } = state.dayManagement;
+
+  return {
+    cem: customersServed >= 1,
+    mira: customersServed >= 2,
+    lukas: customersServed >= 3,
+    christa: state.day >= 2 && customersServed >= 2,
+    bohn: state.day >= 3 && customersServed >= 1,
+    strange: state.day >= 4 && customersServed >= 3
+  };
+}
+
 export function getVisibleDaySevenLetter(state: GameState): string | null {
   if (!state.demoComplete || !state.weirdnessVisible) {
     return null;

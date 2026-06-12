@@ -1099,6 +1099,10 @@ h3 {
   .placeholder-guest-normal-07 .cafe-pilot-asset--guest {
     animation-delay: -2.8s;
   }
+
+  .placeholder-guest-strange-01 .cafe-pilot-asset--guest {
+    animation-delay: -3.5s;
+  }
 }
 
 @keyframes cafe-guest-breathe {
@@ -1268,8 +1272,8 @@ h3 {
 
 /* Herr Bohn — mid-back, near storage shelf (day 3+) */
 .placeholder-guest-normal-07 {
-  left: 38%;
-  bottom: 42%;
+  left: 43%;
+  bottom: 45%;
 }
 
 .placeholder-guest-strange-01,
@@ -1279,8 +1283,8 @@ h3 {
 
 /* Strange guest — positioned when conditionally rendered */
 .placeholder-guest-strange-01 {
-  left: 30%;
-  bottom: 40%;
+  left: 60%;
+  bottom: 43%;
 }
 
 .placeholder-guest-strange-01::before {
@@ -1308,14 +1312,13 @@ h3 {
 }
 
 /*
- * Real plant prop (Pixellab, shabby tier-1 default). The engine applies the décor
- * tier treatment via .cafe-decor--tier-N (opacity/filter); art just renders the
- * sprite here as a background image. Sits on the open floor, front-right.
- * The CSS-drawn pot/leaves below are hidden but kept as fallback structure.
+ * Real plant prop (Pixellab, shabby tier-1 default). Positioned relative to the
+ * diorama image, not .cafe-floor, so save-injected tier changes stay anchored to
+ * the painted empty floor corner.
  */
-.cafe-plant {
-  right: 13%;
-  bottom: 16%;
+.cafe-decor-plant {
+  left: 10%;
+  top: 61.5%;
   z-index: 5;
   width: 68px;
   height: 80px;
@@ -1324,10 +1327,10 @@ h3 {
 }
 
 /* Hidden: replaced by the sprite above. Kept as fallback if the image is absent. */
-.cafe-plant::before,
-.cafe-plant span,
-.cafe-plant span::before,
-.cafe-plant span::after {
+.cafe-decor-plant::before,
+.cafe-decor-plant span,
+.cafe-decor-plant span::before,
+.cafe-decor-plant span::after {
   display: none;
 }
 
@@ -1338,16 +1341,16 @@ h3 {
  * reads as a sad, faded plant — not a ghost. NOTE for engine session: once every
  * décor slot uses real per-tier sprites, the generic opacity dimming can be dropped.
  */
-.cafe-plant.cafe-decor--tier-1 {
+.cafe-decor-plant.cafe-decor--tier-1 {
   opacity: 0.95;
 }
 
-.cafe-plant.cafe-decor--tier-2 {
+.cafe-decor-plant.cafe-decor--tier-2 {
   opacity: 1;
   background-image: url("../../assets/sprites/props/placeholder-cafe-plant-t2.png");
 }
 
-.cafe-plant.cafe-decor--tier-3 {
+.cafe-decor-plant.cafe-decor--tier-3 {
   opacity: 1;
   background-image: url("../../assets/sprites/props/placeholder-cafe-plant-t3.png");
   width: 60px;

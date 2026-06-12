@@ -3,7 +3,9 @@ import { describe, expect, it } from "vitest";
 
 import { App } from "../src/app/App";
 import { createInitialGameState } from "../src/game/engine/gameState";
+import { getDioramaGuestVisibility } from "../src/game/engine/selectors";
 import { CafePlaceholder } from "../src/ui/cafe/CafePlaceholder";
+import type { DayNumber } from "../src/game/types/content";
 import type { GameState } from "../src/game/types/game";
 
 function renderCafe(state: GameState = createInitialGameState()) {
@@ -100,6 +102,39 @@ describe("café diorama view", () => {
     expect(two).toContain("placeholder-guest-normal-04");
   });
 
+  it("emits décor tier classes for every prop slot", () => {
+    const base = createInitialGameState();
+    const markup = renderCafe({
+      ...base,
+      decor: { plant: 2, shelf: 3, clock: 1, lamp: 2, cups: 3 }
+    });
+
+    expect(markup).toMatch(/cafe-decor-plant[^"]*cafe-decor--tier-2/);
+    expect(markup).toMatch(/cafe-decor-shelf[^"]*cafe-decor--tier-3/);
+    expect(markup).toMatch(/cafe-decor-clock[^"]*cafe-decor--tier-1/);
+    expect(markup).toMatch(/cafe-decor-lamp[^"]*cafe-decor--tier-2/);
+    expect(markup).toMatch(/cafe-decor-cups[^"]*cafe-decor--tier-3/);
+  });
+
+  it("uses day and served-count thresholds for Bohn and the first strange guest", () => {
+    expect(getDioramaGuestVisibility(cafeStateFor(2, 3)).bohn).toBe(false);
+    expect(getDioramaGuestVisibility(cafeStateFor(3, 0)).bohn).toBe(false);
+    expect(getDioramaGuestVisibility(cafeStateFor(3, 1)).bohn).toBe(true);
+
+    expect(getDioramaGuestVisibility(cafeStateFor(3, 3)).strange).toBe(false);
+    expect(getDioramaGuestVisibility(cafeStateFor(4, 2)).strange).toBe(false);
+    expect(getDioramaGuestVisibility(cafeStateFor(4, 3)).strange).toBe(true);
+  });
+
+  it("renders Bohn and the first strange guest sprites when thresholds are met", () => {
+    const markup = renderCafe(cafeStateFor(4, 3));
+
+    expect(markup).toContain("placeholder-guest-bohn.png");
+    expect(markup).toContain("placeholder-guest-strange.png");
+    expect(markup).toContain("cafe-pilot-asset--bohn");
+    expect(markup).toContain("cafe-pilot-asset--strange");
+  });
+
   it("keeps the explicit weirdness cue behind the visibility gate", () => {
     const daySevenBeforeHook = renderCafe({
       ...createInitialGameState(),
@@ -134,3 +169,17 @@ describe("café diorama view", () => {
     expect(markup).toContain("cafe-diorama--kassandra-awake");
   });
 });
+
+function cafeStateFor(day: DayNumber, customersServed: number): GameState {
+  const base = createInitialGameState();
+
+  return {
+    ...base,
+    day,
+    dayPhase: "open",
+    dayManagement: {
+      ...base.dayManagement,
+      customersServed
+    }
+  };
+}
