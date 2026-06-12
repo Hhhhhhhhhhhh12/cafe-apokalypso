@@ -1112,6 +1112,37 @@ h3 {
   }
 }
 
+/* Cem blinks: hand-edited 2-frame sheet (80x48 source, frame 0 = original
+   sprite). Listed together with the breathe animation because the seated
+   breathe rule would otherwise win on specificity and cancel the blink. */
+.cafe-pilot-asset--cem {
+  background-image: url("../../assets/sprites/guests/placeholder-guest-cem-idle.png");
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  /* 2 frames x rendered 108px */
+  background-size: 216px 108px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .placeholder-guest-seated .cafe-pilot-asset--cem {
+    animation:
+      cafe-guest-breathe 3.4s linear infinite,
+      cafe-cem-blink 4.2s linear infinite;
+  }
+}
+
+@keyframes cafe-cem-blink {
+  0%,
+  95.9% {
+    background-position: 0 0;
+  }
+
+  96%,
+  100% {
+    background-position: -108px 0;
+  }
+}
+
 /* When a real guest sprite is present, hide the CSS blob backing (fill, border,
    head dot) so only the sprite reads. Shadow (::after) is kept as a soft anchor. */
 .placeholder-guest:has(.cafe-pilot-asset--guest),

@@ -4,7 +4,6 @@ import stageBaseAsset from "../../../assets/backgrounds/placeholder-cafe-stage-b
 import stageBaseDustyAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v04.png";
 import coffeeMachineAsset from "../../../assets/sprites/props/placeholder-cafe-coffee-machine.png";
 import kassandraRegisterAsset from "../../../assets/sprites/props/placeholder-kassandra-register.png";
-import cemGuestAsset from "../../../assets/sprites/guests/placeholder-guest-cem.png";
 import miraGuestAsset from "../../../assets/sprites/guests/placeholder-guest-mira.png";
 import lukasGuestAsset from "../../../assets/sprites/guests/placeholder-guest-lukas.png";
 import christaGuestAsset from "../../../assets/sprites/guests/placeholder-guest-christa.png";
@@ -263,10 +262,9 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
               className="placeholder-guest placeholder-guest-seated placeholder-guest-normal-03"
               aria-hidden="true"
             >
-              <img
-                className="cafe-pilot-asset cafe-pilot-asset--guest"
-                src={cemGuestAsset}
-                alt=""
+              {/* 2-frame blink sheet; frame 0 is the original static sprite */}
+              <span
+                className="cafe-pilot-asset cafe-pilot-asset--guest cafe-pilot-asset--cem"
                 aria-hidden="true"
               />
             </span>
