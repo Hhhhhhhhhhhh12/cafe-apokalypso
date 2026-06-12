@@ -589,8 +589,8 @@ Implement the structured week-one data model.
 
 Required data:
 - 6 normal guests
-- 2 subtly strange guests
-- 5 basic products
+- 3 subtly strange guests
+- 6 basic products
 - 4 advertising campaigns
 - 3 temporary staff options
 - 7 early upgrades

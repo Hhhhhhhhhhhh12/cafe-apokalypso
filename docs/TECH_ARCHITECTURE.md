@@ -170,11 +170,11 @@ These hold the integrated provisional pilot assets (see `docs/art/PILOT_ASSET_IN
 
 The MVP game state should be serializable.
 
-The serialized state carries an explicit `version` field. **The current schema version is `5`** (`GameStateVersion = 5`), alongside a `contentCatalogVersion` (`"week-one-v1"`). On load, a save whose `version` or `contentCatalogVersion` does not match the current values is rejected and the game falls back to a fresh initial state (see Save System below).
+The serialized state carries an explicit `version` field. **The current schema version is `9`** (`GameStateVersion = 9`), alongside a `contentCatalogVersion` (`"week-one-v1"`). On load, a save whose `version` or `contentCatalogVersion` does not match the current values is rejected or migrated where supported before validation (see Save System below).
 
 Important state fields (as implemented; the shape is grouped, not flat):
 
-- `version` — schema version, currently `5`
+- `version` — schema version, currently `9`
 - `contentCatalogVersion` — content catalog version, currently `"week-one-v1"`
 - `day`, `dayPhase`, `phaseLabel`
 - `resources` — `{ money, reputation, cleanliness, stress, mood }`
@@ -209,7 +209,7 @@ The MVP uses localStorage.
 
 ### Versioning (as implemented)
 
-- The serialized `GameState` carries `version` (currently `5`) and `contentCatalogVersion` (currently `"week-one-v1"`). A save is only accepted if both match the current constants; otherwise the loader returns a fresh initial state instead of crashing.
+- The serialized `GameState` carries `version` (currently `9`) and `contentCatalogVersion` (currently `"week-one-v1"`). Supported older saves are migrated before validation; otherwise the loader returns a fresh initial state instead of crashing.
 - The localStorage **key** is currently `cafe-apokalypso.save.v4`. Earlier keys (`...v1`, `...v2`, `...v3`) are treated as legacy and cleared on reset. Note: the storage-key suffix and the in-state schema `version` are tracked separately and are not required to share the same number.
 - A "Reset / New Game" control removes the current save and the legacy keys.
 

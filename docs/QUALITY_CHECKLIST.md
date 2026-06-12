@@ -35,9 +35,9 @@ If a task would violate a requirement here, stop and explain the conflict instea
 
 - Day 1: orders can be taken, drinks prepared, payment accepted, tables cleaned, first coffee-machine flicker appears after closing.
 - Day 2: guest behavior differences are present and the day completes without errors.
-- Day 3: price adjustment and daily offers panel is functional.
+- Day 3: price adjustment, daily offers panel, and optional helper choice are functional.
 - Day 4: advertising panel appears and at least one advertising action is available; Herr Grau appears.
-- Day 5: at least one temporary staff option (Jana, Nino, or Nele) can be hired; Meda may appear.
+- Day 5: delegation pressure is readable; at least one temporary staff option (Jana, Nino, or Nele) can be hired; Meda may appear.
 - Day 6: KASSANDRA update appears and displays its first message.
 - Day 7: the official apocalyptic letter is delivered; the demo ends with the Day 7 cliffhanger; Frau mit rotem Regenschirm appears.
 - The hidden weirdness value must not appear in the UI before the Day 7 hook.
@@ -76,7 +76,7 @@ If a task would violate a requirement here, stop and explain the conflict instea
 - All 6 normal guests must be present in the data: Pendlerin Paula, Laptop-Lukas, Lieferfahrer Cem, Cappuccino-Christa, Herr Bohn, Freelancerin Nele.
 - All 3 subtly strange guests must be present in the data: Herr Grau, Frau mit rotem Regenschirm, Meda.
 - Nele and Meda must not be merged or confused in data, code, or copy. They are separate characters.
-- All 5 basic products must be present: Filterkaffee, Espresso, Cappuccino, Croissant, Kaffee + Croissant.
+- All 6 basic products must be present: Filterkaffee, Espresso, Cappuccino, Croissant, Kaffee + Croissant, Handfilter-Spezialität.
 - KASSANDRA messages must follow the documented tone: calm, analytical, slightly wrong, oddly specific. No overt fantasy language in week 1.
 - The Day 7 hook letter text must match the version documented in `docs/GAME_DESIGN.md` and `docs/CONTENT_GUIDE.md`.
 - No guest, product, or event may use final art assets without review and approval by the user. CSS placeholders are allowed if clearly marked.
