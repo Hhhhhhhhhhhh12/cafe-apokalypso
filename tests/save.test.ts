@@ -115,9 +115,8 @@ describe("save migration", () => {
   /** A save as the v8 release actually wrote it: version 8, two décor
       slots, no dailyOverhead in summaries, helper still named "mira". */
   function makeRealV8Save(day = 1, extra: Record<string, unknown> = {}) {
-    const base = createInitialGameState();
     return JSON.stringify({
-      ...base,
+      ...createInitialGameState(),
       version: 8,
       contentCatalogVersion: CURRENT_CONTENT_CATALOG_VERSION,
       day,
