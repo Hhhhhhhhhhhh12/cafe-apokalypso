@@ -1002,6 +1002,24 @@ h3 {
   transform: translateX(-50%);
 }
 
+/* Paula's entrance: start at the painted door, walk to the queue spot.
+   The transition runs when .placeholder-guest--at-door is removed. */
+@media (prefers-reduced-motion: no-preference) {
+  .placeholder-guest-normal-01 {
+    transition:
+      left 2.6s linear,
+      bottom 2.6s linear;
+  }
+}
+
+/* Calibrated against the painted door: sprite center dio x 8.4%, feet
+   y 56.6%. Percentages are relative to .cafe-queue, hence the overshoot. */
+.placeholder-guest-normal-01.placeholder-guest--at-door {
+  left: -195%;
+  bottom: 130%;
+  transition: none;
+}
+
 .cafe-pilot-asset--paula,
 .cafe-pilot-asset--guest {
   left: 50%;
@@ -1035,6 +1053,25 @@ h3 {
 @keyframes cafe-paula-idle {
   to {
     background-position: -540px 0;
+  }
+}
+
+/* 6-frame walk cycle (south-east) while Paula crosses from door to queue. */
+.cafe-pilot-asset--paula-walking {
+  background-image: url("../../assets/sprites/guests/placeholder-guest-paula-walk.png");
+  /* 6 frames x rendered 108px */
+  background-size: 648px 108px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cafe-pilot-asset--paula-walking {
+    animation: cafe-paula-walk 0.72s steps(6) infinite;
+  }
+}
+
+@keyframes cafe-paula-walk {
+  to {
+    background-position: -648px 0;
   }
 }
 

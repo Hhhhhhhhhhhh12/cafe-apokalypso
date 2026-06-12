@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import type { GameState } from "../../game/types/game";
 import stageBaseAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v03.png";
 import stageBaseDustyAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v04.png";
@@ -48,6 +49,33 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
 
   // A customer is waiting in queue when the day is open and there are actions left
   const showQueueGuest = isOpen && actionPointsRemaining > 0;
+
+  // Paula enters through the door and walks to the queue spot. Phases:
+  // "at-door" (start position, one paint) → "walking" (CSS transition moves
+  // the wrapper, walk sheet plays) → "idle" (queue spot, idle sheet plays).
+  const [paulaPhase, setPaulaPhase] = useState<"at-door" | "walking" | "idle">(
+    "at-door"
+  );
+  useEffect(() => {
+    if (!showQueueGuest) {
+      setPaulaPhase("at-door");
+      return;
+    }
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setPaulaPhase("idle");
+      return;
+    }
+    setPaulaPhase("at-door");
+    // Double rAF so the door position is painted before the transition starts
+    let raf2 = 0;
+    const raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(() => setPaulaPhase("walking"));
+    });
+    return () => {
+      cancelAnimationFrame(raf1);
+      cancelAnimationFrame(raf2);
+    };
+  }, [showQueueGuest]);
 
   // Seated guests accumulate as customers are served during the day
   const showSeated1 = customersServed >= 1;
@@ -206,11 +234,21 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
           {/* Queue — customer waiting visible when day is open + actions remain */}
           <div className="cafe-queue" aria-hidden="true">
             {showQueueGuest ? (
-              <span className="placeholder-guest placeholder-guest-normal-01">
+              <span
+                className={`placeholder-guest placeholder-guest-normal-01${
+                  paulaPhase === "at-door" ? " placeholder-guest--at-door" : ""
+                }`}
+                onTransitionEnd={(e) => {
+                  if (e.propertyName === "left") setPaulaPhase("idle");
+                }}
+              >
                 {/* Sprite-sheet idle (5 frames); frame 0 is the original
-                    static Paula sprite, so reduced-motion users see her too. */}
+                    static Paula sprite, so reduced-motion users see her too.
+                    While entering, the 6-frame walk sheet plays instead. */}
                 <span
-                  className="cafe-pilot-asset cafe-pilot-asset--paula"
+                  className={`cafe-pilot-asset cafe-pilot-asset--paula${
+                    paulaPhase !== "idle" ? " cafe-pilot-asset--paula-walking" : ""
+                  }`}
                   aria-hidden="true"
                 />
               </span>
