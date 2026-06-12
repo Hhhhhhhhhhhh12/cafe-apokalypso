@@ -6,7 +6,12 @@ import {
   saveGameState,
   type StorageLike
 } from "../src/game/engine/save";
-import { createInitialGameState } from "../src/game/engine/gameState";
+import {
+  createInitialGameState,
+  migrateRawSave,
+  CURRENT_GAME_STATE_VERSION,
+  CURRENT_CONTENT_CATALOG_VERSION
+} from "../src/game/engine/gameState";
 import { gameReducer } from "../src/game/engine/reducer";
 
 function createMemoryStorage(initialValue?: string): StorageLike {
@@ -103,5 +108,110 @@ describe("save safety", () => {
     saveGameState(state, storage);
 
     expect(loadGameState(storage)).toEqual(state);
+  });
+});
+
+describe("save migration", () => {
+  /** A save as the v8 release actually wrote it: version 8, two décor
+      slots, no dailyOverhead in summaries, helper still named "mira". */
+  function makeRealV8Save(day = 1, extra: Record<string, unknown> = {}) {
+    return JSON.stringify({
+      ...createInitialGameState(),
+      version: 8,
+      contentCatalogVersion: CURRENT_CONTENT_CATALOG_VERSION,
+      day,
+      decor: { plant: 1, shelf: 1 }, // old save: missing clock / lamp / cups
+      ...extra
+    });
+  }
+
+  it("migrateRawSave fills in missing décor slots with tier 1", () => {
+    const raw = JSON.parse(makeRealV8Save());
+    const migrated = migrateRawSave(raw) as { decor: Record<string, number> };
+
+    expect(migrated.decor.plant).toBe(1);
+    expect(migrated.decor.shelf).toBe(1);
+    expect(migrated.decor.clock).toBe(1);
+    expect(migrated.decor.lamp).toBe(1);
+    expect(migrated.decor.cups).toBe(1);
+  });
+
+  it("migrateRawSave does not overwrite existing décor values", () => {
+    const raw = JSON.parse(makeRealV8Save());
+    (raw as Record<string, unknown>).decor = { plant: 2, shelf: 3, clock: 2 };
+    const migrated = migrateRawSave(raw) as { decor: Record<string, number> };
+
+    expect(migrated.decor.plant).toBe(2);
+    expect(migrated.decor.shelf).toBe(3);
+    expect(migrated.decor.clock).toBe(2);
+    expect(migrated.decor.lamp).toBe(1);  // patched
+    expect(migrated.decor.cups).toBe(1);  // patched
+  });
+
+  it("migrateRawSave upgrades version 8 to 9", () => {
+    const migrated = migrateRawSave(JSON.parse(makeRealV8Save())) as {
+      version: number;
+    };
+    expect(migrated.version).toBe(CURRENT_GAME_STATE_VERSION);
+  });
+
+  it("loadGameState migrates a real v8 save instead of resetting to a new game", () => {
+    const storage = createMemoryStorage(makeRealV8Save(3));
+    const state = loadGameState(storage);
+
+    // Should have kept day 3, not reset to day 1 fresh game
+    expect(state.day).toBe(3);
+    expect(state.version).toBe(CURRENT_GAME_STATE_VERSION);
+    expect(state.decor).toEqual({ plant: 1, shelf: 1, clock: 1, lamp: 1, cups: 1 });
+  });
+
+  it("loadGameState keeps a v8 day-end save lacking dailyOverhead", () => {
+    const summary = {
+      day: 2,
+      rating: "Solide",
+      moneyEarned: 30,
+      moneySpent: 12,
+      customersServed: 4,
+      suppliesUsed: { coffee: 4, milk: 3, pastries: 2 },
+      suppliesRestocked: { coffee: 0, milk: 0, pastries: 0 },
+      suppliesRemaining: { coffee: 8, milk: 5, pastries: 4 },
+      cleanlinessLabel: "Sauber",
+      stressLabel: "Ruhig",
+      reputationDelta: 1,
+      objectiveTitle: "Test",
+      objectiveCompleted: true,
+      helperRecap: null,
+      stressEvent: null,
+      flavorLines: []
+      // no dailyOverhead — the field did not exist in v8
+    };
+    const storage = createMemoryStorage(
+      makeRealV8Save(2, { dayPhase: "day_end", daySummary: summary })
+    );
+    const state = loadGameState(storage);
+
+    expect(state.day).toBe(2);
+    expect(state.daySummary?.dailyOverhead).toBe(0);
+  });
+
+  it("loadGameState renames the v8 helper 'mira' to 'nele'", () => {
+    const helperAssignment = {
+      helperId: "mira",
+      taskId: "service",
+      locked: false,
+      dailyCost: 10,
+      flavorLine: "Hilft aus."
+    };
+    const storage = createMemoryStorage(makeRealV8Save(4, { helperAssignment }));
+    const state = loadGameState(storage);
+
+    expect(state.day).toBe(4);
+    expect(state.helperAssignment?.helperId).toBe("nele");
+  });
+
+  it("migrateRawSave is a no-op for non-objects", () => {
+    expect(migrateRawSave(null)).toBeNull();
+    expect(migrateRawSave("string")).toBe("string");
+    expect(migrateRawSave(42)).toBe(42);
   });
 });

@@ -413,7 +413,14 @@ h3 {
   position: absolute;
 }
 
+/* Hidden entirely: the painted Stage Base provides walls, window, door, menu
+   board, and shelf. The CSS structure used to sit beneath the image (z 0/1),
+   but the PNG has transparent corners outside the room shape, so these
+   elements bled through as graphic garbage (yellow window box top-left).
+   display:none also disables the .cafe-storage shelf-tier visual — the shelf
+   slot has no per-tier sprites yet, so nothing meaningful is lost. */
 .cafe-back-wall {
+  display: none;
   inset: 0 20% 39% 0;
   z-index: 0;
   background:
@@ -423,6 +430,7 @@ h3 {
 }
 
 .cafe-side-wall {
+  display: none; /* see .cafe-back-wall note above */
   inset: 0 0 31% auto;
   z-index: 1;
   width: 29%;
@@ -446,8 +454,7 @@ h3 {
   z-index: 2;
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  object-position: center bottom;
+  object-fit: fill;
   pointer-events: none;
   user-select: none;
 }
@@ -622,13 +629,16 @@ h3 {
  * on without doubling the painted room. Class/structure retained as fallback.
  */
 .cafe-counter {
-  top: 9%;
-  left: 18%;
+  /* Overlays the painted L-counter of the Stage Base (diorama x 58-97%,
+     y 66-88%), expressed in .cafe-floor coordinates. The skew is removed so
+     the machine/register sprites stand upright on the painted worktop. */
+  top: 53.8%;
+  left: 59.6%;
   z-index: 4;
-  width: 52%;
-  height: 33%;
-  transform: skewY(-5deg);
-  border: 2px solid rgba(53, 36, 30, 0.28);
+  width: 43.8%;
+  height: 33.8%;
+  /* Border transparent: a visible outline doubled the painted counter edges. */
+  border: 2px solid transparent;
   border-radius: 7px;
   /* Transparent: the painted Stage Base provides the counter; this element is
      kept only as the positioning container for the coffee-machine + register
@@ -668,10 +678,9 @@ h3 {
  */
 .cafe-coffee-machine {
   position: absolute;
-  /* Sits on the left segment of the painted back-corner ledge (was floating over
-     the left window). Pushed right onto the ledge and up to the shelf line. */
-  top: -6%;
-  left: 38%;
+  /* Stands on the painted counter top at the L-junction (left end of the bar). */
+  top: -28%;
+  left: 7%;
   width: 22%;
   height: 52%;
   border: 3px solid transparent;
@@ -734,8 +743,9 @@ h3 {
  */
 .cafe-register {
   position: absolute;
-  top: -18%;
-  right: 11%;
+  /* Stands on the right end of the painted counter top. */
+  top: -16%;
+  right: 16%;
   width: 21%;
   height: 48%;
   transform: skewY(2deg);
@@ -992,6 +1002,24 @@ h3 {
   transform: translateX(-50%);
 }
 
+/* Paula's entrance: start at the painted door, walk to the queue spot.
+   The transition runs when .placeholder-guest--at-door is removed. */
+@media (prefers-reduced-motion: no-preference) {
+  .placeholder-guest-normal-01 {
+    transition:
+      left 2.6s linear,
+      bottom 2.6s linear;
+  }
+}
+
+/* Calibrated against the painted door: sprite center dio x 8.4%, feet
+   y 56.6%. Percentages are relative to .cafe-queue, hence the overshoot. */
+.placeholder-guest-normal-01.placeholder-guest--at-door {
+  left: -195%;
+  bottom: 130%;
+  transition: none;
+}
+
 .cafe-pilot-asset--paula,
 .cafe-pilot-asset--guest {
   left: 50%;
@@ -1003,6 +1031,190 @@ h3 {
   transform: translateX(-50%);
   object-fit: contain;
   image-rendering: pixelated;
+}
+
+/* Paula renders from a 5-frame idle sprite sheet (340x68 source, frames side
+   by side). Frame 0 is the original static sprite, shown when animations are
+   off (prefers-reduced-motion) — identical to the old <img> presentation. */
+.cafe-pilot-asset--paula {
+  background-image: url("../../assets/sprites/guests/placeholder-guest-paula-idle.png");
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  /* 5 frames x rendered 108px */
+  background-size: 540px 108px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cafe-pilot-asset--paula {
+    animation: cafe-paula-idle 2.4s steps(5) infinite;
+  }
+}
+
+@keyframes cafe-paula-idle {
+  to {
+    background-position: -540px 0;
+  }
+}
+
+/* 6-frame walk cycle (south-east) while Paula crosses from door to queue. */
+.cafe-pilot-asset--paula-walking {
+  background-image: url("../../assets/sprites/guests/placeholder-guest-paula-walk.png");
+  /* 6 frames x rendered 108px */
+  background-size: 648px 108px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cafe-pilot-asset--paula-walking {
+    animation: cafe-paula-walk 0.72s steps(6) infinite;
+  }
+}
+
+@keyframes cafe-paula-walk {
+  to {
+    background-position: -648px 0;
+  }
+}
+
+/* Seated guests breathe with a discrete 1px bob — pixel-art-safe (no
+   subpixel resampling), staggered per guest so the room never moves in
+   lockstep. */
+@media (prefers-reduced-motion: no-preference) {
+  .placeholder-guest-seated .cafe-pilot-asset--guest {
+    animation: cafe-guest-breathe 3.4s linear infinite;
+  }
+
+  .placeholder-guest-normal-04 .cafe-pilot-asset--guest {
+    animation-delay: -0.7s;
+  }
+
+  .placeholder-guest-normal-05 .cafe-pilot-asset--guest {
+    animation-delay: -1.4s;
+  }
+
+  .placeholder-guest-normal-06 .cafe-pilot-asset--guest {
+    animation-delay: -2.1s;
+  }
+
+  .placeholder-guest-normal-07 .cafe-pilot-asset--guest {
+    animation-delay: -2.8s;
+  }
+}
+
+@keyframes cafe-guest-breathe {
+  0%,
+  54.9% {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  55%,
+  100% {
+    transform: translateX(-50%) translateY(1px);
+  }
+}
+
+/* Blinking guests: hand-edited 2-frame sheets (frame 0 = original sprite).
+   Element widths match the source aspect at 108px render height, so the
+   sheets aren't stretched. Blink rules restate the breathe animation (with
+   the slot's stagger delay) because the seated breathe rule would otherwise
+   win on specificity and cancel the blink; blink cadences are deliberately
+   co-prime-ish so nobody blinks in sync. */
+.cafe-pilot-asset--cem,
+.cafe-pilot-asset--mira {
+  /* 40x48 source -> 90x108 per frame */
+  width: 90px;
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: 180px 108px;
+}
+
+.cafe-pilot-asset--cem {
+  background-image: url("../../assets/sprites/guests/placeholder-guest-cem-idle.png");
+}
+
+.cafe-pilot-asset--mira {
+  background-image: url("../../assets/sprites/guests/placeholder-guest-mira-idle.png");
+}
+
+.cafe-pilot-asset--lukas {
+  /* 72x108 source -> 72x108 per frame */
+  width: 72px;
+  background-image: url("../../assets/sprites/guests/placeholder-guest-lukas-idle.png");
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: 144px 108px;
+}
+
+.cafe-pilot-asset--christa {
+  /* 34x108 source -> 34x108 per frame */
+  width: 34px;
+  background-image: url("../../assets/sprites/guests/placeholder-guest-christa-idle.png");
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: 68px 108px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .placeholder-guest-seated .cafe-pilot-asset--cem {
+    animation:
+      cafe-guest-breathe 3.4s linear infinite,
+      cafe-blink-90 4.2s linear infinite;
+  }
+
+  .placeholder-guest-seated .cafe-pilot-asset--mira {
+    animation:
+      cafe-guest-breathe 3.4s linear -0.7s infinite,
+      cafe-blink-90 3.8s linear -1.3s infinite;
+  }
+
+  .placeholder-guest-seated .cafe-pilot-asset--lukas {
+    animation:
+      cafe-guest-breathe 3.4s linear -1.4s infinite,
+      cafe-blink-72 4.6s linear -2.2s infinite;
+  }
+
+  .placeholder-guest-seated .cafe-pilot-asset--christa {
+    animation:
+      cafe-guest-breathe 3.4s linear -2.1s infinite,
+      cafe-blink-34 5s linear -3.1s infinite;
+  }
+}
+
+/* Blink keyframes per frame width: eyes open until 96%, closed for the
+   final ~4% of the loop (~170-200ms). */
+@keyframes cafe-blink-90 {
+  0%,
+  95.9% {
+    background-position: 0 0;
+  }
+
+  96%,
+  100% {
+    background-position: -90px 0;
+  }
+}
+
+@keyframes cafe-blink-72 {
+  0%,
+  95.9% {
+    background-position: 0 0;
+  }
+
+  96%,
+  100% {
+    background-position: -72px 0;
+  }
+}
+
+@keyframes cafe-blink-34 {
+  0%,
+  95.9% {
+    background-position: 0 0;
+  }
+
+  96%,
+  100% {
+    background-position: -34px 0;
+  }
 }
 
 /* When a real guest sprite is present, hide the CSS blob backing (fill, border,
@@ -1041,6 +1253,24 @@ h3 {
   background: #d9a47d;
 }
 
+/* Third seated guest — Lukas, left side near window */
+.placeholder-guest-normal-05 {
+  left: 10%;
+  bottom: 35%;
+}
+
+/* Christa — right side, near second table (day 2+) */
+.placeholder-guest-normal-06 {
+  right: 14%;
+  bottom: 30%;
+}
+
+/* Herr Bohn — mid-back, near storage shelf (day 3+) */
+.placeholder-guest-normal-07 {
+  left: 38%;
+  bottom: 42%;
+}
+
 .placeholder-guest-strange-01,
 .placeholder-guest-strange-02 {
   background: #5d3b78;
@@ -1064,62 +1294,153 @@ h3 {
   bottom: 31%;
 }
 
+/*
+ * Real plant prop (Pixellab, shabby tier-1 default). The engine applies the décor
+ * tier treatment via .cafe-decor--tier-N (opacity/filter); art just renders the
+ * sprite here as a background image. Sits on the open floor, front-right.
+ * The CSS-drawn pot/leaves below are hidden but kept as fallback structure.
+ */
 .cafe-plant {
-  right: 11%;
-  bottom: 39%;
-  z-index: 4;
-  width: 34px;
-  height: 48px;
-  /* Hidden: reads oddly over the painted counter. A real plant prop (Pixellab)
-     will replace this. Class retained as fallback. */
-  opacity: 0;
+  right: 13%;
+  bottom: 16%;
+  z-index: 5;
+  width: 68px;
+  height: 80px;
+  background: url("../../assets/sprites/props/placeholder-cafe-plant.png") center bottom / contain no-repeat;
+  image-rendering: pixelated;
 }
 
-.cafe-plant::before {
-  position: absolute;
-  right: 5px;
-  bottom: 0;
-  width: 21px;
-  height: 18px;
-  border: 2px solid #3d2a23;
-  border-radius: 4px 4px 7px 7px;
-  background: #a46642;
-  content: "";
-}
-
+/* Hidden: replaced by the sprite above. Kept as fallback if the image is absent. */
+.cafe-plant::before,
 .cafe-plant span,
 .cafe-plant span::before,
 .cafe-plant span::after {
+  display: none;
+}
+
+/*
+ * Real-sprite décor tiers keep readable opacity (the generic .cafe-decor--tier-1
+ * dims to 0.5, which makes a real sprite look broken rather than shabby). The
+ * desaturating grayscale filter from the generic rule still applies, so tier-1
+ * reads as a sad, faded plant — not a ghost. NOTE for engine session: once every
+ * décor slot uses real per-tier sprites, the generic opacity dimming can be dropped.
+ */
+.cafe-plant.cafe-decor--tier-1 {
+  opacity: 0.95;
+}
+
+.cafe-plant.cafe-decor--tier-2 {
+  opacity: 1;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-plant-t2.png");
+}
+
+.cafe-plant.cafe-decor--tier-3 {
+  opacity: 1;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-plant-t3.png");
+  width: 60px;
+  height: 80px;
+}
+
+/*
+ * Wall clock (Pixellab shabby tier-1). Hangs on the back wall between the
+ * window and menu board. The weirdness-hint .cafe-clock CSS below is separate
+ * and untouched — that's the overlay omen; this is the real décor prop.
+ */
+/* ── Décor props: positioned relative to .cafe-diorama ──────────────────
+   The stage base fills the diorama at object-fit:fill (987×619 rendered).
+   Percentages here are of the diorama box (≈993×625).
+   ── */
+.cafe-decor-clock {
   position: absolute;
-  display: block;
-  border: 2px solid #23452e;
-  border-radius: 70% 30% 70% 30%;
-  background: #2d6f58;
-  content: "";
+  /* On the right-wall segment between the corner seam and the right window
+     (left:48% put it straddling the corner seam, which read as floating). */
+  left: 53.5%;
+  top: 23%;
+  z-index: 4;
+  width: 56px;
+  height: 56px;
+  background: url("../../assets/sprites/props/placeholder-cafe-clock.png") center / contain no-repeat;
+  image-rendering: pixelated;
 }
 
-.cafe-plant span {
-  right: 8px;
-  bottom: 16px;
-  width: 18px;
-  height: 26px;
-  transform: rotate(-20deg);
+.cafe-decor-clock.cafe-decor--tier-1 {
+  opacity: 0.92;
 }
 
-.cafe-plant span::before {
-  right: -9px;
-  bottom: 1px;
-  width: 16px;
-  height: 24px;
-  transform: rotate(45deg);
+.cafe-decor-clock.cafe-decor--tier-2 {
+  opacity: 1;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-clock-t2.png");
 }
 
-.cafe-plant span::after {
-  right: 6px;
-  bottom: 7px;
-  width: 14px;
-  height: 22px;
-  transform: rotate(-52deg);
+.cafe-decor-clock.cafe-decor--tier-3 {
+  opacity: 1;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-clock-t3.png");
+  width: 52px;
+  height: 68px; /* pendulum clock is taller */
+}
+
+/*
+ * Floor lamp (Pixellab shabby tier-1). Positioned near the left table area,
+ * giving the seating corner some warmth even in the starter state.
+ */
+.cafe-decor-lamp {
+  position: absolute;
+  left: 36%;
+  top: 17%;
+  z-index: 4;
+  width: 48px;
+  height: 64px;
+  background: url("../../assets/sprites/props/placeholder-cafe-lamp.png") center top / contain no-repeat;
+  image-rendering: pixelated;
+}
+
+.cafe-decor-lamp.cafe-decor--tier-1 {
+  opacity: 0.90;
+}
+
+.cafe-decor-lamp.cafe-decor--tier-2 {
+  opacity: 1;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-lamp-t2.png");
+}
+
+.cafe-decor-lamp.cafe-decor--tier-3 {
+  opacity: 1;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-lamp-t3.png");
+  width: 56px;
+}
+
+/*
+ * Counter cups (Pixellab shabby tier-1). A stack of mismatched cups sitting
+ * on the counter clutter area. Small accent, adds life to the counter.
+ */
+.cafe-decor-cups {
+  position: absolute;
+  /* Rests on the painted upper wall shelf right of the right window. */
+  left: 80%;
+  top: 40.5%;
+  z-index: 6;
+  width: 48px;
+  height: 40px;
+  background: url("../../assets/sprites/props/placeholder-cafe-cups.png") center / contain no-repeat;
+  image-rendering: pixelated;
+}
+
+.cafe-decor-cups.cafe-decor--tier-1 {
+  opacity: 0.90;
+}
+
+.cafe-decor-cups.cafe-decor--tier-2 {
+  opacity: 1;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-cups-t2.png");
+  width: 52px;
+  height: 44px;
+}
+
+.cafe-decor-cups.cafe-decor--tier-3 {
+  opacity: 1;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-cups-t3.png");
+  width: 44px;
+  height: 52px;
 }
 
 .cafe-diorama--busy .placeholder-guest-normal-02,
@@ -1803,34 +2124,63 @@ h3 {
 /* Décor shop (day-end review) */
 .decor-shop {
   display: grid;
-  gap: 8px;
+  gap: 6px;
   margin-top: 14px;
   border-top: 2px solid #d5bda5;
   padding-top: 12px;
 }
 
+.decor-shop h3 {
+  margin: 0 0 4px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #7a5c47;
+}
+
 .decor-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  gap: 8px;
+  padding: 5px 8px;
+  border-radius: 6px;
+  background: rgba(255, 248, 237, 0.6);
+  border: 1px solid #e8d5bc;
 }
 
 .decor-row__label {
   color: #4a3b34;
-  font-size: 0.86rem;
+  font-size: 0.82rem;
+  line-height: 1.3;
+}
+
+.decor-row__label strong {
+  display: block;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #7a5c47;
 }
 
 .decor-row__label em {
   color: #1f555f;
   font-style: normal;
-  font-weight: 700;
 }
 
 .decor-row__maxed {
-  color: #6b5444;
-  font-size: 0.8rem;
-  font-weight: 700;
+  color: #8a7060;
+  font-size: 0.75rem;
+  font-style: italic;
+}
+
+/* Upgrade button inside shop rows */
+.decor-row .secondary-button {
+  font-size: 0.78rem;
+  padding: 4px 10px;
+  white-space: nowrap;
 }
 
 /* Décor visual tiers — cosmetic placeholder progression (real sprites later, #57) */
@@ -1847,4 +2197,174 @@ h3 {
 .cafe-decor--tier-3 {
   opacity: 1;
   filter: saturate(1.18);
+}
+
+/* ── Ambient motion ─────────────────────────────────────────────────────
+   Subtle life in the diorama: drifting dust (days 1-2, dusty v04 base),
+   rising steam, swinging T3 pendulum, breathing lamp light. Everything
+   lives behind prefers-reduced-motion so the scene stays static for
+   users who ask for it. */
+
+.cafe-dust {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.cafe-dust::before,
+.cafe-dust::after {
+  position: absolute;
+  top: 24%;
+  left: 32%;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(255, 244, 214, 0.5);
+  box-shadow:
+    110px 40px 0 rgba(255, 244, 214, 0.4),
+    230px 110px 0 rgba(255, 240, 205, 0.35),
+    340px 20px 0 rgba(255, 244, 214, 0.45),
+    60px 150px 0 rgba(255, 240, 205, 0.3);
+  content: "";
+}
+
+.cafe-dust::after {
+  top: 46%;
+  left: 18%;
+  width: 2px;
+  height: 2px;
+  box-shadow:
+    150px -30px 0 rgba(255, 244, 214, 0.35),
+    300px 60px 0 rgba(255, 240, 205, 0.4),
+    430px -10px 0 rgba(255, 244, 214, 0.3);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Dust motes drift slowly through the light shafts */
+  .cafe-dust::before {
+    animation: cafe-dust-drift 14s ease-in-out infinite;
+  }
+
+  .cafe-dust::after {
+    animation: cafe-dust-drift 18s ease-in-out 4s infinite reverse;
+  }
+
+  /* Steam rises and fades from the coffee machine (visible at stress >= 35) */
+  .cafe-coffee-machine__steam {
+    animation: cafe-steam-rise 2.8s ease-out infinite;
+  }
+
+  .cafe-coffee-machine__steam--soft {
+    animation-duration: 3.6s;
+    animation-delay: 1.1s;
+  }
+
+  /* T3 pendulum clock sways gently from its mount */
+  .cafe-decor-clock.cafe-decor--tier-3 {
+    transform-origin: 50% 8%;
+    animation: cafe-clock-sway 2.6s ease-in-out infinite alternate;
+  }
+
+  /* Lamp light breathes; opacity (not filter) so tier looks stay intact */
+  .cafe-decor-lamp {
+    animation: cafe-lamp-breathe 6s ease-in-out infinite alternate;
+  }
+
+  /* Once the weirdness shows, the lamp flickers nervously */
+  .cafe-diorama--weirdness-visible .cafe-decor-lamp {
+    animation: cafe-lamp-flicker 4.5s steps(1, end) infinite;
+  }
+}
+
+@keyframes cafe-dust-drift {
+  0% {
+    transform: translate3d(0, 0, 0);
+    opacity: 0;
+  }
+
+  12% {
+    opacity: 1;
+  }
+
+  50% {
+    transform: translate3d(16px, -20px, 0);
+  }
+
+  88% {
+    opacity: 0.7;
+  }
+
+  100% {
+    transform: translate3d(-12px, -42px, 0);
+    opacity: 0;
+  }
+}
+
+@keyframes cafe-steam-rise {
+  0% {
+    transform: translateY(2px) scaleY(0.9);
+    opacity: 0;
+  }
+
+  25% {
+    opacity: 0.7;
+  }
+
+  100% {
+    transform: translateY(-14px) scaleY(1.15);
+    opacity: 0;
+  }
+}
+
+@keyframes cafe-clock-sway {
+  from {
+    transform: rotate(-1.6deg);
+  }
+
+  to {
+    transform: rotate(1.6deg);
+  }
+}
+
+@keyframes cafe-lamp-breathe {
+  from {
+    opacity: 0.88;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes cafe-lamp-flicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  6% {
+    opacity: 0.7;
+  }
+
+  9% {
+    opacity: 1;
+  }
+
+  38% {
+    opacity: 0.82;
+  }
+
+  41% {
+    opacity: 1;
+  }
+
+  73% {
+    opacity: 0.65;
+  }
+
+  76% {
+    opacity: 1;
+  }
 }

@@ -68,7 +68,7 @@ export function createInitialGameState(): GameState {
     cafeClosed: false,
     closureReason: null,
     reputationZeroStreak: 0,
-    decor: { plant: 1, shelf: 1 },
+    decor: { plant: 1, shelf: 1, clock: 1, lamp: 1, cups: 1 },
     completedActions: [],
     unlocks: { ...initialUnlocks },
     guestHistory: [],
@@ -292,14 +292,69 @@ function isValidUnlocks(value: unknown): value is UnlockState {
   );
 }
 
-function isValidDecor(value: unknown): value is Record<"plant" | "shelf", number> {
+/** All décor slot keys that must exist in a valid save. */
+const DECOR_SLOT_KEYS = ["plant", "shelf", "clock", "lamp", "cups"] as const;
+
+function isValidDecor(value: unknown): value is Record<typeof DECOR_SLOT_KEYS[number], number> {
   if (!value || typeof value !== "object") {
     return false;
   }
   const decor = value as Record<string, unknown>;
-  return (["plant", "shelf"] as const).every(
+  return DECOR_SLOT_KEYS.every(
     (slot) => typeof decor[slot] === "number" && Number.isInteger(decor[slot]) && (decor[slot] as number) >= 1
   );
+}
+
+/**
+ * Migrate a raw parsed save written by an older release so it passes
+ * isValidGameState. Called by loadGameState before validation so existing
+ * localStorage saves are not wiped. Only runs if the raw value looks like
+ * an object; does nothing otherwise.
+ *
+ * v8 -> v9: day summaries gained the required `dailyOverhead` field and the
+ * helper "mira" was renamed to "nele". Both versions may also lack décor
+ * slots that were added after the save was written (clock/lamp/cups).
+ */
+export function migrateRawSave(raw: unknown): unknown {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
+    return raw;
+  }
+  const obj = { ...(raw as Record<string, unknown>) };
+  let patched = false;
+
+  if (obj.version === 8) {
+    obj.version = 9;
+    patched = true;
+
+    const summary = obj.daySummary;
+    if (summary && typeof summary === "object" && !Array.isArray(summary)) {
+      const s = summary as Record<string, unknown>;
+      if (typeof s.dailyOverhead !== "number") {
+        obj.daySummary = { ...s, dailyOverhead: 0 };
+      }
+    }
+
+    const assignment = obj.helperAssignment;
+    if (assignment && typeof assignment === "object" && !Array.isArray(assignment)) {
+      const a = assignment as Record<string, unknown>;
+      if (a.helperId === "mira") {
+        obj.helperAssignment = { ...a, helperId: "nele" };
+      }
+    }
+  }
+
+  if (obj.decor && typeof obj.decor === "object" && !Array.isArray(obj.decor)) {
+    const decor = { ...(obj.decor as Record<string, unknown>) };
+    for (const slot of DECOR_SLOT_KEYS) {
+      if (typeof decor[slot] !== "number") {
+        decor[slot] = 1;
+        patched = true;
+      }
+    }
+    obj.decor = decor;
+  }
+
+  return patched ? obj : raw;
 }
 
 function isStringArray(value: unknown): value is string[] {

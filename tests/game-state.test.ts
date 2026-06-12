@@ -13,7 +13,7 @@ describe("initial game state", () => {
     const state = createInitialGameState();
 
     expect(state.version).toBe(9);
-    expect(state.decor).toEqual({ plant: 1, shelf: 1 });
+    expect(state.decor).toEqual({ plant: 1, shelf: 1, clock: 1, lamp: 1, cups: 1 });
     expect(state.contentCatalogVersion).toBe("week-one-v1");
     expect(state.day).toBe(1);
     expect(state.weirdnessVisible).toBe(false);

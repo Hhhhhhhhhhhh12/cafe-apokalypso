@@ -1,10 +1,10 @@
+import { useEffect, useState } from "react";
 import type { GameState } from "../../game/types/game";
 import stageBaseAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v03.png";
+import stageBaseDustyAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v04.png";
 import coffeeMachineAsset from "../../../assets/sprites/props/placeholder-cafe-coffee-machine.png";
 import kassandraRegisterAsset from "../../../assets/sprites/props/placeholder-kassandra-register.png";
-import paulaGuestAsset from "../../../assets/sprites/guests/placeholder-guest-paula.png";
-import cemGuestAsset from "../../../assets/sprites/guests/placeholder-guest-cem.png";
-import miraGuestAsset from "../../../assets/sprites/guests/placeholder-guest-mira.png";
+import bohnGuestAsset from "../../../assets/sprites/guests/placeholder-guest-bohn.png";
 
 interface CafePlaceholderProps {
   gameState: GameState;
@@ -46,9 +46,43 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
   // A customer is waiting in queue when the day is open and there are actions left
   const showQueueGuest = isOpen && actionPointsRemaining > 0;
 
+  // Paula enters through the door and walks to the queue spot. Phases:
+  // "at-door" (start position, one paint) → "walking" (CSS transition moves
+  // the wrapper, walk sheet plays) → "idle" (queue spot, idle sheet plays).
+  const [paulaPhase, setPaulaPhase] = useState<"at-door" | "walking" | "idle">(
+    "at-door"
+  );
+  useEffect(() => {
+    if (!showQueueGuest) {
+      setPaulaPhase("at-door");
+      return;
+    }
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setPaulaPhase("idle");
+      return;
+    }
+    setPaulaPhase("at-door");
+    // Double rAF so the door position is painted before the transition starts
+    let raf2 = 0;
+    const raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(() => setPaulaPhase("walking"));
+    });
+    return () => {
+      cancelAnimationFrame(raf1);
+      cancelAnimationFrame(raf2);
+    };
+  }, [showQueueGuest]);
+
   // Seated guests accumulate as customers are served during the day
   const showSeated1 = customersServed >= 1;
   const showSeated2 = customersServed >= 2;
+  const showSeated3 = customersServed >= 3;
+
+  // Christa — regular, appears from day 2 once the second customer is served
+  const showChrista = gameState.day >= 2 && customersServed >= 2;
+
+  // Herr Bohn — regular, appears from day 3 once the café gets going
+  const showBohn = gameState.day >= 3 && customersServed >= 1;
 
   // Strange guest appears day 4+, after 3 customers have been served
   const showStrangeGuest = gameState.day >= 4 && customersServed >= 3;
@@ -62,6 +96,11 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
 
   // KASSANDRA screen glows when installed / awake
   const kassandraAwake = gameState.kassandraInstalled || gameState.day >= 6;
+
+  // Days 1-2 use the dusty, slightly enchanted stage base (v04) — the café has
+  // been closed for a long time. From day 3 the warmer lived-in v03 takes over.
+  const isDusty = gameState.day <= 2;
+  const stageBase = isDusty ? stageBaseDustyAsset : stageBaseAsset;
 
   return (
     <section
@@ -89,10 +128,13 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
         {/* Stage base background image */}
         <img
           className="cafe-stage-base"
-          src={stageBaseAsset}
+          src={stageBase}
           alt=""
           aria-hidden="true"
         />
+
+        {/* Drifting dust motes — only while the café still feels long-closed */}
+        {isDusty && <div className="cafe-dust" aria-hidden="true" />}
 
         {/* CSS wall fallbacks — mostly transparent when stage base is present */}
         <div className="cafe-back-wall" aria-hidden="true">
@@ -188,11 +230,21 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
           {/* Queue — customer waiting visible when day is open + actions remain */}
           <div className="cafe-queue" aria-hidden="true">
             {showQueueGuest ? (
-              <span className="placeholder-guest placeholder-guest-normal-01">
-                <img
-                  className="cafe-pilot-asset cafe-pilot-asset--paula"
-                  src={paulaGuestAsset}
-                  alt=""
+              <span
+                className={`placeholder-guest placeholder-guest-normal-01${
+                  paulaPhase === "at-door" ? " placeholder-guest--at-door" : ""
+                }`}
+                onTransitionEnd={(e) => {
+                  if (e.propertyName === "left") setPaulaPhase("idle");
+                }}
+              >
+                {/* Sprite-sheet idle (5 frames); frame 0 is the original
+                    static Paula sprite, so reduced-motion users see her too.
+                    While entering, the 6-frame walk sheet plays instead. */}
+                <span
+                  className={`cafe-pilot-asset cafe-pilot-asset--paula${
+                    paulaPhase !== "idle" ? " cafe-pilot-asset--paula-walking" : ""
+                  }`}
                   aria-hidden="true"
                 />
               </span>
@@ -207,10 +259,9 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
               className="placeholder-guest placeholder-guest-seated placeholder-guest-normal-03"
               aria-hidden="true"
             >
-              <img
-                className="cafe-pilot-asset cafe-pilot-asset--guest"
-                src={cemGuestAsset}
-                alt=""
+              {/* 2-frame blink sheet; frame 0 is the original static sprite */}
+              <span
+                className="cafe-pilot-asset cafe-pilot-asset--guest cafe-pilot-asset--cem"
                 aria-hidden="true"
               />
             </span>
@@ -222,9 +273,51 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
               className="placeholder-guest placeholder-guest-seated placeholder-guest-normal-04"
               aria-hidden="true"
             >
+              {/* 2-frame blink sheet; frame 0 is the original static sprite */}
+              <span
+                className="cafe-pilot-asset cafe-pilot-asset--guest cafe-pilot-asset--mira"
+                aria-hidden="true"
+              />
+            </span>
+          )}
+
+          {/* Seated guest 3 — Lukas, appears after third customer served */}
+          {showSeated3 && (
+            <span
+              className="placeholder-guest placeholder-guest-seated placeholder-guest-normal-05"
+              aria-hidden="true"
+            >
+              {/* 2-frame blink sheet; frame 0 is the original static sprite */}
+              <span
+                className="cafe-pilot-asset cafe-pilot-asset--guest cafe-pilot-asset--lukas"
+                aria-hidden="true"
+              />
+            </span>
+          )}
+
+          {/* Christa — day 2+, right table area */}
+          {showChrista && (
+            <span
+              className="placeholder-guest placeholder-guest-seated placeholder-guest-normal-06"
+              aria-hidden="true"
+            >
+              {/* 2-frame blink sheet; frame 0 is the original static sprite */}
+              <span
+                className="cafe-pilot-asset cafe-pilot-asset--guest cafe-pilot-asset--christa"
+                aria-hidden="true"
+              />
+            </span>
+          )}
+
+          {/* Herr Bohn — day 3+, mid-back near storage */}
+          {showBohn && (
+            <span
+              className="placeholder-guest placeholder-guest-seated placeholder-guest-normal-07"
+              aria-hidden="true"
+            >
               <img
                 className="cafe-pilot-asset cafe-pilot-asset--guest"
-                src={miraGuestAsset}
+                src={bohnGuestAsset}
                 alt=""
                 aria-hidden="true"
               />
@@ -252,6 +345,14 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
             </div>
           )}
         </div>
+
+        {/* ── Décor props ──────────────────────────────────────────────────
+            Positioned relative to .cafe-diorama (not .cafe-floor) so they
+            can sit on the back wall and ceiling of the painted room image,
+            which are above the .cafe-floor div's coordinate space.        */}
+        <div className={`cafe-decor-clock cafe-decor--tier-${gameState.decor?.clock ?? 1}`} aria-hidden="true" />
+        <div className={`cafe-decor-lamp cafe-decor--tier-${gameState.decor?.lamp ?? 1}`} aria-hidden="true" />
+        <div className={`cafe-decor-cups cafe-decor--tier-${gameState.decor?.cups ?? 1}`} aria-hidden="true" />
       </div>
     </section>
   );

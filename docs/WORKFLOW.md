@@ -409,3 +409,33 @@ Track (in the PR/commit description or run protocol; optionally in ClickUp):
 - result link (PR/commit) or placeholder
 
 A handoff that leaves no trace in Git history (branch/commit/PR) is not considered officially handed off. This keeps the project auditable and prevents duplicate or contradictory work across tools. Tracking in ClickUp is welcome but optional.
+
+## Parallel sessions: worktree isolation (2026-06-03)
+
+Multiple agent sessions may run at once (e.g. engine programming + art/UI). They
+**must not share one working copy** — branch switches and uncommitted changes by one
+session clobber the other. Use **git worktrees**: one repo, separate working dirs.
+
+```
+cafe-apokalypso/        → engine session (main + engine feature branches)
+cafe-apokalypso-art/    → art/UI session (branch art/work; own dev-server port, e.g. 5180)
+```
+
+Set up: `git worktree add ../cafe-apokalypso-art -b art/work` then symlink
+`node_modules` from the main checkout (same lockfile, no reinstall).
+
+### File ownership (minimise conflicts)
+
+| Area | Owner |
+|---|---|
+| `src/game/**` (engine, reducer, types, data) | engine session |
+| `assets/**`, `src/ui/**`, `src/styles/**`, `docs/art/**` | art session |
+| ⚠️ `src/ui/cafe/CafePlaceholder.tsx` (shared: engine wires state, art wires assets) | whoever touches it: small commit **immediately**, the other pulls `main` before editing |
+
+Clean division for décor/visual state: the **engine wires CSS tier classes** onto
+slots (e.g. `cafe-decor--tier-${shelf}`); the **art session styles those classes**
+(sprite per tier) in `src/styles/global.css`. This keeps most visual work out of the
+shared TSX.
+
+Rule of thumb: frequent small commits, PR into `main`, never leave a dirty working
+tree across a handoff.
