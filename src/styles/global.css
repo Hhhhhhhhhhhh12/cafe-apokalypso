@@ -1015,6 +1015,29 @@ h3 {
   image-rendering: pixelated;
 }
 
+/* Paula renders from a 5-frame idle sprite sheet (340x68 source, frames side
+   by side). Frame 0 is the original static sprite, shown when animations are
+   off (prefers-reduced-motion) — identical to the old <img> presentation. */
+.cafe-pilot-asset--paula {
+  background-image: url("../../assets/sprites/guests/placeholder-guest-paula-idle.png");
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  /* 5 frames x rendered 108px */
+  background-size: 540px 108px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cafe-pilot-asset--paula {
+    animation: cafe-paula-idle 2.4s steps(5) infinite;
+  }
+}
+
+@keyframes cafe-paula-idle {
+  to {
+    background-position: -540px 0;
+  }
+}
+
 /* When a real guest sprite is present, hide the CSS blob backing (fill, border,
    head dot) so only the sprite reads. Shadow (::after) is kept as a soft anchor. */
 .placeholder-guest:has(.cafe-pilot-asset--guest),

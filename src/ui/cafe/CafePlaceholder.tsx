@@ -3,7 +3,6 @@ import stageBaseAsset from "../../../assets/backgrounds/placeholder-cafe-stage-b
 import stageBaseDustyAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v04.png";
 import coffeeMachineAsset from "../../../assets/sprites/props/placeholder-cafe-coffee-machine.png";
 import kassandraRegisterAsset from "../../../assets/sprites/props/placeholder-kassandra-register.png";
-import paulaGuestAsset from "../../../assets/sprites/guests/placeholder-guest-paula.png";
 import cemGuestAsset from "../../../assets/sprites/guests/placeholder-guest-cem.png";
 import miraGuestAsset from "../../../assets/sprites/guests/placeholder-guest-mira.png";
 import lukasGuestAsset from "../../../assets/sprites/guests/placeholder-guest-lukas.png";
@@ -208,10 +207,10 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
           <div className="cafe-queue" aria-hidden="true">
             {showQueueGuest ? (
               <span className="placeholder-guest placeholder-guest-normal-01">
-                <img
+                {/* Sprite-sheet idle (5 frames); frame 0 is the original
+                    static Paula sprite, so reduced-motion users see her too. */}
+                <span
                   className="cafe-pilot-asset cafe-pilot-asset--paula"
-                  src={paulaGuestAsset}
-                  alt=""
                   aria-hidden="true"
                 />
               </span>
