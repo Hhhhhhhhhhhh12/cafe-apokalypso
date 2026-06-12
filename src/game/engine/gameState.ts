@@ -75,7 +75,7 @@ export function createInitialGameState(): GameState {
     eventHistory: [],
     unlockedAchievements: [],
     statusMessage:
-      "The café is not open yet. This shell only proves layout, state, save safety, and reset flow."
+      "The café opens. The guestbook quietly writes: Previous runs: [REDACTED]."
   };
 }
 

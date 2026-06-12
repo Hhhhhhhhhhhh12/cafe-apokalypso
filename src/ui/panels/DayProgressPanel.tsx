@@ -78,7 +78,7 @@ export function DayProgressPanel({ gameState }: DayProgressPanelProps) {
 
       {staffOptions.length > 0 ? (
         <section className="inline-callout" aria-labelledby="staff-options-title">
-          <h3 id="staff-options-title">Day 5 unlock: temporary help</h3>
+          <h3 id="staff-options-title">Temporary help</h3>
           <p>
             {gameState.helperAssignment
               ? `${gameState.helperAssignment.flavorLine}`

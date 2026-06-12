@@ -319,6 +319,7 @@ function applySuccessfulServe(
   const servedGuest = getGuestForCustomer(workingState, servedCustomerIndex);
   const guestPreferences = servedGuest?.appreciatedProductIds ?? [];
   const appreciates = guestPreferences.includes(product.id);
+  const matchesSoftPreference = servedGuest?.preferredProductId === product.id;
   let appreciationLine = "";
 
   if (appreciates) {
@@ -335,8 +336,12 @@ function applySuccessfulServe(
       };
       appreciationLine = servedGuest?.delightLine ?? "";
     }
+  } else if (matchesSoftPreference) {
+    appreciationLine = servedGuest?.matchedPreferenceLine ?? "";
   } else if (guestPreferences.length > 0) {
     appreciationLine = servedGuest?.letdownLine ?? "";
+  } else if (servedGuest?.preferredProductId) {
+    appreciationLine = servedGuest.missedPreferenceLine ?? "";
   }
 
   const statusParts = [serveLine, appreciationLine, ...flavorLines].filter(

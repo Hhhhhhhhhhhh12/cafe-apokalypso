@@ -254,7 +254,7 @@ export function getIngredientRequirement(
     assignment?.helperId === "nino" &&
     assignment.taskId === "barista"
   ) {
-    return Math.floor(baseRequirement * 0.9);
+    return Math.max(1, Math.floor(baseRequirement * 0.9));
   }
 
   return baseRequirement;

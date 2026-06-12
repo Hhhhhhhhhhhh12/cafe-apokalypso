@@ -282,7 +282,7 @@ describe("management tradeoff system", () => {
     expect(firstSummary?.objectiveTitle).toBe("Close the first shift");
   });
 
-  it("keeps helpers unavailable before Day 5 and locks the Day-5 assignment", () => {
+  it("keeps helpers unavailable before Day 3 and locks the day-start assignment", () => {
     const earlyState = gameReducer(createInitialGameState(), {
       type: "select_helper",
       helperId: "jana",
@@ -355,7 +355,7 @@ describe("management tradeoff system", () => {
     );
     // Starting reputation (25) plus the +1 barista bonus on a cappuccino.
     expect(ninoBaristaState.resources.reputation).toBe(26);
-    expect(ninoBaristaState.supplies.milk).toBe(8);
+    expect(ninoBaristaState.supplies.milk).toBe(7);
 
     const ninoCounterState = gameReducer(
       {
@@ -571,7 +571,9 @@ describe("fail-state and reputation-scaled income", () => {
     const open = createInitialGameState();
     const preview = getNextGuestPreview(open);
     expect(preview?.name).toBe("Pendlerin Paula");
-    expect(preview?.wants).toBeNull();
+    expect(preview?.orderLine).toContain("Just coffee");
+    expect(preview?.learningCue).toContain("never looks at the pastry shelf");
+    expect(preview?.wants).toBe("Filterkaffee");
 
     // No preview once the day's actions are spent.
     const spent: GameState = {

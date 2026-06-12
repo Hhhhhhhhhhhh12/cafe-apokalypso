@@ -128,6 +128,10 @@ export function getGuestForCustomer(
 
 export interface NextGuestPreview {
   name: string;
+  /** In-world order or remark shown before serving. */
+  orderLine: string;
+  /** Behavioral cue that teaches preference without a tutorial panel. */
+  learningCue: string | null;
   /** Name of a product this guest particularly values, if any (a light hint). */
   wants: string | null;
 }
@@ -147,9 +151,11 @@ export function getNextGuestPreview(state: GameState): NextGuestPreview | null {
     return null;
   }
 
-  const wantedProductId = guest.appreciatedProductIds?.[0];
+  const wantedProductId = guest.preferredProductId ?? guest.appreciatedProductIds?.[0];
   return {
     name: guest.name,
+    orderLine: guest.orderLine ?? guest.sampleLines[0] ?? "",
+    learningCue: guest.learningCue ?? null,
     wants: wantedProductId ? getProductById(wantedProductId).name : null
   };
 }

@@ -9,7 +9,7 @@ import {
 import type { GameState } from "../src/game/types/game";
 
 describe("initial game state", () => {
-  it("starts as a serializable day-one placeholder shell", () => {
+  it("starts as a serializable day-one café state", () => {
     const state = createInitialGameState();
 
     expect(state.version).toBe(9);
@@ -42,6 +42,7 @@ describe("initial game state", () => {
     expect(state.supplies).toEqual({ coffee: 12, milk: 8, pastries: 6 });
     expect(state.resources.cleanliness).toBe(80);
     expect(state.resources.stress).toBe(0);
+    expect(state.statusMessage).toContain("Previous runs: [REDACTED]");
     expect(() => JSON.stringify(state)).not.toThrow();
   });
 
