@@ -1038,6 +1038,43 @@ h3 {
   }
 }
 
+/* Seated guests breathe with a discrete 1px bob — pixel-art-safe (no
+   subpixel resampling), staggered per guest so the room never moves in
+   lockstep. */
+@media (prefers-reduced-motion: no-preference) {
+  .placeholder-guest-seated .cafe-pilot-asset--guest {
+    animation: cafe-guest-breathe 3.4s linear infinite;
+  }
+
+  .placeholder-guest-normal-04 .cafe-pilot-asset--guest {
+    animation-delay: -0.7s;
+  }
+
+  .placeholder-guest-normal-05 .cafe-pilot-asset--guest {
+    animation-delay: -1.4s;
+  }
+
+  .placeholder-guest-normal-06 .cafe-pilot-asset--guest {
+    animation-delay: -2.1s;
+  }
+
+  .placeholder-guest-normal-07 .cafe-pilot-asset--guest {
+    animation-delay: -2.8s;
+  }
+}
+
+@keyframes cafe-guest-breathe {
+  0%,
+  54.9% {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  55%,
+  100% {
+    transform: translateX(-50%) translateY(1px);
+  }
+}
+
 /* When a real guest sprite is present, hide the CSS blob backing (fill, border,
    head dot) so only the sprite reads. Shadow (::after) is kept as a soft anchor. */
 .placeholder-guest:has(.cafe-pilot-asset--guest),
