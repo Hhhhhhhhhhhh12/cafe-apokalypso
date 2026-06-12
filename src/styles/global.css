@@ -1290,6 +1290,18 @@ h3 {
     7px 1px 0 #403448;
 }
 
+/* Herr Grau — verblasst wie ein zu oft gewendetes Formular.
+   Bürokratisch, staubig. Kein volles Grau: der Sepia-Rest ist das,
+   was bleibt, wenn man lange genug da war. */
+.placeholder-guest-strange-01 .cafe-pilot-asset--guest {
+  filter: saturate(0.52) sepia(0.14) brightness(0.93);
+  transition: filter 4s ease;
+}
+
+.cafe-diorama--day-seven .placeholder-guest-strange-01 .cafe-pilot-asset--guest {
+  filter: saturate(0.12) sepia(0.24) brightness(0.87) contrast(1.05);
+}
+
 .placeholder-guest-strange-02 {
   right: 28%;
   bottom: 31%;
