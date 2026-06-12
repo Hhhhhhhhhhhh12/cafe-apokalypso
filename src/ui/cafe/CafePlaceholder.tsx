@@ -4,9 +4,6 @@ import stageBaseAsset from "../../../assets/backgrounds/placeholder-cafe-stage-b
 import stageBaseDustyAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v04.png";
 import coffeeMachineAsset from "../../../assets/sprites/props/placeholder-cafe-coffee-machine.png";
 import kassandraRegisterAsset from "../../../assets/sprites/props/placeholder-kassandra-register.png";
-import miraGuestAsset from "../../../assets/sprites/guests/placeholder-guest-mira.png";
-import lukasGuestAsset from "../../../assets/sprites/guests/placeholder-guest-lukas.png";
-import christaGuestAsset from "../../../assets/sprites/guests/placeholder-guest-christa.png";
 import bohnGuestAsset from "../../../assets/sprites/guests/placeholder-guest-bohn.png";
 
 interface CafePlaceholderProps {
@@ -276,10 +273,9 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
               className="placeholder-guest placeholder-guest-seated placeholder-guest-normal-04"
               aria-hidden="true"
             >
-              <img
-                className="cafe-pilot-asset cafe-pilot-asset--guest"
-                src={miraGuestAsset}
-                alt=""
+              {/* 2-frame blink sheet; frame 0 is the original static sprite */}
+              <span
+                className="cafe-pilot-asset cafe-pilot-asset--guest cafe-pilot-asset--mira"
                 aria-hidden="true"
               />
             </span>
@@ -291,10 +287,9 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
               className="placeholder-guest placeholder-guest-seated placeholder-guest-normal-05"
               aria-hidden="true"
             >
-              <img
-                className="cafe-pilot-asset cafe-pilot-asset--guest"
-                src={lukasGuestAsset}
-                alt=""
+              {/* 2-frame blink sheet; frame 0 is the original static sprite */}
+              <span
+                className="cafe-pilot-asset cafe-pilot-asset--guest cafe-pilot-asset--lukas"
                 aria-hidden="true"
               />
             </span>
@@ -306,10 +301,9 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
               className="placeholder-guest placeholder-guest-seated placeholder-guest-normal-06"
               aria-hidden="true"
             >
-              <img
-                className="cafe-pilot-asset cafe-pilot-asset--guest"
-                src={christaGuestAsset}
-                alt=""
+              {/* 2-frame blink sheet; frame 0 is the original static sprite */}
+              <span
+                className="cafe-pilot-asset cafe-pilot-asset--guest cafe-pilot-asset--christa"
                 aria-hidden="true"
               />
             </span>

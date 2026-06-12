@@ -1112,26 +1112,76 @@ h3 {
   }
 }
 
-/* Cem blinks: hand-edited 2-frame sheet (80x48 source, frame 0 = original
-   sprite). Listed together with the breathe animation because the seated
-   breathe rule would otherwise win on specificity and cancel the blink. */
-.cafe-pilot-asset--cem {
-  background-image: url("../../assets/sprites/guests/placeholder-guest-cem-idle.png");
+/* Blinking guests: hand-edited 2-frame sheets (frame 0 = original sprite).
+   Element widths match the source aspect at 108px render height, so the
+   sheets aren't stretched. Blink rules restate the breathe animation (with
+   the slot's stagger delay) because the seated breathe rule would otherwise
+   win on specificity and cancel the blink; blink cadences are deliberately
+   co-prime-ish so nobody blinks in sync. */
+.cafe-pilot-asset--cem,
+.cafe-pilot-asset--mira {
+  /* 40x48 source -> 90x108 per frame */
+  width: 90px;
   background-repeat: no-repeat;
   background-position: 0 0;
-  /* 2 frames x rendered 108px */
-  background-size: 216px 108px;
+  background-size: 180px 108px;
+}
+
+.cafe-pilot-asset--cem {
+  background-image: url("../../assets/sprites/guests/placeholder-guest-cem-idle.png");
+}
+
+.cafe-pilot-asset--mira {
+  background-image: url("../../assets/sprites/guests/placeholder-guest-mira-idle.png");
+}
+
+.cafe-pilot-asset--lukas {
+  /* 72x108 source -> 72x108 per frame */
+  width: 72px;
+  background-image: url("../../assets/sprites/guests/placeholder-guest-lukas-idle.png");
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: 144px 108px;
+}
+
+.cafe-pilot-asset--christa {
+  /* 34x108 source -> 34x108 per frame */
+  width: 34px;
+  background-image: url("../../assets/sprites/guests/placeholder-guest-christa-idle.png");
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: 68px 108px;
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .placeholder-guest-seated .cafe-pilot-asset--cem {
     animation:
       cafe-guest-breathe 3.4s linear infinite,
-      cafe-cem-blink 4.2s linear infinite;
+      cafe-blink-90 4.2s linear infinite;
+  }
+
+  .placeholder-guest-seated .cafe-pilot-asset--mira {
+    animation:
+      cafe-guest-breathe 3.4s linear -0.7s infinite,
+      cafe-blink-90 3.8s linear -1.3s infinite;
+  }
+
+  .placeholder-guest-seated .cafe-pilot-asset--lukas {
+    animation:
+      cafe-guest-breathe 3.4s linear -1.4s infinite,
+      cafe-blink-72 4.6s linear -2.2s infinite;
+  }
+
+  .placeholder-guest-seated .cafe-pilot-asset--christa {
+    animation:
+      cafe-guest-breathe 3.4s linear -2.1s infinite,
+      cafe-blink-34 5s linear -3.1s infinite;
   }
 }
 
-@keyframes cafe-cem-blink {
+/* Blink keyframes per frame width: eyes open until 96%, closed for the
+   final ~4% of the loop (~170-200ms). */
+@keyframes cafe-blink-90 {
   0%,
   95.9% {
     background-position: 0 0;
@@ -1139,7 +1189,31 @@ h3 {
 
   96%,
   100% {
-    background-position: -108px 0;
+    background-position: -90px 0;
+  }
+}
+
+@keyframes cafe-blink-72 {
+  0%,
+  95.9% {
+    background-position: 0 0;
+  }
+
+  96%,
+  100% {
+    background-position: -72px 0;
+  }
+}
+
+@keyframes cafe-blink-34 {
+  0%,
+  95.9% {
+    background-position: 0 0;
+  }
+
+  96%,
+  100% {
+    background-position: -34px 0;
   }
 }
 
