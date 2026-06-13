@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import type { GameState } from "../../game/types/game";
 import { getDioramaGuestVisibility } from "../../game/engine/selectors";
-import stageBaseAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v03.png";
-import stageBaseDustyAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v04.png";
+import stageBaseAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v03-tiles.png";
+import stageBaseDustyAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v04-px.png";
 import coffeeMachineAsset from "../../../assets/sprites/props/placeholder-cafe-coffee-machine.png";
 import kassandraRegisterAsset from "../../../assets/sprites/props/placeholder-kassandra-register.png";
 import bohnGuestAsset from "../../../assets/sprites/guests/placeholder-guest-bohn.png";
@@ -52,7 +52,7 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
   // "at-door" → "walking" (entrance, SE walk sheet + CSS left/bottom transition)
   // → "idle" (queue spot, idle sheet) → "walking-to-counter" (north walk sheet +
   // bottom transition toward counter) → "at-door" (reset, triggers next entrance).
-  const [paulaPhase, setPaulaPhase] = useState<"at-door" | "walking" | "idle" | "walking-to-counter">(
+  const [paulaPhase, setPaulaPhase] = useState<"at-door" | "walking" | "idle" | "walking-to-counter" | "exiting-east">(
     "at-door"
   );
 
@@ -236,21 +236,32 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
 
           {/* Queue — customer waiting visible when day is open + actions remain */}
           <div className="cafe-queue" aria-hidden="true">
-            {showQueueGuest || paulaPhase === "walking-to-counter" ? (
+            {showQueueGuest || paulaPhase === "walking-to-counter" || paulaPhase === "exiting-east" ? (
               <span
                 className={[
                   "placeholder-guest",
                   "placeholder-guest-normal-01",
                   paulaPhase === "at-door" ? "placeholder-guest--at-door" : "",
-                  paulaPhase === "walking-to-counter" ? "placeholder-guest--walking-to-counter" : ""
+                  paulaPhase === "walking-to-counter" ? "placeholder-guest--walking-to-counter" :
+                  paulaPhase === "exiting-east" ? "placeholder-guest--exiting-east" : ""
                 ].filter(Boolean).join(" ")}
                 onTransitionEnd={(e) => {
                   // Entrance: left transition completes → guest is at queue
                   if (e.propertyName === "left" && paulaPhase === "walking") {
                     setPaulaPhase("idle");
                   }
-                  // Exit: bottom transition completes → guest reached counter, reset
+                  // Exit: bottom transition completes → guest reached counter, now exits east
                   if (e.propertyName === "bottom" && paulaPhase === "walking-to-counter") {
+                    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+                      setPaulaPhase("exiting-east");
+                    } else if (showQueueGuest) {
+                      setPaulaPhase("idle");
+                    } else {
+                      setPaulaPhase("at-door");
+                    }
+                  }
+                  // East exit: left transition completes → Paula has left the frame, reset
+                  if (e.propertyName === "left" && paulaPhase === "exiting-east") {
                     if (showQueueGuest && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
                       setPaulaPhase("at-door");
                       requestAnimationFrame(() => {
@@ -271,7 +282,8 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
                     "cafe-pilot-asset",
                     "cafe-pilot-asset--paula",
                     paulaPhase === "walking" ? "cafe-pilot-asset--paula-walking" : "",
-                    paulaPhase === "walking-to-counter" ? "cafe-pilot-asset--paula-walking-north" : ""
+                    paulaPhase === "walking-to-counter" ? "cafe-pilot-asset--paula-walking-north" :
+                    paulaPhase === "exiting-east" ? "cafe-pilot-asset--paula-walking-east" : ""
                   ].filter(Boolean).join(" ")}
                   aria-hidden="true"
                 />

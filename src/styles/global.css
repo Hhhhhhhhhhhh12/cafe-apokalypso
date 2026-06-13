@@ -195,6 +195,134 @@ h3 {
   background: #97401f;
 }
 
+/* ── Demo-complete banner (after Day 7) ──────────────────────────────── */
+.demo-complete-banner {
+  margin-bottom: 16px;
+  padding: 18px 20px;
+  border: 3px solid #3a4a7a;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #e6ddf6 0%, #cdbfe9 100%);
+  color: #241a4a;
+  box-shadow: 0 4px 0 #6a4fb0;
+}
+
+.demo-complete-banner .eyebrow {
+  margin: 0 0 2px;
+  color: #5a33a3;
+}
+
+.demo-complete-banner h2 {
+  margin: 0 0 6px;
+  font-size: 1.4rem;
+}
+
+.demo-complete-banner h2:focus {
+  outline: 3px solid #3a4a7a;
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+.demo-complete-banner p {
+  margin: 0 0 12px;
+  max-width: 60ch;
+  line-height: 1.45;
+}
+
+.demo-complete-banner__teaser {
+  font-style: italic;
+  color: #3a2a6a;
+}
+
+.demo-complete-banner button {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 8px;
+  background: #3a4a7a;
+  color: #f4f0ff;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.demo-complete-banner button:hover {
+  background: #4a5a97;
+}
+
+/* ── KASSANDRA boot splash (before Day 1) ────────────────────────────── */
+.kassandra-boot {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(12, 10, 24, 0.78);
+  backdrop-filter: blur(2px);
+}
+
+.kassandra-boot__panel {
+  width: min(440px, 100%);
+  padding: 24px 26px;
+  border: 2px solid #4a6a5a;
+  border-radius: 12px;
+  background: #0e1512;
+  color: #c8e6d4;
+  box-shadow: 0 8px 0 #1a2a22, 0 0 0 4px rgba(74, 106, 90, 0.25);
+}
+
+.kassandra-boot__panel .eyebrow {
+  margin: 0 0 4px;
+  letter-spacing: 0.18em;
+  color: #6fae8a;
+}
+
+.kassandra-boot__panel h2 {
+  margin: 0 0 14px;
+  font-size: 1.25rem;
+  color: #e2f5ea;
+}
+
+.kassandra-boot__log {
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: #060b08;
+  border: 1px solid #2a4035;
+  color: #8fd4a8;
+  font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.kassandra-boot__note {
+  margin: 0 0 18px;
+  max-width: 48ch;
+  line-height: 1.45;
+  color: #a6c4b2;
+}
+
+.kassandra-boot__panel button {
+  min-height: 44px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 8px;
+  background: #4a6a5a;
+  color: #f0fff6;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.kassandra-boot__panel button:hover {
+  background: #5c8270;
+}
+
+.kassandra-boot__panel button:focus-visible {
+  outline: 3px solid #8fd4a8;
+  outline-offset: 3px;
+}
+
 .panel {
   padding: 18px;
 }
@@ -1115,6 +1243,36 @@ h3 {
   to {
     background-position: -972px 0;
   }
+}
+
+/* 7-frame east walk cycle while Paula exits the frame to the right.
+   Sheet: 7 × 68px native → rendered 7 × 108px = 756px wide.
+   Frame 0 = reference pose (static fallback for reduced-motion). */
+.cafe-pilot-asset--paula-walking-east {
+  background-image: url("../../assets/sprites/guests/placeholder-guest-paula-walk-east.png");
+  background-size: 756px 108px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cafe-pilot-asset--paula-walking-east {
+    animation: cafe-paula-walk-east 0.84s steps(7) infinite;
+  }
+}
+
+@keyframes cafe-paula-walk-east {
+  to {
+    background-position: -756px 0;
+  }
+}
+
+/* Paula's east exit: slides off-screen right after reaching the counter.
+   Uses a faster transition (1.4s) so the exit feels snappy. */
+.placeholder-guest-normal-01.placeholder-guest--exiting-east {
+  left: 420%;
+  bottom: 185%;
+  transition:
+    left 1.4s linear,
+    bottom 0s;
 }
 
 /* Seated guests breathe with a discrete 1px bob — pixel-art-safe (no
