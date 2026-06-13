@@ -80,11 +80,21 @@ export interface GuestDefinition {
   behaviorTags: readonly string[];
   summary: string;
   sampleLines: readonly string[];
+  /** Spoken or observed line shown before serving, used as in-world learning. */
+  orderLine?: string;
+  /** Small behavioral cue shown with the next guest instead of a separate tutorial. */
+  learningCue?: string;
+  /** Product this guest visibly tends to want; may be softer than a reputation bonus. */
+  preferredProductId?: ProductId;
   /**
    * Player-facing line shown after this guest is successfully served.
    * Distinct from sampleLines (which are authoring/reference lines).
    */
   serveLine: string;
+  /** Shown after serving the guest's soft preference when no reputation bonus applies. */
+  matchedPreferenceLine?: string;
+  /** Shown after missing the guest's soft preference when no penalty applies. */
+  missedPreferenceLine?: string;
   visualNotes?: string;
   /**
    * Products this guest particularly values. Serving one grants a small

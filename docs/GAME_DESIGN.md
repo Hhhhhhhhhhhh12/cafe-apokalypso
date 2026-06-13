@@ -8,11 +8,11 @@ Day 1 introduces direct café interactions: taking orders, preparing coffee, acc
 
 Day 2 introduces guest behavior differences such as patience, spending power, seat time, and quality expectations.
 
-Day 3 introduces basic economy: ingredient purchasing, price adjustment, and daily offers.
+Day 3 introduces basic economy: ingredient purchasing, price adjustment, daily offers, and the first optional helper choice.
 
 Day 4 introduces advertising as a way to influence guest types and demand.
 
-Day 5 introduces temporary staff as the first delegation mechanic.
+Day 5 makes delegation pressure more noticeable and adds staff-flavored narrative beats.
 
 Day 6 introduces the KASSANDRA cash register update, adding basic demand prediction and the first simulated AI/oracle layer.
 
@@ -239,6 +239,7 @@ Day 3: Prices and Supplies
 - ingredient purchasing
 - price adjustment
 - daily offers
+- first optional helper choice
 - strange cash-register suggestion
 
 Day 4: Advertising
@@ -248,10 +249,10 @@ Day 4: Advertising
 - social media post
 - first appearance of Herr Grau
 
-Day 5: First Temporary Help
+Day 5: Delegation Pressure
 
-- Jana, Nino, or Nele can help for one day
-- first delegation mechanic
+- helper choice becomes more consequential as the café gets busier
+- solo days start to feel more visibly strained
 - strange wet-table event if Jana works
 - first possible appearance of Meda
 

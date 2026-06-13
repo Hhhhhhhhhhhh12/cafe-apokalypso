@@ -9,7 +9,13 @@ export const weekOneGuests = [
     behaviorTags: ["fast", "practical", "low-seat-time"],
     summary: "Quick coffee customer who wants to survive Monday.",
     sampleLines: ["Just coffee. The train already took the rest of my patience."],
-    serveLine: "She takes the coffee without slowing down. The train was already late."
+    orderLine: "Just coffee. The train already took the rest of my patience.",
+    learningCue: "Paula keeps one hand near the door and never looks at the pastry shelf.",
+    preferredProductId: "filterkaffee",
+    serveLine: "She takes the coffee without slowing down. The train was already late.",
+    matchedPreferenceLine: "Filterkaffee suits the rhythm: quick, warm, done.",
+    missedPreferenceLine:
+      "She takes it, but the extra ceremony costs her another glance at the clock."
   },
   {
     id: "laptop-lukas",
@@ -19,7 +25,15 @@ export const weekOneGuests = [
     behaviorTags: ["low-spend", "long-seat-time", "remote-work"],
     summary: "Spends little, sits for a long time, and blocks tables.",
     sampleLines: ["I only need one small table and the emotional support of Wi-Fi."],
-    serveLine: "He nods and opens another browser tab. He will be here for a while."
+    orderLine: "Small coffee, please. I only need the table for one quick call.",
+    learningCue:
+      "Lukas spends carefully, opens the laptop early, and settles in before paying.",
+    preferredProductId: "filterkaffee",
+    serveLine: "He nods and opens another browser tab. He will be here for a while.",
+    matchedPreferenceLine:
+      "A simple coffee keeps the table occupied without making the order complicated.",
+    missedPreferenceLine:
+      "He accepts it, but the order now costs more attention than he planned to spend."
   },
   {
     id: "lieferfahrer-cem",
@@ -29,7 +43,13 @@ export const weekOneGuests = [
     behaviorTags: ["impatient", "low-spend", "quick-service"],
     summary: "Impatient, efficient, and not interested in latte philosophy.",
     sampleLines: ["Espresso. Fast. I am parked in a place where optimism ends."],
-    serveLine: "He is out the door before you finish the sentence. The invoice is correct."
+    orderLine: "Espresso. Fast. I am parked in a place where optimism ends.",
+    learningCue: "Cem checks the street twice before he checks the menu.",
+    preferredProductId: "espresso",
+    serveLine: "He is out the door before you finish the sentence. The invoice is correct.",
+    matchedPreferenceLine: "Espresso matches the visit: short, direct, already over.",
+    missedPreferenceLine:
+      "He waits politely, which somehow makes the order feel slower."
   },
   {
     id: "cappuccino-christa",
@@ -39,6 +59,9 @@ export const weekOneGuests = [
     behaviorTags: ["quality-expectations", "higher-spend", "foam-precision"],
     summary: "Pays better and has precise expectations for cappuccino foam.",
     sampleLines: ["The foam was good yesterday. Today I am open to evidence."],
+    orderLine: "Cappuccino, please. The foam was good yesterday. Today I am open to evidence.",
+    learningCue: "Christa studies the cup before she studies the price.",
+    preferredProductId: "cappuccino",
     serveLine:
       "She holds the cup at a slight angle. After a moment, she nods. This counts as approval.",
     appreciatedProductIds: ["cappuccino"],
@@ -53,6 +76,9 @@ export const weekOneGuests = [
     behaviorTags: ["regular", "patient", "memory-hints"],
     summary: "Older regular with strange memories of the building.",
     sampleLines: ["This corner used to be quieter. Before it remembered things."],
+    orderLine: "Filter coffee, if that is still what I usually have.",
+    learningCue: "Herr Bohn asks like the answer has existed longer than the café.",
+    preferredProductId: "filterkaffee",
     serveLine:
       "He thanks you as though this has happened many times in many versions of this café.",
     appreciatedProductIds: ["filterkaffee"],
@@ -72,6 +98,8 @@ export const weekOneGuests = [
       "The café is authentic. I am not sure whether that is good.",
       "The light is good. Slightly existential, but good."
     ],
+    orderLine: "Whatever tastes least like a decision.",
+    learningCue: "Nele watches the café more than the menu.",
     serveLine:
       "She accepts it without looking up. 'Authentic,' she says. You are still not sure if that is good."
   },

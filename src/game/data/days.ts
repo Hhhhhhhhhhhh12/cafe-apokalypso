@@ -50,7 +50,7 @@ export const weekOneDays = [
     dayOpener:
       "The offer board now has a slot for a daily suggestion. Supplies are being purchased in quantities that require actual accounting. The register has an opinion about prices, for what that is worth.",
     unlockMessage:
-      "The offer board is active and the register already has a recommendation.",
+      "The offer board is active. Before opening, you can also hire one helper or keep the money for supplies.",
     objective: {
       id: "day-3-offer-board",
       day: 3,
@@ -98,12 +98,12 @@ export const weekOneDays = [
   },
   {
     day: 5,
-    title: "First Temporary Help",
-    milestone: "Jana, Nino, or Nele can help for one day.",
+    title: "Delegation Pressure",
+    milestone: "Helper choices start to matter more as the café gets busier.",
     dayOpener:
-      "Today is the first day you can ask for help, which suggests the café has become real enough to need it. Jana, Nino, and Nele are available. The choice is yours.",
+      "By now help is no longer a novelty. Jana, Nino, and Nele can each solve one problem well, which leaves the other problems politely waiting.",
     unlockMessage:
-      "Temporary help is available from today: one person, one task, one day at a time.",
+      "Delegation is still narrow: one person, one task, one day at a time.",
     objective: {
       id: "day-5-helper-choice",
       day: 5,
@@ -111,7 +111,7 @@ export const weekOneDays = [
       description: "Choose whether today needs help, then prove the shift still works.",
       completionHint: "Open the day after a helper decision and serve 3 customers."
     },
-    unlocks: ["temporary help", "first delegation"],
+    unlocks: ["stronger delegation pressure", "staff-flavored narrative beat"],
     guestIds: [
       "pendlerin-paula",
       "laptop-lukas",

@@ -272,8 +272,18 @@ function OpenDayControls({
 
       {nextGuest ? (
         <p className="next-guest" role="status">
-          Next in line: <strong>{nextGuest.name}</strong>
-          {nextGuest.wants ? <span> · seems to be hoping for a proper {nextGuest.wants}.</span> : null}
+          <span>
+            Next in line: <strong>{nextGuest.name}</strong>
+          </span>
+          {nextGuest.orderLine ? (
+            <span className="next-guest__order">Says: "{nextGuest.orderLine}"</span>
+          ) : null}
+          {nextGuest.learningCue ? (
+            <span className="next-guest__cue">You notice: {nextGuest.learningCue}</span>
+          ) : null}
+          {nextGuest.wants ? (
+            <span className="next-guest__fit">Likely order: {nextGuest.wants}.</span>
+          ) : null}
         </p>
       ) : null}
 

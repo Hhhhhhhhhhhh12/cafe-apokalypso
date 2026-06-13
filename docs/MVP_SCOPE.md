@@ -7,7 +7,7 @@
 - seven playable in-game days forming the first café week / first soft-roguelite run
 - 6 normal guests
 - 3 subtly strange guests
-- 5 basic products
+- 6 basic products
 - basic resources: money, coffee, milk, pastries, reputation, cleanliness, stress, hidden weirdness
 - basic order flow
 - basic table cleaning
@@ -119,7 +119,7 @@ The MVP data set includes:
 
 - 6 normal guests
 - 3 subtly strange guests
-- 5 basic products
+- 6 basic products
 - 4 advertising campaigns
 - 3 temporary staff options
 - 7 early upgrades
@@ -154,6 +154,7 @@ The MVP products are:
 - Cappuccino
 - Croissant
 - Kaffee + Croissant
+- Handfilter-Spezialität
 
 Later products such as Cold Brew, Flat White, Ambrosia Macchiato, Schattenmilch Cortado, Apokalypse Americano, and entkoffeinierter Unterweltkaffee are out of scope for the MVP.
 
@@ -180,7 +181,7 @@ Temporary staff options:
 - Nino: barista
 - Nele: marketing / counter
 
-Nele is the same character as Freelancerin Nele (normal recurring guest). She is a freelancer-style regular who can also be hired as a day helper starting Day 5. This dual role is intentional and should be reflected in both the guest data entry and the staff data entry.
+Nele is the same character as Freelancerin Nele (normal recurring guest). She is a freelancer-style regular who can also be hired as a day helper starting Day 3. This dual role is intentional and should be reflected in both the guest data entry and the staff data entry.
 
 Each staff option should have a clear gameplay effect, a daily cost, and at least one flavor line.
 
@@ -192,9 +193,9 @@ Each of the seven in-game days should introduce at least one meaningful new elem
 
 - Day 1: core order flow
 - Day 2: guest behavior differences
-- Day 3: prices, supplies, and daily offers
+- Day 3: prices, supplies, daily offers, and the first optional helper choice
 - Day 4: advertising and Herr Grau
-- Day 5: temporary staff
+- Day 5: stronger delegation pressure and staff-flavored narrative beats
 - Day 6: KASSANDRA update and subtle upstairs-room foreshadowing
 - Day 7: operational stress test, Frau mit rotem Regenschirm, and official apocalyptic letter
 

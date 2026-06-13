@@ -4,6 +4,7 @@ import type {
   CleanlinessStateLabel,
   DayManagementState,
   DayShiftRating,
+  EmployeeLevel,
   GameState,
   HelperAssignment,
   HelperTaskId,
@@ -45,6 +46,23 @@ export const SUPPLY_UNIT_COSTS: Record<IngredientKey, number> = {
   milk: 0.4,
   pastries: 1.2
 };
+
+/** XP thresholds for each employee level. Level 1 = new hire (0+ XP), L2 = 5+, L3 = 10+. */
+export const XP_LEVEL_THRESHOLDS: Record<EmployeeLevel, number> = { 1: 0, 2: 5, 3: 10 };
+
+export function getEmployeeLevel(xp: number): EmployeeLevel {
+  if (xp >= XP_LEVEL_THRESHOLDS[3]) return 3;
+  if (xp >= XP_LEVEL_THRESHOLDS[2]) return 2;
+  return 1;
+}
+
+/** Returns the per-day bonuses granted by a given employee level. */
+export function getEmployeeLevelBonuses(level: EmployeeLevel): { extraAP: number; tipBonus: number } {
+  return {
+    extraAP: level >= 2 ? 1 : 0,
+    tipBonus: level >= 3 ? 0.05 : 0
+  };
+}
 
 export const COMFORTABLE_CAPACITY_BY_DAY: Record<GameState["day"], number> = {
   1: 5,
@@ -254,7 +272,7 @@ export function getIngredientRequirement(
     assignment?.helperId === "nino" &&
     assignment.taskId === "barista"
   ) {
-    return Math.floor(baseRequirement * 0.9);
+    return Math.max(1, Math.floor(baseRequirement * 0.9));
   }
 
   return baseRequirement;

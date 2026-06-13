@@ -66,9 +66,9 @@ Out of scope:
 
 - Day 1: core order flow and first coffee-machine anomaly
 - Day 2: guest behavior differences
-- Day 3: prices, supplies, and daily offers
+- Day 3: prices, supplies, daily offers, and optional temporary help
 - Day 4: advertising and first appearance of Herr Grau
-- Day 5: temporary staff and first delegation
+- Day 5: stronger delegation pressure and first staff-flavored narrative beats
 - Day 6: KASSANDRA update
 - Day 7: busier café day, Frau mit rotem Regenschirm, and official apocalyptic letter
 

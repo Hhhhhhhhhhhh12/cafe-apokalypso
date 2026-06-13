@@ -7,7 +7,7 @@ import type {
 } from "./content";
 import type { DayNumber } from "./content";
 
-export type GameStateVersion = 9;
+export type GameStateVersion = 10;
 
 export type ContentCatalogVersion = "week-one-v1";
 
@@ -19,6 +19,7 @@ export type DayPhase = "day_start" | "open" | "day_end";
 export type ClosureReason = "money" | "reputation";
 export type DecorSlotId = "plant" | "shelf" | "clock" | "lamp" | "cups";
 export type HelperTaskId = "cleaning" | "service" | "barista" | "counter" | "marketing";
+export type EmployeeLevel = 1 | 2 | 3;
 
 export type DayActionId =
   | "take_order"
@@ -145,6 +146,8 @@ export interface GameState {
   decor: Record<DecorSlotId, number>;
   completedActions: DayActionId[];
   unlocks: UnlockState;
+  /** Accumulated XP per hired helper (key = StaffOptionId). XP = customers served on days they worked. */
+  staffXp: Partial<Record<StaffOptionId, number>>;
   guestHistory: GuestId[];
   eventHistory: EventId[];
   unlockedAchievements: AchievementId[];

@@ -128,6 +128,10 @@ export function getGuestForCustomer(
 
 export interface NextGuestPreview {
   name: string;
+  /** In-world order or remark shown before serving. */
+  orderLine: string;
+  /** Behavioral cue that teaches preference without a tutorial panel. */
+  learningCue: string | null;
   /** Name of a product this guest particularly values, if any (a light hint). */
   wants: string | null;
 }
@@ -147,9 +151,11 @@ export function getNextGuestPreview(state: GameState): NextGuestPreview | null {
     return null;
   }
 
-  const wantedProductId = guest.appreciatedProductIds?.[0];
+  const wantedProductId = guest.preferredProductId ?? guest.appreciatedProductIds?.[0];
   return {
     name: guest.name,
+    orderLine: guest.orderLine ?? guest.sampleLines[0] ?? "",
+    learningCue: guest.learningCue ?? null,
     wants: wantedProductId ? getProductById(wantedProductId).name : null
   };
 }
@@ -186,6 +192,30 @@ export function getVisibleStaffOptions(
   }
 
   return weekOneStaffOptions.filter((staffOption) => staffOption.unlockDay <= state.day);
+}
+
+export interface DioramaGuestVisibility {
+  cem: boolean;
+  mira: boolean;
+  lukas: boolean;
+  christa: boolean;
+  bohn: boolean;
+  strange: boolean;
+}
+
+export function getDioramaGuestVisibility(
+  state: GameState
+): DioramaGuestVisibility {
+  const { customersServed } = state.dayManagement;
+
+  return {
+    cem: customersServed >= 1,
+    mira: customersServed >= 2,
+    lukas: customersServed >= 3,
+    christa: state.day >= 2 && customersServed >= 2,
+    bohn: state.day >= 3 && customersServed >= 1,
+    strange: state.day >= 4 && customersServed >= 3
+  };
 }
 
 export function getVisibleDaySevenLetter(state: GameState): string | null {

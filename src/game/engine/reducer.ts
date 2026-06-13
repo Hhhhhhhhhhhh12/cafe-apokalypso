@@ -25,6 +25,8 @@ import {
   DAILY_FIXED_COST,
   findSubstituteProduct,
   getDayShiftRating,
+  getEmployeeLevel,
+  getEmployeeLevelBonuses,
   getIngredientRequirement,
   getCleanlinessLabel,
   getDefaultProductForState,
@@ -319,6 +321,7 @@ function applySuccessfulServe(
   const servedGuest = getGuestForCustomer(workingState, servedCustomerIndex);
   const guestPreferences = servedGuest?.appreciatedProductIds ?? [];
   const appreciates = guestPreferences.includes(product.id);
+  const matchesSoftPreference = servedGuest?.preferredProductId === product.id;
   let appreciationLine = "";
 
   if (appreciates) {
@@ -335,8 +338,12 @@ function applySuccessfulServe(
       };
       appreciationLine = servedGuest?.delightLine ?? "";
     }
+  } else if (matchesSoftPreference) {
+    appreciationLine = servedGuest?.matchedPreferenceLine ?? "";
   } else if (guestPreferences.length > 0) {
     appreciationLine = servedGuest?.letdownLine ?? "";
+  } else if (servedGuest?.preferredProductId) {
+    appreciationLine = servedGuest.missedPreferenceLine ?? "";
   }
 
   const statusParts = [serveLine, appreciationLine, ...flavorLines].filter(
@@ -606,6 +613,11 @@ function openDay(state: GameState): GameState {
   }
 
   let resources: ResourceState = { ...state.resources };
+  const helperXp = state.helperAssignment
+    ? (state.staffXp[state.helperAssignment.helperId] ?? 0)
+    : 0;
+  const helperLevel = state.helperAssignment ? getEmployeeLevel(helperXp) : 1;
+  const levelBonuses = state.helperAssignment ? getEmployeeLevelBonuses(helperLevel) : { extraAP: 0, tipBonus: 0 };
   const management = {
     ...state.dayManagement,
     moneySpent: state.dayManagement.moneySpent + (state.helperAssignment?.dailyCost ?? 0),
@@ -615,7 +627,8 @@ function openDay(state: GameState): GameState {
       state.helperAssignment.taskId === "marketing"
         ? 1
         : 0,
-    helperDecisionMade: true
+    helperDecisionMade: true,
+    actionPointsRemaining: state.dayManagement.actionPointsRemaining + levelBonuses.extraAP
   };
 
   if (state.helperAssignment) {
@@ -780,6 +793,30 @@ function applyDayEndConsequences(state: GameState): GameState {
     flavorLines.push(state.helperAssignment.flavorLine);
   }
 
+  // Employee XP and level bonuses.
+  let staffXp = { ...state.staffXp };
+  if (state.helperAssignment && management.customersServed > 0) {
+    const helperId = state.helperAssignment.helperId;
+    const prevXp = staffXp[helperId] ?? 0;
+    const xpGained = management.customersServed;
+    const newXp = prevXp + xpGained;
+    staffXp = { ...staffXp, [helperId]: newXp };
+
+    const prevLevel = getEmployeeLevel(prevXp);
+    const newLevel = getEmployeeLevel(newXp);
+    if (newLevel > prevLevel) {
+      flavorLines.push(`${state.helperAssignment.helperId.charAt(0).toUpperCase() + state.helperAssignment.helperId.slice(1)} hat Level ${newLevel} erreicht!`);
+    }
+
+    const tipBonusRate = getEmployeeLevelBonuses(getEmployeeLevel(prevXp)).tipBonus;
+    if (tipBonusRate > 0) {
+      const tipBonus = clampResource(management.moneyEarned * tipBonusRate);
+      resources = { ...resources, money: clampResource(resources.money + tipBonus) };
+      management = { ...management, moneyEarned: clampResource(management.moneyEarned + tipBonus) };
+      flavorLines.push(`Trinkgeld-Bonus (Lv.${getEmployeeLevel(prevXp)}): +€${tipBonus.toFixed(2)}.`);
+    }
+  }
+
   // Fixed daily overhead — rent, utilities, baseline costs every café day.
   resources = { ...resources, money: clampResource(resources.money - DAILY_FIXED_COST) };
   flavorLines.push(`Tageskosten (Miete, Betrieb): -€${DAILY_FIXED_COST}.`);
@@ -799,6 +836,7 @@ function applyDayEndConsequences(state: GameState): GameState {
 
   return {
     ...state,
+    staffXp,
     resources: {
       ...resources,
       mood: resources.stress >= 61 ? "strained" : resources.stress >= 41 ? "busy" : "calm"

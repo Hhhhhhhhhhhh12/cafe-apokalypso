@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import type { GameState } from "../../game/types/game";
-import stageBaseAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v03.png";
-import stageBaseDustyAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v04.png";
+import { getDioramaGuestVisibility } from "../../game/engine/selectors";
+import stageBaseAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v03-px.png";
+import stageBaseDustyAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v04-px.png";
 import coffeeMachineAsset from "../../../assets/sprites/props/placeholder-cafe-coffee-machine.png";
 import kassandraRegisterAsset from "../../../assets/sprites/props/placeholder-kassandra-register.png";
 import bohnGuestAsset from "../../../assets/sprites/guests/placeholder-guest-bohn.png";
+import strangeGuestAsset from "../../../assets/sprites/guests/placeholder-guest-strange.png";
 
 interface CafePlaceholderProps {
   gameState: GameState;
@@ -73,19 +75,7 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
     };
   }, [showQueueGuest]);
 
-  // Seated guests accumulate as customers are served during the day
-  const showSeated1 = customersServed >= 1;
-  const showSeated2 = customersServed >= 2;
-  const showSeated3 = customersServed >= 3;
-
-  // Christa — regular, appears from day 2 once the second customer is served
-  const showChrista = gameState.day >= 2 && customersServed >= 2;
-
-  // Herr Bohn — regular, appears from day 3 once the café gets going
-  const showBohn = gameState.day >= 3 && customersServed >= 1;
-
-  // Strange guest appears day 4+, after 3 customers have been served
-  const showStrangeGuest = gameState.day >= 4 && customersServed >= 3;
+  const visibleGuests = getDioramaGuestVisibility(gameState);
 
   // Cups on tables appear when cleanliness drops below clean threshold
   const tablesDirty =
@@ -125,6 +115,8 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
         role="img"
         aria-label={`3/4 café room on Day ${gameState.day}: counter, coffee machine, register, queue, two tables, door, window, storage shelf, menu board, and environmental details.`}
       >
+        {/* Scrollable / zoomable world — scale via --cafe-zoom, pan via --cafe-pan-x */}
+        <div className="cafe-world">
         {/* Stage base background image */}
         <img
           className="cafe-stage-base"
@@ -222,7 +214,7 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
             <span className="cafe-table__top" />
             <span className="cafe-chair cafe-chair--front" />
             <span className="cafe-chair cafe-chair--side" />
-            {tablesDirty && showSeated2 && (
+            {tablesDirty && visibleGuests.mira && (
               <span className="cafe-cup cafe-cup--dirty" />
             )}
           </div>
@@ -254,7 +246,7 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
           </div>
 
           {/* Seated guest 1 — Cem, appears after first customer served */}
-          {showSeated1 && (
+          {visibleGuests.cem && (
             <span
               className="placeholder-guest placeholder-guest-seated placeholder-guest-normal-03"
               aria-hidden="true"
@@ -268,7 +260,7 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
           )}
 
           {/* Seated guest 2 — Nele, appears after second customer served */}
-          {showSeated2 && (
+          {visibleGuests.mira && (
             <span
               className="placeholder-guest placeholder-guest-seated placeholder-guest-normal-04"
               aria-hidden="true"
@@ -282,7 +274,7 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
           )}
 
           {/* Seated guest 3 — Lukas, appears after third customer served */}
-          {showSeated3 && (
+          {visibleGuests.lukas && (
             <span
               className="placeholder-guest placeholder-guest-seated placeholder-guest-normal-05"
               aria-hidden="true"
@@ -296,7 +288,7 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
           )}
 
           {/* Christa — day 2+, right table area */}
-          {showChrista && (
+          {visibleGuests.christa && (
             <span
               className="placeholder-guest placeholder-guest-seated placeholder-guest-normal-06"
               aria-hidden="true"
@@ -310,13 +302,13 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
           )}
 
           {/* Herr Bohn — day 3+, mid-back near storage */}
-          {showBohn && (
+          {visibleGuests.bohn && (
             <span
               className="placeholder-guest placeholder-guest-seated placeholder-guest-normal-07"
               aria-hidden="true"
             >
               <img
-                className="cafe-pilot-asset cafe-pilot-asset--guest"
+                className="cafe-pilot-asset cafe-pilot-asset--guest cafe-pilot-asset--bohn"
                 src={bohnGuestAsset}
                 alt=""
                 aria-hidden="true"
@@ -325,16 +317,19 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
           )}
 
           {/* Strange guest — day 4+, after 3 customers served */}
-          {showStrangeGuest && (
+          {visibleGuests.strange && (
             <span
               className="placeholder-guest placeholder-guest-seated placeholder-guest-strange-01"
               aria-hidden="true"
-            />
+            >
+              <img
+                className="cafe-pilot-asset cafe-pilot-asset--guest cafe-pilot-asset--strange"
+                src={strangeGuestAsset}
+                alt=""
+                aria-hidden="true"
+              />
+            </span>
           )}
-
-          <div className={`cafe-plant cafe-decor--tier-${gameState.decor?.plant ?? 1}`} aria-hidden="true">
-            <span />
-          </div>
 
           {/* Weirdness overlays — day 7 / weirdness flag */}
           {showWeirdness && (
@@ -350,9 +345,14 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
             Positioned relative to .cafe-diorama (not .cafe-floor) so they
             can sit on the back wall and ceiling of the painted room image,
             which are above the .cafe-floor div's coordinate space.        */}
+        <div className={`cafe-decor-plant cafe-plant cafe-decor--tier-${gameState.decor?.plant ?? 1}`} aria-hidden="true">
+          <span />
+        </div>
         <div className={`cafe-decor-clock cafe-decor--tier-${gameState.decor?.clock ?? 1}`} aria-hidden="true" />
         <div className={`cafe-decor-lamp cafe-decor--tier-${gameState.decor?.lamp ?? 1}`} aria-hidden="true" />
         <div className={`cafe-decor-cups cafe-decor--tier-${gameState.decor?.cups ?? 1}`} aria-hidden="true" />
+        <div className={`cafe-decor-shelf cafe-decor--tier-${gameState.decor?.shelf ?? 1}`} aria-hidden="true" />
+        </div>{/* /cafe-world */}
       </div>
     </section>
   );

@@ -32,7 +32,7 @@ mundane in Days 1–6. No supernatural language appears before the Day-7 hook.
 |---|---|---|---|
 | Money | 0–∞ | `Kasse: €X` | Primary income/cost unit |
 | Coffee | 0–20 | `Kaffee: X` | Consumed per espresso/cappuccino order |
-| Milk | 0–20 | `Milch: X` | Consumed per cappuccino; 10% more efficient with Nino on barista |
+| Milk | 0–20 | `Milch: X` | Consumed per cappuccino; more efficient with Nino on larger milk recipes, but never below 1 unit when milk is required |
 | Pastries | 0–12 | `Gebäck: X` | Consumed per croissant/combo order |
 | Cleanliness | 0–100 | Text state (see below) | Degrades per customer; restored by cleaning |
 | Stress | 0–100 | Text state (see below) | Builds on busy days; partial overnight reset |
@@ -216,7 +216,7 @@ The weirdness event list is locked and must not be drawn from until after
 
 ### Rules (approved)
 
-- Helpers are available from Day 5 onward. Before Day 5, the hire UI must not appear or must be disabled.
+- Helpers are available from Day 3 onward. Before Day 3, the hire UI must not appear or must be disabled.
 - Only one helper may be hired per day.
 - The assignment choice is made at day start and is final for the day. No mid-day reassignment in Week 1.
 - Hiring cost is deducted when the day opens (before the first customer).
@@ -235,14 +235,14 @@ The weirdness event list is locked and must not be drawn from until after
 
 | Task | Mechanical effect | Flavor note |
 |---|---|---|
-| Barista | Cappuccino and espresso orders grant +1 reputation each (capped at 3 per day); milk consumed 10% more efficiently (round down) | "Nino made a latte art. It was a bird. Or possibly a bureaucratic stamp." |
+| Barista | Cappuccino and espresso orders grant +1 reputation each (capped at 3 per day); milk consumption is more efficient on larger recipes, but a milk drink still consumes at least 1 milk | "Nino made a latte art. It was a bird. Or possibly a bureaucratic stamp." |
 | Counter service | Stress reduced by −8 during the day; one extra order slot | "Nino handled the counter. The queue moved. Stress dropped slightly." |
 
 **Nele**
 
 Nele is the same character as Freelancerin Nele (normal recurring guest). She
 is a freelancer-style regular who can also be hired as a day helper starting
-Day 5. Her dual role is intentional. Both the guest data entry and the staff
+Day 3. Her dual role is intentional. Both the guest data entry and the staff
 data entry should reference the same character identity. Nele is not Meda.
 
 | Task | Mechanical effect | Flavor note |
@@ -253,7 +253,7 @@ data entry should reference the same character identity. Nele is not Meda.
 ### Day-start assignment UI
 
 ```
-Before opening — Day 5, 6, 7:
+Before opening — Day 3 onward:
 
 [ Hire Jana ]   Cleaning  ○   Service  ○
 [ Hire Nino ]   Barista   ○   Counter  ○
@@ -419,7 +419,7 @@ These tests must pass before PROMPT-6B is considered done.
 
 ### Helper assignment tests
 
-- Helper hire UI is absent or disabled before Day 5.
+- Helper hire UI is absent or disabled before Day 3.
 - Only one helper can be hired per day; a second selection replaces the first.
 - Helper assignment is fixed at day start; the UI does not allow reassignment after the day opens.
 - Jana cleaning: cleanliness auto-maintained at or above 45 without player cleaning action.
@@ -451,11 +451,13 @@ These tests must pass before PROMPT-6B is considered done.
 
 A light, slice-level hint of the long-term coffee-appreciation system (GitHub #56):
 
-- Guest data may carry `appreciatedProductIds` plus a `delightLine` / `letdownLine`.
-- Serving a guest a product they appreciate grants **+1 reputation**, capped at
-  **2 bonuses per day** (`dayManagement.appreciationBonusesGiven`), and shows the delight line.
+- Guest data may carry `preferredProductId` for soft learning cues and
+  `appreciatedProductIds` plus a `delightLine` / `letdownLine` for reputation rewards.
+- Serving a guest a product they appreciate grants **+1 reputation**, or **+2** for
+  a premium quality-tier product, capped at **4 bonuses per day**
+  (`dayManagement.appreciationBonusesGiven`), and shows the delight line.
 - Serving a picky guest something they don't value shows the letdown line — **no penalty**.
-- Currently wired for Cappuccino-Christa (cappuccino) and Herr Bohn (filterkaffee).
+- Currently wired for Cappuccino-Christa (cappuccino), Herr Bohn (filterkaffee), and Herr Grau (handfilter).
 - The full coffee-variety / quality-tier system and per-guest taste catalog remain **out of scope** (post-MVP, #56).
 
 ---
@@ -502,7 +504,7 @@ They are binding. Do not re-open them during implementation.
 | Coffee supply cap | 20 |
 | Milk supply cap | 20 |
 | Pastry supply cap | 12 |
-| Helper availability | Day 5 onward |
+| Helper availability | Day 3 onward |
 | Helpers per day | 1 |
 | Assignment timing | Day start; final for the day |
 | Mid-day reassignment | Not allowed in Week 1 |

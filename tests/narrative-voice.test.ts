@@ -3,13 +3,14 @@ import { describe, expect, it } from "vitest";
 import {
   getManagementHudLabels,
   getNarrativeEventCards,
+  getNextGuestPreview,
   getServeLineForCustomer,
   getVisibleDaySevenLetter
 } from "../src/game/engine/selectors";
 import { gameReducer } from "../src/game/engine/reducer";
 import { createInitialGameState } from "../src/game/engine/gameState";
 import { weekOneDays, weekOneEvents, weekOneGuests } from "../src/game/data";
-import type { DayDefinition, DayNumber } from "../src/game/types/content";
+import type { DayDefinition, DayNumber, GuestDefinition } from "../src/game/types/content";
 import type { GameState } from "../src/game/types/game";
 
 function stateForDay(day: DayNumber, overrides: Partial<GameState> = {}): GameState {
@@ -30,6 +31,27 @@ describe("guest serve lines", () => {
       expect(guest.serveLine.length).toBeGreaterThan(0);
       expect(guest.sampleLines).not.toContain(guest.serveLine);
     }
+  });
+
+  it("gives day-one-to-three guests in-world order and learning cues", () => {
+    const dayOneToThreeGuestIds = new Set(
+      weekOneDays
+        .filter((day) => day.day <= 3)
+        .flatMap((day) => day.guestIds)
+    );
+    const dayOneToThreeGuests = weekOneGuests.filter((guest) =>
+      dayOneToThreeGuestIds.has(guest.id)
+    ) as readonly GuestDefinition[];
+
+    for (const guest of dayOneToThreeGuests) {
+      expect(guest.orderLine?.length ?? 0).toBeGreaterThan(0);
+      expect(guest.learningCue?.length ?? 0).toBeGreaterThan(0);
+    }
+
+    const preview = getNextGuestPreview(stateForDay(1));
+    expect(preview?.orderLine).toContain("Just coffee");
+    expect(preview?.learningCue).toContain("Paula");
+    expect(preview?.wants).toBe("Filterkaffee");
   });
 
   it("prefers strange guests once three customers have been served", () => {

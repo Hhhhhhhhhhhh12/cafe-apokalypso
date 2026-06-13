@@ -1,13 +1,13 @@
-# Café Apokalypso — Arbeitswissen für Claude
+# Café Apokalypso — Arbeitswissen für Codex
 
 Cozy-Management-Spiel (React + Vite + TypeScript), 7 Tage, langsam kippende Stimmung.
 KRITISCHE Regel: Immer auf gescheite Diversität der Figuren achten (Hauttöne, Körperformen, Hintergründe).
 
 ## Befehle
 
-- Dev-Server: `preview_start` mit Name `cafe-apokalypso` (Port 5173, definiert in `.claude/launch.json`)
+- Dev-Server: `preview_start` mit Name `cafe-apokalypso` (Port 5173, definiert in `.Codex/launch.json`)
 - Tests: `npx vitest run` (79 Tests, müssen grün bleiben)
-- Für Preview-/Kalibrier-Arbeit: Skill `.claude/skills/cafe-preview/SKILL.md` lesen und befolgen
+- Für Preview-/Kalibrier-Arbeit: Skill `.Codex/skills/cafe-preview/SKILL.md` lesen und befolgen
 
 ## Token-Arbeitsregeln
 
@@ -23,7 +23,7 @@ KRITISCHE Regel: Immer auf gescheite Diversität der Figuren achten (Hauttöne, 
 - CSS-Fallback-Wände (`.cafe-back-wall`, `.cafe-side-wall` inkl. Fenster/Tür/Menütafel/Regal) sind `display: none` — das gemalte Bild liefert den Raum. Nicht reaktivieren.
 - `.cafe-floor` = Positionierungs-Container für Gäste: left 5 % / right 6 % / bottom 4 % / height 65 % des Dioramas. Umrechnung Diorama-% → Floor-%: `floorX = (dioX − 5) / 89 · 100`, `floorY = (dioY − 31) / 65 · 100`.
 - `.cafe-counter` overlayt die **gemalte L-Theke** (Diorama x 58–97 %, y 66–88 %; in Floor-Koordinaten left 59.6 % / top 53.8 % / w 43.8 % / h 33.8 %). Kaffeemaschine + KASSANDRA-Kasse sind seine Kinder und stehen auf der Arbeitsplatte. Rahmen/Hintergrund transparent lassen.
-- Décor-Props `.cafe-decor-clock/-lamp/-cups/-shelf` sind **direkte Kinder von `.cafe-diorama`** (nicht `.cafe-floor`), Prozent = Diorama-Box. Gemalte Ankerpunkte: Uhr auf rechtem Wandabschnitt (left 53.5 %), Lampe Decke links (36 %/17 %), Tassen auf oberem Wandregal (80 %/40.5 %), Regal-Items auf Wandbänken rechts (left 62 %/top 43 %, 96×56 px). Alle vier Slots haben echte Tier-1/2/3-Sprites.
+- Décor-Props `.cafe-decor-clock/-lamp/-cups` sind **direkte Kinder von `.cafe-diorama`** (nicht `.cafe-floor`), Prozent = Diorama-Box. Gemalte Ankerpunkte: Uhr auf rechtem Wandabschnitt (left 53.5 %), Lampe Decke links (36 %/17 %), Tassen auf oberem Wandregal (80 %/40.5 %), Regal-Slot hat keine Sprites (CSS-only, derzeit ohne Tier-Visual).
 - Tier-Wechsel (1–3) via Klasse `cafe-decor--tier-N`; Sprite-Austausch über `background-image`-Override in tier-spezifischen Regeln; tier-1 hat explizite Opacity-Overrides (0.90–0.95) gegen die generische 0.5-Dimmung.
 
 ## Sprite-Pipeline
@@ -36,8 +36,8 @@ KRITISCHE Regel: Immer auf gescheite Diversität der Figuren achten (Hauttöne, 
 ## Savegame-Testing
 
 - Key: `cafe-apokalypso.save.v4` (siehe `src/game/engine/save.ts`)
-- Testzustand injizieren (preview_eval): Save lesen, Felder patchen (`day`, `dayPhase:'open'`, `decor:{clock:3,lamp:2,cups:2,plant:3,shelf:3}`, `dayManagement.customersServed`, `resources.cleanliness`), zurückschreiben, `location.reload()`. Danach mit `localStorage.removeItem(key)` aufräumen.
-- Gast-Sichtbarkeit: Cem ≥1 served, Mira ≥2, Lukas ≥3, Christa Day ≥2 & ≥2 served, Bohn Day ≥3 & ≥1 served, Herr Grau (Strange) Day ≥4 & ≥3 served — Sprite `placeholder-guest-grau.png`.
+- Testzustand injizieren (preview_eval): Save lesen, Felder patchen (`day`, `dayPhase:'open'`, `decor:{clock:3,lamp:2,cups:2,plant:3}`, `dayManagement.customersServed`, `resources.cleanliness`), zurückschreiben, `location.reload()`. Danach mit `localStorage.removeItem(key)` aufräumen.
+- Gast-Sichtbarkeit: Cem ≥1 served, Mira ≥2, Lukas ≥3, Christa Day ≥2 & ≥2 served, Bohn Day ≥3 & ≥1 served, Strange Day ≥4 & ≥3 served.
 
 ## Pixellab
 

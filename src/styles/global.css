@@ -369,6 +369,9 @@ h3 {
   --cream: #fff2d8;
   --teal: #16606c;
   --shadow: rgba(43, 32, 27, 0.28);
+  /* Zoom and pan — change via JS style attribute for room expansion */
+  --cafe-zoom: 1.35;
+  --cafe-pan-x: 0%;
   position: relative;
   min-height: 625px;
   overflow: hidden;
@@ -378,6 +381,17 @@ h3 {
     radial-gradient(circle at 22% 18%, rgba(255, 248, 237, 0.68), transparent 30%),
     linear-gradient(135deg, #e4bb90 0 52%, #c49375 52% 100%);
   isolation: isolate;
+}
+
+/* The zoomable/pannable world inside the viewport.
+   Scale and pan the entire scene without moving the clip/overlay layers. */
+.cafe-world {
+  position: absolute;
+  inset: 0;
+  transform-origin: center 58%;
+  transform: scale(var(--cafe-zoom)) translateX(var(--cafe-pan-x));
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
 }
 
 .cafe-diorama::before,
@@ -455,6 +469,7 @@ h3 {
   width: 100%;
   height: 100%;
   object-fit: fill;
+  image-rendering: pixelated;
   pointer-events: none;
   user-select: none;
 }
@@ -1098,6 +1113,10 @@ h3 {
   .placeholder-guest-normal-07 .cafe-pilot-asset--guest {
     animation-delay: -2.8s;
   }
+
+  .placeholder-guest-strange-01 .cafe-pilot-asset--guest {
+    animation-delay: -3.5s;
+  }
 }
 
 @keyframes cafe-guest-breathe {
@@ -1267,8 +1286,8 @@ h3 {
 
 /* Herr Bohn — mid-back, near storage shelf (day 3+) */
 .placeholder-guest-normal-07 {
-  left: 38%;
-  bottom: 42%;
+  left: 43%;
+  bottom: 45%;
 }
 
 .placeholder-guest-strange-01,
@@ -1278,8 +1297,8 @@ h3 {
 
 /* Strange guest — positioned when conditionally rendered */
 .placeholder-guest-strange-01 {
-  left: 30%;
-  bottom: 40%;
+  left: 60%;
+  bottom: 43%;
 }
 
 .placeholder-guest-strange-01::before {
@@ -1289,20 +1308,31 @@ h3 {
     7px 1px 0 #403448;
 }
 
+/* Herr Grau — verblasst wie ein zu oft gewendetes Formular.
+   Bürokratisch, staubig. Kein volles Grau: der Sepia-Rest ist das,
+   was bleibt, wenn man lange genug da war. */
+.placeholder-guest-strange-01 .cafe-pilot-asset--guest {
+  filter: saturate(0.52) sepia(0.14) brightness(0.93);
+  transition: filter 4s ease;
+}
+
+.cafe-diorama--day-seven .placeholder-guest-strange-01 .cafe-pilot-asset--guest {
+  filter: saturate(0.12) sepia(0.24) brightness(0.87) contrast(1.05);
+}
+
 .placeholder-guest-strange-02 {
   right: 28%;
   bottom: 31%;
 }
 
 /*
- * Real plant prop (Pixellab, shabby tier-1 default). The engine applies the décor
- * tier treatment via .cafe-decor--tier-N (opacity/filter); art just renders the
- * sprite here as a background image. Sits on the open floor, front-right.
- * The CSS-drawn pot/leaves below are hidden but kept as fallback structure.
+ * Real plant prop (Pixellab, shabby tier-1 default). Positioned relative to the
+ * diorama image, not .cafe-floor, so save-injected tier changes stay anchored to
+ * the painted empty floor corner.
  */
-.cafe-plant {
-  right: 13%;
-  bottom: 16%;
+.cafe-decor-plant {
+  left: 10%;
+  top: 61.5%;
   z-index: 5;
   width: 68px;
   height: 80px;
@@ -1311,10 +1341,10 @@ h3 {
 }
 
 /* Hidden: replaced by the sprite above. Kept as fallback if the image is absent. */
-.cafe-plant::before,
-.cafe-plant span,
-.cafe-plant span::before,
-.cafe-plant span::after {
+.cafe-decor-plant::before,
+.cafe-decor-plant span,
+.cafe-decor-plant span::before,
+.cafe-decor-plant span::after {
   display: none;
 }
 
@@ -1325,16 +1355,16 @@ h3 {
  * reads as a sad, faded plant — not a ghost. NOTE for engine session: once every
  * décor slot uses real per-tier sprites, the generic opacity dimming can be dropped.
  */
-.cafe-plant.cafe-decor--tier-1 {
+.cafe-decor-plant.cafe-decor--tier-1 {
   opacity: 0.95;
 }
 
-.cafe-plant.cafe-decor--tier-2 {
+.cafe-decor-plant.cafe-decor--tier-2 {
   opacity: 1;
   background-image: url("../../assets/sprites/props/placeholder-cafe-plant-t2.png");
 }
 
-.cafe-plant.cafe-decor--tier-3 {
+.cafe-decor-plant.cafe-decor--tier-3 {
   opacity: 1;
   background-image: url("../../assets/sprites/props/placeholder-cafe-plant-t3.png");
   width: 60px;
@@ -1441,6 +1471,36 @@ h3 {
   background-image: url("../../assets/sprites/props/placeholder-cafe-cups-t3.png");
   width: 44px;
   height: 52px;
+}
+
+/*
+ * Wall shelf items (Pixellab). Overlays the painted wooden bench on the
+ * back-right wall. Shows items sitting on the shelf — sparse/worn at tier 1,
+ * progressively nicer at tier 2 and 3.
+ */
+.cafe-decor-shelf {
+  position: absolute;
+  left: 62%;
+  top: 43%;
+  z-index: 4;
+  width: 96px;
+  height: 56px;
+  background: url("../../assets/sprites/props/placeholder-cafe-shelf.png") center bottom / contain no-repeat;
+  image-rendering: pixelated;
+}
+
+.cafe-decor-shelf.cafe-decor--tier-1 {
+  opacity: 0.90;
+}
+
+.cafe-decor-shelf.cafe-decor--tier-2 {
+  opacity: 1;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-shelf-t2.png");
+}
+
+.cafe-decor-shelf.cafe-decor--tier-3 {
+  opacity: 1;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-shelf-t3.png");
 }
 
 .cafe-diorama--busy .placeholder-guest-normal-02,
@@ -1611,10 +1671,21 @@ h3 {
   color: #4a3b34;
   font-size: 0.86rem;
   line-height: 1.4;
+  display: grid;
+  gap: 3px;
 }
 
 .next-guest strong {
   color: #1f555f;
+}
+
+.next-guest__order {
+  color: #2b2420;
+}
+
+.next-guest__cue,
+.next-guest__fit {
+  color: #6a554b;
 }
 
 .product-grid {
