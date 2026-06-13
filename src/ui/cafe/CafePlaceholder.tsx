@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import type { GameState } from "../../game/types/game";
 import { getDioramaGuestVisibility } from "../../game/engine/selectors";
-import stageBaseAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v03-px.png";
-import stageBaseDustyAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v04-px.png";
+import stageBaseAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v03.png";
+import stageBaseDustyAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v04.png";
 import coffeeMachineAsset from "../../../assets/sprites/props/placeholder-cafe-coffee-machine.png";
 import kassandraRegisterAsset from "../../../assets/sprites/props/placeholder-kassandra-register.png";
 import bohnGuestAsset from "../../../assets/sprites/guests/placeholder-guest-bohn.png";
