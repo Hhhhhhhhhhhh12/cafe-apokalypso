@@ -505,9 +505,7 @@ h3 {
   overflow: hidden;
   border: 3px solid #3d2a23;
   border-radius: 8px;
-  background:
-    radial-gradient(circle at 22% 18%, rgba(255, 248, 237, 0.68), transparent 30%),
-    linear-gradient(135deg, #e4bb90 0 52%, #c49375 52% 100%);
+  background: #d4bfa0;
   isolation: isolate;
 }
 
@@ -1275,10 +1273,63 @@ h3 {
     bottom 0s;
 }
 
+/* Standing poses for queue rotation — each guest's single static frame shown
+   while waiting to order. Only Paula has dedicated walk sheets; other guests
+   slide via CSS position transition with their static standing sprite. */
+.cafe-pilot-asset--cem-standing,
+.cafe-pilot-asset--mira-standing {
+  width: 90px;
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  /* 40×48 source scaled to 108px height → 90×108 rendered */
+  background-size: 90px 108px;
+}
+
+.cafe-pilot-asset--cem-standing {
+  background-image: url("../../assets/sprites/guests/placeholder-guest-cem.png");
+}
+
+.cafe-pilot-asset--mira-standing {
+  background-image: url("../../assets/sprites/guests/placeholder-guest-mira.png");
+}
+
+.cafe-pilot-asset--lukas-standing {
+  width: 72px;
+  background-image: url("../../assets/sprites/guests/placeholder-guest-lukas.png");
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: 72px 108px;
+}
+
+.cafe-pilot-asset--christa-standing {
+  width: 34px;
+  background-image: url("../../assets/sprites/guests/placeholder-guest-christa.png");
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: 34px 108px;
+}
+
+/* Seated guests slide up on first appearance (one-shot on DOM mount). */
+@keyframes guest-seat-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /* Seated guests breathe with a discrete 1px bob — pixel-art-safe (no
    subpixel resampling), staggered per guest so the room never moves in
    lockstep. */
 @media (prefers-reduced-motion: no-preference) {
+  .placeholder-guest-seated {
+    animation: guest-seat-in 0.45s cubic-bezier(0.2, 0.8, 0.4, 1) both;
+  }
+
   .placeholder-guest-seated .cafe-pilot-asset--guest {
     animation: cafe-guest-breathe 3.4s linear infinite;
   }
@@ -2008,11 +2059,129 @@ h3 {
 .status-message {
   margin: 0;
   border: 1px solid #c2aaa0;
+  border-left: 3px solid #16606c;
   border-radius: 8px;
   padding: 0.75rem;
   background: #eef3e7;
   color: #273a2d;
   font-weight: 650;
+  animation: status-slide-in 0.22s ease-out both;
+}
+
+@keyframes status-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .status-message {
+    animation: none;
+  }
+}
+
+/* Achievement toast — fixed overlay, bottom-right */
+.achievement-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 200;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: min(320px, calc(100vw - 32px));
+  padding: 14px 16px;
+  border: 2px solid #7b5e3a;
+  border-left: 4px solid #c88a3a;
+  border-radius: 10px;
+  background: #fdf3e3;
+  box-shadow: 0 4px 16px rgba(61, 42, 35, 0.22);
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.28s ease-out, transform 0.28s ease-out;
+  pointer-events: none;
+}
+
+.achievement-toast--visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.achievement-toast__check {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #c88a3a;
+  color: #fff8ed;
+  font-size: 0.95rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.achievement-toast__body {
+  min-width: 0;
+}
+
+.achievement-toast__label {
+  margin: 0 0 1px;
+  color: #8a5e28;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.achievement-toast__name {
+  margin: 0 0 2px;
+  color: #2b201b;
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.achievement-toast__desc {
+  margin: 0;
+  color: #4a3b34;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .achievement-toast {
+    transition: none;
+  }
+}
+
+/* Summary list stagger — each row fades in with increasing delay */
+@keyframes summary-row-in {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.summary-list div {
+  animation: summary-row-in 0.28s ease-out both;
+  animation-delay: calc(var(--i, 0) * 55ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .summary-list div {
+    animation: none;
+  }
 }
 
 .action-hint {

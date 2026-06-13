@@ -56,12 +56,18 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
     "at-door"
   );
 
+  // Queue guest rotates through characters: Paula → Cem → Mira → Lukas → Christa → Paula…
+  const QUEUE_ROTATION = ["paula", "cem", "mira", "lukas", "christa"] as const;
+  type QueueGuest = (typeof QUEUE_ROTATION)[number];
+  const [queueGuest, setQueueGuest] = useState<QueueGuest>("paula");
+
   // Entrance effect: fires when the queue slot opens or is re-activated.
   useEffect(() => {
     if (!showQueueGuest) {
       setPaulaPhase("at-door");
       return;
     }
+    setQueueGuest(QUEUE_ROTATION[customersServed % QUEUE_ROTATION.length]);
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       setPaulaPhase("idle");
       return;
@@ -260,8 +266,10 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
                       setPaulaPhase("at-door");
                     }
                   }
-                  // East exit: left transition completes → Paula has left the frame, reset
+                  // East exit: left transition completes → guest has left, pick next and reset
                   if (e.propertyName === "left" && paulaPhase === "exiting-east") {
+                    const nextGuest = QUEUE_ROTATION[customersServed % QUEUE_ROTATION.length];
+                    setQueueGuest(nextGuest);
                     if (showQueueGuest && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
                       setPaulaPhase("at-door");
                       requestAnimationFrame(() => {
@@ -280,10 +288,15 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
                 <span
                   className={[
                     "cafe-pilot-asset",
-                    "cafe-pilot-asset--paula",
-                    paulaPhase === "walking" ? "cafe-pilot-asset--paula-walking" : "",
-                    paulaPhase === "walking-to-counter" ? "cafe-pilot-asset--paula-walking-north" :
-                    paulaPhase === "exiting-east" ? "cafe-pilot-asset--paula-walking-east" : ""
+                    queueGuest === "paula"
+                      ? "cafe-pilot-asset--paula"
+                      : `cafe-pilot-asset--${queueGuest}-standing`,
+                    paulaPhase === "walking" && queueGuest === "paula"
+                      ? "cafe-pilot-asset--paula-walking" : "",
+                    paulaPhase === "walking-to-counter" && queueGuest === "paula"
+                      ? "cafe-pilot-asset--paula-walking-north" : "",
+                    paulaPhase === "exiting-east" && queueGuest === "paula"
+                      ? "cafe-pilot-asset--paula-walking-east" : ""
                   ].filter(Boolean).join(" ")}
                   aria-hidden="true"
                 />
