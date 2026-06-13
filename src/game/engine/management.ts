@@ -113,6 +113,7 @@ export function createInitialDayManagement(
     cleaningActions: 0,
     offerReviewed: false,
     advertisingRun: false,
+    socialAdRun: false,
     kassandraConsulted: false,
     helperDecisionMade: day < 3,
     reputationAtStart,

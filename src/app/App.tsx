@@ -1,16 +1,35 @@
-import { useEffect, useMemo, useReducer, useRef } from "react";
+import { useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { gameReducer } from "../game/engine/reducer";
 import { createInitialGameState } from "../game/engine/gameState";
 import {
   getBrowserStorage,
   loadGameState,
   resetSavedGameState,
-  saveGameState
+  saveGameState,
+  type StorageLike
 } from "../game/engine/save";
+import { weekOneAchievements } from "../game/data/achievements";
+import type { AchievementDefinition } from "../game/types/content";
+import { AchievementToast } from "../ui/components/AchievementToast";
 import { ActionPanel } from "../ui/components/ActionPanel";
 import { CafePlaceholder } from "../ui/cafe/CafePlaceholder";
+import { KassandraBootScreen } from "../ui/components/KassandraBootScreen";
 import { DayProgressPanel } from "../ui/panels/DayProgressPanel";
 import { ResourceHud } from "../ui/panels/ResourceHud";
+
+/** localStorage flag (separate from the game save) marking the boot splash acknowledged. */
+const BOOT_ACK_KEY = "cafe-apokalypso.booted.v1";
+
+function readBootAck(storage: StorageLike | null): boolean {
+  if (!storage) {
+    return false;
+  }
+  try {
+    return storage.getItem(BOOT_ACK_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
 
 export function App() {
   const storage = useMemo(() => getBrowserStorage(), []);
@@ -27,24 +46,72 @@ export function App() {
     }
   }, [gameState, storage]);
 
+  // Achievement toast queue — detect newly unlocked achievements each render
+  const seenAchievementsRef = useRef<readonly string[]>(gameState.unlockedAchievements);
+  const [achievementQueue, setAchievementQueue] = useState<AchievementDefinition[]>([]);
+  useEffect(() => {
+    const seen = seenAchievementsRef.current;
+    const newIds = gameState.unlockedAchievements.filter(id => !seen.includes(id));
+    if (newIds.length > 0) {
+      const newDefs = weekOneAchievements.filter(a => newIds.includes(a.id));
+      setAchievementQueue(q => [...q, ...newDefs]);
+      seenAchievementsRef.current = gameState.unlockedAchievements;
+    }
+  }, [gameState.unlockedAchievements]);
+
   // Move focus to the closure banner when the café closes, so keyboard and
   // screen-reader users are not stranded on a now-disabled control.
   const closureHeadingRef = useRef<HTMLHeadingElement>(null);
   useEffect(() => {
-    if (gameState.cafeClosed) {
+    if (gameState.cafeClosed || gameState.demoComplete) {
       closureHeadingRef.current?.focus();
     }
-  }, [gameState.cafeClosed]);
+  }, [gameState.cafeClosed, gameState.demoComplete]);
+
+  // Boot splash: show before Day 1 of a fresh run, once per browser run. The
+  // ack flag is cleared on reset so a new café week re-shows it (roguelite tone).
+  const isFreshDayOne =
+    gameState.day === 1 &&
+    !gameState.demoComplete &&
+    !gameState.cafeClosed &&
+    gameState.dayManagement.customersServed === 0;
+  const [bootAcknowledged, setBootAcknowledged] = useState(() => readBootAck(storage));
+  const showBoot = isFreshDayOne && !bootAcknowledged;
+
+  function dismissBoot() {
+    if (storage) {
+      try {
+        storage.setItem(BOOT_ACK_KEY, "1");
+      } catch {
+        // ignore — boot just re-shows on reload if storage is unavailable
+      }
+    }
+    setBootAcknowledged(true);
+  }
 
   function handleReset() {
     if (storage) {
       resetSavedGameState(storage);
+      try {
+        storage.removeItem(BOOT_ACK_KEY);
+      } catch {
+        // ignore
+      }
     }
+    setBootAcknowledged(false);
+    setAchievementQueue([]);
+    seenAchievementsRef.current = [];
     dispatch({ type: "reset_game" });
   }
 
   return (
     <main className="app-shell">
+      {showBoot ? <KassandraBootScreen onDismiss={dismissBoot} /> : null}
+      <AchievementToast
+        queue={achievementQueue}
+        onDequeue={() => setAchievementQueue(q => q.slice(1))}
+      />
+
       <header className="hero-bar" aria-labelledby="app-title">
         <div>
           <h1 id="app-title">Café Apokalypso</h1>
@@ -78,6 +145,32 @@ export function App() {
         </section>
       ) : null}
 
+      {gameState.demoComplete ? (
+        <section
+          className="demo-complete-banner"
+          role="alert"
+          aria-labelledby="demo-complete-title"
+        >
+          <p className="eyebrow">End of week one</p>
+          <h2 id="demo-complete-title" ref={closureHeadingRef} tabIndex={-1}>
+            The first café week is over
+          </h2>
+          <p>
+            Seven days served. The official letter has arrived, the register has
+            opinions it did not have on Monday, and the guestbook is still
+            quietly editing the line about previous runs. Something is wrong with
+            this café — and you want to know what happens on Day 8.
+          </p>
+          <p className="demo-complete-banner__teaser">
+            Week two is where the weirdness stops being deniable. That café week
+            is not built yet. For now, the loop begins again.
+          </p>
+          <button type="button" onClick={handleReset}>
+            Start the next café week
+          </button>
+        </section>
+      ) : null}
+
       <section className="workspace-grid" aria-label="Game shell workspace">
         <ResourceHud gameState={gameState} />
         <CafePlaceholder gameState={gameState} />
@@ -90,7 +183,8 @@ export function App() {
           onCheckSupplies={() => dispatch({ type: "check_supplies" })}
           onCleanTables={() => dispatch({ type: "clean_tables" })}
           onAdjustOffer={() => dispatch({ type: "adjust_offer" })}
-          onRunAdvertising={() => dispatch({ type: "run_advertising" })}
+          onRunAdvertising={() => dispatch({ type: "run_advertising", adType: "flyer" })}
+          onRunSocialAd={() => dispatch({ type: "run_advertising", adType: "social" })}
           onConsultKassandra={() => dispatch({ type: "consult_kassandra" })}
           onSelectHelper={(helperId, taskId) =>
             dispatch({ type: "select_helper", helperId, taskId })

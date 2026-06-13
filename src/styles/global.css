@@ -1618,10 +1618,9 @@ h3 {
    ── */
 .cafe-decor-clock {
   position: absolute;
-  /* On the right-wall segment between the corner seam and the right window
-     (left:48% put it straddling the corner seam, which read as floating). */
-  left: 53.5%;
-  top: 23%;
+  /* Between the two arched windows on the tile-room back wall. */
+  left: 48%;
+  top: 5%;
   z-index: 4;
   width: 56px;
   height: 56px;
@@ -1651,8 +1650,8 @@ h3 {
  */
 .cafe-decor-lamp {
   position: absolute;
-  left: 36%;
-  top: 17%;
+  left: 40%;
+  top: 9%;
   z-index: 4;
   width: 48px;
   height: 64px;
@@ -1681,9 +1680,9 @@ h3 {
  */
 .cafe-decor-cups {
   position: absolute;
-  /* Rests on the painted upper wall shelf right of the right window. */
-  left: 80%;
-  top: 40.5%;
+  /* Right of the right arched window on the tile-room back wall. */
+  left: 72%;
+  top: 5%;
   z-index: 6;
   width: 48px;
   height: 40px;
@@ -1716,8 +1715,8 @@ h3 {
  */
 .cafe-decor-shelf {
   position: absolute;
-  left: 62%;
-  top: 43%;
+  left: 58%;
+  top: 7%;
   z-index: 4;
   width: 96px;
   height: 56px;

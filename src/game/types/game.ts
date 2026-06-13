@@ -8,7 +8,7 @@ import type {
 } from "./content";
 import type { DayNumber } from "./content";
 
-export type GameStateVersion = 11;
+export type GameStateVersion = 12;
 
 export type ContentCatalogVersion = "week-one-v1";
 
@@ -61,6 +61,7 @@ export interface DayManagementState {
   cleaningActions: number;
   offerReviewed: boolean;
   advertisingRun: boolean;
+  socialAdRun: boolean;
   kassandraConsulted: boolean;
   helperDecisionMade: boolean;
   reputationAtStart: number;
@@ -181,7 +182,7 @@ export type GameAction =
   | { type: "check_supplies" }
   | { type: "clean_tables" }
   | { type: "adjust_offer" }
-  | { type: "run_advertising" }
+  | { type: "run_advertising"; adType?: "flyer" | "social" }
   | { type: "consult_kassandra" }
   | {
       type: "select_helper";

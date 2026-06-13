@@ -6,7 +6,7 @@ import {
   createInitialGameState
 } from "./gameState";
 import { weekOneAchievements } from "../data";
-import { getDecorTier, getMaxDecorTier } from "../data/decor";
+import { getDecorDailyBonuses, getDecorTier, getMaxDecorTier } from "../data/decor";
 import {
   getCurrentDayDefinition,
   getCurrentDayModifier,
@@ -59,7 +59,8 @@ import type {
   SupplyState
 } from "../types/game";
 
-const ADVERTISING_ACTION_COST = 3;
+const FLYER_COST = 2;
+const SOCIAL_AD_COST = 5;
 
 /** Max guest-appreciation reputation points awarded per day (keeps it a light nudge). */
 const APPRECIATION_DAILY_CAP = 4;
@@ -135,7 +136,7 @@ function applyAction(state: GameState, action: GameAction): GameState {
       return adjustOffer(state);
 
     case "run_advertising":
-      return runAdvertising(state);
+      return runAdvertising(state, action.adType ?? "flyer");
 
     case "consult_kassandra":
       return consultKassandra(state);
@@ -268,8 +269,9 @@ function applySuccessfulServe(
 
     supplies = applyProductConsumption(product, supplies, workingState.helperAssignment);
     const suppliesUsed = getSuppliesUsedForProduct(product, workingState.helperAssignment);
-    // Income scales with current reputation (lower reputation -> less earned).
-    const earned = getEarnedPrice(product.basePrice, resources.reputation);
+    // Income scales with reputation; offer review adds a 10 % daily boost.
+    const offerMultiplier = workingState.dayManagement.offerReviewed ? 1.1 : 1;
+    const earned = getEarnedPrice(product.basePrice * offerMultiplier, resources.reputation);
     resources = {
       ...resources,
       money: clampResource(resources.money + earned),
@@ -570,38 +572,53 @@ function adjustOffer(state: GameState): GameState {
   return {
     ...actionState,
     completedActions: addUniqueDayAction(actionState.completedActions, "adjust_offer"),
+    resources: {
+      ...actionState.resources,
+      reputation: clampMeter(actionState.resources.reputation + 1)
+    },
     dayManagement: {
       ...actionState.dayManagement,
       offerReviewed: true
     },
     statusMessage:
-      "Offer board reviewed. The register recommends being normal in a slightly more profitable way."
+      "Offer board reviewed. Today's orders earn a little more. Ruf +1."
   };
 }
 
-function runAdvertising(state: GameState): GameState {
+function runAdvertising(state: GameState, adType: "flyer" | "social"): GameState {
   if (!state.unlocks.advertising || state.day < 4) {
-    return {
-      ...state,
-      statusMessage: "Local advertising unlocks on Day 4."
-    };
+    return { ...state, statusMessage: "Local advertising unlocks on Day 4." };
+  }
+
+  if (adType === "social" && state.day < 5) {
+    return { ...state, statusMessage: "Social media posts unlock on Day 5." };
+  }
+
+  if (adType === "flyer" && state.dayManagement.advertisingRun) {
+    return { ...state, statusMessage: "A flyer has already gone out today." };
+  }
+
+  if (adType === "social" && state.dayManagement.socialAdRun) {
+    return { ...state, statusMessage: "A social post has already gone out today." };
   }
 
   if (state.dayPhase !== "open") {
+    return { ...state, statusMessage: "Advertising choices belong to the open café day." };
+  }
+
+  const cost = adType === "social" ? SOCIAL_AD_COST : FLYER_COST;
+
+  if (state.resources.money < cost) {
     return {
       ...state,
-      statusMessage: "Advertising choices belong to the open café day."
+      statusMessage:
+        adType === "social"
+          ? `Not enough money for a social post (€${SOCIAL_AD_COST}).`
+          : "The café cannot afford a flyer today."
     };
   }
 
-  if (state.resources.money < ADVERTISING_ACTION_COST) {
-    return {
-      ...state,
-      statusMessage: "The café cannot afford a small ad today."
-    };
-  }
-
-  const hasBonusAdvertisingAction = state.dayManagement.extraAdvertisingActions > 0;
+  const hasBonusAdvertisingAction = adType === "flyer" && state.dayManagement.extraAdvertisingActions > 0;
   const actionState = hasBonusAdvertisingAction
     ? {
         ...state,
@@ -610,42 +627,43 @@ function runAdvertising(state: GameState): GameState {
           extraAdvertisingActions: state.dayManagement.extraAdvertisingActions - 1
         }
       }
-    : spendActionPoint(state, "run a local ad");
+    : spendActionPoint(state, adType === "social" ? "post on social media" : "run a local flyer");
 
   if (!actionState) {
     return noActionCapacityState(state);
   }
 
   const posterEchoApplies =
+    adType === "flyer" &&
     getCurrentDayModifier(actionState).id === "poster-echo" &&
     !state.dayManagement.advertisingRun;
-  const reputationGain = posterEchoApplies ? 2 : 1;
+
+  const baseRepGain = adType === "social" ? 3 : 1;
+  const reputationGain = posterEchoApplies ? baseRepGain + 1 : baseRepGain;
   const stressGain = posterEchoApplies ? 2 : 0;
 
   return {
     ...actionState,
-    completedActions: addUniqueDayAction(
-      actionState.completedActions,
-      "run_advertising"
-    ),
+    completedActions: addUniqueDayAction(actionState.completedActions, "run_advertising"),
     resources: {
       ...actionState.resources,
-      money: clampResource(actionState.resources.money - ADVERTISING_ACTION_COST),
+      money: clampResource(actionState.resources.money - cost),
       reputation: clampMeter(actionState.resources.reputation + reputationGain),
       stress: clampMeter(actionState.resources.stress + stressGain),
       mood: getMoodForStress(clampMeter(actionState.resources.stress + stressGain))
     },
     dayManagement: {
       ...actionState.dayManagement,
-      moneySpent: clampResource(
-        actionState.dayManagement.moneySpent + ADVERTISING_ACTION_COST
-      ),
-      advertisingRun: true
+      moneySpent: clampResource(actionState.dayManagement.moneySpent + cost),
+      advertisingRun: adType === "flyer" ? true : actionState.dayManagement.advertisingRun,
+      socialAdRun: adType === "social" ? true : actionState.dayManagement.socialAdRun
     },
     statusMessage:
-      posterEchoApplies
-        ? "A local ad goes out. It lands unusually well. Ruf +2, Stress +2."
-        : "A local ad goes out. It costs €3, improves reputation by 1, and may make the counter feel smaller."
+      adType === "social"
+        ? `A social post goes out. It costs €${SOCIAL_AD_COST} and brings a visible reputation boost. Ruf +3.`
+        : posterEchoApplies
+          ? "A local flyer goes out. It lands unusually well. Ruf +2, Stress +2."
+          : `A local flyer goes out. It costs €${FLYER_COST} and improves reputation by 1.`
   };
 }
 
@@ -785,6 +803,16 @@ function openDay(state: GameState): GameState {
     if (state.helperAssignment.helperId === "nele" && state.helperAssignment.taskId === "counter") {
       resources = { ...resources, stress: clampMeter(resources.stress - 5) };
     }
+  }
+
+  // Décor daily bonuses: nicer furniture keeps the place feeling cared-for.
+  const decorBonuses = getDecorDailyBonuses(state.decor);
+  if (decorBonuses.cleanliness > 0 || decorBonuses.reputation > 0) {
+    resources = {
+      ...resources,
+      cleanliness: clampMeter(resources.cleanliness + decorBonuses.cleanliness),
+      reputation: clampMeter(resources.reputation + decorBonuses.reputation)
+    };
   }
 
   return {
