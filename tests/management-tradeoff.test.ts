@@ -282,6 +282,93 @@ describe("management tradeoff system", () => {
     expect(firstSummary?.objectiveTitle).toBe("Close the first shift");
   });
 
+  it("unlocks opening achievements from actual order and cleaning actions", () => {
+    const firstOrderOnly = completePreparedDay({
+      ...createInitialGameState(),
+      completedActions: ["take_order"]
+    });
+    const cleanedOpening = completePreparedDay({
+      ...createInitialGameState(),
+      completedActions: ["take_order", "clean_tables"]
+    });
+
+    expect(firstOrderOnly.unlockedAchievements).toContain("first-order");
+    expect(firstOrderOnly.unlockedAchievements).not.toContain("clean-counter");
+    expect(cleanedOpening.unlockedAchievements).toContain("first-order");
+    expect(cleanedOpening.unlockedAchievements).toContain("clean-counter");
+  });
+
+  it("unlocks system achievements only when their actions happened", () => {
+    const dayFourNoAd = completePreparedDay({
+      ...createDayStartState(4),
+      dayPhase: "open",
+      completedActions: ["take_order"],
+      dayManagement: {
+        ...createInitialGameState().dayManagement,
+        customersServed: 3,
+        advertisingRun: false
+      }
+    });
+    const dayFourWithAd = completePreparedDay({
+      ...dayFourNoAd,
+      dayManagement: {
+        ...dayFourNoAd.dayManagement,
+        advertisingRun: true
+      }
+    });
+
+    let helperDay = gameReducer(createDayStartState(3), {
+      type: "select_helper",
+      helperId: "jana",
+      taskId: "service"
+    });
+    helperDay = gameReducer(helperDay, { type: "open_day" });
+    const helperClosed = completePreparedDay(helperDay);
+
+    const soloDayFive = completePreparedDay({
+      ...createDayStartState(5),
+      dayPhase: "open",
+      completedActions: ["take_order"]
+    });
+
+    expect(dayFourNoAd.unlockedAchievements).not.toContain("first-ad");
+    expect(dayFourWithAd.unlockedAchievements).toContain("first-ad");
+    expect(helperClosed.unlockedAchievements).toContain("first-helper");
+    expect(soloDayFive.unlockedAchievements).not.toContain("first-helper");
+  });
+
+  it("unlocks KASSANDRA and letter achievements from actual late-week state", () => {
+    const daySixWithoutKassandra = completePreparedDay({
+      ...createDayStartState(6),
+      dayPhase: "open",
+      kassandraInstalled: false,
+      unlocks: {
+        ...createDayStartState(6).unlocks,
+        kassandra: false
+      },
+      completedActions: ["take_order"]
+    });
+    const daySixWithKassandra = completePreparedDay({
+      ...createDayStartState(6),
+      dayPhase: "open",
+      kassandraInstalled: true,
+      completedActions: ["take_order"]
+    });
+    const daySevenClosed = completePreparedDay({
+      ...createInitialGameState(),
+      day: 7,
+      completedActions: ["take_order"]
+    });
+
+    expect(daySixWithoutKassandra.unlockedAchievements).not.toContain(
+      "kassandra-installed"
+    );
+    expect(daySixWithKassandra.unlockedAchievements).toContain(
+      "kassandra-installed"
+    );
+    expect(daySevenClosed.unlockedAchievements).toContain("week-one-letter");
+  });
+
   it("keeps helpers unavailable before Day 3 and locks the day-start assignment", () => {
     const earlyState = gameReducer(createInitialGameState(), {
       type: "select_helper",

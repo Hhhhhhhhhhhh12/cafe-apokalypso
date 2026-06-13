@@ -39,7 +39,12 @@ import {
   SUPPLY_CAPS,
   SUPPLY_UNIT_COSTS
 } from "./management";
-import type { DayNumber, ProductId, StaffOptionId } from "../types/content";
+import type {
+  AchievementId,
+  DayNumber,
+  ProductId,
+  StaffOptionId
+} from "../types/content";
 import type {
   DecorSlotId,
   GameAction,
@@ -684,7 +689,7 @@ function completeCurrentDay(state: GameState): GameState {
     eventHistory: addUniqueEventIds(state.eventHistory, currentDay.eventIds),
     unlockedAchievements: addUniqueAchievementIds(
       state.unlockedAchievements,
-      getAchievementIdsForDay(state.day)
+      getAchievementIdsForState(state)
     )
   };
   const closedState = applyDayEndConsequences({ ...state, ...nextHistoryState });
@@ -1140,10 +1145,38 @@ function getUnlocksForDay(day: DayNumber) {
   };
 }
 
-function getAchievementIdsForDay(day: DayNumber) {
+function getAchievementIdsForState(state: GameState): AchievementId[] {
   return weekOneAchievements
-    .filter((achievement) => achievement.unlockDay === day)
+    .filter(
+      (achievement) =>
+        achievement.unlockDay <= state.day && isAchievementEarned(achievement.id, state)
+    )
     .map((achievement) => achievement.id);
+}
+
+function isAchievementEarned(id: AchievementId, state: GameState): boolean {
+  switch (id) {
+    case "first-order":
+      return state.dayManagement.customersServed > 0;
+    case "clean-counter":
+      return (
+        state.day === 1 &&
+        (state.completedActions.includes("clean_tables") ||
+          state.dayManagement.cleaningActions > 0)
+      );
+    case "regular-recognized":
+      return state.day >= 2 && state.dayManagement.customersServed > 0;
+    case "first-ad":
+      return state.dayManagement.advertisingRun;
+    case "first-helper":
+      return Boolean(state.helperAssignment);
+    case "kassandra-installed":
+      return state.kassandraInstalled || state.unlocks.kassandra;
+    case "week-one-letter":
+      return state.day === 7;
+    default:
+      return false;
+  }
 }
 
 function formatMissingSupply(ingredients: readonly IngredientKey[]): string {

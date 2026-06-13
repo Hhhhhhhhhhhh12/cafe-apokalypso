@@ -32,7 +32,7 @@ export const weekOneAchievements = [
   {
     id: "first-helper",
     name: "First Helper",
-    unlockDay: 5,
+    unlockDay: 3,
     requirement: "Hire temporary help for one day.",
     description: "Delegation begins carefully."
   },
