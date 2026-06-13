@@ -7,6 +7,7 @@ import {
   getVisibleStaffOptions,
   getObjectiveStatus
 } from "../../game/engine/selectors";
+import { getEmployeeLevel, XP_LEVEL_THRESHOLDS } from "../../game/engine/management";
 import type { GameState } from "../../game/types/game";
 
 interface DayProgressPanelProps {
@@ -86,6 +87,27 @@ export function DayProgressPanel({ gameState }: DayProgressPanelProps) {
                   .map((staffOption) => staffOption.name)
                   .join(", ")}.`}
           </p>
+          <ul className="staff-xp-list">
+            {staffOptions.map((staffOption) => {
+              const xp = gameState.staffXp[staffOption.id] ?? 0;
+              const level = getEmployeeLevel(xp);
+              const nextThreshold = XP_LEVEL_THRESHOLDS[Math.min(3, level + 1) as 1 | 2 | 3];
+              const xpToNext = level < 3 ? nextThreshold - xp : null;
+              return (
+                <li key={staffOption.id} className="staff-xp-entry">
+                  <strong>{staffOption.name}</strong>{" "}
+                  <span className="staff-xp-level">Lv.{level}</span>
+                  {" · "}
+                  <span className="staff-xp-count">{xp} XP</span>
+                  {xpToNext !== null ? (
+                    <span className="staff-xp-next"> ({xpToNext} bis Lv.{level + 1})</span>
+                  ) : (
+                    <span className="staff-xp-max"> (max.)</span>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
         </section>
       ) : null}
 

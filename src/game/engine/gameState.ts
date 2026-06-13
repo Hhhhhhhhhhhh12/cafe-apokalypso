@@ -15,7 +15,7 @@ import type {
 } from "../types/game";
 import { createInitialDayManagement, STARTING_REPUTATION, SUPPLY_CAPS } from "./management";
 
-export const CURRENT_GAME_STATE_VERSION = 9;
+export const CURRENT_GAME_STATE_VERSION = 10;
 export const CURRENT_CONTENT_CATALOG_VERSION = "week-one-v1";
 
 const initialResources: ResourceState = {
@@ -71,6 +71,7 @@ export function createInitialGameState(): GameState {
     decor: { plant: 1, shelf: 1, clock: 1, lamp: 1, cups: 1 },
     completedActions: [],
     unlocks: { ...initialUnlocks },
+    staffXp: {},
     guestHistory: [],
     eventHistory: [],
     unlockedAchievements: [],
@@ -118,7 +119,8 @@ export function isValidGameState(value: unknown): value is GameState {
     isStringArray(candidate.completedActions) &&
     isStringArray(candidate.guestHistory) &&
     isStringArray(candidate.eventHistory) &&
-    isStringArray(candidate.unlockedAchievements)
+    isStringArray(candidate.unlockedAchievements) &&
+    isValidStaffXp(candidate.staffXp)
   );
 }
 
@@ -311,9 +313,9 @@ function isValidDecor(value: unknown): value is Record<typeof DECOR_SLOT_KEYS[nu
  * localStorage saves are not wiped. Only runs if the raw value looks like
  * an object; does nothing otherwise.
  *
- * v8 -> v9: day summaries gained the required `dailyOverhead` field and the
- * helper "mira" was renamed to "nele". Both versions may also lack décor
- * slots that were added after the save was written (clock/lamp/cups).
+ * v8 -> v9: day summaries gained `dailyOverhead`; helper "mira" renamed to "nele".
+ * v9 -> v10: `staffXp` object added (defaults to empty {}). Both versions may also
+ * lack décor slots added after the save was written (clock/lamp/cups).
  */
 export function migrateRawSave(raw: unknown): unknown {
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
@@ -343,6 +345,15 @@ export function migrateRawSave(raw: unknown): unknown {
     }
   }
 
+  if (obj.version === 9) {
+    obj.version = 10;
+    patched = true;
+
+    if (!obj.staffXp || typeof obj.staffXp !== "object" || Array.isArray(obj.staffXp)) {
+      obj.staffXp = {};
+    }
+  }
+
   if (obj.decor && typeof obj.decor === "object" && !Array.isArray(obj.decor)) {
     const decor = { ...(obj.decor as Record<string, unknown>) };
     for (const slot of DECOR_SLOT_KEYS) {
@@ -355,6 +366,27 @@ export function migrateRawSave(raw: unknown): unknown {
   }
 
   return patched ? obj : raw;
+}
+
+const STAFF_OPTION_IDS = ["jana", "nino", "nele"] as const;
+
+function isValidStaffXp(value: unknown): boolean {
+  if (value === null || value === undefined) {
+    return false;
+  }
+  if (typeof value !== "object" || Array.isArray(value)) {
+    return false;
+  }
+  const obj = value as Record<string, unknown>;
+  for (const key of Object.keys(obj)) {
+    if (!STAFF_OPTION_IDS.includes(key as (typeof STAFF_OPTION_IDS)[number])) {
+      return false;
+    }
+    if (typeof obj[key] !== "number" || !Number.isFinite(obj[key] as number) || (obj[key] as number) < 0) {
+      return false;
+    }
+  }
+  return true;
 }
 
 function isStringArray(value: unknown): value is string[] {

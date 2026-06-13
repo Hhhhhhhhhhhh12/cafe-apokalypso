@@ -209,6 +209,22 @@ describe("save migration", () => {
     expect(state.helperAssignment?.helperId).toBe("nele");
   });
 
+  it("migrateRawSave adds staffXp: {} to a v9 save", () => {
+    const raw = { ...createInitialGameState(), version: 9 } as Record<string, unknown>;
+    delete raw.staffXp;
+    const migrated = migrateRawSave(raw) as { version: number; staffXp: unknown };
+    expect(migrated.version).toBe(CURRENT_GAME_STATE_VERSION);
+    expect(migrated.staffXp).toEqual({});
+  });
+
+  it("migrateRawSave chains v8 → v9 → v10 in one pass", () => {
+    const raw = JSON.parse(makeRealV8Save()) as Record<string, unknown>;
+    delete raw.staffXp;
+    const migrated = migrateRawSave(raw) as { version: number; staffXp: unknown };
+    expect(migrated.version).toBe(CURRENT_GAME_STATE_VERSION);
+    expect(migrated.staffXp).toEqual({});
+  });
+
   it("migrateRawSave is a no-op for non-objects", () => {
     expect(migrateRawSave(null)).toBeNull();
     expect(migrateRawSave("string")).toBe("string");

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { createInitialGameState } from "../src/game/engine/gameState";
 import { gameReducer } from "../src/game/engine/reducer";
+import { getEmployeeLevel, getEmployeeLevelBonuses } from "../src/game/engine/management";
 import {
   getObjectiveStatus,
   getVisibleDaySevenLetter,
@@ -12,7 +13,7 @@ describe("initial game state", () => {
   it("starts as a serializable day-one café state", () => {
     const state = createInitialGameState();
 
-    expect(state.version).toBe(9);
+    expect(state.version).toBe(10);
     expect(state.decor).toEqual({ plant: 1, shelf: 1, clock: 1, lamp: 1, cups: 1 });
     expect(state.contentCatalogVersion).toBe("week-one-v1");
     expect(state.day).toBe(1);
@@ -104,6 +105,92 @@ describe("initial game state", () => {
     const resetState = gameReducer(progressedState, { type: "reset_game" });
 
     expect(resetState).toEqual(createInitialGameState());
+  });
+});
+
+describe("employee XP system", () => {
+  it("getEmployeeLevel maps XP to correct levels", () => {
+    expect(getEmployeeLevel(0)).toBe(1);
+    expect(getEmployeeLevel(4)).toBe(1);
+    expect(getEmployeeLevel(5)).toBe(2);
+    expect(getEmployeeLevel(9)).toBe(2);
+    expect(getEmployeeLevel(10)).toBe(3);
+    expect(getEmployeeLevel(99)).toBe(3);
+  });
+
+  it("getEmployeeLevelBonuses returns correct bonuses per level", () => {
+    expect(getEmployeeLevelBonuses(1)).toEqual({ extraAP: 0, tipBonus: 0 });
+    expect(getEmployeeLevelBonuses(2)).toEqual({ extraAP: 1, tipBonus: 0 });
+    expect(getEmployeeLevelBonuses(3)).toEqual({ extraAP: 1, tipBonus: 0.05 });
+  });
+
+  it("staffXp starts empty", () => {
+    const state = createInitialGameState();
+    expect(state.staffXp).toEqual({});
+  });
+
+  it("awards XP to helper equal to customers served after day close", () => {
+    let state: GameState = {
+      ...createInitialGameState(),
+      day: 3,
+      dayPhase: "day_start",
+      unlocks: { pricing: true, advertising: false, staff: true, kassandra: false, apocalypseOperations: false },
+      dayManagement: {
+        ...createInitialGameState().dayManagement,
+        actionPointsRemaining: 5,
+        helperDecisionMade: false
+      }
+    };
+
+    state = gameReducer(state, { type: "select_helper", helperId: "jana", taskId: "service" });
+    state = gameReducer(state, { type: "open_day" });
+    state = gameReducer(state, { type: "take_order" });
+    state = gameReducer(state, { type: "take_order" });
+    state = gameReducer(state, { type: "complete_day" });
+
+    expect(state.staffXp["jana"]).toBeGreaterThan(0);
+  });
+
+  it("level-2 helper grants +1 AP when opening the day", () => {
+    const baseAP = 4; // day-2 budget
+    let state: GameState = {
+      ...createInitialGameState(),
+      day: 3,
+      dayPhase: "day_start",
+      staffXp: { jana: 5 }, // level 2
+      unlocks: { pricing: true, advertising: false, staff: true, kassandra: false, apocalypseOperations: false },
+      dayManagement: {
+        ...createInitialGameState().dayManagement,
+        actionPointsRemaining: baseAP,
+        helperDecisionMade: false
+      }
+    };
+
+    state = gameReducer(state, { type: "select_helper", helperId: "jana", taskId: "service" });
+    state = gameReducer(state, { type: "open_day" });
+
+    expect(state.dayManagement.actionPointsRemaining).toBe(baseAP + 1);
+  });
+
+  it("level-1 helper does not grant extra AP", () => {
+    const baseAP = 4;
+    let state: GameState = {
+      ...createInitialGameState(),
+      day: 3,
+      dayPhase: "day_start",
+      staffXp: { jana: 0 }, // level 1
+      unlocks: { pricing: true, advertising: false, staff: true, kassandra: false, apocalypseOperations: false },
+      dayManagement: {
+        ...createInitialGameState().dayManagement,
+        actionPointsRemaining: baseAP,
+        helperDecisionMade: false
+      }
+    };
+
+    state = gameReducer(state, { type: "select_helper", helperId: "jana", taskId: "service" });
+    state = gameReducer(state, { type: "open_day" });
+
+    expect(state.dayManagement.actionPointsRemaining).toBe(baseAP);
   });
 });
 
