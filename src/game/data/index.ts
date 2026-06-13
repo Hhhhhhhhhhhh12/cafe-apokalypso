@@ -1,5 +1,6 @@
 export { weekOneAchievements } from "./achievements";
 export { weekOneAdvertisingCampaigns } from "./ads";
+export { weekOneDayModifiers } from "./dayModifiers";
 export { weekOneDays } from "./days";
 export { daySevenHookLetter, weekOneEvents } from "./events";
 export {

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { createInitialGameState } from "../src/game/engine/gameState";
 import { gameReducer } from "../src/game/engine/reducer";
 import {
+  getCurrentDayModifier,
   getDayEndRecapLine,
   getDecorUpgradeOptions,
   getGuestForCustomer,
@@ -36,6 +37,14 @@ describe("management tradeoff system", () => {
       expect(dayDefinition.objective.title.length).toBeGreaterThan(0);
       expect(dayDefinition.objective.completionHint.length).toBeGreaterThan(0);
     }
+  });
+
+  it("selects deterministic day modifiers for the week-one run", () => {
+    expect(getCurrentDayModifier(createInitialGameState()).id).toBe("soft-opening");
+    expect(getCurrentDayModifier(createDayStartState(4)).id).toBe("poster-echo");
+    expect(getCurrentDayModifier(createDayStartState(7)).id).toBe(
+      "inspection-pressure"
+    );
   });
 
   it("consumes the documented supplies for cappuccino orders", () => {
@@ -113,6 +122,17 @@ describe("management tradeoff system", () => {
     expect(nextState.resources.money).toBe(38.8);
   });
 
+  it("rewards the Day-3 inventory audit when supplies are checked before anything is empty", () => {
+    const dayThree: GameState = {
+      ...createDayStartState(3),
+      dayPhase: "open"
+    };
+    const checked = gameReducer(dayThree, { type: "check_supplies" });
+
+    expect(checked.resources.reputation).toBe(dayThree.resources.reputation + 1);
+    expect(checked.statusMessage).toContain("Ruf +1");
+  });
+
   it("decreases cleanliness from serving and increases it through cleaning", () => {
     const servedState = gameReducer(createInitialGameState(), {
       type: "serve_product",
@@ -163,6 +183,33 @@ describe("management tradeoff system", () => {
 
     state = gameReducer(state, { type: "serve_product", productId: "filterkaffee" });
     expect(state.resources.stress).toBe(8);
+  });
+
+  it("applies commuter-wave stress changes from obvious guest preferences", () => {
+    const cemNext: GameState = {
+      ...createInitialGameState(),
+      day: 2,
+      resources: { ...createInitialGameState().resources, stress: 10 },
+      dayManagement: {
+        ...createInitialGameState().dayManagement,
+        actionPointsRemaining: 5,
+        customersServed: 2
+      }
+    };
+
+    const fastServe = gameReducer(cemNext, {
+      type: "serve_product",
+      productId: "espresso"
+    });
+    const wrongServe = gameReducer(cemNext, {
+      type: "serve_product",
+      productId: "cappuccino"
+    });
+
+    expect(fastServe.resources.stress).toBe(8);
+    expect(fastServe.statusMessage).toContain("Stress -2");
+    expect(wrongServe.resources.stress).toBe(12);
+    expect(wrongServe.statusMessage).toContain("Stress +2");
   });
 
   it("prevents the action budget from going below zero", () => {
@@ -337,6 +384,20 @@ describe("management tradeoff system", () => {
     expect(soloDayFive.unlockedAchievements).not.toContain("first-helper");
   });
 
+  it("makes the Day-4 poster echo stronger but more stressful", () => {
+    const dayFour: GameState = {
+      ...createDayStartState(4),
+      dayPhase: "open"
+    };
+    const advertised = gameReducer(dayFour, { type: "run_advertising" });
+
+    expect(advertised.resources.money).toBe(39);
+    expect(advertised.resources.reputation).toBe(27);
+    expect(advertised.resources.stress).toBe(2);
+    expect(advertised.statusMessage).toContain("Ruf +2");
+    expect(advertised.statusMessage).toContain("Stress +2");
+  });
+
   it("unlocks KASSANDRA and letter achievements from actual late-week state", () => {
     const daySixWithoutKassandra = completePreparedDay({
       ...createDayStartState(6),
@@ -455,12 +516,12 @@ describe("management tradeoff system", () => {
       12
     );
 
-    const miraState = gameReducer(
+    const neleMarketingState = gameReducer(
       createOpenHelperState("nele", "marketing"),
       { type: "serve_product", productId: "filterkaffee" }
     );
-    expect(miraState.dayManagement.extraAdvertisingActions).toBe(1);
-    expect(miraState.dayManagement.customersServed).toBe(2);
+    expect(neleMarketingState.dayManagement.extraAdvertisingActions).toBe(1);
+    expect(neleMarketingState.dayManagement.customersServed).toBe(2);
   });
 
   it("keeps weirdness hidden through Days 1-6 and shows it only after the Day-7 hook", () => {
@@ -695,6 +756,26 @@ describe("fail-state and reputation-scaled income", () => {
     expect(getNextGuestPreview(christaNext)?.wants).toBe("Cappuccino");
   });
 
+  it("learns guest preferences through serving instead of a tutorial", () => {
+    const learned = gameReducer(createInitialGameState(), {
+      type: "serve_product",
+      productId: "filterkaffee"
+    });
+    const rememberedPaula: GameState = {
+      ...createInitialGameState(),
+      guestMemory: learned.guestMemory
+    };
+    const preview = getNextGuestPreview(rememberedPaula);
+
+    expect(learned.guestMemory["pendlerin-paula"]?.visits).toBe(1);
+    expect(learned.guestMemory["pendlerin-paula"]?.knownPreferenceId).toBe(
+      "filterkaffee"
+    );
+    expect(learned.statusMessage).toContain("You write it down");
+    expect(preview?.learningCue).toContain("You remember");
+    expect(preview?.wants).toBe("Filterkaffee");
+  });
+
   it("composes a narrative day-end recap, heavier on Day 7", () => {
     expect(getDayEndRecapLine(createInitialGameState())).toBe("");
 
@@ -730,7 +811,11 @@ describe("fail-state and reputation-scaled income", () => {
     // Consulting surfaces a voiced KASSANDRA line.
     const consulted = gameReducer(daySix, { type: "consult_kassandra" });
     expect(consulted.statusMessage.startsWith("KASSANDRA:")).toBe(true);
+    expect(consulted.statusMessage).toContain("Action refunded");
     expect(consulted.dayManagement.kassandraConsulted).toBe(true);
+    expect(consulted.dayManagement.actionPointsRemaining).toBe(
+      daySix.dayManagement.actionPointsRemaining
+    );
   });
 
   it("upgrades décor at day end: cost, tier, one-time reputation, and caps", () => {
@@ -779,6 +864,36 @@ describe("fail-state and reputation-scaled income", () => {
     expect(
       soloDayFour.daySummary?.flavorLines.some((line) => line.includes("alone"))
     ).toBe(true);
+  });
+
+  it("makes Day-7 inspection pressure reward clean closing and punish messy closing", () => {
+    const cleanInspection = completePreparedDay({
+      ...createInitialGameState(),
+      day: 7,
+      resources: { ...createInitialGameState().resources, reputation: 25, cleanliness: 80 },
+      dayManagement: {
+        ...createInitialGameState().dayManagement,
+        reputationAtStart: 25
+      }
+    });
+    const messyInspection = completePreparedDay({
+      ...createInitialGameState(),
+      day: 7,
+      resources: { ...createInitialGameState().resources, reputation: 25, cleanliness: 30 },
+      dayManagement: {
+        ...createInitialGameState().dayManagement,
+        reputationAtStart: 25
+      }
+    });
+
+    expect(cleanInspection.resources.reputation).toBe(27);
+    expect(cleanInspection.daySummary?.flavorLines).toContain(
+      "Inspection day likes a clean closing. Ruf +1."
+    );
+    expect(messyInspection.resources.reputation).toBe(23);
+    expect(messyInspection.daySummary?.flavorLines).toContain(
+      "Inspection day notices the neglected corners. Ruf -1."
+    );
   });
 });
 

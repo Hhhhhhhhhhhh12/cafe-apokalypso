@@ -1,5 +1,6 @@
 import type {
   AchievementId,
+  DayModifierId,
   EventId,
   GuestId,
   ProductId,
@@ -7,7 +8,7 @@ import type {
 } from "./content";
 import type { DayNumber } from "./content";
 
-export type GameStateVersion = 10;
+export type GameStateVersion = 11;
 
 export type ContentCatalogVersion = "week-one-v1";
 
@@ -72,6 +73,20 @@ export interface DayManagementState {
   extraAdvertisingActions: number;
   /** Per-day count of guest-appreciation reputation bonuses already awarded (capped). */
   appreciationBonusesGiven: number;
+}
+
+export interface GuestMemoryEntry {
+  visits: number;
+  matchedPreferences: number;
+  lastServedProductId?: ProductId;
+  knownPreferenceId?: ProductId;
+}
+
+export interface RunState {
+  runNumber: number;
+  seed: number;
+  modifierIds: DayModifierId[];
+  memoryFragments: string[];
 }
 
 export interface DaySummary {
@@ -144,6 +159,10 @@ export interface GameState {
   reputationZeroStreak: number;
   /** Current owned tier per décor slot (1 = shabby default). See #57. */
   decor: Record<DecorSlotId, number>;
+  /** Soft-run structure: deterministic week modifiers plus KASSANDRA memory fragments. */
+  run: RunState;
+  /** Guest preferences learned by play, used to teach without a separate tutorial. */
+  guestMemory: Partial<Record<GuestId, GuestMemoryEntry>>;
   completedActions: DayActionId[];
   unlocks: UnlockState;
   /** Accumulated XP per hired helper (key = StaffOptionId). XP = customers served on days they worked. */

@@ -100,8 +100,13 @@ export const weekOneGuests = [
     ],
     orderLine: "Whatever tastes least like a decision.",
     learningCue: "Nele watches the café more than the menu.",
+    preferredProductId: "espresso",
     serveLine:
-      "She accepts it without looking up. 'Authentic,' she says. You are still not sure if that is good."
+      "She accepts it without looking up. 'Authentic,' she says. You are still not sure if that is good.",
+    matchedPreferenceLine:
+      "Espresso gives her fewer variables to review. This appears to be mercy.",
+    missedPreferenceLine:
+      "She accepts the choice as evidence, which is not the same as approval."
   },
   {
     id: "herr-grau",
@@ -115,6 +120,10 @@ export const weekOneGuests = [
       "Black. No sugar. I am only passing through.",
       "Your opening hours are pleasantly mortal."
     ],
+    orderLine: "Handfilter, if you have the time. Black is enough; hurried is not.",
+    learningCue:
+      "Herr Grau waits without impatience. He notices deliberate preparation more than speed.",
+    preferredProductId: "handfilter",
     serveLine:
       "He pays and thanks you. The coin does not match any denomination you can identify.",
     appreciatedProductIds: ["handfilter"],
@@ -135,6 +144,10 @@ export const weekOneGuests = [
       "A cappuccino. Very light. I do not want to be recognized today.",
       "No receipt, please. Paper remembers too well."
     ],
+    orderLine: "A cappuccino. Very light. I do not want to be recognized today.",
+    learningCue:
+      "She keeps the umbrella close and asks for softness without asking for comfort.",
+    preferredProductId: "cappuccino",
     serveLine:
       "She accepts the order quietly and asks you not to mention she was here."
   },
@@ -150,6 +163,10 @@ export const weekOneGuests = [
       "An espresso. And please, look at the counter when you bring it.",
       "I prefer the corner seat. People look at me less from there."
     ],
+    orderLine: "An espresso. And please, look at the counter when you bring it.",
+    learningCue:
+      "Meda asks for the shortest drink and the least eye contact.",
+    preferredProductId: "espresso",
     serveLine:
       "She takes the cup without looking at you. The table beside her grows briefly still.",
     visualNotes:

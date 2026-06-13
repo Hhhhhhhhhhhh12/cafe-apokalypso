@@ -9,6 +9,7 @@ import { weekOneAchievements } from "../data";
 import { getDecorTier, getMaxDecorTier } from "../data/decor";
 import {
   getCurrentDayDefinition,
+  getCurrentDayModifier,
   getGuestForCustomer,
   getKassandraConsultLine,
   getServeLineForCustomer
@@ -42,6 +43,8 @@ import {
 import type {
   AchievementId,
   DayNumber,
+  GuestDefinition,
+  GuestId,
   ProductId,
   StaffOptionId
 } from "../types/content";
@@ -49,6 +52,7 @@ import type {
   DecorSlotId,
   GameAction,
   GameState,
+  GuestMemoryEntry,
   HelperTaskId,
   IngredientKey,
   ResourceState,
@@ -236,9 +240,11 @@ function applySuccessfulServe(
   let supplies = { ...state.supplies };
   let resources = { ...state.resources };
   let management = { ...state.dayManagement };
+  let guestMemory = { ...state.guestMemory };
   const flavorLines: string[] = [];
 
   for (let index = 0; index < servedWithHelper; index += 1) {
+    const servedGuest = getGuestForCustomer(workingState, management.customersServed);
     const missingIngredients = getMissingIngredients(
       product,
       supplies,
@@ -307,6 +313,23 @@ function applySuccessfulServe(
         baristaReputationBonus: management.baristaReputationBonus + 1
       };
     }
+
+    const modifierResult = applyServeModifier(
+      workingState,
+      servedGuest,
+      product,
+      resources
+    );
+    resources = modifierResult.resources;
+    if (modifierResult.line) {
+      flavorLines.push(modifierResult.line);
+    }
+
+    const memoryResult = rememberServedGuest(guestMemory, servedGuest, product);
+    guestMemory = memoryResult.guestMemory;
+    if (memoryResult.line) {
+      flavorLines.push(memoryResult.line);
+    }
   }
 
   if (management.helperExtraOrdersRemaining > 0) {
@@ -362,9 +385,85 @@ function applySuccessfulServe(
       ...resources,
       mood: resources.stress >= 61 ? "strained" : resources.stress >= 41 ? "busy" : "calm"
     },
+    guestMemory,
     dayManagement: management,
     completedActions: addUniqueDayAction(workingState.completedActions, "take_order"),
     statusMessage: statusParts.join(" ")
+  };
+}
+
+function applyServeModifier(
+  state: GameState,
+  guest: GuestDefinition | undefined,
+  product: ReturnType<typeof getProductById>,
+  resources: ResourceState
+): { resources: ResourceState; line: string | null } {
+  const modifier = getCurrentDayModifier(state);
+
+  if (modifier.id !== "commuter-wave" || !guest) {
+    return { resources, line: null };
+  }
+
+  const isFastGuest = guest.behaviorTags.some((tag) =>
+    ["fast", "impatient", "quick-service", "low-seat-time"].includes(tag)
+  );
+  const expectedProductId = guest.preferredProductId ?? guest.appreciatedProductIds?.[0];
+
+  if (!isFastGuest || !expectedProductId) {
+    return { resources, line: null };
+  }
+
+  if (product.id === expectedProductId) {
+    return {
+      resources: { ...resources, stress: clampMeter(resources.stress - 2) },
+      line: "The commuter rhythm clicks into place. Stress -2."
+    };
+  }
+
+  return {
+    resources: { ...resources, stress: clampMeter(resources.stress + 2) },
+    line: "The order is fine, but the queue loses a little rhythm. Stress +2."
+  };
+}
+
+function rememberServedGuest(
+  guestMemory: Partial<Record<GuestId, GuestMemoryEntry>>,
+  guest: GuestDefinition | undefined,
+  product: ReturnType<typeof getProductById>
+): {
+  guestMemory: Partial<Record<GuestId, GuestMemoryEntry>>;
+  line: string | null;
+} {
+  if (!guest) {
+    return { guestMemory, line: null };
+  }
+
+  const previous = guestMemory[guest.id] ?? {
+    visits: 0,
+    matchedPreferences: 0
+  };
+  const appreciatedProductIds = guest.appreciatedProductIds ?? [];
+  const matchedPreference =
+    guest.preferredProductId === product.id || appreciatedProductIds.includes(product.id);
+  const knownPreferenceId =
+    previous.knownPreferenceId ?? (matchedPreference ? product.id : undefined);
+  const nextMemory: GuestMemoryEntry = {
+    visits: previous.visits + 1,
+    matchedPreferences: previous.matchedPreferences + (matchedPreference ? 1 : 0),
+    lastServedProductId: product.id,
+    knownPreferenceId
+  };
+  const learnedLine =
+    matchedPreference && !previous.knownPreferenceId
+      ? `You write it down: ${guest.name} tends toward ${product.name}.`
+      : null;
+
+  return {
+    guestMemory: {
+      ...guestMemory,
+      [guest.id]: nextMemory
+    },
+    line: learnedLine
   };
 }
 
@@ -423,13 +522,28 @@ function checkSupplies(state: GameState): GameState {
     return noActionCapacityState(state);
   }
 
+  const modifier = getCurrentDayModifier(actionState);
+  const firstSupplyCheck = !state.completedActions.includes("check_supplies");
+  const allSuppliesAvailable = (Object.keys(SUPPLY_CAPS) as IngredientKey[]).every(
+    (ingredient) => actionState.supplies[ingredient] > 0
+  );
+  const auditBonusApplies =
+    modifier.id === "inventory-audit" && firstSupplyCheck && allSuppliesAvailable;
+
   return {
     ...actionState,
     completedActions: addUniqueDayAction(
       actionState.completedActions,
       "check_supplies"
     ),
+    resources: auditBonusApplies
+      ? {
+          ...actionState.resources,
+          reputation: clampMeter(actionState.resources.reputation + 1)
+        }
+      : actionState.resources,
     statusMessage: `Supply check: coffee ${actionState.supplies.coffee}/${SUPPLY_CAPS.coffee}, milk ${actionState.supplies.milk}/${SUPPLY_CAPS.milk}, pastries ${actionState.supplies.pastries}/${SUPPLY_CAPS.pastries}.`
+      + (auditBonusApplies ? " The tidy shelf calms the offer board. Ruf +1." : "")
   };
 }
 
@@ -502,6 +616,12 @@ function runAdvertising(state: GameState): GameState {
     return noActionCapacityState(state);
   }
 
+  const posterEchoApplies =
+    getCurrentDayModifier(actionState).id === "poster-echo" &&
+    !state.dayManagement.advertisingRun;
+  const reputationGain = posterEchoApplies ? 2 : 1;
+  const stressGain = posterEchoApplies ? 2 : 0;
+
   return {
     ...actionState,
     completedActions: addUniqueDayAction(
@@ -511,7 +631,9 @@ function runAdvertising(state: GameState): GameState {
     resources: {
       ...actionState.resources,
       money: clampResource(actionState.resources.money - ADVERTISING_ACTION_COST),
-      reputation: clampMeter(actionState.resources.reputation + 1)
+      reputation: clampMeter(actionState.resources.reputation + reputationGain),
+      stress: clampMeter(actionState.resources.stress + stressGain),
+      mood: getMoodForStress(clampMeter(actionState.resources.stress + stressGain))
     },
     dayManagement: {
       ...actionState.dayManagement,
@@ -521,7 +643,9 @@ function runAdvertising(state: GameState): GameState {
       advertisingRun: true
     },
     statusMessage:
-      "A local ad goes out. It costs €3, improves reputation by 1, and may make the counter feel smaller."
+      posterEchoApplies
+        ? "A local ad goes out. It lands unusually well. Ruf +2, Stress +2."
+        : "A local ad goes out. It costs €3, improves reputation by 1, and may make the counter feel smaller."
   };
 }
 
@@ -545,6 +669,11 @@ function consultKassandra(state: GameState): GameState {
     return noActionCapacityState(state);
   }
 
+  const earlyForecastRefund =
+    getCurrentDayModifier(actionState).id === "forecast-static" &&
+    !state.dayManagement.kassandraConsulted &&
+    state.dayManagement.customersServed === 0;
+
   return {
     ...actionState,
     completedActions: addUniqueDayAction(
@@ -553,9 +682,17 @@ function consultKassandra(state: GameState): GameState {
     ),
     dayManagement: {
       ...actionState.dayManagement,
+      actionPointsRemaining: earlyForecastRefund
+        ? actionState.dayManagement.actionPointsRemaining + 1
+        : actionState.dayManagement.actionPointsRemaining,
+      actionPointsSpent: earlyForecastRefund
+        ? Math.max(0, actionState.dayManagement.actionPointsSpent - 1)
+        : actionState.dayManagement.actionPointsSpent,
       kassandraConsulted: true
     },
-    statusMessage: `KASSANDRA: ${getKassandraConsultLine(actionState)}`
+    statusMessage: `KASSANDRA: ${getKassandraConsultLine(actionState)}${
+      earlyForecastRefund ? " Early forecast logged. Action refunded." : ""
+    }`
   };
 }
 
@@ -704,6 +841,7 @@ function completeCurrentDay(state: GameState): GameState {
     title: objectiveStatus.objective.title,
     status: objectiveStatus.completed ? "completed" : "missed"
   } as const;
+  const memoryFragments = getRunMemoryFragments(closedState, objectiveResult.status);
 
   // Reputation fail-state with a 2-day grace period: one day at zero is a
   // warning; a second consecutive day at zero closes the café.
@@ -733,6 +871,10 @@ function completeCurrentDay(state: GameState): GameState {
       ...closedState.objectiveResults.filter((result) => result.day !== state.day),
       objectiveResult
     ],
+    run: {
+      ...closedState.run,
+      memoryFragments: addUniqueStrings(closedState.run.memoryFragments, memoryFragments)
+    },
     demoComplete: daySevenClose,
     weirdnessVisible: daySevenClose ? true : false,
     reputationZeroStreak,
@@ -780,6 +922,16 @@ function applyDayEndConsequences(state: GameState): GameState {
   } else if (resources.cleanliness < 40) {
     resources = { ...resources, reputation: clampMeter(resources.reputation - 1) };
     flavorLines.push("The room felt a little neglected by closing time. Ruf -1.");
+  }
+
+  if (getCurrentDayModifier(state).id === "inspection-pressure") {
+    if (resources.cleanliness >= 70) {
+      resources = { ...resources, reputation: clampMeter(resources.reputation + 1) };
+      flavorLines.push("Inspection day likes a clean closing. Ruf +1.");
+    } else if (resources.cleanliness < 40) {
+      resources = { ...resources, reputation: clampMeter(resources.reputation - 1) };
+      flavorLines.push("Inspection day notices the neglected corners. Ruf -1.");
+    }
   }
 
   if (management.customersServed < 4) {
@@ -1177,6 +1329,46 @@ function isAchievementEarned(id: AchievementId, state: GameState): boolean {
     default:
       return false;
   }
+}
+
+function getRunMemoryFragments(
+  state: GameState,
+  objectiveStatus: "completed" | "missed"
+): string[] {
+  const fragments = [`day-${state.day}-objective-${objectiveStatus}`];
+  const knownPreferenceCount = Object.values(state.guestMemory).filter(
+    (entry) => entry?.knownPreferenceId
+  ).length;
+
+  if (knownPreferenceCount >= 2) {
+    fragments.push("guest-preference-ledger");
+  }
+
+  if (state.dayManagement.advertisingRun) {
+    fragments.push("advertising-pattern-logged");
+  }
+
+  if (state.helperAssignment) {
+    fragments.push("delegation-pattern-logged");
+  }
+
+  if (state.day === 7) {
+    fragments.push("office-letter-arrived");
+  }
+
+  return fragments;
+}
+
+function addUniqueStrings(current: readonly string[], additions: readonly string[]): string[] {
+  const result = [...current];
+
+  for (const addition of additions) {
+    if (!result.includes(addition)) {
+      result.push(addition);
+    }
+  }
+
+  return result;
 }
 
 function formatMissingSupply(ingredients: readonly IngredientKey[]): string {

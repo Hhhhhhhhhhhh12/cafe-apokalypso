@@ -50,6 +50,7 @@ Included:
 - basic order flow, products, ingredients, supplies, money, reputation, cleanliness, stress, and hidden weirdness
 - normal and subtly strange guests
 - prices, daily offers, advertising, and temporary staff
+- deterministic day modifiers, learned guest preferences, and KASSANDRA run fragments
 - KASSANDRA cash-register update
 - local browser save and achievements
 - first explicit apocalyptic hook at the end of day 7

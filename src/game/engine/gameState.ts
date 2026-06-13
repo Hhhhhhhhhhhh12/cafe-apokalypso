@@ -1,4 +1,5 @@
-import type { AchievementId, EventId, GuestId } from "../types/content";
+import { weekOneDayModifiers } from "../data/dayModifiers";
+import type { AchievementId, DayModifierId, EventId, GuestId } from "../types/content";
 import type {
   DayManagementState,
   DayObjectiveResult,
@@ -6,16 +7,18 @@ import type {
   DaySummary,
   DayActionId,
   GameState,
+  GuestMemoryEntry,
   HelperAssignment,
   IngredientKey,
   ResourceState,
+  RunState,
   SupplyPurchaseState,
   SupplyState,
   UnlockState
 } from "../types/game";
 import { createInitialDayManagement, STARTING_REPUTATION, SUPPLY_CAPS } from "./management";
 
-export const CURRENT_GAME_STATE_VERSION = 10;
+export const CURRENT_GAME_STATE_VERSION = 11;
 export const CURRENT_CONTENT_CATALOG_VERSION = "week-one-v1";
 
 const initialResources: ResourceState = {
@@ -46,6 +49,13 @@ const initialUnlocks: UnlockState = {
   apocalypseOperations: false
 };
 
+const initialRun: RunState = {
+  runNumber: 1,
+  seed: 101,
+  modifierIds: weekOneDayModifiers.map((modifier) => modifier.id),
+  memoryFragments: []
+};
+
 export function createInitialGameState(): GameState {
   return {
     version: CURRENT_GAME_STATE_VERSION,
@@ -69,6 +79,8 @@ export function createInitialGameState(): GameState {
     closureReason: null,
     reputationZeroStreak: 0,
     decor: { plant: 1, shelf: 1, clock: 1, lamp: 1, cups: 1 },
+    run: { ...initialRun, modifierIds: [...initialRun.modifierIds], memoryFragments: [] },
+    guestMemory: {},
     completedActions: [],
     unlocks: { ...initialUnlocks },
     staffXp: {},
@@ -107,6 +119,8 @@ export function isValidGameState(value: unknown): value is GameState {
       candidate.closureReason === "reputation") &&
     typeof candidate.reputationZeroStreak === "number" &&
     isValidDecor(candidate.decor) &&
+    isValidRun(candidate.run) &&
+    isValidGuestMemory(candidate.guestMemory) &&
     isValidResources(candidate.resources) &&
     isValidSupplies(candidate.supplies) &&
     isValidSupplyPurchase(candidate.pendingSupplyPurchase) &&
@@ -307,6 +321,96 @@ function isValidDecor(value: unknown): value is Record<typeof DECOR_SLOT_KEYS[nu
   );
 }
 
+const DAY_MODIFIER_IDS = [
+  "soft-opening",
+  "commuter-wave",
+  "inventory-audit",
+  "poster-echo",
+  "short-staffed",
+  "forecast-static",
+  "inspection-pressure"
+] as const satisfies readonly DayModifierId[];
+
+function isValidRun(value: unknown): value is RunState {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return false;
+  }
+
+  const run = value as Partial<RunState>;
+
+  return (
+    typeof run.runNumber === "number" &&
+    Number.isInteger(run.runNumber) &&
+    run.runNumber >= 1 &&
+    typeof run.seed === "number" &&
+    Number.isInteger(run.seed) &&
+    Array.isArray(run.modifierIds) &&
+    run.modifierIds.length === 7 &&
+    run.modifierIds.every((id) =>
+      DAY_MODIFIER_IDS.includes(id as (typeof DAY_MODIFIER_IDS)[number])
+    ) &&
+    isStringArray(run.memoryFragments)
+  );
+}
+
+const PRODUCT_IDS = [
+  "filterkaffee",
+  "espresso",
+  "cappuccino",
+  "croissant",
+  "kaffee-croissant",
+  "handfilter"
+] as const;
+
+const GUEST_IDS = [
+  "pendlerin-paula",
+  "laptop-lukas",
+  "lieferfahrer-cem",
+  "cappuccino-christa",
+  "herr-bohn",
+  "freelancerin-nele",
+  "herr-grau",
+  "frau-roter-regenschirm",
+  "meda"
+] as const;
+
+function isValidGuestMemory(value: unknown): value is Partial<Record<GuestId, GuestMemoryEntry>> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return false;
+  }
+
+  const memory = value as Record<string, unknown>;
+
+  return Object.entries(memory).every(([guestId, entry]) => {
+    if (!GUEST_IDS.includes(guestId as (typeof GUEST_IDS)[number])) {
+      return false;
+    }
+
+    if (!entry || typeof entry !== "object" || Array.isArray(entry)) {
+      return false;
+    }
+
+    const guestMemory = entry as Partial<GuestMemoryEntry>;
+    const lastProductValid =
+      guestMemory.lastServedProductId === undefined ||
+      PRODUCT_IDS.includes(guestMemory.lastServedProductId as (typeof PRODUCT_IDS)[number]);
+    const knownPreferenceValid =
+      guestMemory.knownPreferenceId === undefined ||
+      PRODUCT_IDS.includes(guestMemory.knownPreferenceId as (typeof PRODUCT_IDS)[number]);
+
+    return (
+      typeof guestMemory.visits === "number" &&
+      Number.isInteger(guestMemory.visits) &&
+      guestMemory.visits >= 0 &&
+      typeof guestMemory.matchedPreferences === "number" &&
+      Number.isInteger(guestMemory.matchedPreferences) &&
+      guestMemory.matchedPreferences >= 0 &&
+      lastProductValid &&
+      knownPreferenceValid
+    );
+  });
+}
+
 /**
  * Migrate a raw parsed save written by an older release so it passes
  * isValidGameState. Called by loadGameState before validation so existing
@@ -314,8 +418,10 @@ function isValidDecor(value: unknown): value is Record<typeof DECOR_SLOT_KEYS[nu
  * an object; does nothing otherwise.
  *
  * v8 -> v9: day summaries gained `dailyOverhead`; helper "mira" renamed to "nele".
- * v9 -> v10: `staffXp` object added (defaults to empty {}). Both versions may also
- * lack décor slots added after the save was written (clock/lamp/cups).
+ * v9 -> v10: `staffXp` object added (defaults to empty {}).
+ * v10 -> v11: soft-run metadata and guest memory added.
+ * Older versions may also lack décor slots added after the save was written
+ * (clock/lamp/cups).
  */
 export function migrateRawSave(raw: unknown): unknown {
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
@@ -354,6 +460,27 @@ export function migrateRawSave(raw: unknown): unknown {
     }
   }
 
+  if (obj.version === 10) {
+    obj.version = 11;
+    patched = true;
+
+    if (!obj.run || typeof obj.run !== "object" || Array.isArray(obj.run)) {
+      obj.run = {
+        ...initialRun,
+        modifierIds: [...initialRun.modifierIds],
+        memoryFragments: []
+      };
+    }
+
+    if (
+      !obj.guestMemory ||
+      typeof obj.guestMemory !== "object" ||
+      Array.isArray(obj.guestMemory)
+    ) {
+      obj.guestMemory = {};
+    }
+  }
+
   if (obj.decor && typeof obj.decor === "object" && !Array.isArray(obj.decor)) {
     const decor = { ...(obj.decor as Record<string, unknown>) };
     for (const slot of DECOR_SLOT_KEYS) {
@@ -363,6 +490,27 @@ export function migrateRawSave(raw: unknown): unknown {
       }
     }
     obj.decor = decor;
+  }
+
+  if (obj.run && typeof obj.run === "object" && !Array.isArray(obj.run)) {
+    const run = { ...(obj.run as Record<string, unknown>) };
+    if (!Array.isArray(run.modifierIds) || run.modifierIds.length !== 7) {
+      run.modifierIds = [...initialRun.modifierIds];
+      patched = true;
+    }
+    if (!Array.isArray(run.memoryFragments)) {
+      run.memoryFragments = [];
+      patched = true;
+    }
+    if (typeof run.runNumber !== "number") {
+      run.runNumber = 1;
+      patched = true;
+    }
+    if (typeof run.seed !== "number") {
+      run.seed = initialRun.seed;
+      patched = true;
+    }
+    obj.run = run;
   }
 
   return patched ? obj : raw;

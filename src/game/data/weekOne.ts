@@ -1,5 +1,6 @@
 import { weekOneAchievements } from "./achievements";
 import { weekOneAdvertisingCampaigns } from "./ads";
+import { weekOneDayModifiers } from "./dayModifiers";
 import { weekOneDays } from "./days";
 import { daySevenHookLetter, weekOneEvents } from "./events";
 import {
@@ -20,6 +21,7 @@ export const weekOneContent = {
   upgrades: weekOneUpgrades,
   events: weekOneEvents,
   achievements: weekOneAchievements,
+  dayModifiers: weekOneDayModifiers,
   days: weekOneDays,
   kassandraMessages,
   daySevenHookLetter
@@ -35,6 +37,7 @@ export function getWeekOneContentSummary() {
     upgrades: weekOneUpgrades.length,
     scriptedEvents: weekOneEvents.length,
     achievements: weekOneAchievements.length,
+    dayModifiers: weekOneDayModifiers.length,
     days: weekOneDays.length,
     kassandraMessages: kassandraMessages.length
   };

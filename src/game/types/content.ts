@@ -2,6 +2,15 @@ export type DayNumber = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
 export type GuestCategory = "normal" | "subtly_strange";
 
+export type DayModifierId =
+  | "soft-opening"
+  | "commuter-wave"
+  | "inventory-audit"
+  | "poster-echo"
+  | "short-staffed"
+  | "forecast-static"
+  | "inspection-pressure";
+
 export type GuestId =
   | "pendlerin-paula"
   | "laptop-lukas"
@@ -185,6 +194,17 @@ export interface DayDefinition {
   unlocks: readonly string[];
   guestIds: readonly GuestId[];
   eventIds: readonly EventId[];
+}
+
+export interface DayModifierDefinition {
+  id: DayModifierId;
+  day: DayNumber;
+  title: string;
+  summary: string;
+  /** A player-learnable rule written as in-world operational advice. */
+  learningHint: string;
+  /** Short authored notes for tests/docs; actual effects live in the engine. */
+  effects: readonly string[];
 }
 
 export interface DayObjectiveDefinition {
