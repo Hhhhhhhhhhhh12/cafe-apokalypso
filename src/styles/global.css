@@ -1035,6 +1035,13 @@ h3 {
   transition: none;
 }
 
+/* Paula's exit: walks toward the counter (north in the painted room).
+   Target overshoots the queue box upward so she disappears into the counter area. */
+.placeholder-guest-normal-01.placeholder-guest--walking-to-counter {
+  left: 60%;
+  bottom: 185%;
+}
+
 .cafe-pilot-asset--paula,
 .cafe-pilot-asset--guest {
   left: 50%;
@@ -1087,6 +1094,26 @@ h3 {
 @keyframes cafe-paula-walk {
   to {
     background-position: -648px 0;
+  }
+}
+
+/* 9-frame north walk cycle while Paula walks to the counter.
+   Sheet: 9 × 68px native → rendered 9 × 108px = 972px wide.
+   Frame 0 = reference pose (static fallback for reduced-motion). */
+.cafe-pilot-asset--paula-walking-north {
+  background-image: url("../../assets/sprites/guests/placeholder-guest-paula-walk-north.png");
+  background-size: 972px 108px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cafe-pilot-asset--paula-walking-north {
+    animation: cafe-paula-walk-north 1.08s steps(9) infinite;
+  }
+}
+
+@keyframes cafe-paula-walk-north {
+  to {
+    background-position: -972px 0;
   }
 }
 
