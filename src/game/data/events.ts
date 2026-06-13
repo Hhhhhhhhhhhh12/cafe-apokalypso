@@ -90,6 +90,23 @@ export const weekOneEvents = [
     text: "A guest compliments the new poster by the door. You only print it that afternoon. You decide not to dwell on the order of events."
   },
   {
+    id: "day-4-flyer-wrong-address",
+    day: 4,
+    title: "The Flyer Reaches Someone",
+    tone: "anomaly",
+    trigger: "First advertising run.",
+    text: "Three people arrive from an address that does not appear in the neighborhood map. They seem glad the café is open. You do not ask how they found the flyer."
+  },
+  {
+    id: "day-4-bohn-recognizes-coin",
+    day: 4,
+    title: "Herr Bohn, on Denominations",
+    tone: "anomaly",
+    trigger: "Herr Grau's coin from earlier.",
+    text: "Herr Bohn sees the coin from Herr Grau on the counter. He says he recognizes the denomination. He does not say from where. He finishes his coffee and leaves before you can ask.",
+    relatedGuestIds: ["herr-bohn", "herr-grau"]
+  },
+  {
     id: "day-5-wet-table-jana",
     day: 5,
     title: "Wet Table",
@@ -105,6 +122,22 @@ export const weekOneEvents = [
     trigger: "First possible Meda appearance.",
     text: "Meda prefers the corner seat. People look at her less from there.",
     relatedGuestIds: ["meda"]
+  },
+  {
+    id: "day-5-receipt-printer-early",
+    day: 5,
+    title: "Receipt Before Order",
+    tone: "anomaly",
+    trigger: "Register begins foreshadowing KASSANDRA behavior one day early.",
+    text: "The receipt printer issued a receipt four seconds before the order was placed. You timed it. It is consistent. The amounts are correct."
+  },
+  {
+    id: "day-5-storage-smell",
+    day: 5,
+    title: "Storage Room",
+    tone: "anomaly",
+    trigger: "Escalating environmental weirdness on day 5.",
+    text: "Your helper mentions the storage room smells different today. Not bad. Just as if something in there has been somewhere else recently."
   },
   {
     id: "day-6-kassandra-update",
@@ -123,6 +156,22 @@ export const weekOneEvents = [
     text: "KASSANDRA flags a \"returning guest, 15:12, slightly out of sequence.\" At 15:12 someone thanks you warmly for last time. You are fairly sure there was no last time."
   },
   {
+    id: "day-6-kassandra-complaint-queue",
+    day: 6,
+    title: "Pending Complaints",
+    tone: "kassandra",
+    trigger: "KASSANDRA surfaces bureaucratic anomaly.",
+    text: "KASSANDRA has opened a complaint register. Zero complaints filed. Three complaints listed as pending from events that have not happened yet. Status: waiting."
+  },
+  {
+    id: "day-6-disclaimer-receipt",
+    day: 6,
+    title: "Pre-Approved",
+    tone: "kassandra",
+    trigger: "KASSANDRA printer behavior escalation.",
+    text: "The receipts now include a small footer line: \"This transaction has been pre-approved.\" KASSANDRA says this is a formatting update. You did not authorize a formatting update."
+  },
+  {
     id: "day-7-red-umbrella",
     day: 7,
     title: "Red Umbrella",
@@ -138,5 +187,21 @@ export const weekOneEvents = [
     tone: "anomaly",
     trigger: "Day 7: the busiest day, just before the letter.",
     text: "For one breath the back wall reads like a doorway to somewhere with different weather. Then it is a wall again. None of the regulars mention it, which is how you know they noticed too."
+  },
+  {
+    id: "day-7-menu-bookmark",
+    day: 7,
+    title: "Bookmark",
+    tone: "anomaly",
+    trigger: "Escalating reality loosening on day 7.",
+    text: "A guest leaves a bookmark inside the menu. It marks page 47. The menu is 12 pages long. Page 47 is not there, but the bookmark holds something open."
+  },
+  {
+    id: "day-7-kassandra-threshold",
+    day: 7,
+    title: "THRESHOLD",
+    tone: "kassandra",
+    trigger: "Day 7 peak weirdness: KASSANDRA and the machine sync.",
+    text: "The coffee machine and KASSANDRA displayed the same word for six seconds: THRESHOLD. A brief hardware alignment issue, probably. Both systems returned to normal without being asked."
   }
 ] as const satisfies readonly EventDefinition[];

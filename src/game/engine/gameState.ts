@@ -18,7 +18,7 @@ import type {
 } from "../types/game";
 import { createInitialDayManagement, STARTING_REPUTATION, SUPPLY_CAPS } from "./management";
 
-export const CURRENT_GAME_STATE_VERSION = 11;
+export const CURRENT_GAME_STATE_VERSION = 12;
 export const CURRENT_CONTENT_CATALOG_VERSION = "week-one-v1";
 
 const initialResources: ResourceState = {
@@ -193,6 +193,7 @@ function isValidDayManagement(value: unknown): value is DayManagementState {
     typeof management.cleaningActions === "number" &&
     typeof management.offerReviewed === "boolean" &&
     typeof management.advertisingRun === "boolean" &&
+    typeof management.socialAdRun === "boolean" &&
     typeof management.kassandraConsulted === "boolean" &&
     typeof management.helperDecisionMade === "boolean" &&
     typeof management.reputationAtStart === "number" &&
@@ -420,6 +421,7 @@ function isValidGuestMemory(value: unknown): value is Partial<Record<GuestId, Gu
  * v8 -> v9: day summaries gained `dailyOverhead`; helper "mira" renamed to "nele".
  * v9 -> v10: `staffXp` object added (defaults to empty {}).
  * v10 -> v11: soft-run metadata and guest memory added.
+ * v11 -> v12: `socialAdRun` added to dayManagement.
  * Older versions may also lack décor slots added after the save was written
  * (clock/lamp/cups).
  */
@@ -478,6 +480,18 @@ export function migrateRawSave(raw: unknown): unknown {
       Array.isArray(obj.guestMemory)
     ) {
       obj.guestMemory = {};
+    }
+  }
+
+  if (obj.version === 11) {
+    obj.version = 12;
+    patched = true;
+
+    if (obj.dayManagement && typeof obj.dayManagement === "object" && !Array.isArray(obj.dayManagement)) {
+      const dm = obj.dayManagement as Record<string, unknown>;
+      if (typeof dm.socialAdRun !== "boolean") {
+        obj.dayManagement = { ...dm, socialAdRun: false };
+      }
     }
   }
 

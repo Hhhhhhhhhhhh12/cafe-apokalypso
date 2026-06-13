@@ -33,6 +33,7 @@ interface ActionPanelProps {
   onCleanTables: () => void;
   onAdjustOffer: () => void;
   onRunAdvertising: () => void;
+  onRunSocialAd: () => void;
   onConsultKassandra: () => void;
   onSelectHelper: (helperId: StaffOptionId, taskId: HelperTaskId) => void;
   onOpenDay: () => void;
@@ -61,6 +62,7 @@ export function ActionPanel({
   onCleanTables,
   onAdjustOffer,
   onRunAdvertising,
+  onRunSocialAd,
   onConsultKassandra,
   onSelectHelper,
   onOpenDay,
@@ -98,6 +100,7 @@ export function ActionPanel({
           onCleanTables={onCleanTables}
           onAdjustOffer={onAdjustOffer}
           onRunAdvertising={onRunAdvertising}
+          onRunSocialAd={onRunSocialAd}
           onConsultKassandra={onConsultKassandra}
           onCompleteDay={onCompleteDay}
           canCloseDay={canCloseDay}
@@ -133,7 +136,7 @@ export function ActionPanel({
                   : "Core café tasks complete. The day can be closed."}
       </p>
 
-      <p className="status-message" role="status" aria-live="polite">
+      <p key={statusMessage} className="status-message" role="status" aria-live="polite">
         {statusMessage}
       </p>
     </section>
@@ -149,6 +152,7 @@ function OpenDayControls({
   onCleanTables,
   onAdjustOffer,
   onRunAdvertising,
+  onRunSocialAd,
   onConsultKassandra,
   onCompleteDay,
   canCloseDay
@@ -161,6 +165,7 @@ function OpenDayControls({
   onCleanTables: () => void;
   onAdjustOffer: () => void;
   onRunAdvertising: () => void;
+  onRunSocialAd: () => void;
   onConsultKassandra: () => void;
   onCompleteDay: () => void;
   canCloseDay: boolean;
@@ -236,13 +241,30 @@ function OpenDayControls({
             disabled={!canUseAdvertisingAction || gameState.dayManagement.advertisingRun}
             title={
               gameState.dayManagement.advertisingRun
-                ? "One small ad has already run today."
+                ? "A flyer has already gone out today."
                 : canUseAdvertisingAction
-                  ? undefined
+                  ? "€2 · +1 reputation"
                   : actionLockReason
             }
           >
-            Run local ad
+            Run flyer (€2)
+          </button>
+        ) : null}
+        {gameState.unlocks.advertising && gameState.day >= 5 ? (
+          <button
+            type="button"
+            className="secondary-button"
+            onClick={onRunSocialAd}
+            disabled={!canAct || gameState.dayManagement.socialAdRun}
+            title={
+              gameState.dayManagement.socialAdRun
+                ? "A social post has already gone out today."
+                : canAct
+                  ? "€5 · +3 reputation"
+                  : actionLockReason
+            }
+          >
+            Social post (€5)
           </button>
         ) : null}
         {gameState.unlocks.kassandra ? (

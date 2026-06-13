@@ -391,7 +391,7 @@ describe("management tradeoff system", () => {
     };
     const advertised = gameReducer(dayFour, { type: "run_advertising" });
 
-    expect(advertised.resources.money).toBe(39);
+    expect(advertised.resources.money).toBe(40);
     expect(advertised.resources.reputation).toBe(27);
     expect(advertised.resources.stress).toBe(2);
     expect(advertised.statusMessage).toContain("Ruf +2");
