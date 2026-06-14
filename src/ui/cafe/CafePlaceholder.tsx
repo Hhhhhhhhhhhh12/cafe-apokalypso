@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { GameState } from "../../game/types/game";
 import { getDioramaGuestVisibility } from "../../game/engine/selectors";
-import stageBaseAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v03-tiles.png";
-import stageBaseDustyAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v04-px.png";
+import stageBaseAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v03.png";
 import coffeeMachineAsset from "../../../assets/sprites/props/placeholder-cafe-coffee-machine.png";
 import kassandraRegisterAsset from "../../../assets/sprites/props/placeholder-kassandra-register.png";
 import bohnGuestAsset from "../../../assets/sprites/guests/placeholder-guest-bohn.png";
@@ -108,10 +107,10 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
   // KASSANDRA screen glows when installed / awake
   const kassandraAwake = gameState.kassandraInstalled || gameState.day >= 6;
 
-  // Days 1-2 use the dusty, slightly enchanted stage base (v04) — the café has
-  // been closed for a long time. From day 3 the warmer lived-in v03 takes over.
+  // Days 1-2 show dust motes (cafe-dust overlay). Background is always the
+  // high-res stage base — v04-px.png is too small (223×177) for the zoom level.
   const isDusty = gameState.day <= 2;
-  const stageBase = isDusty ? stageBaseDustyAsset : stageBaseAsset;
+  const stageBase = stageBaseAsset;
 
   return (
     <section

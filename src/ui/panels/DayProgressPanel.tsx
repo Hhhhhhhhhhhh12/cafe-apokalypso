@@ -127,7 +127,7 @@ export function DayProgressPanel({ gameState }: DayProgressPanelProps) {
               { label: "Net profit / loss", value: (() => { const net = Math.round((gameState.daySummary!.moneyEarned - gameState.daySummary!.moneySpent - gameState.daySummary!.dailyOverhead) * 100) / 100; return net >= 0 ? `+€${net}` : `-€${Math.abs(net)}`; })() },
               { label: "Customers served", value: String(gameState.daySummary.customersServed) },
               { label: "Supplies used", value: `Coffee ${gameState.daySummary.suppliesUsed.coffee}, Milk ${gameState.daySummary.suppliesUsed.milk}, Pastries ${gameState.daySummary.suppliesUsed.pastries}` },
-              { label: "Restock planned", value: `Coffee ${gameState.pendingSupplyPurchase.coffee}, Milk ${gameState.pendingSupplyPurchase.milk}, Pastries ${gameState.pendingSupplyPurchase.pastries}` },
+              ...(gameState.pendingSupplyPurchase ? [{ label: "Restock planned", value: `Coffee ${gameState.pendingSupplyPurchase.coffee}, Milk ${gameState.pendingSupplyPurchase.milk}, Pastries ${gameState.pendingSupplyPurchase.pastries}` }] : []),
               { label: "Supplies left", value: `Coffee ${gameState.daySummary.suppliesRemaining.coffee}, Milk ${gameState.daySummary.suppliesRemaining.milk}, Pastries ${gameState.daySummary.suppliesRemaining.pastries}` },
               { label: "Cleanliness", value: gameState.daySummary.cleanlinessLabel },
               { label: "Stress", value: gameState.daySummary.stressLabel },
