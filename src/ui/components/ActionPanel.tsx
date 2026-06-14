@@ -116,7 +116,15 @@ export function ActionPanel({
         />
       ) : null}
 
-      <button type="button" className="secondary-button" onClick={onResetGame}>
+      <button
+        type="button"
+        className="secondary-button"
+        onClick={() => {
+          if (window.confirm("Café-Woche abbrechen und neu starten?")) {
+            onResetGame();
+          }
+        }}
+      >
         Reset / New Game
       </button>
 
@@ -124,7 +132,7 @@ export function ActionPanel({
         {gameState.demoComplete
           ? "Demo complete. Reset to replay the seven-day loop."
           : gameState.dayPhase === "day_start"
-            ? "Choose one helper task or open without help. The choice locks when the day opens."
+            ? null
             : !canCloseDay
               ? `Before closing: ${formatMissingActions(missingActions)}.`
               : gameState.dayManagement.customersServed === 0
@@ -309,6 +317,12 @@ function OpenDayControls({
         </p>
       ) : null}
 
+      {!canAct ? (
+        <p className="action-capacity-warn" role="status">
+          No actions left for this shift.
+        </p>
+      ) : null}
+
       <div className="product-grid" aria-label="Serve a specific product">
         {products.map((product) => (
           <button
@@ -320,6 +334,7 @@ function OpenDayControls({
             title={actionLockReason}
           >
             {product.name} · €{product.basePrice}
+            <span className="product-cost-hint">{formatIngredients(product.ingredients)}</span>
           </button>
         ))}
       </div>
@@ -356,7 +371,7 @@ function HelperStartPanel({
         <fieldset key={staffOption.id}>
           <legend>
             Hire {staffOption.name} · €{staffOption.dailyCost}
-            {gameState.resources.money < staffOption.dailyCost ? " · Nicht genug" : ""}
+            {gameState.resources.money < staffOption.dailyCost ? " · Can't afford" : ""}
           </legend>
           <div className="radio-row">
             {helperTasks[staffOption.id].map((taskId) => (
@@ -488,13 +503,21 @@ function RestockPanel({
                 {option.next.reputationBonus > 0 ? ` · ★${option.next.reputationBonus}` : ""}
               </button>
             ) : (
-              <span className="decor-row__maxed">Bestmöglich</span>
+              <span className="decor-row__maxed">Best available</span>
             )}
           </div>
         ))}
       </div>
     </div>
   );
+}
+
+function formatIngredients(ingredients: Partial<Record<"coffee" | "milk" | "pastries", number>>): string {
+  const parts: string[] = [];
+  if (ingredients.coffee) parts.push(`${ingredients.coffee}☕`);
+  if (ingredients.milk) parts.push(`${ingredients.milk}🥛`);
+  if (ingredients.pastries) parts.push(`${ingredients.pastries}🥐`);
+  return parts.join(" ");
 }
 
 function formatMissingActions(actions: readonly string[]): string {
