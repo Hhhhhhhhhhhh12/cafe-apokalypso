@@ -218,6 +218,18 @@ Soft-roguelite progression may later include:
 
 The first seven-day MVP represents the first playable café week / first soft-roguelite run. Day 7 reveals that the café is part of a larger repeating crisis structure, but full meta-progression does not need to be implemented in the MVP.
 
+Implemented slice seed:
+
+- Week 1 now carries deterministic day modifiers in game state. They act like a
+  fixed first-run modifier deck: soft opening, commuter wave, inventory audit,
+  poster echo, short staffing, forecast static, and inspection pressure.
+- Guest preferences can be learned by serving the right product. The learned
+  preference is stored in `guestMemory` and can later replace generic cues with
+  remembered in-world knowledge.
+- KASSANDRA collects `run.memoryFragments` at day close. These fragments do not
+  yet drive a new UI, but they provide the save-safe foundation for later
+  repeat-week bonuses, known guest files, and forecast modules.
+
 ### Week 1 Day Structure
 
 Day 1: New Opening

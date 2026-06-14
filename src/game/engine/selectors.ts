@@ -1,5 +1,6 @@
 import {
   daySevenHookLetter,
+  weekOneDayModifiers,
   kassandraMessages,
   weekOneDays,
   weekOneEvents,
@@ -20,6 +21,7 @@ import { decorSlots, getDecorTier, getMaxDecorTier } from "../data/decor";
 import { getCurrentObjective, getObjectiveStatus } from "./objectives";
 import type {
   DayDefinition,
+  DayModifierDefinition,
   EventDefinition,
   GuestDefinition,
   GuestId,
@@ -46,6 +48,15 @@ export const requiredDayActionIds: readonly DayActionId[] = [
 
 export function getCurrentDayDefinition(state: GameState): DayDefinition {
   return weekOneDays[state.day - 1];
+}
+
+export function getCurrentDayModifier(state: GameState): DayModifierDefinition {
+  const modifierId = state.run.modifierIds[state.day - 1];
+  const modifier =
+    weekOneDayModifiers.find((candidate) => candidate.id === modifierId) ??
+    weekOneDayModifiers.find((candidate) => candidate.day === state.day);
+
+  return modifier ?? weekOneDayModifiers[0];
 }
 
 export function getAvailableProducts(state: GameState): readonly ProductDefinition[] {
@@ -152,11 +163,16 @@ export function getNextGuestPreview(state: GameState): NextGuestPreview | null {
   }
 
   const wantedProductId = guest.preferredProductId ?? guest.appreciatedProductIds?.[0];
+  const knownPreferenceId = state.guestMemory[guest.id]?.knownPreferenceId;
+  const knownProductName = knownPreferenceId ? getProductById(knownPreferenceId).name : null;
+
   return {
     name: guest.name,
     orderLine: guest.orderLine ?? guest.sampleLines[0] ?? "",
-    learningCue: guest.learningCue ?? null,
-    wants: wantedProductId ? getProductById(wantedProductId).name : null
+    learningCue: knownProductName
+      ? `You remember: ${guest.name} tends toward ${knownProductName}.`
+      : guest.learningCue ?? getCurrentDayModifier(state).learningHint,
+    wants: knownProductName ?? (wantedProductId ? getProductById(wantedProductId).name : null)
   };
 }
 

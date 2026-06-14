@@ -170,11 +170,11 @@ These hold the integrated provisional pilot assets (see `docs/art/PILOT_ASSET_IN
 
 The MVP game state should be serializable.
 
-The serialized state carries an explicit `version` field. **The current schema version is `9`** (`GameStateVersion = 9`), alongside a `contentCatalogVersion` (`"week-one-v1"`). On load, a save whose `version` or `contentCatalogVersion` does not match the current values is rejected or migrated where supported before validation (see Save System below).
+The serialized state carries an explicit `version` field. **The current schema version is `11`** (`GameStateVersion = 11`), alongside a `contentCatalogVersion` (`"week-one-v1"`). On load, a save whose `version` or `contentCatalogVersion` does not match the current values is rejected or migrated where supported before validation (see Save System below).
 
 Important state fields (as implemented; the shape is grouped, not flat):
 
-- `version` — schema version, currently `9`
+- `version` — schema version, currently `11`
 - `contentCatalogVersion` — content catalog version, currently `"week-one-v1"`
 - `day`, `dayPhase`, `phaseLabel`
 - `resources` — `{ money, reputation, cleanliness, stress, mood }`
@@ -183,6 +183,8 @@ Important state fields (as implemented; the shape is grouped, not flat):
 - `pendingSupplyPurchase` — per-ingredient quantities staged for the next day
 - `dayManagement` — per-day counters (customers served, money earned/spent, stress sources applied, helper bonuses, etc.)
 - `daySummary`, `objectiveResults`
+- `run` — soft-run metadata: run number, deterministic week modifier IDs, and KASSANDRA memory fragments
+- `guestMemory` — learned guest preference entries used by selectors and status copy to teach without a separate tutorial
 - `stressEventLog` — list of stress-event flavor lines fired so far
 - `hiddenWeirdness` — internal weirdness value, updated throughout Days 1–7
 - `weirdnessVisible` — gate controlling whether weirdness may surface in the UI (`false` until the Day-7 letter)
@@ -209,7 +211,7 @@ The MVP uses localStorage.
 
 ### Versioning (as implemented)
 
-- The serialized `GameState` carries `version` (currently `9`) and `contentCatalogVersion` (currently `"week-one-v1"`). Supported older saves are migrated before validation; otherwise the loader returns a fresh initial state instead of crashing.
+- The serialized `GameState` carries `version` (currently `11`) and `contentCatalogVersion` (currently `"week-one-v1"`). Supported older saves are migrated before validation; otherwise the loader returns a fresh initial state instead of crashing.
 - The localStorage **key** is currently `cafe-apokalypso.save.v4`. Earlier keys (`...v1`, `...v2`, `...v3`) are treated as legacy and cleared on reset. Note: the storage-key suffix and the in-state schema `version` are tracked separately and are not required to share the same number.
 - A "Reset / New Game" control removes the current save and the legacy keys.
 

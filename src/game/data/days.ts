@@ -94,14 +94,14 @@ export const weekOneDays = [
       "freelancerin-nele",
       "herr-grau"
     ],
-    eventIds: ["day-4-herr-grau-coin", "day-4-poster-before-printed"]
+    eventIds: ["day-4-herr-grau-coin", "day-4-poster-before-printed", "day-4-flyer-wrong-address", "day-4-bohn-recognizes-coin"]
   },
   {
     day: 5,
     title: "Delegation Pressure",
     milestone: "Helper choices start to matter more as the café gets busier.",
     dayOpener:
-      "By now help is no longer a novelty. Jana, Nino, and Nele can each solve one problem well, which leaves the other problems politely waiting.",
+      "By now help is no longer a novelty. Each person on the staff board can solve one problem well, which leaves the other problems politely waiting. A table was wet this morning in a way that did not match any spill. You wipe it and move on.",
     unlockMessage:
       "Delegation is still narrow: one person, one task, one day at a time.",
     objective: {
@@ -122,7 +122,7 @@ export const weekOneDays = [
       "herr-grau",
       "meda"
     ],
-    eventIds: ["day-5-wet-table-jana", "day-5-meda-corner-seat"]
+    eventIds: ["day-5-wet-table-jana", "day-5-meda-corner-seat", "day-5-receipt-printer-early", "day-5-storage-smell"]
   },
   {
     day: 6,
@@ -150,7 +150,7 @@ export const weekOneDays = [
       "herr-grau",
       "meda"
     ],
-    eventIds: ["day-6-kassandra-update", "day-6-returning-guest"]
+    eventIds: ["day-6-kassandra-update", "day-6-returning-guest", "day-6-kassandra-complaint-queue", "day-6-disclaimer-receipt"]
   },
   {
     day: 7,
@@ -158,7 +158,7 @@ export const weekOneDays = [
     milestone:
       "Operational stress test, red umbrella guest, official apocalyptic letter.",
     dayOpener:
-      "The café is more crowded than usual today. A few of the faces are unfamiliar. The day should close normally.",
+      "The café is more crowded than usual today. A few of the faces are unfamiliar in a specific way — not new, but as if they arrived from a slightly different version of here. The back wall has been a wall all morning. A letter may arrive.",
     objective: {
       id: "day-7-the-letter",
       day: 7,
@@ -178,6 +178,6 @@ export const weekOneDays = [
       "meda",
       "frau-roter-regenschirm"
     ],
-    eventIds: ["day-7-red-umbrella", "day-7-back-wall-doorway"]
+    eventIds: ["day-7-red-umbrella", "day-7-back-wall-doorway", "day-7-menu-bookmark", "day-7-kassandra-threshold"]
   }
 ] as const satisfies readonly DayDefinition[];

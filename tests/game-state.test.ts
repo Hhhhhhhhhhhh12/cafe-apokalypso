@@ -3,6 +3,7 @@ import { createInitialGameState } from "../src/game/engine/gameState";
 import { gameReducer } from "../src/game/engine/reducer";
 import { getEmployeeLevel, getEmployeeLevelBonuses } from "../src/game/engine/management";
 import {
+  getCurrentDayModifier,
   getObjectiveStatus,
   getVisibleDaySevenLetter,
   getVisibleKassandraMessages
@@ -13,8 +14,12 @@ describe("initial game state", () => {
   it("starts as a serializable day-one café state", () => {
     const state = createInitialGameState();
 
-    expect(state.version).toBe(10);
+    expect(state.version).toBe(12);
     expect(state.decor).toEqual({ plant: 1, shelf: 1, clock: 1, lamp: 1, cups: 1 });
+    expect(state.run.runNumber).toBe(1);
+    expect(state.run.modifierIds).toHaveLength(7);
+    expect(getCurrentDayModifier(state).id).toBe("soft-opening");
+    expect(state.guestMemory).toEqual({});
     expect(state.contentCatalogVersion).toBe("week-one-v1");
     expect(state.day).toBe(1);
     expect(state.weirdnessVisible).toBe(false);
@@ -105,6 +110,15 @@ describe("initial game state", () => {
     const resetState = gameReducer(progressedState, { type: "reset_game" });
 
     expect(resetState).toEqual(createInitialGameState());
+  });
+
+  it("records soft-run memory fragments without ending the week", () => {
+    const state = closeCurrentDay(createInitialGameState());
+
+    expect(state.day).toBe(2);
+    expect(state.run.memoryFragments).toContain("day-1-objective-completed");
+    expect(state.run.memoryFragments).toContain("guest-preference-ledger");
+    expect(state.demoComplete).toBe(false);
   });
 });
 

@@ -44,6 +44,21 @@ mundane in Days 1–6. No supernatural language appears before the Day-7 hook.
 |---|---|
 | Weirdness | Ticks up internally on scripted events. The field `weirdnessVisible` must be `false` through Day 6. No UI element — label, bar, number, or class — may reference weirdness until after the Day-7 letter fires. |
 
+### Soft-run memory fields
+
+Week 1 now has a small backend-only roguelike scaffold:
+
+- `run.modifierIds` defines one deterministic day modifier per day.
+- `run.memoryFragments` records useful week facts at day close, such as objective
+  results, learned guest preferences, advertising patterns, delegation patterns,
+  and the Day-7 letter.
+- `guestMemory` records visits, matched preferences, last served product, and the
+  known preference once the player has learned it through play.
+
+These fields are intentionally save-safe and UI-agnostic. They support later
+repeat-week bonuses without forcing a separate tutorial or a new screen in the
+current slice.
+
 ---
 
 ## Supply System
@@ -209,6 +224,21 @@ installation, not to anything unexplained.
 Stress event text is selected from the mundane event list in Days 1–6.
 The weirdness event list is locked and must not be drawn from until after
 `weirdnessVisible` is `true`.
+
+## Day Modifiers
+
+The first run uses a fixed modifier deck so the player can learn systems through
+concrete days:
+
+| Day | Modifier | Engine effect |
+|---|---|---|
+| 1 | Soft Opening | No extra pressure; establishes the basic order-clean-close loop |
+| 2 | Commuter Wave | Fast/impatient guests reduce stress by 2 when served their obvious preference; missing it adds 2 stress |
+| 3 | Inventory Audit | First clean supply check grants +1 reputation if no ingredient is empty |
+| 4 | Poster Echo | First ad grants +2 reputation instead of +1, but adds 2 stress |
+| 5 | Short Staffed | Existing solo-floor penalty is the day's delegation lesson |
+| 6 | Forecast Static | First KASSANDRA consult before serving any guest refunds its action point |
+| 7 | Inspection Pressure | Clean close grants an extra +1 reputation; messy close costs an extra -1 reputation |
 
 ---
 

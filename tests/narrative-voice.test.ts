@@ -33,17 +33,8 @@ describe("guest serve lines", () => {
     }
   });
 
-  it("gives day-one-to-three guests in-world order and learning cues", () => {
-    const dayOneToThreeGuestIds = new Set(
-      weekOneDays
-        .filter((day) => day.day <= 3)
-        .flatMap((day) => day.guestIds)
-    );
-    const dayOneToThreeGuests = weekOneGuests.filter((guest) =>
-      dayOneToThreeGuestIds.has(guest.id)
-    ) as readonly GuestDefinition[];
-
-    for (const guest of dayOneToThreeGuests) {
+  it("gives every week-one guest in-world order and learning cues", () => {
+    for (const guest of weekOneGuests as readonly GuestDefinition[]) {
       expect(guest.orderLine?.length ?? 0).toBeGreaterThan(0);
       expect(guest.learningCue?.length ?? 0).toBeGreaterThan(0);
     }

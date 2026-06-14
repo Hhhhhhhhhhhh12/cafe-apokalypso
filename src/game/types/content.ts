@@ -2,6 +2,15 @@ export type DayNumber = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
 export type GuestCategory = "normal" | "subtly_strange";
 
+export type DayModifierId =
+  | "soft-opening"
+  | "commuter-wave"
+  | "inventory-audit"
+  | "poster-echo"
+  | "short-staffed"
+  | "forecast-static"
+  | "inspection-pressure";
+
 export type GuestId =
   | "pendlerin-paula"
   | "laptop-lukas"
@@ -47,12 +56,20 @@ export type EventId =
   | "day-3-guest-checks-in"
   | "day-4-herr-grau-coin"
   | "day-4-poster-before-printed"
+  | "day-4-flyer-wrong-address"
+  | "day-4-bohn-recognizes-coin"
   | "day-5-wet-table-jana"
   | "day-5-meda-corner-seat"
+  | "day-5-receipt-printer-early"
+  | "day-5-storage-smell"
   | "day-6-kassandra-update"
   | "day-6-returning-guest"
+  | "day-6-kassandra-complaint-queue"
+  | "day-6-disclaimer-receipt"
   | "day-7-red-umbrella"
-  | "day-7-back-wall-doorway";
+  | "day-7-back-wall-doorway"
+  | "day-7-menu-bookmark"
+  | "day-7-kassandra-threshold";
 
 export type AchievementId =
   | "first-order"
@@ -185,6 +202,17 @@ export interface DayDefinition {
   unlocks: readonly string[];
   guestIds: readonly GuestId[];
   eventIds: readonly EventId[];
+}
+
+export interface DayModifierDefinition {
+  id: DayModifierId;
+  day: DayNumber;
+  title: string;
+  summary: string;
+  /** A player-learnable rule written as in-world operational advice. */
+  learningHint: string;
+  /** Short authored notes for tests/docs; actual effects live in the engine. */
+  effects: readonly string[];
 }
 
 export interface DayObjectiveDefinition {

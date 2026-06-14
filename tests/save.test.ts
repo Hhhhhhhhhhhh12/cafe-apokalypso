@@ -148,7 +148,7 @@ describe("save migration", () => {
     expect(migrated.decor.cups).toBe(1);  // patched
   });
 
-  it("migrateRawSave upgrades version 8 to 9", () => {
+  it("migrateRawSave upgrades version 8 to the current schema", () => {
     const migrated = migrateRawSave(JSON.parse(makeRealV8Save())) as {
       version: number;
     };
@@ -217,9 +217,27 @@ describe("save migration", () => {
     expect(migrated.staffXp).toEqual({});
   });
 
-  it("migrateRawSave chains v8 → v9 → v10 in one pass", () => {
+  it("migrateRawSave adds run metadata and guest memory to a v10 save", () => {
+    const raw = { ...createInitialGameState(), version: 10 } as Record<string, unknown>;
+    delete raw.run;
+    delete raw.guestMemory;
+    const migrated = migrateRawSave(raw) as {
+      version: number;
+      run: { modifierIds: unknown[]; memoryFragments: unknown[] };
+      guestMemory: unknown;
+    };
+
+    expect(migrated.version).toBe(CURRENT_GAME_STATE_VERSION);
+    expect(migrated.run.modifierIds).toHaveLength(7);
+    expect(migrated.run.memoryFragments).toEqual([]);
+    expect(migrated.guestMemory).toEqual({});
+  });
+
+  it("migrateRawSave chains v8 → v9 → v10 → v11 in one pass", () => {
     const raw = JSON.parse(makeRealV8Save()) as Record<string, unknown>;
     delete raw.staffXp;
+    delete raw.run;
+    delete raw.guestMemory;
     const migrated = migrateRawSave(raw) as { version: number; staffXp: unknown };
     expect(migrated.version).toBe(CURRENT_GAME_STATE_VERSION);
     expect(migrated.staffXp).toEqual({});

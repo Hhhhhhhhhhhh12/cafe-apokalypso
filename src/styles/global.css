@@ -72,7 +72,19 @@ button:focus-visible {
   grid-template-columns: minmax(0, 1fr) minmax(180px, 240px);
   gap: 24px;
   align-items: end;
-  padding: 0 0 18px;
+  padding: 10px 0 14px;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background:
+    linear-gradient(90deg, rgba(83, 49, 42, 0.06) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(83, 49, 42, 0.06) 1px, transparent 1px),
+    #f4eadf;
+  background-size: 24px 24px;
+  border-bottom: 1px solid #d5bda5;
+  /* Extend background to viewport edges on wide screens */
+  margin-inline: calc(50% - 50vw);
+  padding-inline: calc(50vw - 50%);
 }
 
 .eyebrow {
@@ -193,6 +205,134 @@ h3 {
 
 .cafe-closed-banner button:hover {
   background: #97401f;
+}
+
+/* ── Demo-complete banner (after Day 7) ──────────────────────────────── */
+.demo-complete-banner {
+  margin-bottom: 16px;
+  padding: 18px 20px;
+  border: 3px solid #3a4a7a;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #e6ddf6 0%, #cdbfe9 100%);
+  color: #241a4a;
+  box-shadow: 0 4px 0 #6a4fb0;
+}
+
+.demo-complete-banner .eyebrow {
+  margin: 0 0 2px;
+  color: #5a33a3;
+}
+
+.demo-complete-banner h2 {
+  margin: 0 0 6px;
+  font-size: 1.4rem;
+}
+
+.demo-complete-banner h2:focus {
+  outline: 3px solid #3a4a7a;
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+.demo-complete-banner p {
+  margin: 0 0 12px;
+  max-width: 60ch;
+  line-height: 1.45;
+}
+
+.demo-complete-banner__teaser {
+  font-style: italic;
+  color: #3a2a6a;
+}
+
+.demo-complete-banner button {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 8px;
+  background: #3a4a7a;
+  color: #f4f0ff;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.demo-complete-banner button:hover {
+  background: #4a5a97;
+}
+
+/* ── KASSANDRA boot splash (before Day 1) ────────────────────────────── */
+.kassandra-boot {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(12, 10, 24, 0.78);
+  backdrop-filter: blur(2px);
+}
+
+.kassandra-boot__panel {
+  width: min(440px, 100%);
+  padding: 24px 26px;
+  border: 2px solid #4a6a5a;
+  border-radius: 12px;
+  background: #0e1512;
+  color: #c8e6d4;
+  box-shadow: 0 8px 0 #1a2a22, 0 0 0 4px rgba(74, 106, 90, 0.25);
+}
+
+.kassandra-boot__panel .eyebrow {
+  margin: 0 0 4px;
+  letter-spacing: 0.18em;
+  color: #6fae8a;
+}
+
+.kassandra-boot__panel h2 {
+  margin: 0 0 14px;
+  font-size: 1.25rem;
+  color: #e2f5ea;
+}
+
+.kassandra-boot__log {
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: #060b08;
+  border: 1px solid #2a4035;
+  color: #8fd4a8;
+  font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.kassandra-boot__note {
+  margin: 0 0 18px;
+  max-width: 48ch;
+  line-height: 1.45;
+  color: #a6c4b2;
+}
+
+.kassandra-boot__panel button {
+  min-height: 44px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 8px;
+  background: #4a6a5a;
+  color: #f0fff6;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.kassandra-boot__panel button:hover {
+  background: #5c8270;
+}
+
+.kassandra-boot__panel button:focus-visible {
+  outline: 3px solid #8fd4a8;
+  outline-offset: 3px;
 }
 
 .panel {
@@ -377,9 +517,7 @@ h3 {
   overflow: hidden;
   border: 3px solid #3d2a23;
   border-radius: 8px;
-  background:
-    radial-gradient(circle at 22% 18%, rgba(255, 248, 237, 0.68), transparent 30%),
-    linear-gradient(135deg, #e4bb90 0 52%, #c49375 52% 100%);
+  background: #d4bfa0;
   isolation: isolate;
 }
 
@@ -469,7 +607,8 @@ h3 {
   width: 100%;
   height: 100%;
   object-fit: fill;
-  image-rendering: pixelated;
+  image-rendering: smooth;
+  image-rendering: high-quality;
   pointer-events: none;
   user-select: none;
 }
@@ -1035,6 +1174,13 @@ h3 {
   transition: none;
 }
 
+/* Paula's exit: walks toward the counter (north in the painted room).
+   Target overshoots the queue box upward so she disappears into the counter area. */
+.placeholder-guest-normal-01.placeholder-guest--walking-to-counter {
+  left: 60%;
+  bottom: 185%;
+}
+
 .cafe-pilot-asset--paula,
 .cafe-pilot-asset--guest {
   left: 50%;
@@ -1090,10 +1236,113 @@ h3 {
   }
 }
 
+/* 9-frame north walk cycle while Paula walks to the counter.
+   Sheet: 9 × 68px native → rendered 9 × 108px = 972px wide.
+   Frame 0 = reference pose (static fallback for reduced-motion). */
+.cafe-pilot-asset--paula-walking-north {
+  background-image: url("../../assets/sprites/guests/placeholder-guest-paula-walk-north.png");
+  background-size: 972px 108px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cafe-pilot-asset--paula-walking-north {
+    animation: cafe-paula-walk-north 1.08s steps(9) infinite;
+  }
+}
+
+@keyframes cafe-paula-walk-north {
+  to {
+    background-position: -972px 0;
+  }
+}
+
+/* 7-frame east walk cycle while Paula exits the frame to the right.
+   Sheet: 7 × 68px native → rendered 7 × 108px = 756px wide.
+   Frame 0 = reference pose (static fallback for reduced-motion). */
+.cafe-pilot-asset--paula-walking-east {
+  background-image: url("../../assets/sprites/guests/placeholder-guest-paula-walk-east.png");
+  background-size: 756px 108px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cafe-pilot-asset--paula-walking-east {
+    animation: cafe-paula-walk-east 0.84s steps(7) infinite;
+  }
+}
+
+@keyframes cafe-paula-walk-east {
+  to {
+    background-position: -756px 0;
+  }
+}
+
+/* Paula's east exit: slides off-screen right after reaching the counter.
+   Uses a faster transition (1.4s) so the exit feels snappy. */
+.placeholder-guest-normal-01.placeholder-guest--exiting-east {
+  left: 420%;
+  bottom: 8%;
+  transition:
+    left 1.4s linear,
+    bottom 0.5s ease-in;
+}
+
+/* Standing poses for queue rotation — each guest's single static frame shown
+   while waiting to order. Only Paula has dedicated walk sheets; other guests
+   slide via CSS position transition with their static standing sprite. */
+.cafe-pilot-asset--cem-standing,
+.cafe-pilot-asset--mira-standing {
+  width: 90px;
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  /* 40×48 source scaled to 108px height → 90×108 rendered */
+  background-size: 90px 108px;
+}
+
+.cafe-pilot-asset--cem-standing {
+  background-image: url("../../assets/sprites/guests/placeholder-guest-cem.png");
+}
+
+.cafe-pilot-asset--mira-standing {
+  background-image: url("../../assets/sprites/guests/placeholder-guest-mira.png");
+}
+
+.cafe-pilot-asset--lukas-standing {
+  width: 72px;
+  background-image: url("../../assets/sprites/guests/placeholder-guest-lukas.png");
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: 72px 108px;
+}
+
+.cafe-pilot-asset--christa-standing {
+  width: 34px;
+  background-image: url("../../assets/sprites/guests/placeholder-guest-christa.png");
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: 34px 108px;
+}
+
+/* Seated guests slide up on first appearance (one-shot on DOM mount). */
+@keyframes guest-seat-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /* Seated guests breathe with a discrete 1px bob — pixel-art-safe (no
    subpixel resampling), staggered per guest so the room never moves in
    lockstep. */
 @media (prefers-reduced-motion: no-preference) {
+  .placeholder-guest-seated {
+    animation: guest-seat-in 0.45s cubic-bezier(0.2, 0.8, 0.4, 1) both;
+  }
+
   .placeholder-guest-seated .cafe-pilot-asset--guest {
     animation: cafe-guest-breathe 3.4s linear infinite;
   }
@@ -1382,8 +1631,6 @@ h3 {
    ── */
 .cafe-decor-clock {
   position: absolute;
-  /* On the right-wall segment between the corner seam and the right window
-     (left:48% put it straddling the corner seam, which read as floating). */
   left: 53.5%;
   top: 23%;
   z-index: 4;
@@ -1445,7 +1692,6 @@ h3 {
  */
 .cafe-decor-cups {
   position: absolute;
-  /* Rests on the painted upper wall shelf right of the right window. */
   left: 80%;
   top: 40.5%;
   z-index: 6;
@@ -1694,6 +1940,18 @@ h3 {
   gap: 7px;
   border-top: 2px solid #d5bda5;
   padding-top: 10px;
+  margin-top: 4px;
+}
+
+.product-grid::before {
+  content: "Oder direkt servieren";
+  grid-column: 1 / -1;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #6c5146;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 2px;
 }
 
 .helper-slot {
@@ -1823,11 +2081,129 @@ h3 {
 .status-message {
   margin: 0;
   border: 1px solid #c2aaa0;
+  border-left: 3px solid #16606c;
   border-radius: 8px;
   padding: 0.75rem;
   background: #eef3e7;
   color: #273a2d;
   font-weight: 650;
+  animation: status-slide-in 0.22s ease-out both;
+}
+
+@keyframes status-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .status-message {
+    animation: none;
+  }
+}
+
+/* Achievement toast — fixed overlay, bottom-right */
+.achievement-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 200;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: min(320px, calc(100vw - 32px));
+  padding: 14px 16px;
+  border: 2px solid #7b5e3a;
+  border-left: 4px solid #c88a3a;
+  border-radius: 10px;
+  background: #fdf3e3;
+  box-shadow: 0 4px 16px rgba(61, 42, 35, 0.22);
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.28s ease-out, transform 0.28s ease-out;
+  pointer-events: none;
+}
+
+.achievement-toast--visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.achievement-toast__check {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #c88a3a;
+  color: #fff8ed;
+  font-size: 0.95rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.achievement-toast__body {
+  min-width: 0;
+}
+
+.achievement-toast__label {
+  margin: 0 0 1px;
+  color: #8a5e28;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.achievement-toast__name {
+  margin: 0 0 2px;
+  color: #2b201b;
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.achievement-toast__desc {
+  margin: 0;
+  color: #4a3b34;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .achievement-toast {
+    transition: none;
+  }
+}
+
+/* Summary list stagger — each row fades in with increasing delay */
+@keyframes summary-row-in {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.summary-list div {
+  animation: summary-row-in 0.28s ease-out both;
+  animation-delay: calc(var(--i, 0) * 55ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .summary-list div {
+    animation: none;
+  }
 }
 
 .action-hint {
@@ -1835,6 +2211,25 @@ h3 {
   color: #4a3b34;
   font-size: 0.92rem;
   font-weight: 650;
+}
+
+.action-capacity-warn {
+  margin: 0;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: #f5e4d4;
+  color: #7a3a1a;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.product-cost-hint {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  opacity: 0.75;
+  letter-spacing: 0.03em;
 }
 
 .data-preview {

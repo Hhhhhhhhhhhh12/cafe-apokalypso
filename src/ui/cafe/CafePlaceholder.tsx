@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { GameState } from "../../game/types/game";
 import { getDioramaGuestVisibility } from "../../game/engine/selectors";
-import stageBaseAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v03-px.png";
-import stageBaseDustyAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v04-px.png";
+import stageBaseAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v03.png";
 import coffeeMachineAsset from "../../../assets/sprites/props/placeholder-cafe-coffee-machine.png";
 import kassandraRegisterAsset from "../../../assets/sprites/props/placeholder-kassandra-register.png";
 import bohnGuestAsset from "../../../assets/sprites/guests/placeholder-guest-bohn.png";
@@ -49,16 +48,25 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
   const showQueueGuest = isOpen && actionPointsRemaining > 0;
 
   // Paula enters through the door and walks to the queue spot. Phases:
-  // "at-door" (start position, one paint) → "walking" (CSS transition moves
-  // the wrapper, walk sheet plays) → "idle" (queue spot, idle sheet plays).
-  const [paulaPhase, setPaulaPhase] = useState<"at-door" | "walking" | "idle">(
+  // "at-door" → "walking" (entrance, SE walk sheet + CSS left/bottom transition)
+  // → "idle" (queue spot, idle sheet) → "walking-to-counter" (north walk sheet +
+  // bottom transition toward counter) → "at-door" (reset, triggers next entrance).
+  const [paulaPhase, setPaulaPhase] = useState<"at-door" | "walking" | "idle" | "walking-to-counter" | "exiting-east">(
     "at-door"
   );
+
+  // Queue guest rotates through characters: Paula → Cem → Mira → Lukas → Christa → Paula…
+  const QUEUE_ROTATION = ["paula", "cem", "mira", "lukas", "christa"] as const;
+  type QueueGuest = (typeof QUEUE_ROTATION)[number];
+  const [queueGuest, setQueueGuest] = useState<QueueGuest>("paula");
+
+  // Entrance effect: fires when the queue slot opens or is re-activated.
   useEffect(() => {
     if (!showQueueGuest) {
       setPaulaPhase("at-door");
       return;
     }
+    setQueueGuest(QUEUE_ROTATION[customersServed % QUEUE_ROTATION.length]);
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       setPaulaPhase("idle");
       return;
@@ -75,6 +83,18 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
     };
   }, [showQueueGuest]);
 
+  // When an order is served, the waiting guest walks toward the counter.
+  // Skipped entirely for reduced-motion — transitionend never fires without CSS transitions.
+  const prevServedRef = useRef(customersServed);
+  useEffect(() => {
+    if (customersServed > prevServedRef.current) {
+      if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        setPaulaPhase(prev => prev === "idle" ? "walking-to-counter" : prev);
+      }
+    }
+    prevServedRef.current = customersServed;
+  }, [customersServed]);
+
   const visibleGuests = getDioramaGuestVisibility(gameState);
 
   // Cups on tables appear when cleanliness drops below clean threshold
@@ -87,10 +107,10 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
   // KASSANDRA screen glows when installed / awake
   const kassandraAwake = gameState.kassandraInstalled || gameState.day >= 6;
 
-  // Days 1-2 use the dusty, slightly enchanted stage base (v04) — the café has
-  // been closed for a long time. From day 3 the warmer lived-in v03 takes over.
+  // Days 1-2 show dust motes (cafe-dust overlay). Background is always the
+  // high-res stage base — v04-px.png is too small (223×177) for the zoom level.
   const isDusty = gameState.day <= 2;
-  const stageBase = isDusty ? stageBaseDustyAsset : stageBaseAsset;
+  const stageBase = stageBaseAsset;
 
   return (
     <section
@@ -221,22 +241,62 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
 
           {/* Queue — customer waiting visible when day is open + actions remain */}
           <div className="cafe-queue" aria-hidden="true">
-            {showQueueGuest ? (
+            {showQueueGuest || paulaPhase === "walking-to-counter" || paulaPhase === "exiting-east" ? (
               <span
-                className={`placeholder-guest placeholder-guest-normal-01${
-                  paulaPhase === "at-door" ? " placeholder-guest--at-door" : ""
-                }`}
+                className={[
+                  "placeholder-guest",
+                  "placeholder-guest-normal-01",
+                  paulaPhase === "at-door" ? "placeholder-guest--at-door" : "",
+                  paulaPhase === "walking-to-counter" ? "placeholder-guest--walking-to-counter" :
+                  paulaPhase === "exiting-east" ? "placeholder-guest--exiting-east" : ""
+                ].filter(Boolean).join(" ")}
                 onTransitionEnd={(e) => {
-                  if (e.propertyName === "left") setPaulaPhase("idle");
+                  // Entrance: left transition completes → guest is at queue
+                  if (e.propertyName === "left" && paulaPhase === "walking") {
+                    setPaulaPhase("idle");
+                  }
+                  // Exit: bottom transition completes → guest reached counter, now exits east
+                  if (e.propertyName === "bottom" && paulaPhase === "walking-to-counter") {
+                    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+                      setPaulaPhase("exiting-east");
+                    } else if (showQueueGuest) {
+                      setPaulaPhase("idle");
+                    } else {
+                      setPaulaPhase("at-door");
+                    }
+                  }
+                  // East exit: left transition completes → guest has left, pick next and reset
+                  if (e.propertyName === "left" && paulaPhase === "exiting-east") {
+                    const nextGuest = QUEUE_ROTATION[customersServed % QUEUE_ROTATION.length];
+                    setQueueGuest(nextGuest);
+                    if (showQueueGuest && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+                      setPaulaPhase("at-door");
+                      requestAnimationFrame(() => {
+                        requestAnimationFrame(() => setPaulaPhase("walking"));
+                      });
+                    } else if (showQueueGuest) {
+                      setPaulaPhase("idle");
+                    } else {
+                      setPaulaPhase("at-door");
+                    }
+                  }
                 }}
               >
-                {/* Sprite-sheet idle (5 frames); frame 0 is the original
-                    static Paula sprite, so reduced-motion users see her too.
-                    While entering, the 6-frame walk sheet plays instead. */}
+                {/* Sprite sheet: idle when waiting, SE walk on entrance, N walk to counter.
+                    Frame 0 of each sheet is the original static sprite (reduced-motion fallback). */}
                 <span
-                  className={`cafe-pilot-asset cafe-pilot-asset--paula${
-                    paulaPhase !== "idle" ? " cafe-pilot-asset--paula-walking" : ""
-                  }`}
+                  className={[
+                    "cafe-pilot-asset",
+                    queueGuest === "paula"
+                      ? "cafe-pilot-asset--paula"
+                      : `cafe-pilot-asset--${queueGuest}-standing`,
+                    paulaPhase === "walking" && queueGuest === "paula"
+                      ? "cafe-pilot-asset--paula-walking" : "",
+                    paulaPhase === "walking-to-counter" && queueGuest === "paula"
+                      ? "cafe-pilot-asset--paula-walking-north" : "",
+                    paulaPhase === "exiting-east" && queueGuest === "paula"
+                      ? "cafe-pilot-asset--paula-walking-east" : ""
+                  ].filter(Boolean).join(" ")}
                   aria-hidden="true"
                 />
               </span>

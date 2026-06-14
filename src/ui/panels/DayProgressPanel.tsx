@@ -119,83 +119,26 @@ export function DayProgressPanel({ gameState }: DayProgressPanelProps) {
             Rating: <strong>{gameState.daySummary.rating}</strong>
           </p>
           <dl className="summary-list">
-            <div>
-              <dt>Objective</dt>
-              <dd>
-                {gameState.daySummary.objectiveCompleted ? "Completed" : "Missed"} ·{" "}
-                {gameState.daySummary.objectiveTitle}
-              </dd>
-            </div>
-            <div>
-              <dt>Money earned</dt>
-              <dd>€{gameState.daySummary.moneyEarned}</dd>
-            </div>
-            <div>
-              <dt>Money spent</dt>
-              <dd>€{gameState.daySummary.moneySpent}</dd>
-            </div>
-            <div>
-              <dt>Daily overhead</dt>
-              <dd>-€{gameState.daySummary.dailyOverhead}</dd>
-            </div>
-            <div>
-              <dt>Net profit / loss</dt>
-              <dd>
-                {(() => {
-                  const net = Math.round(
-                    (gameState.daySummary.moneyEarned -
-                      gameState.daySummary.moneySpent -
-                      gameState.daySummary.dailyOverhead) *
-                      100
-                  ) / 100;
-                  return net >= 0 ? `+€${net}` : `-€${Math.abs(net)}`;
-                })()}
-              </dd>
-            </div>
-            <div>
-              <dt>Customers served</dt>
-              <dd>{gameState.daySummary.customersServed}</dd>
-            </div>
-            <div>
-              <dt>Supplies used</dt>
-              <dd>
-                Coffee {gameState.daySummary.suppliesUsed.coffee}, Milk{" "}
-                {gameState.daySummary.suppliesUsed.milk}, Pastries{" "}
-                {gameState.daySummary.suppliesUsed.pastries}
-              </dd>
-            </div>
-            <div>
-              <dt>Restock planned</dt>
-              <dd>
-                Coffee {gameState.pendingSupplyPurchase.coffee}, Milk{" "}
-                {gameState.pendingSupplyPurchase.milk}, Pastries{" "}
-                {gameState.pendingSupplyPurchase.pastries}
-              </dd>
-            </div>
-            <div>
-              <dt>Supplies left</dt>
-              <dd>
-                Coffee {gameState.daySummary.suppliesRemaining.coffee}, Milk{" "}
-                {gameState.daySummary.suppliesRemaining.milk}, Pastries{" "}
-                {gameState.daySummary.suppliesRemaining.pastries}
-              </dd>
-            </div>
-            <div>
-              <dt>Cleanliness</dt>
-              <dd>{gameState.daySummary.cleanlinessLabel}</dd>
-            </div>
-            <div>
-              <dt>Stress</dt>
-              <dd>{gameState.daySummary.stressLabel}</dd>
-            </div>
-            <div>
-              <dt>Reputation change</dt>
-              <dd>{gameState.daySummary.reputationDelta}</dd>
-            </div>
-            <div>
-              <dt>Helper</dt>
-              <dd>{gameState.daySummary.helperRecap ?? "None"}</dd>
-            </div>
+            {[
+              { label: "Objective", value: `${gameState.daySummary.objectiveCompleted ? "Completed" : "Missed"} · ${gameState.daySummary.objectiveTitle}` },
+              { label: "Money earned", value: `€${gameState.daySummary.moneyEarned}` },
+              { label: "Money spent", value: `€${gameState.daySummary.moneySpent}` },
+              { label: "Daily overhead", value: `-€${gameState.daySummary.dailyOverhead}` },
+              { label: "Net profit / loss", value: (() => { const net = Math.round((gameState.daySummary!.moneyEarned - gameState.daySummary!.moneySpent - gameState.daySummary!.dailyOverhead) * 100) / 100; return net >= 0 ? `+€${net}` : `-€${Math.abs(net)}`; })() },
+              { label: "Customers served", value: String(gameState.daySummary.customersServed) },
+              { label: "Supplies used", value: `Coffee ${gameState.daySummary.suppliesUsed.coffee}, Milk ${gameState.daySummary.suppliesUsed.milk}, Pastries ${gameState.daySummary.suppliesUsed.pastries}` },
+              ...(gameState.pendingSupplyPurchase ? [{ label: "Restock planned", value: `Coffee ${gameState.pendingSupplyPurchase.coffee}, Milk ${gameState.pendingSupplyPurchase.milk}, Pastries ${gameState.pendingSupplyPurchase.pastries}` }] : []),
+              { label: "Supplies left", value: `Coffee ${gameState.daySummary.suppliesRemaining.coffee}, Milk ${gameState.daySummary.suppliesRemaining.milk}, Pastries ${gameState.daySummary.suppliesRemaining.pastries}` },
+              { label: "Cleanliness", value: gameState.daySummary.cleanlinessLabel },
+              { label: "Stress", value: gameState.daySummary.stressLabel },
+              { label: "Reputation change", value: String(gameState.daySummary.reputationDelta) },
+              { label: "Helper", value: gameState.daySummary.helperRecap ?? "None" },
+            ].map(({ label, value }, i) => (
+              <div key={label} style={{ "--i": i } as React.CSSProperties}>
+                <dt>{label}</dt>
+                <dd>{value}</dd>
+              </div>
+            ))}
           </dl>
           {gameState.daySummary.flavorLines.length > 0 ? (
             <ul>

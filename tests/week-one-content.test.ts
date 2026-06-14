@@ -4,6 +4,7 @@ import {
   kassandraMessages,
   weekOneAchievements,
   weekOneAdvertisingCampaigns,
+  weekOneDayModifiers,
   weekOneDays,
   weekOneEvents,
   weekOneGuests,
@@ -74,8 +75,20 @@ describe("week-one content data", () => {
     expect(weekOneAdvertisingCampaigns).toHaveLength(4);
     expect(weekOneUpgrades).toHaveLength(7);
     expect(weekOneAchievements).toHaveLength(7);
-    expect(weekOneEvents).toHaveLength(14);
+    expect(weekOneEvents).toHaveLength(22);
+    expect(weekOneDayModifiers).toHaveLength(7);
     expect(weekOneDays).toHaveLength(7);
+  });
+
+  it("defines one deterministic day modifier for each week-one day", () => {
+    const modifierDays = weekOneDayModifiers.map((modifier) => modifier.day);
+
+    expect(modifierDays).toEqual([1, 2, 3, 4, 5, 6, 7]);
+    for (const modifier of weekOneDayModifiers) {
+      expect(modifier.title.length).toBeGreaterThan(0);
+      expect(modifier.learningHint.length).toBeGreaterThan(0);
+      expect(modifier.effects.length).toBeGreaterThan(0);
+    }
   });
 
   it("defines day milestones and only references existing guest and event IDs", () => {
