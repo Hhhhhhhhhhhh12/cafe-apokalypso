@@ -56,12 +56,20 @@ export type EventId =
   | "day-3-guest-checks-in"
   | "day-4-herr-grau-coin"
   | "day-4-poster-before-printed"
+  | "day-4-flyer-wrong-address"
+  | "day-4-bohn-recognizes-coin"
   | "day-5-wet-table-jana"
   | "day-5-meda-corner-seat"
+  | "day-5-receipt-printer-early"
+  | "day-5-storage-smell"
   | "day-6-kassandra-update"
   | "day-6-returning-guest"
+  | "day-6-kassandra-complaint-queue"
+  | "day-6-disclaimer-receipt"
   | "day-7-red-umbrella"
-  | "day-7-back-wall-doorway";
+  | "day-7-back-wall-doorway"
+  | "day-7-menu-bookmark"
+  | "day-7-kassandra-threshold";
 
 export type AchievementId =
   | "first-order"

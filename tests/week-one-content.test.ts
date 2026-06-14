@@ -75,7 +75,7 @@ describe("week-one content data", () => {
     expect(weekOneAdvertisingCampaigns).toHaveLength(4);
     expect(weekOneUpgrades).toHaveLength(7);
     expect(weekOneAchievements).toHaveLength(7);
-    expect(weekOneEvents).toHaveLength(14);
+    expect(weekOneEvents).toHaveLength(22);
     expect(weekOneDayModifiers).toHaveLength(7);
     expect(weekOneDays).toHaveLength(7);
   });
