@@ -6,7 +6,7 @@ KRITISCHE Regel: Immer auf gescheite Diversität der Figuren achten (Hauttöne, 
 ## Befehle
 
 - Dev-Server: `preview_start` mit Name `cafe-apokalypso` (Port 5173, definiert in `.claude/launch.json`)
-- Tests: `npx vitest run` (107 Tests, müssen grün bleiben)
+- Tests: `npx vitest run` (113 Tests, müssen grün bleiben)
 - Für Preview-/Kalibrier-Arbeit: Skill `.claude/skills/cafe-preview/SKILL.md` lesen und befolgen
 
 ## Token-Arbeitsregeln
@@ -19,12 +19,15 @@ KRITISCHE Regel: Immer auf gescheite Diversität der Figuren achten (Hauttöne, 
 
 ## Diorama-Geometrie (nicht neu herleiten!)
 
-- Stage Base: `assets/backgrounds/placeholder-cafe-stage-base-v03.png`, gerendert mit `object-fit: fill` über das ganze Diorama (`.cafe-diorama`, ~987×619). Das PNG hat **transparente Ecken** außerhalb des Raums — alles, was dahinter liegt, scheint dort durch.
-- CSS-Fallback-Wände (`.cafe-back-wall`, `.cafe-side-wall` inkl. Fenster/Tür/Menütafel/Regal) sind `display: none` — das gemalte Bild liefert den Raum. Nicht reaktivieren.
-- `.cafe-floor` = Positionierungs-Container für Gäste: left 5 % / right 6 % / bottom 4 % / height 65 % des Dioramas. Umrechnung Diorama-% → Floor-%: `floorX = (dioX − 5) / 89 · 100`, `floorY = (dioY − 31) / 65 · 100`.
-- `.cafe-counter` overlayt die **gemalte L-Theke** (Diorama x 58–97 %, y 66–88 %; in Floor-Koordinaten left 59.6 % / top 53.8 % / w 43.8 % / h 33.8 %). Kaffeemaschine + KASSANDRA-Kasse sind seine Kinder und stehen auf der Arbeitsplatte. Rahmen/Hintergrund transparent lassen.
-- Décor-Props `.cafe-decor-clock/-lamp/-cups/-shelf` sind Kinder von `.cafe-world` (zoomen mit 1.35× mit), Prozent = `.cafe-world`-Box. **ACHTUNG:** CSS-Werte sind Inverse-Transform der visuellen Ankerpunkte (Transform-Origin center 58%). Gemalte Ankerpunkte (visuell) → CSS-Werte: Uhr rechte Wand über Regal (vis 78 %/24 %) → CSS `left 67.7 % / top 28.4 %`; Lampe Deckenpendel links (vis 35 %/17 %) → CSS `left 35.9 % / top 22.4 %`; Tassen oberes Wandregal rechts (vis 80 %/39 %) → CSS `left 70.0 % / top 40.9 %`; Regal-Items unteres Wandregal rechts (vis 80 %/50 %) → CSS `left 67.0 % / top 47.6 %`; Pflanze linke Ecke (vis 9 %/72 %) → CSS `left 15.2 % / top 62.4 %`. Neue Ankerpunkte berechnen: `css = (vis_px - ox)/S + ox`, ox=W/2=436.5, oy=0.58*H=362.5, S=1.35, W=873, H=625. Alle vier Slots haben echte Tier-1/2/3-Sprites.
-- Tier-Wechsel (1–3) via Klasse `cafe-decor--tier-N`; Sprite-Austausch über `background-image`-Override in tier-spezifischen Regeln; tier-1 hat explizite Opacity-Overrides (0.90–0.95) gegen die generische 0.5-Dimmung.
+**Aktueller Raum: reines CSS-Diorama** — kein gemaltes PNG mehr. Stage Base v03 ist deaktiviert (`.cafe-stage-base { display: none }`). Décor-Sprites (clock/lamp/cups/shelf/plant) ebenfalls deaktiviert (`display: none` auf alle `.cafe-decor-*`). Gemischte Renderebenen sind abgelehnt — siehe `docs/ART_STYLEGUIDE.md` → "Visual QA".
+
+- `.cafe-back-wall` = CSS-Hintergrundwand (`inset: 0 20% 39% 0`, z 0, `--wall` Farbe). Enthält: `.cafe-window` (links), `.cafe-menu-board` (Mitte), `.cafe-storage` (rechts). **Nicht auf display:none setzen.**
+- `.cafe-side-wall` = linke CSS-Seitenwand mit `.cafe-door` (`width: 29%`, z 1, `--side-wall` Farbe). **Nicht auf display:none setzen.**
+- `.cafe-floor` = Positionierungs-Container für Gäste: left 5 % / right 6 % / bottom 4 % / height 65 % des Dioramas, `clip-path: polygon(9% 1%, 100% 15%, 88% 100%, 0 84%)`, sichtbare Füllung `var(--floor)`. Umrechnung Diorama-% → Floor-%: `floorX = (dioX − 5) / 89 · 100`, `floorY = (dioY − 31) / 65 · 100`.
+- `.cafe-counter` = CSS-Theken-Slab (Floor-Koordinaten left 59.6 % / top 53.8 % / w 43.8 % / h 33.8 %), sichtbarer `background: linear-gradient(#b8774f → #7f2f2c)`. Kaffeemaschine + KASSANDRA-Kasse sind seine Kinder (Sprites).
+- Décor-Tier-Klassen (`cafe-decor--tier-N`) existieren noch im DOM (wird von Hooks eingefügt), sind aber per CSS unsichtbar. Das Gameplay-State `decor` bleibt erhalten — nur die Sprite-Overlays sind deaktiviert.
+- Serve-Menü (Produktliste) ist aus dem Diorama heraus in die ActionPanel-Sidebar verlagert (`.serve-menu`). Kein floating UI über dem Spielbereich mehr.
+- Paula-Walk-Choreografie: Phasen-Maschine in CafePlaceholder.tsx (`at-door` → `walking` → `idle`), Tür-Startposition ist relativ zu `.cafe-queue` (left −195 % / bottom 130 %).
 
 ## Sprite-Pipeline
 
