@@ -9,7 +9,7 @@ import type { DayNumber } from "../src/game/types/content";
 import type { GameState } from "../src/game/types/game";
 
 function renderCafe(state: GameState = createInitialGameState()) {
-  return renderToStaticMarkup(<CafePlaceholder gameState={state} onServeProduct={() => {}} />);
+  return renderToStaticMarkup(<CafePlaceholder gameState={state} />);
 }
 
 function visibleText(markup: string) {
