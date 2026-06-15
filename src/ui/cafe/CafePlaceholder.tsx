@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { GameState } from "../../game/types/game";
+import type { ProductId } from "../../game/types/content";
 import { getDioramaGuestVisibility } from "../../game/engine/selectors";
 import coffeeMachineAsset from "../../../assets/sprites/props/placeholder-cafe-coffee-machine.png";
 import kassandraRegisterAsset from "../../../assets/sprites/props/placeholder-kassandra-register.png";
@@ -12,6 +13,7 @@ import christaGuestAsset from "../../../assets/sprites/guests/placeholder-guest-
 
 interface CafePlaceholderProps {
   gameState: GameState;
+  onServeProduct?: (productId: ProductId) => void;
 }
 
 export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
