@@ -14,8 +14,8 @@ export type ContentCatalogVersion = "week-one-v1";
 
 export type MoodLevel = "calm" | "busy" | "strained";
 export type IngredientKey = "coffee" | "milk" | "pastries";
-export type CleanlinessStateLabel = "Sauber" | "Ordentlich" | "Unordentlich" | "Chaotisch";
-export type StressStateLabel = "Ruhig" | "Geschäftig" | "Angespannt" | "Überlastet";
+export type CleanlinessStateLabel = "Clean" | "Tidy" | "Messy" | "Chaotic";
+export type StressStateLabel = "Calm" | "Busy" | "Tense" | "Overloaded";
 export type DayPhase = "day_start" | "open" | "day_end";
 export type ClosureReason = "money" | "reputation";
 export type DecorSlotId = "plant" | "shelf" | "clock" | "lamp" | "cups";

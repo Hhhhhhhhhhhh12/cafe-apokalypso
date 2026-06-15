@@ -33,47 +33,47 @@ export interface DecorSlotDefinition {
 export const decorSlots = [
   {
     id: "plant",
-    label: "Pflanze",
+    label: "Plant",
     tiers: [
-      { tier: 1, name: "Hängendes Topfgewächs", cost: 0, reputationBonus: 0, dailyCleanBonus: 0, dailyRepBonus: 0 },
-      { tier: 2, name: "Kräftiges Grün", cost: 12, reputationBonus: 1, dailyCleanBonus: 2, dailyRepBonus: 0 },
-      { tier: 3, name: "Üppige Monstera", cost: 24, reputationBonus: 2, dailyCleanBonus: 2, dailyRepBonus: 1 }
+      { tier: 1, name: "Hanging Potted Plant", cost: 0, reputationBonus: 0, dailyCleanBonus: 0, dailyRepBonus: 0 },
+      { tier: 2, name: "Lush Greens", cost: 12, reputationBonus: 1, dailyCleanBonus: 2, dailyRepBonus: 0 },
+      { tier: 3, name: "Full Monstera", cost: 24, reputationBonus: 2, dailyCleanBonus: 2, dailyRepBonus: 1 }
     ]
   },
   {
     id: "shelf",
-    label: "Regal",
+    label: "Shelf",
     tiers: [
-      { tier: 1, name: "Wackeliges Brettregal", cost: 0, reputationBonus: 0, dailyCleanBonus: 0, dailyRepBonus: 0 },
-      { tier: 2, name: "Solides Holzregal", cost: 14, reputationBonus: 1, dailyCleanBonus: 2, dailyRepBonus: 0 },
-      { tier: 3, name: "Kuratiertes Wandregal", cost: 28, reputationBonus: 2, dailyCleanBonus: 2, dailyRepBonus: 1 }
+      { tier: 1, name: "Wobbly Board Shelf", cost: 0, reputationBonus: 0, dailyCleanBonus: 0, dailyRepBonus: 0 },
+      { tier: 2, name: "Solid Wood Shelf", cost: 14, reputationBonus: 1, dailyCleanBonus: 2, dailyRepBonus: 0 },
+      { tier: 3, name: "Curated Wall Shelf", cost: 28, reputationBonus: 2, dailyCleanBonus: 2, dailyRepBonus: 1 }
     ]
   },
   {
     id: "clock",
-    label: "Wanduhr",
+    label: "Wall Clock",
     tiers: [
-      { tier: 1, name: "Schiefe Wanduhr", cost: 0, reputationBonus: 0, dailyCleanBonus: 0, dailyRepBonus: 0 },
-      { tier: 2, name: "Holzrahmenuhr", cost: 10, reputationBonus: 1, dailyCleanBonus: 2, dailyRepBonus: 0 },
-      { tier: 3, name: "Messingpendel-Uhr", cost: 22, reputationBonus: 2, dailyCleanBonus: 2, dailyRepBonus: 1 }
+      { tier: 1, name: "Crooked Wall Clock", cost: 0, reputationBonus: 0, dailyCleanBonus: 0, dailyRepBonus: 0 },
+      { tier: 2, name: "Wood Frame Clock", cost: 10, reputationBonus: 1, dailyCleanBonus: 2, dailyRepBonus: 0 },
+      { tier: 3, name: "Brass Pendulum Clock", cost: 22, reputationBonus: 2, dailyCleanBonus: 2, dailyRepBonus: 1 }
     ]
   },
   {
     id: "lamp",
-    label: "Stehlampe",
+    label: "Floor Lamp",
     tiers: [
-      { tier: 1, name: "Glühbirne am Stab", cost: 0, reputationBonus: 0, dailyCleanBonus: 0, dailyRepBonus: 0 },
-      { tier: 2, name: "Stoffschirmlampe", cost: 12, reputationBonus: 1, dailyCleanBonus: 2, dailyRepBonus: 0 },
-      { tier: 3, name: "Warme Bogenlampe", cost: 26, reputationBonus: 2, dailyCleanBonus: 2, dailyRepBonus: 1 }
+      { tier: 1, name: "Bare Bulb on a Pole", cost: 0, reputationBonus: 0, dailyCleanBonus: 0, dailyRepBonus: 0 },
+      { tier: 2, name: "Fabric Shade Lamp", cost: 12, reputationBonus: 1, dailyCleanBonus: 2, dailyRepBonus: 0 },
+      { tier: 3, name: "Warm Arc Lamp", cost: 26, reputationBonus: 2, dailyCleanBonus: 2, dailyRepBonus: 1 }
     ]
   },
   {
     id: "cups",
-    label: "Thekentassen",
+    label: "Counter Cups",
     tiers: [
-      { tier: 1, name: "Zusammengewürfelte Tassen", cost: 0, reputationBonus: 0, dailyCleanBonus: 0, dailyRepBonus: 0 },
-      { tier: 2, name: "Passendes Set", cost: 8, reputationBonus: 1, dailyCleanBonus: 2, dailyRepBonus: 0 },
-      { tier: 3, name: "Handgefertigte Keramik", cost: 18, reputationBonus: 1, dailyCleanBonus: 2, dailyRepBonus: 1 }
+      { tier: 1, name: "Mismatched Cups", cost: 0, reputationBonus: 0, dailyCleanBonus: 0, dailyRepBonus: 0 },
+      { tier: 2, name: "Matching Set", cost: 8, reputationBonus: 1, dailyCleanBonus: 2, dailyRepBonus: 0 },
+      { tier: 3, name: "Handcrafted Ceramics", cost: 18, reputationBonus: 1, dailyCleanBonus: 2, dailyRepBonus: 1 }
     ]
   }
 ] as const satisfies readonly DecorSlotDefinition[];

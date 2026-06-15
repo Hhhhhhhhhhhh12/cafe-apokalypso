@@ -67,7 +67,7 @@ export const weekOneDays = [
       "herr-bohn",
       "freelancerin-nele"
     ],
-    eventIds: ["day-3-cash-register-suggestion", "day-3-guest-checks-in"]
+    eventIds: ["day-3-cash-register-suggestion", "day-3-supply-tally", "day-3-guest-checks-in"]
   },
   {
     day: 4,
@@ -122,7 +122,7 @@ export const weekOneDays = [
       "herr-grau",
       "meda"
     ],
-    eventIds: ["day-5-wet-table-jana", "day-5-meda-corner-seat", "day-5-receipt-printer-early", "day-5-storage-smell"]
+    eventIds: ["day-5-wet-table-jana", "day-5-meda-corner-seat", "day-5-receipt-printer-early", "day-5-second-table-hum", "day-5-storage-smell"]
   },
   {
     day: 6,
@@ -150,7 +150,7 @@ export const weekOneDays = [
       "herr-grau",
       "meda"
     ],
-    eventIds: ["day-6-kassandra-update", "day-6-returning-guest", "day-6-kassandra-complaint-queue", "day-6-disclaimer-receipt"]
+    eventIds: ["day-6-kassandra-update", "day-6-kassandra-forecast", "day-6-returning-guest", "day-6-kassandra-complaint-queue", "day-6-disclaimer-receipt"]
   },
   {
     day: 7,
@@ -178,6 +178,6 @@ export const weekOneDays = [
       "meda",
       "frau-roter-regenschirm"
     ],
-    eventIds: ["day-7-red-umbrella", "day-7-back-wall-doorway", "day-7-menu-bookmark", "day-7-kassandra-threshold"]
+    eventIds: ["day-7-red-umbrella", "day-7-back-wall-doorway", "day-7-menu-bookmark", "day-7-kassandra-threshold", "day-7-closing-count"]
   }
 ] as const satisfies readonly DayDefinition[];

@@ -13,7 +13,7 @@ export const weekOneGuests = [
     learningCue: "Paula keeps one hand near the door and never looks at the pastry shelf.",
     preferredProductId: "filterkaffee",
     serveLine: "She takes the coffee without slowing down. The train was already late.",
-    matchedPreferenceLine: "Filterkaffee suits the rhythm: quick, warm, done.",
+    matchedPreferenceLine: "Filter Coffee suits the rhythm: quick, warm, done.",
     missedPreferenceLine:
       "She takes it, but the extra ceremony costs her another glance at the clock."
   },
@@ -65,7 +65,7 @@ export const weekOneGuests = [
     serveLine:
       "She holds the cup at a slight angle. After a moment, she nods. This counts as approval.",
     appreciatedProductIds: ["cappuccino"],
-    delightLine: "The foam holds. She actually smiles — word of this will travel. Ruf +2.",
+    delightLine: "The foam holds. She actually smiles — word of this will travel. Rep +2.",
     letdownLine: "She drinks it, but the angle of her eyebrow files a quiet complaint."
   },
   {
@@ -83,7 +83,7 @@ export const weekOneGuests = [
       "He thanks you as though this has happened many times in many versions of this café.",
     appreciatedProductIds: ["filterkaffee"],
     delightLine:
-      "\"My usual,\" he says, though you never agreed on one. He seems steadier for it. Ruf +1.",
+      "\"My usual,\" he says, though you never agreed on one. He seems steadier for it. Rep +1.",
     letdownLine: "He accepts it kindly, but you sense this was not the version he remembered."
   },
   {
@@ -120,7 +120,7 @@ export const weekOneGuests = [
       "Black. No sugar. I am only passing through.",
       "Your opening hours are pleasantly mortal."
     ],
-    orderLine: "Handfilter, if you have the time. Black is enough; hurried is not.",
+    orderLine: "Pour-over, if you have the time. Black is enough; hurried is not.",
     learningCue:
       "Herr Grau waits without impatience. He notices deliberate preparation more than speed.",
     preferredProductId: "handfilter",
@@ -128,7 +128,7 @@ export const weekOneGuests = [
       "He pays and thanks you. The coin does not match any denomination you can identify.",
     appreciatedProductIds: ["handfilter"],
     delightLine:
-      "He tastes the pour-over slowly. \"This is the one with the long shadow,\" he says, approving. Ruf +2.",
+      "He tastes the pour-over slowly. \"This is the one with the long shadow,\" he says, approving. Rep +2.",
     letdownLine:
       "He drinks it without complaint, but you sense he was hoping for something brewed more deliberately."
   },

@@ -50,10 +50,13 @@ export type UpgradeId =
 export type EventId =
   | "day-1-opening-rhythm"
   | "day-1-coffee-machine-flicker"
+  | "day-1-first-cup"
   | "day-2-herr-bohn-memory"
   | "day-2-rehearsed-rhythm"
+  | "day-2-paula-fast-order"
   | "day-3-cash-register-suggestion"
   | "day-3-guest-checks-in"
+  | "day-3-supply-tally"
   | "day-4-herr-grau-coin"
   | "day-4-poster-before-printed"
   | "day-4-flyer-wrong-address"
@@ -62,14 +65,17 @@ export type EventId =
   | "day-5-meda-corner-seat"
   | "day-5-receipt-printer-early"
   | "day-5-storage-smell"
+  | "day-5-second-table-hum"
   | "day-6-kassandra-update"
   | "day-6-returning-guest"
   | "day-6-kassandra-complaint-queue"
   | "day-6-disclaimer-receipt"
+  | "day-6-kassandra-forecast"
   | "day-7-red-umbrella"
   | "day-7-back-wall-doorway"
   | "day-7-menu-bookmark"
-  | "day-7-kassandra-threshold";
+  | "day-7-kassandra-threshold"
+  | "day-7-closing-count";
 
 export type AchievementId =
   | "first-order"
@@ -177,6 +183,18 @@ export interface EventDefinition {
   trigger: string;
   text: string;
   relatedGuestIds?: readonly GuestId[];
+  /**
+   * Short overline shown above the event title for presentation grouping
+   * (e.g. "Closing", "On the floor", "From the register"). Optional and
+   * purely cosmetic — never reveals the hidden weirdness value.
+   */
+  kicker?: string;
+  /**
+   * Optional secondary ambient detail lines, shown under the main event text
+   * for a richer card. Same dry/deadpan voice as `text`. Keep each line a
+   * single grounded observation; no explanations.
+   */
+  flavorLines?: readonly string[];
 }
 
 export interface AchievementDefinition {

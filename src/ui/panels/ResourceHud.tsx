@@ -14,32 +14,31 @@ export function ResourceHud({ gameState }: ResourceHudProps) {
   return (
     <section className="panel resource-panel" aria-labelledby="resources-title">
       <div className="panel-heading">
-        <p className="eyebrow">Status</p>
         <h2 id="resources-title">Café HUD</h2>
       </div>
 
       <dl className="resource-list">
-        <ResourceItem label="Kasse" value={`€${gameState.resources.money}`} numericValue={gameState.resources.money} />
+        <ResourceItem label="Cash" value={`€${gameState.resources.money}`} numericValue={gameState.resources.money} />
         <ResourceItem
-          label="Kaffee"
+          label="Coffee"
           value={gameState.supplies.coffee}
           numericValue={gameState.supplies.coffee}
           low={gameState.supplies.coffee <= LOW_SUPPLY_THRESHOLD}
         />
         <ResourceItem
-          label="Milch"
+          label="Milk"
           value={gameState.supplies.milk}
           numericValue={gameState.supplies.milk}
           low={gameState.supplies.milk <= LOW_SUPPLY_THRESHOLD}
         />
         <ResourceItem
-          label="Gebäck"
+          label="Pastries"
           value={gameState.supplies.pastries}
           numericValue={gameState.supplies.pastries}
           low={gameState.supplies.pastries <= LOW_SUPPLY_THRESHOLD}
         />
         <ResourceItem
-          label="Sauberkeit"
+          label="Cleanliness"
           value={labels.cleanliness}
           numericValue={gameState.resources.cleanliness}
           meter={gameState.resources.cleanliness}
@@ -53,13 +52,13 @@ export function ResourceHud({ gameState }: ResourceHudProps) {
           meterTone="negative"
         />
         <ResourceItem
-          label="Ruf"
-          value={`${labels.reputation} (${gameState.resources.reputation})`}
+          label="Reputation"
+          value={gameState.resources.reputation}
           numericValue={gameState.resources.reputation}
           meter={gameState.resources.reputation}
           meterTone="positive"
         />
-        <ResourceItem label="Aktionen" value={labels.actionCapacity} />
+        <ResourceItem label="Actions" value={labels.actionCapacity} />
       </dl>
     </section>
   );
@@ -88,7 +87,7 @@ function ResourceItem({ label, value, numericValue, low, meter, meterTone }: Res
         <span key={`${value}-${flash.tick}`} className={`resource-value ${flash.className}`}>
           {value}
         </span>
-        {low ? <span className="resource-low-tag" role="status"> · niedrig</span> : null}
+        {low ? <span className="resource-low-tag" role="status"> · low</span> : null}
         {typeof meter === "number" ? (
           <span
             className={`resource-meter resource-meter--${meterTone ?? "positive"}`}

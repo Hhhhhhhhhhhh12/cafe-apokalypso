@@ -276,6 +276,67 @@ export function getMissingRequiredActions(state: GameState): readonly DayActionI
   return missingActions;
 }
 
+/** Which open-day action a first-week coach nudge points at, if any. */
+export type DayCoachTarget = "serve" | "clean" | "offer" | null;
+
+export interface DayCoachHint {
+  text: string;
+  target: DayCoachTarget;
+}
+
+/**
+ * Tutorial-less onboarding for the first three days (#PHASE3). Returns a single
+ * contextual nudge derived from current open-day progress, or null once the
+ * hand-holding window is over (day > 3), the café is not open, or no action
+ * capacity remains (the close-day hint covers that case). The `target` lets the
+ * action panel pulse the relevant button without a separate tutorial overlay.
+ */
+export function getDayCoachHint(state: GameState): DayCoachHint | null {
+  if (state.dayPhase !== "open" || state.day > 3) {
+    return null;
+  }
+  if (state.dayManagement.actionPointsRemaining <= 0) {
+    return null;
+  }
+
+  const served = state.dayManagement.customersServed;
+  const cleaned = state.completedActions.includes("clean_tables");
+  const helperCleans =
+    state.helperAssignment?.helperId === "jana" &&
+    (state.helperAssignment.taskId === "cleaning" ||
+      state.helperAssignment.taskId === "service");
+  const roomCared = cleaned || helperCleans;
+
+  if (state.day === 1) {
+    if (served === 0) {
+      return { text: "First shift: take the first order to serve the guest in line.", target: "serve" };
+    }
+    if (served < 2) {
+      return { text: "One more order — today's objective asks for two before you close.", target: "serve" };
+    }
+    if (!roomCared) {
+      return { text: "Wipe the tables before locking up, or reputation takes a small hit.", target: "clean" };
+    }
+    return { text: "First shift handled. Close the day whenever you're ready.", target: null };
+  }
+
+  if (state.day === 2) {
+    if (served === 0) {
+      return { text: "The regulars are back. Serve the morning crowd and keep an eye on stress.", target: "serve" };
+    }
+    if (!roomCared && served >= 2) {
+      return { text: "A quick clean now keeps the room calm and stress down.", target: "clean" };
+    }
+    return null;
+  }
+
+  // day === 3
+  if (served === 0 && state.unlocks.pricing && !state.dayManagement.offerReviewed) {
+    return { text: "New today: set the daily offer for a small income boost, then start serving.", target: "offer" };
+  }
+  return null;
+}
+
 /**
  * A short, cozy narrative recap of the closed day, composed deterministically
  * from the day summary. Voice over numbers (the figures sit in the list below).

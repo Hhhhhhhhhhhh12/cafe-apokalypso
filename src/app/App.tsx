@@ -104,13 +104,16 @@ export function App() {
     dispatch({ type: "reset_game" });
   }
 
+  const dayDataAttr = gameState.day >= 6 ? String(gameState.day) : undefined;
+
   return (
-    <main className="app-shell">
+    <main className="app-shell" data-day={dayDataAttr}>
       {showBoot ? <KassandraBootScreen onDismiss={dismissBoot} /> : null}
       <AchievementToast
         queue={achievementQueue}
         onDequeue={() => setAchievementQueue(q => q.slice(1))}
       />
+      <DayTransitionBanner day={gameState.day} dayPhase={gameState.dayPhase} />
 
       <header className="hero-bar" aria-labelledby="app-title">
         <div>
@@ -119,7 +122,7 @@ export function App() {
             A cozy café. Seven days. Something is not quite right.
           </p>
         </div>
-        <div className="day-card" aria-label={`Aktueller Status: Tag ${gameState.day}`}>
+        <div className="day-card" aria-label={`Current status: Day ${gameState.day}`}>
           <span className="day-card__label">Current day</span>
           <strong>Day {gameState.day}</strong>
           <span>{gameState.phaseLabel}</span>
@@ -173,12 +176,14 @@ export function App() {
 
       <section className="workspace-grid" aria-label="Game shell workspace">
         <ResourceHud gameState={gameState} />
-        <CafePlaceholder gameState={gameState} />
+        <CafePlaceholder
+          gameState={gameState}
+        />
         <ActionPanel
           gameState={gameState}
           statusMessage={gameState.statusMessage}
-          onTakeOrder={() => dispatch({ type: "take_order" })}
           onServeProduct={(productId) => dispatch({ type: "serve_product", productId })}
+          onTakeOrder={() => dispatch({ type: "take_order" })}
           onPrepareDrink={() => dispatch({ type: "prepare_drink" })}
           onCheckSupplies={() => dispatch({ type: "check_supplies" })}
           onCleanTables={() => dispatch({ type: "clean_tables" })}
@@ -209,5 +214,70 @@ export function App() {
         </p>
       </footer>
     </main>
+  );
+}
+
+/**
+ * A brief, non-blocking "moment" when the shift opens or the day closes, so the
+ * transition reads as an event rather than a silent panel swap (#PHASE3). Purely
+ * presentational: it watches the phase prop and auto-dismisses. No banner fires
+ * on first mount (the previous phase starts equal to the current one).
+ */
+function DayTransitionBanner({
+  day,
+  dayPhase
+}: {
+  day: number;
+  dayPhase: "day_start" | "open" | "day_end";
+}) {
+  const previousPhase = useRef(dayPhase);
+  const tickRef = useRef(0);
+  const [banner, setBanner] = useState<{
+    key: number;
+    eyebrow: string;
+    title: string;
+  } | null>(null);
+
+  useEffect(() => {
+    if (previousPhase.current === dayPhase) {
+      return;
+    }
+    previousPhase.current = dayPhase;
+
+    const next =
+      dayPhase === "open"
+        ? { eyebrow: `Day ${day}`, title: "The café is open" }
+        : dayPhase === "day_end"
+          ? { eyebrow: `Day ${day}`, title: "Day closed" }
+          : null;
+
+    if (next) {
+      tickRef.current += 1;
+      setBanner({ key: tickRef.current, ...next });
+    }
+  }, [dayPhase, day]);
+
+  useEffect(() => {
+    if (!banner) {
+      return;
+    }
+    const timer = setTimeout(() => setBanner(null), 2200);
+    return () => clearTimeout(timer);
+  }, [banner]);
+
+  if (!banner) {
+    return null;
+  }
+
+  return (
+    <div
+      key={banner.key}
+      className="day-transition-banner"
+      role="status"
+      aria-live="polite"
+    >
+      <span className="day-transition-banner__eyebrow">{banner.eyebrow}</span>
+      <strong className="day-transition-banner__title">{banner.title}</strong>
+    </div>
   );
 }

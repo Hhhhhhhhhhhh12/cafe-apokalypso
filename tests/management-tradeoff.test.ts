@@ -394,7 +394,7 @@ describe("management tradeoff system", () => {
     expect(advertised.resources.money).toBe(40);
     expect(advertised.resources.reputation).toBe(27);
     expect(advertised.resources.stress).toBe(2);
-    expect(advertised.statusMessage).toContain("Ruf +2");
+    expect(advertised.statusMessage).toContain("Rep +2");
     expect(advertised.statusMessage).toContain("Stress +2");
   });
 
@@ -677,7 +677,7 @@ describe("fail-state and reputation-scaled income", () => {
     const delighted = gameReducer(base, { type: "serve_product", productId: "cappuccino" });
     expect(delighted.resources.reputation).toBe(base.resources.reputation + 2);
     expect(delighted.dayManagement.appreciationBonusesGiven).toBe(2);
-    expect(delighted.statusMessage).toContain("Ruf +2");
+    expect(delighted.statusMessage).toContain("Rep +2");
 
     // Serving her something she does not value: no reputation gain.
     const letdown = gameReducer(base, { type: "serve_product", productId: "filterkaffee" });
@@ -712,7 +712,7 @@ describe("fail-state and reputation-scaled income", () => {
 
     const premium = gameReducer(base, { type: "serve_product", productId: "handfilter" });
     expect(premium.resources.reputation).toBe(base.resources.reputation + 2);
-    expect(premium.statusMessage).toContain("Ruf +2");
+    expect(premium.statusMessage).toContain("Rep +2");
   });
 
   it("previews the next guest (and a wants-hint) only while the café is open", () => {
@@ -721,7 +721,7 @@ describe("fail-state and reputation-scaled income", () => {
     expect(preview?.name).toBe("Pendlerin Paula");
     expect(preview?.orderLine).toContain("Just coffee");
     expect(preview?.learningCue).toContain("never looks at the pastry shelf");
-    expect(preview?.wants).toBe("Filterkaffee");
+    expect(preview?.wants).toBe("Filter Coffee");
 
     // No preview once the day's actions are spent.
     const spent: GameState = {
@@ -773,7 +773,7 @@ describe("fail-state and reputation-scaled income", () => {
     );
     expect(learned.statusMessage).toContain("You write it down");
     expect(preview?.learningCue).toContain("You remember");
-    expect(preview?.wants).toBe("Filterkaffee");
+    expect(preview?.wants).toBe("Filter Coffee");
   });
 
   it("composes a narrative day-end recap, heavier on Day 7", () => {
@@ -888,11 +888,11 @@ describe("fail-state and reputation-scaled income", () => {
 
     expect(cleanInspection.resources.reputation).toBe(27);
     expect(cleanInspection.daySummary?.flavorLines).toContain(
-      "Inspection day likes a clean closing. Ruf +1."
+      "Inspection day: clean closing rewarded. Ruf +1."
     );
     expect(messyInspection.resources.reputation).toBe(23);
     expect(messyInspection.daySummary?.flavorLines).toContain(
-      "Inspection day notices the neglected corners. Ruf -1."
+      "Inspection day: the neglected corners were noted. Ruf -1."
     );
   });
 });

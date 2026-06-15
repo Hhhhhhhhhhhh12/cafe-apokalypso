@@ -27,7 +27,7 @@ describe("café diorama view", () => {
     expect(markup).toContain("action-panel");
     expect(markup).toContain("day-progress-panel");
     expect(text).toContain("Café HUD");
-    expect(text).toContain("Heute im Café");
+    expect(text).toContain("The Café");
     expect(text).toContain("Actions");
     expect(text).toContain("Day 1:");
   });
@@ -66,7 +66,7 @@ describe("café diorama view", () => {
   it("does not show debug or placeholder wording as player-facing text", () => {
     const text = visibleText(renderCafe()).toLowerCase();
 
-    expect(text).toContain("heute im café");
+    expect(text).toContain("the café");
     expect(text).not.toContain("debug");
     expect(text).not.toContain("placeholder");
     expect(text).not.toContain("wireframe");
@@ -110,7 +110,7 @@ describe("café diorama view", () => {
     });
 
     expect(markup).toMatch(/cafe-decor-plant[^"]*cafe-decor--tier-2/);
-    expect(markup).toMatch(/cafe-decor-shelf[^"]*cafe-decor--tier-3/);
+    expect(markup).toMatch(/cafe-storage[^"]*cafe-decor--tier-3/);
     expect(markup).toMatch(/cafe-decor-clock[^"]*cafe-decor--tier-1/);
     expect(markup).toMatch(/cafe-decor-lamp[^"]*cafe-decor--tier-2/);
     expect(markup).toMatch(/cafe-decor-cups[^"]*cafe-decor--tier-3/);

@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import {
   getCurrentDayDefinition,
   getDayEndRecapLine,
@@ -21,6 +22,20 @@ export function DayProgressPanel({ gameState }: DayProgressPanelProps) {
   const kassandraMessages = getVisibleKassandraMessages(gameState);
   const daySevenLetter = getVisibleDaySevenLetter(gameState);
   const objectiveStatus = getObjectiveStatus(gameState);
+
+  // Close-day moment: when a fresh summary lands, bring the result card into
+  // view so the day's outcome is read where the eye is, not missed in the panel.
+  const summary = gameState.daySummary;
+  const summaryRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    if (summary && gameState.dayPhase === "day_end") {
+      summaryRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  }, [summary, gameState.dayPhase]);
+
+  const net = summary
+    ? Math.round((summary.moneyEarned - summary.moneySpent - summary.dailyOverhead) * 100) / 100
+    : 0;
 
   return (
     <section className="panel day-progress-panel" aria-labelledby="day-progress-title">
@@ -63,7 +78,7 @@ export function DayProgressPanel({ gameState }: DayProgressPanelProps) {
       ) : null}
 
       {eventCards.length > 0 ? (
-        <div className="event-card-list" aria-label="Heute im Café">
+        <div className="event-card-list" aria-label="Today in the café">
           {eventCards.map((event) => (
             <section
               className="inline-callout event-card"
@@ -100,7 +115,7 @@ export function DayProgressPanel({ gameState }: DayProgressPanelProps) {
                   {" · "}
                   <span className="staff-xp-count">{xp} XP</span>
                   {xpToNext !== null ? (
-                    <span className="staff-xp-next"> ({xpToNext} bis Lv.{level + 1})</span>
+                    <span className="staff-xp-next"> ({xpToNext} to Lv.{level + 1})</span>
                   ) : (
                     <span className="staff-xp-max"> (max.)</span>
                   )}
@@ -112,12 +127,31 @@ export function DayProgressPanel({ gameState }: DayProgressPanelProps) {
       ) : null}
 
       {gameState.daySummary ? (
-        <section className="inline-callout day-result-card" aria-labelledby="day-summary-title">
-          <h3 id="day-summary-title">Day-end management summary</h3>
+        <section
+          ref={summaryRef}
+          className="inline-callout day-result-card"
+          aria-labelledby="day-summary-title"
+        >
+          <h3 id="day-summary-title">Day {gameState.daySummary.day} closed</h3>
+          <div className="day-result-headline">
+            <div className="day-result-headline__item">
+              <span className="eyebrow">Rating</span>
+              <strong>{gameState.daySummary.rating}</strong>
+            </div>
+            <div
+              className={`day-result-headline__item day-result-headline__net day-result-headline__net--${
+                net >= 0 ? "pos" : "neg"
+              }`}
+            >
+              <span className="eyebrow">Net result</span>
+              <strong>{net >= 0 ? `+€${net}` : `-€${Math.abs(net)}`}</strong>
+            </div>
+            <div className="day-result-headline__item">
+              <span className="eyebrow">Served</span>
+              <strong>{gameState.daySummary.customersServed}</strong>
+            </div>
+          </div>
           <p className="day-recap-line">{getDayEndRecapLine(gameState)}</p>
-          <p className="rating-line">
-            Rating: <strong>{gameState.daySummary.rating}</strong>
-          </p>
           <dl className="summary-list">
             {[
               { label: "Objective", value: `${gameState.daySummary.objectiveCompleted ? "Completed" : "Missed"} · ${gameState.daySummary.objectiveTitle}` },
