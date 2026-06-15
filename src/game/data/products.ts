@@ -3,7 +3,7 @@ import type { ProductDefinition } from "../types/content";
 export const weekOneProducts = [
   {
     id: "filterkaffee",
-    name: "Filterkaffee",
+    name: "Filter Coffee",
     category: "drink",
     firstDay: 1,
     basePrice: 2.2,
@@ -43,7 +43,7 @@ export const weekOneProducts = [
   },
   {
     id: "kaffee-croissant",
-    name: "Kaffee + Croissant",
+    name: "Coffee + Croissant",
     category: "combo",
     firstDay: 3,
     basePrice: 4.6,
@@ -53,7 +53,7 @@ export const weekOneProducts = [
   },
   {
     id: "handfilter",
-    name: "Handfilter-Spezialität",
+    name: "Pour-Over Special",
     category: "drink",
     firstDay: 4,
     basePrice: 4.2,

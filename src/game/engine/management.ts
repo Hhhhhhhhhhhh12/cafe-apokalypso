@@ -130,28 +130,28 @@ export function createInitialDayManagement(
 
 export function getCleanlinessLabel(value: number): CleanlinessStateLabel {
   if (value >= 75) {
-    return "Sauber";
+    return "Clean";
   }
   if (value >= 50) {
-    return "Ordentlich";
+    return "Tidy";
   }
   if (value >= 25) {
-    return "Unordentlich";
+    return "Messy";
   }
-  return "Chaotisch";
+  return "Chaotic";
 }
 
 export function getStressLabel(value: number): StressStateLabel {
   if (value >= 81) {
-    return "Überlastet";
+    return "Overloaded";
   }
   if (value >= 61) {
-    return "Angespannt";
+    return "Tense";
   }
   if (value >= 41) {
-    return "Geschäftig";
+    return "Busy";
   }
-  return "Ruhig";
+  return "Calm";
 }
 
 export function getDayShiftRating(state: GameState): DayShiftRating {
@@ -326,11 +326,11 @@ export function getHelperTaskLabel(taskId: HelperTaskId): string {
 
 export function getHelperTaskHint(taskId: HelperTaskId): string {
   const hints: Record<HelperTaskId, string> = {
-    cleaning: "Keeps the tables tidy — cleanliness stays above 45 without spending an action.",
-    service: "Serves a second guest on each order — more income, faster shift.",
-    barista: "Espresso and cappuccino earn a little extra reputation (up to 3×).",
-    counter: "Steady hands at the till — smooths the shift.",
-    marketing: "Adds an extra advertising action today."
+    cleaning: "Keeps the tables tidy — cleanliness stays above 45 without spending an action. Each serve still drops cleanliness by 2; Jana resets it quietly.",
+    service: "Serves a second guest on each order — doubles income per action point while the extra-orders pool lasts.",
+    barista: "Espresso and cappuccino earn +1 Rep each (up to 3 times today). Nino also uses slightly less milk on milk drinks.",
+    counter: "Steady hands at the till reduce opening stress — Nino saves 8 Stress on arrival, Nele 5.",
+    marketing: "Adds a free advertising action today. Nele's post can reach further than a standard flyer."
   };
 
   return hints[taskId];
@@ -340,23 +340,29 @@ export function getHelperFlavorLine(
   helperId: StaffOptionId,
   taskId: HelperTaskId
 ): string {
+  // Jana — service/cleaning
   if (helperId === "jana" && taskId === "cleaning") {
-    return "Jana cleaned everything. You are not sure when.";
+    return "Jana cleaned everything. You are not sure when. Cleanliness held above 45 all shift.";
   }
   if (helperId === "jana" && taskId === "service") {
-    return "Jana took three orders. She looks mildly confused about the menu but nobody complained.";
+    return "Jana took orders alongside you. Each action served an extra guest — income roughly doubled per round. She remained calm about the menu gaps.";
   }
+  // Nino — barista/counter
   if (helperId === "nino" && taskId === "barista") {
-    return "Nino made a latte art. It was a bird. Or possibly a bureaucratic stamp.";
+    return "Nino ran the espresso machine. Each espresso or cappuccino earned +1 Rep (up to three times today). He used slightly less milk. The latte art was a bird. Or a bureaucratic stamp.";
   }
   if (helperId === "nino" && taskId === "counter") {
-    return "Nino handled the counter. The queue moved. Stress dropped slightly.";
+    return "Nino handled the till. The queue moved without incident. Opening stress was 8 lower than it would have been.";
   }
+  // Nele — marketing/counter
   if (helperId === "nele" && taskId === "marketing") {
-    return "Nele posted something. It got 14 likes and one comment in a language Google says does not exist.";
+    return "Nele posted something. It got 14 likes and one comment in a language Google says does not exist. The extra advertising slot is available today.";
+  }
+  if (helperId === "nele" && taskId === "counter") {
+    return "Nele held the counter. She called the setup 'charmingly precarious.' Opening stress was 5 lower. She meant it as a compliment. Probably.";
   }
 
-  return "Nele called the café 'charmingly precarious.' She meant it as a compliment. Probably.";
+  return "The helper was here. Things went.";
 }
 
 function isValidHelperTask(helperId: StaffOptionId, taskId: HelperTaskId): boolean {

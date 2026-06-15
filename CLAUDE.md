@@ -6,7 +6,7 @@ KRITISCHE Regel: Immer auf gescheite Diversität der Figuren achten (Hauttöne, 
 ## Befehle
 
 - Dev-Server: `preview_start` mit Name `cafe-apokalypso` (Port 5173, definiert in `.claude/launch.json`)
-- Tests: `npx vitest run` (79 Tests, müssen grün bleiben)
+- Tests: `npx vitest run` (107 Tests, müssen grün bleiben)
 - Für Preview-/Kalibrier-Arbeit: Skill `.claude/skills/cafe-preview/SKILL.md` lesen und befolgen
 
 ## Token-Arbeitsregeln
@@ -23,7 +23,7 @@ KRITISCHE Regel: Immer auf gescheite Diversität der Figuren achten (Hauttöne, 
 - CSS-Fallback-Wände (`.cafe-back-wall`, `.cafe-side-wall` inkl. Fenster/Tür/Menütafel/Regal) sind `display: none` — das gemalte Bild liefert den Raum. Nicht reaktivieren.
 - `.cafe-floor` = Positionierungs-Container für Gäste: left 5 % / right 6 % / bottom 4 % / height 65 % des Dioramas. Umrechnung Diorama-% → Floor-%: `floorX = (dioX − 5) / 89 · 100`, `floorY = (dioY − 31) / 65 · 100`.
 - `.cafe-counter` overlayt die **gemalte L-Theke** (Diorama x 58–97 %, y 66–88 %; in Floor-Koordinaten left 59.6 % / top 53.8 % / w 43.8 % / h 33.8 %). Kaffeemaschine + KASSANDRA-Kasse sind seine Kinder und stehen auf der Arbeitsplatte. Rahmen/Hintergrund transparent lassen.
-- Décor-Props `.cafe-decor-clock/-lamp/-cups/-shelf` sind **direkte Kinder von `.cafe-diorama`** (nicht `.cafe-floor`), Prozent = Diorama-Box. Gemalte Ankerpunkte: Uhr auf rechtem Wandabschnitt (left 53.5 %), Lampe Decke links (36 %/17 %), Tassen auf oberem Wandregal (80 %/40.5 %), Regal-Items auf Wandbänken rechts (left 62 %/top 43 %, 96×56 px). Alle vier Slots haben echte Tier-1/2/3-Sprites.
+- Décor-Props `.cafe-decor-clock/-lamp/-cups/-shelf` sind Kinder von `.cafe-world` (zoomen mit 1.35× mit), Prozent = `.cafe-world`-Box. **ACHTUNG:** CSS-Werte sind Inverse-Transform der visuellen Ankerpunkte (Transform-Origin center 58%). Gemalte Ankerpunkte (visuell) → CSS-Werte: Uhr rechte Wand über Regal (vis 78 %/24 %) → CSS `left 67.7 % / top 28.4 %`; Lampe Deckenpendel links (vis 35 %/17 %) → CSS `left 35.9 % / top 22.4 %`; Tassen oberes Wandregal rechts (vis 80 %/39 %) → CSS `left 70.0 % / top 40.9 %`; Regal-Items unteres Wandregal rechts (vis 80 %/50 %) → CSS `left 67.0 % / top 47.6 %`; Pflanze linke Ecke (vis 9 %/72 %) → CSS `left 15.2 % / top 62.4 %`. Neue Ankerpunkte berechnen: `css = (vis_px - ox)/S + ox`, ox=W/2=436.5, oy=0.58*H=362.5, S=1.35, W=873, H=625. Alle vier Slots haben echte Tier-1/2/3-Sprites.
 - Tier-Wechsel (1–3) via Klasse `cafe-decor--tier-N`; Sprite-Austausch über `background-image`-Override in tier-spezifischen Regeln; tier-1 hat explizite Opacity-Overrides (0.90–0.95) gegen die generische 0.5-Dimmung.
 
 ## Sprite-Pipeline

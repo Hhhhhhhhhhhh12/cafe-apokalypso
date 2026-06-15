@@ -1,13 +1,15 @@
 import {
   canCompleteCurrentDay,
   getAvailableProducts,
+  getDayCoachHint,
   getDecorUpgradeOptions,
   getIngredientLabel,
   getMissingRequiredActions,
   getNextGuestPreview,
   getRestockPreview,
   getVisibleStaffOptions,
-  hasActionCapacity
+  hasActionCapacity,
+  type DayCoachTarget
 } from "../../game/engine/selectors";
 import {
   getHelperTaskHint,
@@ -26,8 +28,8 @@ import type {
 interface ActionPanelProps {
   gameState: GameState;
   statusMessage: string;
-  onTakeOrder: () => void;
   onServeProduct: (productId: ProductId) => void;
+  onTakeOrder: () => void;
   onPrepareDrink: () => void;
   onCheckSupplies: () => void;
   onCleanTables: () => void;
@@ -55,8 +57,8 @@ const restockIngredients: IngredientKey[] = ["coffee", "milk", "pastries"];
 export function ActionPanel({
   gameState,
   statusMessage,
-  onTakeOrder,
   onServeProduct,
+  onTakeOrder,
   onPrepareDrink,
   onCheckSupplies,
   onCleanTables,
@@ -93,8 +95,8 @@ export function ActionPanel({
       {gameState.dayPhase === "open" ? (
         <OpenDayControls
           gameState={gameState}
-          onTakeOrder={onTakeOrder}
           onServeProduct={onServeProduct}
+          onTakeOrder={onTakeOrder}
           onPrepareDrink={onPrepareDrink}
           onCheckSupplies={onCheckSupplies}
           onCleanTables={onCleanTables}
@@ -120,7 +122,7 @@ export function ActionPanel({
         type="button"
         className="secondary-button"
         onClick={() => {
-          if (window.confirm("Café-Woche abbrechen und neu starten?")) {
+          if (window.confirm("Start over from Day 1? This week's progress won't be saved.")) {
             onResetGame();
           }
         }}
@@ -153,8 +155,8 @@ export function ActionPanel({
 
 function OpenDayControls({
   gameState,
-  onTakeOrder,
   onServeProduct,
+  onTakeOrder,
   onPrepareDrink,
   onCheckSupplies,
   onCleanTables,
@@ -166,8 +168,8 @@ function OpenDayControls({
   canCloseDay
 }: {
   gameState: GameState;
-  onTakeOrder: () => void;
   onServeProduct: (productId: ProductId) => void;
+  onTakeOrder: () => void;
   onPrepareDrink: () => void;
   onCheckSupplies: () => void;
   onCleanTables: () => void;
@@ -178,17 +180,43 @@ function OpenDayControls({
   onCompleteDay: () => void;
   canCloseDay: boolean;
 }) {
-  const products = getAvailableProducts(gameState);
   const nextGuest = getNextGuestPreview(gameState);
   const canAct = hasActionCapacity(gameState);
+  const products = getAvailableProducts(gameState);
   const advertisingCanUseBonus = gameState.dayManagement.extraAdvertisingActions > 0;
   const canUseAdvertisingAction = canAct || advertisingCanUseBonus;
   const actionLockReason = canAct
     ? undefined
-    : "No daily action capacity remains for this shift.";
+    : "No actions left today.";
+  const coach = getDayCoachHint(gameState);
+  const coachClass = (target: DayCoachTarget, base?: string) =>
+    coach?.target === target
+      ? [base, "cafe-coach-pulse"].filter(Boolean).join(" ")
+      : base;
 
   return (
     <>
+      {products.length > 0 && (
+        <div className="serve-menu" aria-label="Serve a product">
+          <p className="serve-menu__label">Serve</p>
+          <div className="serve-menu__items">
+            {products.map((product) => (
+              <button
+                key={product.id}
+                type="button"
+                className="serve-menu__item"
+                onClick={() => onServeProduct(product.id)}
+                disabled={!canAct}
+                title={!canAct ? "No actions left this shift." : undefined}
+              >
+                <span className="serve-menu__name">{product.name}</span>
+                <span className="serve-menu__price">€{product.basePrice}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="action-budget" aria-label="Daily action capacity">
         <span>Actions left</span>
         <strong>
@@ -197,8 +225,7 @@ function OpenDayControls({
             gameState.dayManagement.actionPointsSpent}
         </strong>
         <small>
-          Serving, cleaning, supply checks, offers, ads, and KASSANDRA checks all
-          compete for the shift.
+          Each action uses one daily slot.
         </small>
       </div>
 
@@ -208,8 +235,21 @@ function OpenDayControls({
         </div>
       ) : null}
 
+      {coach ? (
+        <p key={coach.text} className="cafe-coach" role="status">
+          <span className="cafe-coach__icon" aria-hidden="true">☞</span>
+          {coach.text}
+        </p>
+      ) : null}
+
       <div className="button-row">
-        <button type="button" onClick={onTakeOrder} disabled={!canAct} title={actionLockReason}>
+        <button
+          type="button"
+          className={coachClass("serve")}
+          onClick={onTakeOrder}
+          disabled={!canAct}
+          title={actionLockReason}
+        >
           Take next order
         </button>
         <button
@@ -218,9 +258,15 @@ function OpenDayControls({
           disabled={!canAct}
           title={actionLockReason}
         >
-          Prepare suggested product
+          Brew for next guest
         </button>
-        <button type="button" onClick={onCleanTables} disabled={!canAct} title={actionLockReason}>
+        <button
+          type="button"
+          className={coachClass("clean")}
+          onClick={onCleanTables}
+          disabled={!canAct}
+          title={actionLockReason}
+        >
           Clean tables
         </button>
         <button type="button" onClick={onCheckSupplies} disabled={!canAct} title={actionLockReason}>
@@ -229,7 +275,7 @@ function OpenDayControls({
         {gameState.unlocks.pricing ? (
           <button
             type="button"
-            className="secondary-button"
+            className={coachClass("offer", "secondary-button")}
             onClick={onAdjustOffer}
             disabled={!canAct || gameState.dayManagement.offerReviewed}
             title={
@@ -322,22 +368,6 @@ function OpenDayControls({
           No actions left for this shift.
         </p>
       ) : null}
-
-      <div className="product-grid" aria-label="Serve a specific product">
-        {products.map((product) => (
-          <button
-            type="button"
-            className="secondary-button"
-            key={product.id}
-            onClick={() => onServeProduct(product.id)}
-            disabled={!canAct}
-            title={actionLockReason}
-          >
-            {product.name} · €{product.basePrice}
-            <span className="product-cost-hint">{formatIngredients(product.ingredients)}</span>
-          </button>
-        ))}
-      </div>
     </>
   );
 }
@@ -483,7 +513,7 @@ function RestockPanel({
         Confirm purchases
       </button>
 
-      <div className="decor-shop" aria-label="Café-Einrichtung aufwerten">
+      <div className="decor-shop" aria-label="Upgrade café décor">
         <h3>Einrichtung</h3>
         {decorOptions.map((option) => (
           <div className="decor-row" key={option.id}>
@@ -510,14 +540,6 @@ function RestockPanel({
       </div>
     </div>
   );
-}
-
-function formatIngredients(ingredients: Partial<Record<"coffee" | "milk" | "pastries", number>>): string {
-  const parts: string[] = [];
-  if (ingredients.coffee) parts.push(`${ingredients.coffee}☕`);
-  if (ingredients.milk) parts.push(`${ingredients.milk}🥛`);
-  if (ingredients.pastries) parts.push(`${ingredients.pastries}🥐`);
-  return parts.join(" ");
 }
 
 function formatMissingActions(actions: readonly string[]): string {

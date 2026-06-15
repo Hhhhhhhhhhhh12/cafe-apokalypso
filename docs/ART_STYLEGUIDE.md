@@ -90,3 +90,23 @@ Recommended naming:
 - `placeholder-guest-normal-01`
 - `placeholder-guest-strange-01`
 - `placeholder-kassandra-ui`
+
+
+## Visual QA: why mixed-style collage assets are not accepted
+
+The café diorama must present a single, coherent visual language throughout. Mixing asset types produces a collage effect that undermines the atmosphere:
+
+**The problem**
+A painted or photo-realistic room background combined with pixel-art prop overlays (clocks, lamps, plants, cups) creates a collision of rendering styles. Each asset reads with its own perspective, line weight, and texture language. The result looks like stickers applied to a postcard: nothing sits convincingly in the space.
+
+**Specific failure modes caught in this refactor**
+- Pixel-art Pixellab décor sprites (clock, lamp, cups, shelf items, plant) overlaid on a painted PNG room — mismatched perspective, lighting, and scale
+- The painted Stage Base PNG providing the counter while a CSS counter div also rendered behind it — doubled geometry
+- Product serve buttons floating as an in-diorama overlay — UI widget clashing with the 3/4 room coordinate system
+
+**The rule**
+The room and all non-character elements must belong to one rendering tier:
+- **Tier A (current):** Pure CSS 3/4 room — all walls, floor, counter, tables, chairs, door, window, menu board, and storage shelf are CSS shapes and gradients. Character sprites (guests, machines, register) are the only image layer, as a deliberate character-vs-room contrast.
+- **Tier B (future, requires approval):** Fully pixel-art room — every element (walls, props, characters) shares the same pixel grid, perspective, and palette. Must be adopted all at once, not piece by piece.
+
+Mixed-tier assets require explicit sign-off before merging.

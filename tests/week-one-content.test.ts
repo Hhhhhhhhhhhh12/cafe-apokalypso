@@ -30,12 +30,12 @@ const requiredStrangeGuests = [
 ];
 
 const requiredProducts = [
-  "Filterkaffee",
+  "Filter Coffee",
   "Espresso",
   "Cappuccino",
   "Croissant",
-  "Kaffee + Croissant",
-  "Handfilter-Spezialität"
+  "Coffee + Croissant",
+  "Pour-Over Special"
 ];
 
 describe("week-one content data", () => {
@@ -75,7 +75,7 @@ describe("week-one content data", () => {
     expect(weekOneAdvertisingCampaigns).toHaveLength(4);
     expect(weekOneUpgrades).toHaveLength(7);
     expect(weekOneAchievements).toHaveLength(7);
-    expect(weekOneEvents).toHaveLength(22);
+    expect(weekOneEvents).toHaveLength(28);
     expect(weekOneDayModifiers).toHaveLength(7);
     expect(weekOneDays).toHaveLength(7);
   });

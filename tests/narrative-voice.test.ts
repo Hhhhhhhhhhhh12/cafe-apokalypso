@@ -42,7 +42,7 @@ describe("guest serve lines", () => {
     const preview = getNextGuestPreview(stateForDay(1));
     expect(preview?.orderLine).toContain("Just coffee");
     expect(preview?.learningCue).toContain("Paula");
-    expect(preview?.wants).toBe("Filterkaffee");
+    expect(preview?.wants).toBe("Filter Coffee");
   });
 
   it("prefers strange guests once three customers have been served", () => {

@@ -207,7 +207,7 @@ function serveProduct(state: GameState, productId: ProductId): GameState {
         ...stressedState,
         resources: reputationPenaltyResources,
         completedActions: addUniqueDayAction(stressedState.completedActions, "take_order"),
-        statusMessage: `${formatMissingSupply(missingIngredients)} The guest pauses, then orders nothing. Ruf -1.`
+        statusMessage: `${formatMissingSupply(missingIngredients)} The guest pauses, then orders nothing. Rep −1.`
       };
     }
 
@@ -223,7 +223,7 @@ function serveProduct(state: GameState, productId: ProductId): GameState {
       ...servedState,
       statusMessage: `${formatMissingSupply(
         missingIngredients
-      )} ${requestedProduct.name} becomes ${substitute.name}. The guest accepts this. Ruf -1.`
+      )} ${requestedProduct.name} becomes ${substitute.name}. The guest accepts this. Rep −1.`
     };
   }
 
@@ -581,7 +581,7 @@ function adjustOffer(state: GameState): GameState {
       offerReviewed: true
     },
     statusMessage:
-      "Offer board reviewed. Today's orders earn a little more. Ruf +1."
+      "Offer board reviewed. All orders today earn 10 % more than base price. Rep +1."
   };
 }
 
@@ -660,10 +660,10 @@ function runAdvertising(state: GameState, adType: "flyer" | "social"): GameState
     },
     statusMessage:
       adType === "social"
-        ? `A social post goes out. It costs €${SOCIAL_AD_COST} and brings a visible reputation boost. Ruf +3.`
+        ? `Social post out. €${SOCIAL_AD_COST} spent — wider reach, stronger signal. Rep +3. Guests who find you this way may linger longer.`
         : posterEchoApplies
-          ? "A local flyer goes out. It lands unusually well. Ruf +2, Stress +2."
-          : `A local flyer goes out. It costs €${FLYER_COST} and improves reputation by 1.`
+          ? `Flyer out, and today's modifier makes it land harder than usual. €${FLYER_COST} spent. Rep +2. The extra attention adds a little pressure. Stress +2.`
+          : `Flyer out in the neighbourhood. €${FLYER_COST} spent. Rep +1. Expect a modest uptick in foot traffic.`
   };
 }
 
@@ -938,15 +938,15 @@ function applyDayEndConsequences(state: GameState): GameState {
   // money saved for a steeper end-of-day stress hit.
   if (state.day >= 4 && !state.helperAssignment) {
     resources = { ...resources, stress: clampMeter(resources.stress + 10) };
-    flavorLines.push("You ran the whole floor alone again. It shows. Stress +10.");
+    flavorLines.push("You ran the whole floor alone again. Helpers unlock Day 3 — hiring one trades daily cost for less end-of-day strain. Stress +10.");
   }
 
   if (resources.cleanliness >= 70) {
     resources = { ...resources, reputation: clampMeter(resources.reputation + 1) };
-    flavorLines.push("The café closed with a cozy impression. Ruf +1.");
+    flavorLines.push("The café closed in good order. Guests noticed. Ruf +1.");
   } else if (resources.cleanliness < 25) {
     resources = { ...resources, reputation: clampMeter(resources.reputation - 2) };
-    flavorLines.push("A guest mentioned the tables with professional restraint. Ruf -2.");
+    flavorLines.push("A guest mentioned the tables with professional restraint. Clean during the shift to stay above 25. Ruf -2.");
   } else if (resources.cleanliness < 40) {
     resources = { ...resources, reputation: clampMeter(resources.reputation - 1) };
     flavorLines.push("The room felt a little neglected by closing time. Ruf -1.");
@@ -955,16 +955,16 @@ function applyDayEndConsequences(state: GameState): GameState {
   if (getCurrentDayModifier(state).id === "inspection-pressure") {
     if (resources.cleanliness >= 70) {
       resources = { ...resources, reputation: clampMeter(resources.reputation + 1) };
-      flavorLines.push("Inspection day likes a clean closing. Ruf +1.");
+      flavorLines.push("Inspection day: clean closing rewarded. Ruf +1.");
     } else if (resources.cleanliness < 40) {
       resources = { ...resources, reputation: clampMeter(resources.reputation - 1) };
-      flavorLines.push("Inspection day notices the neglected corners. Ruf -1.");
+      flavorLines.push("Inspection day: the neglected corners were noted. Ruf -1.");
     }
   }
 
   if (management.customersServed < 4) {
     resources = { ...resources, stress: clampMeter(resources.stress - 10) };
-    flavorLines.push("Slow day. The quiet helped. Stress -10.");
+    flavorLines.push("Quiet day — fewer than four customers. The slower pace kept stress down. Stress -10.");
   }
 
   if (
@@ -990,7 +990,13 @@ function applyDayEndConsequences(state: GameState): GameState {
     const prevLevel = getEmployeeLevel(prevXp);
     const newLevel = getEmployeeLevel(newXp);
     if (newLevel > prevLevel) {
-      flavorLines.push(`${state.helperAssignment.helperId.charAt(0).toUpperCase() + state.helperAssignment.helperId.slice(1)} hat Level ${newLevel} erreicht!`);
+      const helperName = state.helperAssignment.helperId.charAt(0).toUpperCase() + state.helperAssignment.helperId.slice(1);
+      const levelBenefits: Record<number, string> = {
+        2: "unlocks +1 action point per day",
+        3: "unlocks tip bonus (5 % of daily earnings)"
+      };
+      const benefit = levelBenefits[newLevel] ?? "new level";
+      flavorLines.push(`${helperName} reached Level ${newLevel} — ${benefit}.`);
     }
 
     const tipBonusRate = getEmployeeLevelBonuses(getEmployeeLevel(prevXp)).tipBonus;
@@ -998,7 +1004,7 @@ function applyDayEndConsequences(state: GameState): GameState {
       const tipBonus = clampResource(management.moneyEarned * tipBonusRate);
       resources = { ...resources, money: clampResource(resources.money + tipBonus) };
       management = { ...management, moneyEarned: clampResource(management.moneyEarned + tipBonus) };
-      flavorLines.push(`Trinkgeld-Bonus (Lv.${getEmployeeLevel(prevXp)}): +€${tipBonus.toFixed(2)}.`);
+      flavorLines.push(`Tip bonus (Level 3, 5 % of earnings): +€${tipBonus.toFixed(2)}.`);
     }
   }
 
@@ -1171,7 +1177,7 @@ function upgradeDecor(state: GameState, slot: DecorSlotId): GameState {
     },
     statusMessage:
       tierDefinition.reputationBonus > 0
-        ? `New look: ${tierDefinition.name}. The café feels a little warmer. Ruf +${tierDefinition.reputationBonus}.`
+        ? `New look: ${tierDefinition.name}. The café feels a little warmer. Rep +${tierDefinition.reputationBonus}.`
         : `New look: ${tierDefinition.name}.`
   };
 }

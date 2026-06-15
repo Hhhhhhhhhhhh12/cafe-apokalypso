@@ -1,4 +1,17 @@
 {
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "statusMessage": "Feature-Branch vorbereiten…",
+            "command": "branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null); if [ \"$branch\" = \"main\" ] || [ \"$branch\" = \"master\" ]; then date_str=$(date +%Y-%m-%d); new_branch=\"feat/session-${date_str}\"; if git show-ref --verify --quiet \"refs/heads/${new_branch}\"; then git checkout \"${new_branch}\" 2>/dev/null && echo \"{\\\"systemMessage\\\": \\\"Resumed branch ${new_branch}\\\"}\" ; else git checkout -b \"${new_branch}\" 2>/dev/null && echo \"{\\\"systemMessage\\\": \\\"Created branch ${new_branch} — ich arbeite dort und erstelle am Ende einen PR.\\\"}\" ; fi; fi"
+          }
+        ]
+      }
+    ]
+  },
   "permissions": {
     "allow": [
       "Bash(npm test)",

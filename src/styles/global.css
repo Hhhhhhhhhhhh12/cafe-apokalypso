@@ -1,3 +1,13 @@
+html {
+  /* Full-bleed elements (.hero-bar) use 50vw math. The viewport unit counts
+     the scrollbar gutter, so when a vertical scrollbar is present 100vw exceeds
+     the content width and a few px of horizontal scroll appear. Reserving the
+     gutter makes vw and the content box agree; clip absorbs any sub-px rounding
+     without breaking sticky positioning. */
+  scrollbar-gutter: stable;
+  overflow-x: clip;
+}
+
 :root {
   color: #211814;
   background: #f4eadf;
@@ -132,7 +142,7 @@ h3 {
   border: 2px solid #5c4037;
   border-radius: 8px;
   background: #fff8ed;
-  box-shadow: 0 6px 0 #c8a98d;
+  box-shadow: 0 6px 0 #c8a98d, 0 10px 20px rgba(140, 88, 48, 0.13);
 }
 
 .day-card {
@@ -167,7 +177,7 @@ h3 {
   border-radius: 10px;
   background: linear-gradient(135deg, #f6d9cb 0%, #ecc0ad 100%);
   color: #4a2014;
-  box-shadow: 0 4px 0 #b06a4f;
+  box-shadow: 0 4px 0 #b06a4f, 0 8px 18px rgba(122, 46, 26, 0.15);
 }
 
 .cafe-closed-banner .eyebrow {
@@ -215,7 +225,7 @@ h3 {
   border-radius: 10px;
   background: linear-gradient(135deg, #e6ddf6 0%, #cdbfe9 100%);
   color: #241a4a;
-  box-shadow: 0 4px 0 #6a4fb0;
+  box-shadow: 0 4px 0 #6a4fb0, 0 8px 20px rgba(58, 36, 106, 0.18);
 }
 
 .demo-complete-banner .eyebrow {
@@ -280,7 +290,7 @@ h3 {
   border-radius: 12px;
   background: #0e1512;
   color: #c8e6d4;
-  box-shadow: 0 8px 0 #1a2a22, 0 0 0 4px rgba(74, 106, 90, 0.25);
+  box-shadow: 0 8px 0 #1a2a22, 0 0 0 4px rgba(74, 106, 90, 0.25), 0 16px 40px rgba(8, 18, 12, 0.35);
 }
 
 .kassandra-boot__panel .eyebrow {
@@ -464,7 +474,7 @@ h3 {
   grid-column: 1 / -1;
   padding: 12px;
   background: #fff4e6;
-  box-shadow: 0 4px 0 #c8a98d;
+  box-shadow: 0 4px 0 #c8a98d, 0 8px 16px rgba(140, 88, 48, 0.10);
 }
 
 .resource-panel .panel-heading {
@@ -487,7 +497,7 @@ h3 {
   background:
     linear-gradient(180deg, rgba(255, 248, 237, 0.72), rgba(244, 224, 200, 0.84)),
     #ead0b2;
-  box-shadow: 0 10px 0 #b98e6a;
+  box-shadow: 0 10px 0 #b98e6a, 0 14px 28px rgba(130, 80, 40, 0.12);
 }
 
 .cafe-panel .panel-heading {
@@ -565,14 +575,7 @@ h3 {
   position: absolute;
 }
 
-/* Hidden entirely: the painted Stage Base provides walls, window, door, menu
-   board, and shelf. The CSS structure used to sit beneath the image (z 0/1),
-   but the PNG has transparent corners outside the room shape, so these
-   elements bled through as graphic garbage (yellow window box top-left).
-   display:none also disables the .cafe-storage shelf-tier visual — the shelf
-   slot has no per-tier sprites yet, so nothing meaningful is lost. */
 .cafe-back-wall {
-  display: none;
   inset: 0 20% 39% 0;
   z-index: 0;
   background:
@@ -582,7 +585,6 @@ h3 {
 }
 
 .cafe-side-wall {
-  display: none; /* see .cafe-back-wall note above */
   inset: 0 0 31% auto;
   z-index: 1;
   width: 29%;
@@ -592,25 +594,9 @@ h3 {
     var(--side-wall);
 }
 
-/*
- * Experimental provisional Stage Base v03 background layer.
- * Sits above the CSS wall placeholders (z 0/1) but below the floor
- * stacking context (z 2) so existing props/guests render on top.
- * Known caveat: source is a square, corner-isometric render, so it does
- * not perfectly match the front-angled 3/4 CSS stage. Provisional only.
- * If this image fails to load, the CSS .cafe-* fallback structure remains.
- */
+/* .cafe-stage-base: painted PNG removed — CSS room is now the room. */
 .cafe-stage-base {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  width: 100%;
-  height: 100%;
-  object-fit: fill;
-  image-rendering: smooth;
-  image-rendering: high-quality;
-  pointer-events: none;
-  user-select: none;
+  display: none;
 }
 
 .cafe-window {
@@ -739,15 +725,9 @@ h3 {
   z-index: 2;
   height: 65%;
   clip-path: polygon(9% 1%, 100% 15%, 88% 100%, 0 84%);
-  /*
-   * Surface fill/border/shadow reduced to transparent so the experimental
-   * Stage Base v03 background reads through. The floor element is kept as the
-   * positioning container for props/guests, and the class/rule remain for
-   * fallback if the background image is unavailable.
-   */
-  border: 3px solid transparent;
-  background: transparent;
-  box-shadow: none;
+  border: 3px solid #624236;
+  background: var(--floor);
+  box-shadow: 0 18px 26px rgba(58, 36, 28, 0.2);
 }
 
 .cafe-floor__tiles {
@@ -757,8 +737,7 @@ h3 {
     linear-gradient(35deg, transparent 47%, var(--floor-line) 48% 52%, transparent 53%),
     linear-gradient(129deg, transparent 47%, var(--floor-line) 48% 52%, transparent 53%);
   background-size: 52px 48px;
-  /* Reduced from 0.62 so CSS tile lines do not double over the Stage Base. */
-  opacity: 0;
+  opacity: 0.42;
 }
 
 .cafe-room-shadow {
@@ -772,33 +751,19 @@ h3 {
     radial-gradient(ellipse at 34% 32%, rgba(52, 31, 24, 0.2), transparent 36%),
     radial-gradient(ellipse at 72% 66%, rgba(52, 31, 24, 0.18), transparent 33%);
   filter: blur(3px);
-  /* Reduced so the floor shadow does not darken the Stage Base background. */
-  opacity: 0;
+  opacity: 0.55;
 }
 
-/*
- * Stage Base coherence cleanup: the CSS counter was a bold, dark-red slab that
- * read as a second counter against the painted Stage Base. It is softened to a
- * muted, semi-transparent ledge so the pilot sprites still have a surface to sit
- * on without doubling the painted room. Class/structure retained as fallback.
- */
 .cafe-counter {
-  /* Overlays the painted L-counter of the Stage Base (diorama x 58-97%,
-     y 66-88%), expressed in .cafe-floor coordinates. The skew is removed so
-     the machine/register sprites stand upright on the painted worktop. */
   top: 53.8%;
   left: 59.6%;
   z-index: 4;
   width: 43.8%;
   height: 33.8%;
-  /* Border transparent: a visible outline doubled the painted counter edges. */
-  border: 2px solid transparent;
+  border: 2px solid #35241e;
   border-radius: 7px;
-  /* Transparent: the painted Stage Base provides the counter; this element is
-     kept only as the positioning container for the coffee-machine + register
-     sprites. The visible slab is removed so it does not double the painted bar. */
-  background: transparent;
-  box-shadow: none;
+  background: linear-gradient(180deg, #b8774f 0 45%, #7f2f2c 45% 100%);
+  box-shadow: 10px 13px 0 rgba(50, 31, 24, 0.2);
 }
 
 .cafe-counter__front {
@@ -807,8 +772,7 @@ h3 {
   border-top: 3px solid rgba(53, 36, 30, 0.75);
   background:
     linear-gradient(90deg, transparent 22%, rgba(255, 248, 237, 0.12) 22% 25%, transparent 25% 54%, rgba(255, 248, 237, 0.12) 54% 57%, transparent 57%);
-  /* Hidden so the CSS counter front does not double the painted counter. */
-  opacity: 0;
+  opacity: 1;
 }
 
 .cafe-counter__ledge {
@@ -820,8 +784,7 @@ h3 {
   border-top: 3px solid rgba(53, 36, 30, 0.55);
   border-bottom: 3px solid rgba(53, 36, 30, 0.3);
   background: rgba(255, 248, 237, 0.12);
-  /* Hidden alongside the counter front. */
-  opacity: 0;
+  opacity: 1;
 }
 
 /*
@@ -1289,37 +1252,40 @@ h3 {
 /* Standing poses for queue rotation — each guest's single static frame shown
    while waiting to order. Only Paula has dedicated walk sheets; other guests
    slide via CSS position transition with their static standing sprite. */
-.cafe-pilot-asset--cem-standing,
-.cafe-pilot-asset--mira-standing {
-  width: 90px;
-  background-repeat: no-repeat;
-  background-position: 0 0;
-  /* 40×48 source scaled to 108px height → 90×108 rendered */
-  background-size: 90px 108px;
-}
-
 .cafe-pilot-asset--cem-standing {
+  width: 88px;
+  height: 88px;
   background-image: url("../../assets/sprites/guests/placeholder-guest-cem.png");
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  background-size: 88px 88px;
 }
 
 .cafe-pilot-asset--mira-standing {
+  width: 96px;
+  height: 96px;
   background-image: url("../../assets/sprites/guests/placeholder-guest-mira.png");
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  background-size: 96px 96px;
 }
 
 .cafe-pilot-asset--lukas-standing {
-  width: 72px;
+  width: 96px;
+  height: 96px;
   background-image: url("../../assets/sprites/guests/placeholder-guest-lukas.png");
   background-repeat: no-repeat;
-  background-position: 0 0;
-  background-size: 72px 108px;
+  background-position: center bottom;
+  background-size: 96px 96px;
 }
 
 .cafe-pilot-asset--christa-standing {
-  width: 34px;
+  width: 92px;
+  height: 92px;
   background-image: url("../../assets/sprites/guests/placeholder-guest-christa.png");
   background-repeat: no-repeat;
-  background-position: 0 0;
-  background-size: 34px 108px;
+  background-position: center bottom;
+  background-size: 92px 92px;
 }
 
 /* Seated guests slide up on first appearance (one-shot on DOM mount). */
@@ -1380,110 +1346,13 @@ h3 {
   }
 }
 
-/* Blinking guests: hand-edited 2-frame sheets (frame 0 = original sprite).
-   Element widths match the source aspect at 108px render height, so the
-   sheets aren't stretched. Blink rules restate the breathe animation (with
-   the slot's stagger delay) because the seated breathe rule would otherwise
-   win on specificity and cancel the blink; blink cadences are deliberately
-   co-prime-ish so nobody blinks in sync. */
-.cafe-pilot-asset--cem,
-.cafe-pilot-asset--mira {
-  /* 40x48 source -> 90x108 per frame */
-  width: 90px;
-  background-repeat: no-repeat;
-  background-position: 0 0;
-  background-size: 180px 108px;
-}
+/* Cem and Mira are now rendered as <img> elements using the .cafe-pilot-asset--guest
+   base rule (108×108 object-fit:contain). No background-image rules needed. */
 
-.cafe-pilot-asset--cem {
-  background-image: url("../../assets/sprites/guests/placeholder-guest-cem-idle.png");
-}
-
-.cafe-pilot-asset--mira {
-  background-image: url("../../assets/sprites/guests/placeholder-guest-mira-idle.png");
-}
-
-.cafe-pilot-asset--lukas {
-  /* 72x108 source -> 72x108 per frame */
-  width: 72px;
-  background-image: url("../../assets/sprites/guests/placeholder-guest-lukas-idle.png");
-  background-repeat: no-repeat;
-  background-position: 0 0;
-  background-size: 144px 108px;
-}
-
-.cafe-pilot-asset--christa {
-  /* 34x108 source -> 34x108 per frame */
-  width: 34px;
-  background-image: url("../../assets/sprites/guests/placeholder-guest-christa-idle.png");
-  background-repeat: no-repeat;
-  background-position: 0 0;
-  background-size: 68px 108px;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .placeholder-guest-seated .cafe-pilot-asset--cem {
-    animation:
-      cafe-guest-breathe 3.4s linear infinite,
-      cafe-blink-90 4.2s linear infinite;
-  }
-
-  .placeholder-guest-seated .cafe-pilot-asset--mira {
-    animation:
-      cafe-guest-breathe 3.4s linear -0.7s infinite,
-      cafe-blink-90 3.8s linear -1.3s infinite;
-  }
-
-  .placeholder-guest-seated .cafe-pilot-asset--lukas {
-    animation:
-      cafe-guest-breathe 3.4s linear -1.4s infinite,
-      cafe-blink-72 4.6s linear -2.2s infinite;
-  }
-
-  .placeholder-guest-seated .cafe-pilot-asset--christa {
-    animation:
-      cafe-guest-breathe 3.4s linear -2.1s infinite,
-      cafe-blink-34 5s linear -3.1s infinite;
-  }
-}
-
-/* Blink keyframes per frame width: eyes open until 96%, closed for the
-   final ~4% of the loop (~170-200ms). */
-@keyframes cafe-blink-90 {
-  0%,
-  95.9% {
-    background-position: 0 0;
-  }
-
-  96%,
-  100% {
-    background-position: -90px 0;
-  }
-}
-
-@keyframes cafe-blink-72 {
-  0%,
-  95.9% {
-    background-position: 0 0;
-  }
-
-  96%,
-  100% {
-    background-position: -72px 0;
-  }
-}
-
-@keyframes cafe-blink-34 {
-  0%,
-  95.9% {
-    background-position: 0 0;
-  }
-
-  96%,
-  100% {
-    background-position: -34px 0;
-  }
-}
+/* Lukas and Christa are now rendered as <img> elements using the
+   .cafe-pilot-asset--guest base rule (108×108 object-fit:contain), like Cem/Mira.
+   No background-image blink sheets needed — seated guests breathe via the shared
+   cafe-guest-breathe rule above. */
 
 /* When a real guest sprite is present, hide the CSS blob backing (fill, border,
    head dot) so only the sprite reads. Shadow (::after) is kept as a soft anchor. */
@@ -1579,9 +1448,18 @@ h3 {
  * diorama image, not .cafe-floor, so save-injected tier changes stay anchored to
  * the painted empty floor corner.
  */
+/* Décor sprite overlays disabled: mixed pixel-art style removed from CSS room. */
+.cafe-decor-plant,
+.cafe-decor-clock,
+.cafe-decor-lamp,
+.cafe-decor-cups,
+.cafe-decor-shelf {
+  display: none;
+}
+
 .cafe-decor-plant {
-  left: 10%;
-  top: 61.5%;
+  left: 46.4%;
+  top: 43.7%;
   z-index: 5;
   width: 68px;
   height: 80px;
@@ -1625,19 +1503,20 @@ h3 {
  * window and menu board. The weirdness-hint .cafe-clock CSS below is separate
  * and untouched — that's the overlay omen; this is the real décor prop.
  */
-/* ── Décor props: positioned relative to .cafe-diorama ──────────────────
-   The stage base fills the diorama at object-fit:fill (987×619 rendered).
-   Percentages here are of the diorama box (≈993×625).
+/* ── Décor props: children of .cafe-world (zoom 1.35× around center/58%) ─
+   CSS % = .cafe-world box (873×625). Visual position after zoom differs from
+   CSS position — use inverse: css = (vis_px − ox)/1.35 + ox, ox=(W/2,0.58H).
    ── */
 .cafe-decor-clock {
   position: absolute;
-  left: 53.5%;
-  top: 23%;
+  left: 78.6%;
+  top: 23.7%;
   z-index: 4;
   width: 56px;
   height: 56px;
   background: url("../../assets/sprites/props/placeholder-cafe-clock.png") center / contain no-repeat;
   image-rendering: pixelated;
+  transform: rotate(-90deg);
 }
 
 .cafe-decor-clock.cafe-decor--tier-1 {
@@ -1662,8 +1541,8 @@ h3 {
  */
 .cafe-decor-lamp {
   position: absolute;
-  left: 36%;
-  top: 17%;
+  left: 47.7%;
+  top: 8.1%;
   z-index: 4;
   width: 48px;
   height: 64px;
@@ -1692,8 +1571,8 @@ h3 {
  */
 .cafe-decor-cups {
   position: absolute;
-  left: 80%;
-  top: 40.5%;
+  left: 78.4%;
+  top: 36.2%;
   z-index: 6;
   width: 48px;
   height: 40px;
@@ -1719,35 +1598,7 @@ h3 {
   height: 52px;
 }
 
-/*
- * Wall shelf items (Pixellab). Overlays the painted wooden bench on the
- * back-right wall. Shows items sitting on the shelf — sparse/worn at tier 1,
- * progressively nicer at tier 2 and 3.
- */
-.cafe-decor-shelf {
-  position: absolute;
-  left: 62%;
-  top: 43%;
-  z-index: 4;
-  width: 96px;
-  height: 56px;
-  background: url("../../assets/sprites/props/placeholder-cafe-shelf.png") center bottom / contain no-repeat;
-  image-rendering: pixelated;
-}
-
-.cafe-decor-shelf.cafe-decor--tier-1 {
-  opacity: 0.90;
-}
-
-.cafe-decor-shelf.cafe-decor--tier-2 {
-  opacity: 1;
-  background-image: url("../../assets/sprites/props/placeholder-cafe-shelf-t2.png");
-}
-
-.cafe-decor-shelf.cafe-decor--tier-3 {
-  opacity: 1;
-  background-image: url("../../assets/sprites/props/placeholder-cafe-shelf-t3.png");
-}
+/* cafe-decor-shelf removed — diorama background already has painted shelves */
 
 .cafe-diorama--busy .placeholder-guest-normal-02,
 .cafe-diorama--strained .placeholder-guest-normal-02 {
@@ -1882,7 +1733,7 @@ h3 {
   gap: 12px;
   padding: 14px;
   background: #fff8ed;
-  box-shadow: 0 5px 0 #c8a98d;
+  box-shadow: 0 5px 0 #c8a98d, 0 8px 18px rgba(140, 88, 48, 0.11);
 }
 
 .button-row {
@@ -1934,24 +1785,136 @@ h3 {
   color: #6a554b;
 }
 
-.product-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 7px;
-  border-top: 2px solid #d5bda5;
-  padding-top: 10px;
-  margin-top: 4px;
+/* Counter menu — product serve buttons overlaid in the diorama above the counter */
+.counter-menu {
+  position: absolute;
+  left: 57%;
+  top: 37%;
+  z-index: 8;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  background: #f8edda;
+  border: 2px solid #7a3d2a;
+  border-radius: 6px;
+  padding: 6px 8px;
+  box-shadow: 0 3px 0 #5a2d1e, 0 5px 14px rgba(80, 36, 20, 0.20);
+  min-width: 118px;
+  pointer-events: all;
 }
 
-.product-grid::before {
-  content: "Oder direkt servieren";
-  grid-column: 1 / -1;
-  font-size: 0.75rem;
+.counter-menu__item {
+  all: unset;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  /* Min 44px touch target (QUALITY_CHECKLIST responsive baseline); `all: unset`
+     above wipes the global button min-height, so restore it explicitly. */
+  min-height: 44px;
+  padding: 4px 6px;
+  margin: 0 -6px;
+  font-size: 0.72rem;
+  color: #3a2218;
+  border-bottom: 1px solid transparent;
+  transition: color 120ms ease-out;
+}
+
+.counter-menu__item:hover:not(:disabled) {
+  color: #7a3d2a;
+}
+
+.counter-menu__item:focus-visible {
+  outline: 2px solid #7a3d2a;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.counter-menu__item:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+}
+
+.counter-menu__name {
+  font-weight: 600;
+}
+
+.counter-menu__price {
+  font-variant-numeric: tabular-nums;
+  color: #5a3a2a;
+  font-weight: 500;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .counter-menu__item {
+    transition: none;
+  }
+}
+
+/* ── Serve-menu (product list in ActionPanel sidebar) ─────────────────────── */
+.serve-menu {
+  margin-bottom: 10px;
+  padding: 8px 10px 6px;
+  border: 2px solid #c2a07a;
+  border-radius: 8px;
+  background: #f8edda;
+}
+
+.serve-menu__label {
+  margin: 0 0 6px;
+  font-size: 0.68rem;
   font-weight: 700;
-  color: #6c5146;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 2px;
+  color: #7a3d2a;
+}
+
+.serve-menu__items {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.serve-menu__item {
+  all: unset;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 4px 6px;
+  margin: 0 -4px;
+  font-size: 0.78rem;
+  color: #3a2218;
+  border-radius: 5px;
+  transition: background 100ms ease-out;
+}
+
+.serve-menu__item:hover:not(:disabled) {
+  background: rgba(122, 61, 42, 0.08);
+}
+
+.serve-menu__item:focus-visible {
+  outline: 2px solid #7a3d2a;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.serve-menu__item:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+}
+
+.serve-menu__name {
+  font-weight: 600;
+}
+
+.serve-menu__price {
+  font-variant-numeric: tabular-nums;
+  color: #5a3a2a;
+  font-weight: 500;
 }
 
 .helper-slot {
@@ -2306,7 +2269,7 @@ h3 {
   gap: 12px 14px;
   padding: 14px;
   background: #fff4e6;
-  box-shadow: 0 4px 0 #c8a98d;
+  box-shadow: 0 4px 0 #c8a98d, 0 8px 18px rgba(140, 88, 48, 0.10);
 }
 
 .day-progress-panel > .panel-heading,
@@ -2457,7 +2420,7 @@ h3 {
   background:
     linear-gradient(180deg, rgba(255, 248, 237, 0.95), rgba(251, 237, 220, 0.95)),
     #fbeddc;
-  box-shadow: 0 4px 0 #d4b28f;
+  box-shadow: 0 4px 0 #d4b28f, 0 8px 18px rgba(140, 88, 48, 0.10);
 }
 
 .placeholder-kassandra-ui {
@@ -2473,7 +2436,7 @@ h3 {
   margin-bottom: 18px;
   border: 3px solid #16606c;
   background: #f4efe7;
-  box-shadow: 0 6px 0 #b8d4d6;
+  box-shadow: 0 6px 0 #b8d4d6, 0 10px 20px rgba(22, 96, 108, 0.13);
 }
 
 .letter-panel--prominent .eyebrow {
@@ -2832,5 +2795,349 @@ h3 {
 
   76% {
     opacity: 1;
+  }
+}
+
+/* ── PHASE 3: first-week game feel ─────────────────────────────────── */
+
+/* Onboarding coach nudge (Days 1–3, tutorial-less) */
+.cafe-coach {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0.55rem 0.7rem;
+  border-left: 4px solid #c88a3a;
+  border-radius: 6px;
+  background: #fbeedd;
+  color: #5c3d18;
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.35;
+  animation: status-slide-in 0.28s ease-out both;
+}
+
+.cafe-coach__icon {
+  flex-shrink: 0;
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+/* Pulse ring on the button the coach points at */
+.cafe-coach-pulse {
+  position: relative;
+  animation: cafe-coach-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes cafe-coach-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(200, 138, 58, 0.55);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(200, 138, 58, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cafe-coach,
+  .cafe-coach-pulse {
+    animation: none;
+  }
+  .cafe-coach-pulse {
+    box-shadow: 0 0 0 3px rgba(200, 138, 58, 0.55);
+  }
+}
+
+/* Day-end summary headline — the outcome at a glance */
+.day-result-headline {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0.6rem 0 0.2rem;
+}
+
+.day-result-headline__item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid #d4b28f;
+  border-radius: 8px;
+  background: rgba(255, 248, 237, 0.7);
+}
+
+.day-result-headline__item .eyebrow {
+  margin: 0;
+  font-size: 0.66rem;
+}
+
+.day-result-headline__item strong {
+  color: #35241e;
+  font-size: 1.1rem;
+  line-height: 1.15;
+}
+
+.day-result-headline__net--pos strong {
+  color: #2d6f58;
+}
+
+.day-result-headline__net--neg strong {
+  color: #7f2f2c;
+}
+
+/* Day-open / day-close "moment" banner */
+.day-transition-banner {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 0.5rem 1.3rem;
+  border: 2px solid #5c4037;
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(255, 248, 237, 0.97), rgba(251, 237, 220, 0.97)),
+    #fbeddc;
+  box-shadow: 0 6px 18px rgba(140, 88, 48, 0.28);
+  pointer-events: none;
+  animation: day-transition-in 2.2s ease-out both;
+}
+
+.day-transition-banner__eyebrow {
+  color: #16606c;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.day-transition-banner__title {
+  color: #2b201b;
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+@keyframes day-transition-in {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -12px);
+  }
+  12%,
+  80% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .day-transition-banner {
+    animation: none;
+  }
+}
+
+/* ── Day-6/7 late-week UI escalation ─────────────────────────────────────────
+   "Escalation is earned": effects are subtle enough to go unnoticed on first
+   play and only register in hindsight. No garish apocalypse imagery — just
+   the faintest sense that something has slipped. All motion behind
+   prefers-reduced-motion: no-preference.                                    */
+
+/* Day 6+: title very occasionally twitches a single pixel — most players
+   chalk it up to eye strain. Fires roughly once every 11 s. */
+@media (prefers-reduced-motion: no-preference) {
+  .app-shell[data-day="6"] h1,
+  .app-shell[data-day="7"] h1 {
+    animation: title-micro-stutter 11s steps(1, end) infinite;
+  }
+
+  /* Day 7 only: a barely-there chromatic split on the title — 1 px red left,
+     1 px teal right — the kind of detail that only shows up in a screenshot. */
+  .app-shell[data-day="7"] h1 {
+    animation:
+      title-micro-stutter 11s steps(1, end) infinite,
+      title-chromatic 15s steps(1, end) 3s infinite;
+  }
+
+  /* Day 7: the "Day 7" numeral in the day-card dims for ~160 ms once
+     per 15 s cycle — a blink of bad circuitry. */
+  .app-shell[data-day="7"] .day-card strong {
+    animation: day-number-flicker 15s steps(1, end) 6s infinite;
+  }
+}
+
+@keyframes title-micro-stutter {
+  0%    { transform: none; }
+  8.2%  { transform: translateX(0.5px); }
+  8.9%  { transform: none; }
+  52.7% { transform: translateX(-0.5px); }
+  53.3% { transform: none; }
+  100%  { transform: none; }
+}
+
+@keyframes title-chromatic {
+  0%    { text-shadow: none; }
+  26.5% { text-shadow: -1px 0 0 rgba(127, 47, 44, 0.35), 1px 0 0 rgba(22, 96, 108, 0.25); }
+  27.8% { text-shadow: none; }
+  100%  { text-shadow: none; }
+}
+
+@keyframes day-number-flicker {
+  0%    { opacity: 1; }
+  46.6% { opacity: 1; }
+  47.7% { opacity: 0.55; }
+  48.7% { opacity: 1; }
+  100%  { opacity: 1; }
+}
+
+/* Day 6+: the café-stage panel border shadow very briefly cools once per
+   long cycle — the caramel flat-offset drifts one tone cooler for ~200 ms.
+   Only perceptible side-by-side; in play it reads as "something felt off
+   for a moment."  */
+@media (prefers-reduced-motion: no-preference) {
+  .app-shell[data-day="6"] .cafe-panel,
+  .app-shell[data-day="7"] .cafe-panel {
+    animation: panel-shadow-drift 22s steps(1, end) 4s infinite;
+  }
+
+  /* Day 7: the tagline under the title briefly loses a word of its warmth —
+     a sub-second desaturation, like a video card hiccup. */
+  .app-shell[data-day="7"] .intro {
+    animation: intro-blink 28s steps(1, end) 9s infinite;
+  }
+
+  /* Day 7: the action-panel right column occasionally skips its warm
+     box-shadow offset for one frame — one fewer data point than expected. */
+  .app-shell[data-day="7"] .action-panel {
+    animation: action-panel-shadow-drift 17s steps(1, end) 2s infinite;
+  }
+}
+
+@keyframes panel-shadow-drift {
+  0%    { box-shadow: 0 6px 0 #c8a98d, 0 10px 20px rgba(140, 88, 48, 0.13); }
+  72%   { box-shadow: 0 6px 0 #c8a98d, 0 10px 20px rgba(140, 88, 48, 0.13); }
+  73%   { box-shadow: 0 6px 0 #b0a8a2, 0 10px 20px rgba(100, 88, 80, 0.10); }
+  74.5% { box-shadow: 0 6px 0 #c8a98d, 0 10px 20px rgba(140, 88, 48, 0.13); }
+  100%  { box-shadow: 0 6px 0 #c8a98d, 0 10px 20px rgba(140, 88, 48, 0.13); }
+}
+
+@keyframes action-panel-shadow-drift {
+  0%    { box-shadow: 0 5px 0 #c8a98d, 0 8px 18px rgba(140, 88, 48, 0.11); }
+  80%   { box-shadow: 0 5px 0 #c8a98d, 0 8px 18px rgba(140, 88, 48, 0.11); }
+  81%   { box-shadow: 0 5px 0 #b0a8a2, 0 8px 18px rgba(100, 88, 80, 0.08); }
+  82.3% { box-shadow: 0 5px 0 #c8a98d, 0 8px 18px rgba(140, 88, 48, 0.11); }
+  100%  { box-shadow: 0 5px 0 #c8a98d, 0 8px 18px rgba(140, 88, 48, 0.11); }
+}
+
+@keyframes intro-blink {
+  0%    { opacity: 1; }
+  61%   { opacity: 1; }
+  61.8% { opacity: 0.72; }
+  62.6% { opacity: 1; }
+  100%  { opacity: 1; }
+}
+
+/* ── Guest status indicators ──────────────────────────────────────────────────
+   Visible + accessible labels on each in-diorama guest.
+   QUALITY_CHECKLIST: never colour-only — always colour + text label.
+   Labels are tiny (0.62 rem) and sit flush below the sprite; the colour tint
+   reinforces the meaning but is never the sole indicator.                   */
+
+.guest-status {
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 1px 5px 1px 4px;
+  border-radius: 999px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  pointer-events: none;
+  line-height: 1.4;
+  backdrop-filter: blur(2px);
+}
+
+/* Waiting (queue) — warm amber */
+.guest-status--waiting {
+  background: rgba(200, 138, 58, 0.88);
+  color: #2b1a06;
+  border: 1px solid rgba(140, 88, 20, 0.5);
+}
+
+/* Seated — calm sage green */
+.guest-status--seated {
+  background: rgba(74, 106, 90, 0.88);
+  color: #f4eeea;
+  border: 1px solid rgba(40, 70, 55, 0.45);
+}
+
+/* .placeholder-guest is already position:absolute (line ~573), which creates
+   a positioning context for the .guest-status child — no override needed. */
+
+/* ── PHASE 4: Coin tick + stress consequence visuals ─────────────────────── */
+
+@keyframes cafe-coin-float {
+  0%   { opacity: 1; transform: translateY(0) scale(1); }
+  15%  { opacity: 1; transform: translateY(-5px) scale(1.08); }
+  100% { opacity: 0; transform: translateY(-30px) scale(0.88); }
+}
+
+/* Floats up from the register area (diorama-relative, right side of counter) */
+.cafe-coin-tick {
+  position: absolute;
+  right: 19%;
+  bottom: 32%;
+  z-index: 20;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #2d7a1f;
+  text-shadow: 0 1px 4px rgba(255, 255, 255, 0.8);
+  pointer-events: none;
+  white-space: nowrap;
+  animation: cafe-coin-float 1.5s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cafe-coin-tick {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+/* Strained mood — warm red vignette overlay via ::before override */
+.cafe-diorama--strained::before {
+  background:
+    radial-gradient(circle at 50% 85%, rgba(160, 55, 35, 0.22), transparent 55%),
+    linear-gradient(110deg, rgba(255, 249, 226, 0.34), transparent 32%),
+    radial-gradient(circle at 86% 26%, rgba(22, 96, 108, 0.14), transparent 24%);
+}
+
+/* Slow heat-shimmer filter pulse on the world when strained */
+@keyframes cafe-strained-pulse {
+  0%, 100% { filter: saturate(1.0) brightness(1.0); }
+  50%       { filter: saturate(1.18) brightness(0.96); }
+}
+
+.cafe-diorama--strained .cafe-world {
+  animation: cafe-strained-pulse 5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cafe-diorama--strained .cafe-world {
+    animation: none;
+    filter: saturate(1.12);
   }
 }
