@@ -1679,10 +1679,10 @@ h3 {
   left: 54.0%;
   top: 32.0%;
   z-index: 8;
-  width: 36px;
-  height: 36px;
+  width: 56px;
+  height: 56px;
   background: url("../../assets/sprites/props/placeholder-cafe-clock.png") center / contain no-repeat;
-  image-rendering: auto;
+  image-rendering: pixelated;
 }
 
 .cafe-decor-clock.cafe-decor--tier-1 {
@@ -1707,7 +1707,14 @@ h3 {
  * See GitHub issue for floor lamp replacement sprites.
  */
 .cafe-decor-lamp {
-  display: none;
+  position: absolute;
+  left: 24.5%;
+  top: 33.0%;
+  z-index: 4;
+  width: 48px;
+  height: 64px;
+  background: url("../../assets/sprites/props/placeholder-cafe-lamp.png") center top / contain no-repeat;
+  image-rendering: pixelated;
 }
 
 .cafe-decor-lamp.cafe-decor--tier-1 {
@@ -1731,8 +1738,8 @@ h3 {
  */
 .cafe-decor-cups {
   position: absolute;
-  left: 68.5%;
-  top: 46.5%;
+  left: 62.0%;
+  top: 40.0%;
   z-index: 6;
   width: 48px;
   height: 40px;
@@ -2165,6 +2172,7 @@ h3 {
   justify-self: stretch;
   text-align: center;
 }
+
 
 .helper-picker fieldset {
   min-width: 0;

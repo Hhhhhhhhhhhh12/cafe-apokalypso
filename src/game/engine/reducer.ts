@@ -831,6 +831,8 @@ function openDay(state: GameState): GameState {
     : 0;
   const helperLevel = state.helperAssignment ? getEmployeeLevel(helperXp) : 1;
   const levelBonuses = state.helperAssignment ? getEmployeeLevelBonuses(helperLevel) : { extraAP: 0, tipBonus: 0 };
+  const modifier = getCurrentDayModifier(state);
+  const shortStaffedPenalty = modifier.id === "short-staffed" && !state.helperAssignment ? 1 : 0;
   const management = {
     ...state.dayManagement,
     moneySpent: state.dayManagement.moneySpent + (state.helperAssignment?.dailyCost ?? 0),
@@ -841,7 +843,7 @@ function openDay(state: GameState): GameState {
         ? 1
         : 0,
     helperDecisionMade: true,
-    actionPointsRemaining: state.dayManagement.actionPointsRemaining + levelBonuses.extraAP
+    actionPointsRemaining: state.dayManagement.actionPointsRemaining + levelBonuses.extraAP - shortStaffedPenalty
   };
 
   if (state.helperAssignment) {
@@ -876,9 +878,14 @@ function openDay(state: GameState): GameState {
       ? { ...state.helperAssignment, locked: true }
       : null,
     dayManagement: management,
-    statusMessage: state.helperAssignment
-      ? `Day opened with ${getHelperLabel(state.helperAssignment)}. ${state.helperAssignment.flavorLine}`
-      : "Day opened without temporary help."
+    statusMessage: [
+      state.helperAssignment
+        ? `Day opened with ${getHelperLabel(state.helperAssignment)}. ${state.helperAssignment.flavorLine}`
+        : shortStaffedPenalty > 0
+          ? "Day 5 opens short-staffed — one fewer action point today."
+          : "Day opened without temporary help.",
+      modifier.learningHint
+    ].join(" ")
   };
   return setNextGuestPatience(openedState);
 }
@@ -1334,10 +1341,12 @@ function finishSetup(state: GameState): GameState {
     dayPhase: "open",
     phaseLabel: "Opening setup",
     resources,
-    statusMessage:
+    statusMessage: [
       state.equipment.seating >= 1
         ? `Doors open. The room is bare but the machine hisses and the first guest is already at the counter. Daily overhead (€${DAILY_FIXED_COST}) will be deducted at closing.`
-        : `Doors open with standing room only — guests order at the counter and take their coffee to go. Daily overhead (€${DAILY_FIXED_COST}) will be deducted at closing.`
+        : `Doors open with standing room only — guests order at the counter and take their coffee to go. Daily overhead (€${DAILY_FIXED_COST}) will be deducted at closing.`,
+      getCurrentDayModifier(state).learningHint
+    ].join(" ")
   };
 }
 
