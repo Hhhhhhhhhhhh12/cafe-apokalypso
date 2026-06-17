@@ -6,7 +6,6 @@ import type {
   DayPhase,
   DaySummary,
   DayActionId,
-  EquipmentSlotId,
   GameState,
   GuestMemoryEntry,
   HelperAssignment,

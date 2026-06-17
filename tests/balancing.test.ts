@@ -6,8 +6,7 @@
  */
 import { describe, expect, it } from "vitest";
 import {
-  createInitialGameState,
-  CURRENT_GAME_STATE_VERSION
+  createInitialGameState
 } from "../src/game/engine/gameState";
 import { gameReducer } from "../src/game/engine/reducer";
 import {
@@ -167,7 +166,7 @@ describe("balancing: day modifiers have measurable effects", () => {
     const afterClose = gameReducer(afterServe, { type: "complete_day" });
     const flavorLines = afterClose.daySummary?.flavorLines ?? [];
     const hasCleanBonus = flavorLines.some((line) =>
-      line.includes("Ruf +1") || line.includes("good order")
+      line.includes("Rep +1") || line.includes("good order")
     );
     expect(hasCleanBonus).toBe(true);
   });

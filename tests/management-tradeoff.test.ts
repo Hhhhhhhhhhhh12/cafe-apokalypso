@@ -130,7 +130,7 @@ describe("management tradeoff system", () => {
     const checked = gameReducer(dayThree, { type: "check_supplies" });
 
     expect(checked.resources.reputation).toBe(dayThree.resources.reputation + 1);
-    expect(checked.statusMessage).toContain("Ruf +1");
+    expect(checked.statusMessage).toContain("Rep +1");
   });
 
   it("decreases cleanliness from serving and increases it through cleaning", () => {
@@ -888,11 +888,11 @@ describe("fail-state and reputation-scaled income", () => {
 
     expect(cleanInspection.resources.reputation).toBe(27);
     expect(cleanInspection.daySummary?.flavorLines).toContain(
-      "Inspection day: clean closing rewarded. Ruf +1."
+      "Inspection day: clean closing rewarded. Rep +1."
     );
     expect(messyInspection.resources.reputation).toBe(23);
     expect(messyInspection.daySummary?.flavorLines).toContain(
-      "Inspection day: the neglected corners were noted. Ruf -1."
+      "Inspection day: the neglected corners were noted. Rep -1."
     );
   });
 });

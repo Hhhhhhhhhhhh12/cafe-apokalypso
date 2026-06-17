@@ -3,8 +3,7 @@ import {
   addUniqueDayAction,
   addUniqueEventIds,
   addUniqueGuestIds,
-  createFreshRunState,
-  createInitialGameState
+  createFreshRunState
 } from "./gameState";
 import { weekOneAchievements } from "../data";
 import { getDecorDailyBonuses, getDecorTier, getMaxDecorTier } from "../data/decor";
@@ -557,7 +556,7 @@ function checkSupplies(state: GameState): GameState {
 
   const supplyMessage =
     `Supply check: coffee ${tickedState.supplies.coffee}/${SUPPLY_CAPS.coffee}, milk ${tickedState.supplies.milk}/${SUPPLY_CAPS.milk}, pastries ${tickedState.supplies.pastries}/${SUPPLY_CAPS.pastries}.` +
-    (auditBonusApplies ? " The tidy shelf calms the offer board. Ruf +1." : "");
+    (auditBonusApplies ? " The tidy shelf calms the offer board. Rep +1." : "");
 
   return {
     ...tickedState,
@@ -985,22 +984,22 @@ function applyDayEndConsequences(state: GameState): GameState {
 
   if (resources.cleanliness >= 70) {
     resources = { ...resources, reputation: clampMeter(resources.reputation + 1) };
-    flavorLines.push("The café closed in good order. Guests noticed. Ruf +1.");
+    flavorLines.push("The café closed in good order. Guests noticed. Rep +1.");
   } else if (resources.cleanliness < 25) {
     resources = { ...resources, reputation: clampMeter(resources.reputation - 2) };
-    flavorLines.push("A guest mentioned the tables with professional restraint. Clean during the shift to stay above 25. Ruf -2.");
+    flavorLines.push("A guest mentioned the tables with professional restraint. Clean during the shift to stay above 25. Rep -2.");
   } else if (resources.cleanliness < 40) {
     resources = { ...resources, reputation: clampMeter(resources.reputation - 1) };
-    flavorLines.push("The room felt a little neglected by closing time. Ruf -1.");
+    flavorLines.push("The room felt a little neglected by closing time. Rep -1.");
   }
 
   if (getCurrentDayModifier(state).id === "inspection-pressure") {
     if (resources.cleanliness >= 70) {
       resources = { ...resources, reputation: clampMeter(resources.reputation + 1) };
-      flavorLines.push("Inspection day: clean closing rewarded. Ruf +1.");
+      flavorLines.push("Inspection day: clean closing rewarded. Rep +1.");
     } else if (resources.cleanliness < 40) {
       resources = { ...resources, reputation: clampMeter(resources.reputation - 1) };
-      flavorLines.push("Inspection day: the neglected corners were noted. Ruf -1.");
+      flavorLines.push("Inspection day: the neglected corners were noted. Rep -1.");
     }
   }
 
