@@ -76,6 +76,9 @@ const SOCIAL_AD_COST = 5;
 /** Max guest-appreciation reputation points awarded per day (keeps it a light nudge). */
 const APPRECIATION_DAILY_CAP = 4;
 
+/** Max decor atmosphere reputation bonuses awarded per day. */
+const DECOR_ATMOSPHERE_DAILY_CAP = 2;
+
 export function gameReducer(state: GameState, action: GameAction): GameState {
   if (state.cafeClosed && action.type !== "reset_game") {
     return {
@@ -262,7 +265,7 @@ function applySuccessfulServe(
   const flavorLines: string[] = [];
 
   for (let index = 0; index < servedWithHelper; index += 1) {
-    const servedGuest = getGuestForCustomer(workingState, management.customersServed);
+    const servedGuest = getGuestForCustomer(workingState, management.customersServed + management.guestsLost);
     const missingIngredients = getMissingIngredients(
       product,
       supplies,
@@ -384,6 +387,8 @@ function applySuccessfulServe(
         appreciationBonusesGiven: management.appreciationBonusesGiven + bonus
       };
       appreciationLine = servedGuest?.delightLine ?? "";
+    } else {
+      appreciationLine = servedGuest?.matchedPreferenceLine ?? "";
     }
   } else if (matchesSoftPreference) {
     appreciationLine = servedGuest?.matchedPreferenceLine ?? "";
@@ -393,7 +398,20 @@ function applySuccessfulServe(
     appreciationLine = servedGuest.missedPreferenceLine ?? "";
   }
 
-  const statusParts = [serveLine, appreciationLine, ...flavorLines].filter(
+  // Decor atmosphere bonus: atmosphere-sensitive guests notice a well-maintained café.
+  let decorAtmosphereLine = "";
+  const decorBonusDef = servedGuest?.decorAtmosphereBonus;
+  if (decorBonusDef && management.decorBonusesGiven < DECOR_ATMOSPHERE_DAILY_CAP) {
+    const decorTiers = Object.values(workingState.decor) as number[];
+    const avgDecorTier = decorTiers.reduce((a, b) => a + b, 0) / decorTiers.length;
+    if (avgDecorTier >= decorBonusDef.minAvgTier) {
+      resources = { ...resources, reputation: clampMeter(resources.reputation + 1) };
+      management = { ...management, decorBonusesGiven: management.decorBonusesGiven + 1 };
+      decorAtmosphereLine = servedGuest?.decorAtmosphereLine ?? "";
+    }
+  }
+
+  const statusParts = [serveLine, appreciationLine, decorAtmosphereLine, ...flavorLines].filter(
     (part) => part.length > 0
   );
 
@@ -813,6 +831,8 @@ function openDay(state: GameState): GameState {
     : 0;
   const helperLevel = state.helperAssignment ? getEmployeeLevel(helperXp) : 1;
   const levelBonuses = state.helperAssignment ? getEmployeeLevelBonuses(helperLevel) : { extraAP: 0, tipBonus: 0 };
+  const modifier = getCurrentDayModifier(state);
+  const shortStaffedPenalty = modifier.id === "short-staffed" && !state.helperAssignment ? 1 : 0;
   const management = {
     ...state.dayManagement,
     moneySpent: state.dayManagement.moneySpent + (state.helperAssignment?.dailyCost ?? 0),
@@ -823,7 +843,7 @@ function openDay(state: GameState): GameState {
         ? 1
         : 0,
     helperDecisionMade: true,
-    actionPointsRemaining: state.dayManagement.actionPointsRemaining + levelBonuses.extraAP
+    actionPointsRemaining: state.dayManagement.actionPointsRemaining + levelBonuses.extraAP - shortStaffedPenalty
   };
 
   if (state.helperAssignment) {
@@ -858,9 +878,14 @@ function openDay(state: GameState): GameState {
       ? { ...state.helperAssignment, locked: true }
       : null,
     dayManagement: management,
-    statusMessage: state.helperAssignment
-      ? `Day opened with ${getHelperLabel(state.helperAssignment)}. ${state.helperAssignment.flavorLine}`
-      : "Day opened without temporary help."
+    statusMessage: [
+      state.helperAssignment
+        ? `Day opened with ${getHelperLabel(state.helperAssignment)}. ${state.helperAssignment.flavorLine}`
+        : shortStaffedPenalty > 0
+          ? "Day 5 opens short-staffed — one fewer action point today."
+          : "Day opened without temporary help.",
+      modifier.learningHint
+    ].join(" ")
   };
   return setNextGuestPatience(openedState);
 }
@@ -1051,7 +1076,7 @@ function applyDayEndConsequences(state: GameState): GameState {
 
   // Fixed daily overhead — rent, utilities, baseline costs every café day.
   resources = { ...resources, money: clampResource(resources.money - DAILY_FIXED_COST) };
-  flavorLines.push(`Tageskosten (Miete, Betrieb): -€${DAILY_FIXED_COST}.`);
+  flavorLines.push(`Daily costs (rent, utilities): −€${DAILY_FIXED_COST}.`);
 
   const stressEvent = getStressEvent(resources.stress, state.stressEventLog.length);
 
@@ -1172,7 +1197,9 @@ function confirmSupplyPurchase(state: GameState): GameState {
     statusMessage:
       nextDay >= 3
         ? `Restock confirmed. Day ${nextDay} begins with helper choices available.`
-        : `Restock confirmed. Day ${nextDay} begins: ${nextDayDefinition.milestone}`
+        : nextDay === 2
+          ? `Restock confirmed. Day 2 begins: ${nextDayDefinition.milestone} Daily overhead (€${DAILY_FIXED_COST}) deducts at closing.`
+          : `Restock confirmed. Day ${nextDay} begins: ${nextDayDefinition.milestone}`
   };
 }
 
@@ -1314,10 +1341,12 @@ function finishSetup(state: GameState): GameState {
     dayPhase: "open",
     phaseLabel: "Opening setup",
     resources,
-    statusMessage:
+    statusMessage: [
       state.equipment.seating >= 1
-        ? "Doors open. The room is bare but the machine hisses and the first guest is already at the counter."
-        : "Doors open with standing room only — guests order at the counter and take their coffee to go."
+        ? `Doors open. The room is bare but the machine hisses and the first guest is already at the counter. Daily overhead (€${DAILY_FIXED_COST}) will be deducted at closing.`
+        : `Doors open with standing room only — guests order at the counter and take their coffee to go. Daily overhead (€${DAILY_FIXED_COST}) will be deducted at closing.`,
+      getCurrentDayModifier(state).learningHint
+    ].join(" ")
   };
 }
 

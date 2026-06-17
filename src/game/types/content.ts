@@ -129,6 +129,13 @@ export interface GuestDefinition {
   delightLine?: string;
   /** Shown when this guest (who has preferences) is served something they do not value. */
   letdownLine?: string;
+  /**
+   * When the café's average decor tier meets minAvgTier, serving this guest grants
+   * a +1 reputation bonus (capped per day). Models atmosphere-sensitive guests.
+   */
+  decorAtmosphereBonus?: { minAvgTier: number };
+  /** Shown when the decor atmosphere bonus triggers. */
+  decorAtmosphereLine?: string;
 }
 
 export interface ProductDefinition {

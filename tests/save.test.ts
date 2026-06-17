@@ -7,6 +7,7 @@ import {
   type StorageLike
 } from "../src/game/engine/save";
 import {
+  createFreshRunState,
   createInitialGameState,
   migrateRawSave,
   CURRENT_GAME_STATE_VERSION,
@@ -36,13 +37,13 @@ describe("save safety", () => {
   it("falls back to a new game when save data is missing", () => {
     const state = loadGameState(createMemoryStorage());
 
-    expect(state).toEqual(createInitialGameState());
+    expect(state).toEqual(createFreshRunState());
   });
 
   it("falls back to a new game when save data is malformed", () => {
     const state = loadGameState(createMemoryStorage("{broken-json"));
 
-    expect(state).toEqual(createInitialGameState());
+    expect(state).toEqual(createFreshRunState());
   });
 
   it("falls back to a new game when save data uses an unsupported schema", () => {
@@ -78,7 +79,7 @@ describe("save safety", () => {
 
     const state = loadGameState(createMemoryStorage(outdatedSave));
 
-    expect(state).toEqual(createInitialGameState());
+    expect(state).toEqual(createFreshRunState());
   });
 
   it("can save and reset the current shell state", () => {
@@ -89,7 +90,7 @@ describe("save safety", () => {
     expect(loadGameState(storage)).toEqual(state);
 
     resetSavedGameState(storage);
-    expect(loadGameState(storage)).toEqual(createInitialGameState());
+    expect(loadGameState(storage)).toEqual(createFreshRunState());
   });
 
   it("preserves valid progress through reload-style save/load", () => {

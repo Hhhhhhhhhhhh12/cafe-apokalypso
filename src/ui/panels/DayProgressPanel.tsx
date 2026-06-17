@@ -33,6 +33,14 @@ export function DayProgressPanel({ gameState }: DayProgressPanelProps) {
     }
   }, [summary, gameState.dayPhase]);
 
+  // When a new day opens (after purchase confirmation), scroll back to top so
+  // the HUD and diorama are the first thing the player sees.
+  useEffect(() => {
+    if (gameState.dayPhase === "open") {
+      window.scrollTo({ top: 0, behavior: "instant" });
+    }
+  }, [gameState.day, gameState.dayPhase]);
+
   const net = summary
     ? Math.round((summary.moneyEarned - summary.moneySpent - summary.dailyOverhead) * 100) / 100
     : 0;
@@ -160,6 +168,7 @@ export function DayProgressPanel({ gameState }: DayProgressPanelProps) {
               { label: "Daily overhead", value: `-€${gameState.daySummary.dailyOverhead}` },
               { label: "Net profit / loss", value: (() => { const net = Math.round((gameState.daySummary!.moneyEarned - gameState.daySummary!.moneySpent - gameState.daySummary!.dailyOverhead) * 100) / 100; return net >= 0 ? `+€${net}` : `-€${Math.abs(net)}`; })() },
               { label: "Customers served", value: String(gameState.daySummary.customersServed) },
+              ...(gameState.daySummary.guestsLost > 0 ? [{ label: "Walked out", value: String(gameState.daySummary.guestsLost) }] : []),
               { label: "Supplies used", value: `Coffee ${gameState.daySummary.suppliesUsed.coffee}, Milk ${gameState.daySummary.suppliesUsed.milk}, Pastries ${gameState.daySummary.suppliesUsed.pastries}` },
               ...(gameState.pendingSupplyPurchase && (gameState.pendingSupplyPurchase.coffee > 0 || gameState.pendingSupplyPurchase.milk > 0 || gameState.pendingSupplyPurchase.pastries > 0) ? [{ label: "Restock planned", value: `Coffee ${gameState.pendingSupplyPurchase.coffee}, Milk ${gameState.pendingSupplyPurchase.milk}, Pastries ${gameState.pendingSupplyPurchase.pastries}` }] : []),
               { label: "Supplies left", value: `Coffee ${gameState.daySummary.suppliesRemaining.coffee}, Milk ${gameState.daySummary.suppliesRemaining.milk}, Pastries ${gameState.daySummary.suppliesRemaining.pastries}` },

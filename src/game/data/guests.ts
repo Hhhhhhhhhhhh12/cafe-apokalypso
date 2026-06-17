@@ -84,7 +84,10 @@ export const weekOneGuests = [
     appreciatedProductIds: ["filterkaffee"],
     delightLine:
       "\"My usual,\" he says, though you never agreed on one. He seems steadier for it. Rep +1.",
-    letdownLine: "He accepts it kindly, but you sense this was not the version he remembered."
+    letdownLine: "He accepts it kindly, but you sense this was not the version he remembered.",
+    decorAtmosphereBonus: { minAvgTier: 2 },
+    decorAtmosphereLine:
+      "He glances around the café slowly. \"It still feels like a place that remembers itself.\" Rep +1."
   },
   {
     id: "freelancerin-nele",
@@ -106,7 +109,10 @@ export const weekOneGuests = [
     matchedPreferenceLine:
       "Espresso gives her fewer variables to review. This appears to be mercy.",
     missedPreferenceLine:
-      "She accepts the choice as evidence, which is not the same as approval."
+      "She accepts the choice as evidence, which is not the same as approval.",
+    decorAtmosphereBonus: { minAvgTier: 2 },
+    decorAtmosphereLine:
+      "She lowers her notebook. \"The light is better in here than it used to be.\" Rep +1."
   },
   {
     id: "herr-grau",
@@ -149,7 +155,10 @@ export const weekOneGuests = [
       "She keeps the umbrella close and asks for softness without asking for comfort.",
     preferredProductId: "cappuccino",
     serveLine:
-      "She accepts the order quietly and asks you not to mention she was here."
+      "She accepts the order quietly and asks you not to mention she was here.",
+    decorAtmosphereBonus: { minAvgTier: 2 },
+    decorAtmosphereLine:
+      "She sets the umbrella beside the chair and breathes out slowly. The space is right today. Rep +1."
   },
   {
     id: "meda",

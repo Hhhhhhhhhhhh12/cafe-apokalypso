@@ -1,4 +1,4 @@
-import { createInitialGameState, isValidGameState, migrateRawSave } from "./gameState";
+import { createFreshRunState, createInitialGameState, isValidGameState, migrateRawSave } from "./gameState";
 import type { GameState } from "../types/game";
 
 export const SAVE_KEY = "cafe-apokalypso.save.v4";
@@ -27,18 +27,18 @@ export function loadGameState(storage: StorageLike): GameState {
     const rawSave = storage.getItem(SAVE_KEY);
 
     if (!rawSave) {
-      return createInitialGameState();
+      return createFreshRunState();
     }
 
     const parsedSave: unknown = migrateRawSave(JSON.parse(rawSave));
 
     if (!isValidGameState(parsedSave)) {
-      return createInitialGameState();
+      return createFreshRunState();
     }
 
     return parsedSave;
   } catch {
-    return createInitialGameState();
+    return createFreshRunState();
   }
 }
 

@@ -15,6 +15,7 @@ import {
   type StorageLike
 } from "../src/game/engine/save";
 import {
+  createFreshRunState,
   createInitialGameState,
   CURRENT_GAME_STATE_VERSION,
   CURRENT_CONTENT_CATALOG_VERSION,
@@ -42,13 +43,13 @@ function createMemoryStorage(
 describe("save-regression: missing key", () => {
   it("returns a valid initial state when no key exists in storage", () => {
     const state = loadGameState(createMemoryStorage());
-    expect(state).toEqual(createInitialGameState());
+    expect(state).toEqual(createFreshRunState());
   });
 
-  it("returns day 1 and phase 'open' for a fresh game", () => {
+  it("returns day 1 and phase 'setup' for a fresh game", () => {
     const state = loadGameState(createMemoryStorage());
     expect(state.day).toBe(1);
-    expect(state.dayPhase).toBe("open");
+    expect(state.dayPhase).toBe("setup");
   });
 
   it("does not throw when the key is absent", () => {
@@ -62,34 +63,34 @@ describe("save-regression: missing key", () => {
 describe("save-regression: malformed JSON", () => {
   it("falls back to new-game state for broken JSON", () => {
     const state = loadGameState(createMemoryStorage({ [SAVE_KEY]: "{not json" }));
-    expect(state).toEqual(createInitialGameState());
+    expect(state).toEqual(createFreshRunState());
   });
 
   it("falls back to new-game state for null JSON value", () => {
     const state = loadGameState(createMemoryStorage({ [SAVE_KEY]: "null" }));
-    expect(state).toEqual(createInitialGameState());
+    expect(state).toEqual(createFreshRunState());
   });
 
   it("falls back to new-game state for JSON number", () => {
     const state = loadGameState(createMemoryStorage({ [SAVE_KEY]: "42" }));
-    expect(state).toEqual(createInitialGameState());
+    expect(state).toEqual(createFreshRunState());
   });
 
   it("falls back to new-game state for JSON array", () => {
     const state = loadGameState(createMemoryStorage({ [SAVE_KEY]: "[]" }));
-    expect(state).toEqual(createInitialGameState());
+    expect(state).toEqual(createFreshRunState());
   });
 
   it("falls back to new-game state for empty string value", () => {
     const state = loadGameState(createMemoryStorage({ [SAVE_KEY]: "" }));
-    expect(state).toEqual(createInitialGameState());
+    expect(state).toEqual(createFreshRunState());
   });
 
   it("falls back to new-game state for JSON string (not an object)", () => {
     const state = loadGameState(
       createMemoryStorage({ [SAVE_KEY]: JSON.stringify("just a string") })
     );
-    expect(state).toEqual(createInitialGameState());
+    expect(state).toEqual(createFreshRunState());
   });
 
   it("does not throw for any of the malformed inputs", () => {
@@ -112,7 +113,7 @@ describe("save-regression: version mismatch", () => {
       version: 999
     });
     const state = loadGameState(createMemoryStorage({ [SAVE_KEY]: badSave }));
-    expect(state).toEqual(createInitialGameState());
+    expect(state).toEqual(createFreshRunState());
   });
 
   it("resets to new-game state for version 0", () => {
@@ -121,7 +122,7 @@ describe("save-regression: version mismatch", () => {
       version: 0
     });
     const state = loadGameState(createMemoryStorage({ [SAVE_KEY]: badSave }));
-    expect(state).toEqual(createInitialGameState());
+    expect(state).toEqual(createFreshRunState());
   });
 
   it("resets to new-game state for wrong contentCatalogVersion", () => {
@@ -130,7 +131,7 @@ describe("save-regression: version mismatch", () => {
       contentCatalogVersion: "week-zero-v0"
     });
     const state = loadGameState(createMemoryStorage({ [SAVE_KEY]: badSave }));
-    expect(state).toEqual(createInitialGameState());
+    expect(state).toEqual(createFreshRunState());
   });
 
   it("resets to new-game state when save is stored under a legacy v1 key", () => {
@@ -140,7 +141,7 @@ describe("save-regression: version mismatch", () => {
       [legacyKey]: JSON.stringify({ ...createInitialGameState(), day: 5 })
     });
     const state = loadGameState(storage);
-    expect(state).toEqual(createInitialGameState());
+    expect(state).toEqual(createFreshRunState());
   });
 
   it("resets to new-game state when save is under v2 key", () => {
@@ -149,7 +150,7 @@ describe("save-regression: version mismatch", () => {
       [legacyKey]: JSON.stringify({ ...createInitialGameState(), day: 3 })
     });
     const state = loadGameState(storage);
-    expect(state).toEqual(createInitialGameState());
+    expect(state).toEqual(createFreshRunState());
   });
 
   it("resets to new-game state when save is under v3 key", () => {
@@ -158,7 +159,7 @@ describe("save-regression: version mismatch", () => {
       [legacyKey]: JSON.stringify({ ...createInitialGameState(), day: 7 })
     });
     const state = loadGameState(storage);
-    expect(state).toEqual(createInitialGameState());
+    expect(state).toEqual(createFreshRunState());
   });
 
   it("resetSavedGameState clears SAVE_KEY and all legacy keys", () => {
@@ -178,7 +179,7 @@ describe("save-regression: version mismatch", () => {
 
     // After reset, loadGameState must produce a fresh game
     const state = loadGameState(storage);
-    expect(state).toEqual(createInitialGameState());
+    expect(state).toEqual(createFreshRunState());
   });
 });
 

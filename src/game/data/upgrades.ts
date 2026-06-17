@@ -3,7 +3,7 @@ import type { UpgradeDefinition } from "../types/content";
 export const weekOneUpgrades = [
   {
     id: "menu-board",
-    name: "Kleine Angebotstafel",
+    name: "Small Offer Board",
     unlockDay: 3,
     cost: 16,
     effects: ["Supports daily offers"],
@@ -11,7 +11,7 @@ export const weekOneUpgrades = [
   },
   {
     id: "storage-shelf",
-    name: "Zusätzliches Vorratsregal",
+    name: "Extra Storage Shelf",
     unlockDay: 3,
     cost: 24,
     effects: ["Supports ingredient purchasing"],
@@ -19,7 +19,7 @@ export const weekOneUpgrades = [
   },
   {
     id: "better-beans",
-    name: "Bessere Bohnen",
+    name: "Better Beans",
     unlockDay: 3,
     cost: 20,
     effects: ["Supports quality-sensitive guests"],
@@ -27,7 +27,7 @@ export const weekOneUpgrades = [
   },
   {
     id: "second-table",
-    name: "Zweiter kleiner Tisch",
+    name: "Second Small Table",
     unlockDay: 4,
     cost: 28,
     effects: ["Supports higher guest traffic"],
@@ -35,7 +35,7 @@ export const weekOneUpgrades = [
   },
   {
     id: "cleaning-kit",
-    name: "Reinigungsset",
+    name: "Cleaning Kit",
     unlockDay: 5,
     cost: 14,
     effects: ["Supports table cleaning"],
@@ -43,7 +43,7 @@ export const weekOneUpgrades = [
   },
   {
     id: "cash-register-update",
-    name: "Kassen-Update KASSANDRA",
+    name: "Register Update KASSANDRA",
     unlockDay: 6,
     cost: 0,
     effects: ["Unlocks simulated demand prediction"],
@@ -51,7 +51,7 @@ export const weekOneUpgrades = [
   },
   {
     id: "weatherproof-umbrella-stand",
-    name: "Schirmständer",
+    name: "Umbrella Stand",
     unlockDay: 7,
     cost: 10,
     effects: ["Supports the red-umbrella day beat"],
