@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import type { GameState } from "../../game/types/game";
 import type { ProductId } from "../../game/types/content";
 import { getDioramaGuestVisibility } from "../../game/engine/selectors";
+import stageBaseAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v04-mid.png";
 import coffeeMachineAsset from "../../../assets/sprites/props/placeholder-cafe-coffee-machine.png";
 import kassandraRegisterAsset from "../../../assets/sprites/props/placeholder-kassandra-register.png";
 import bohnGuestAsset from "../../../assets/sprites/guests/placeholder-guest-bohn.png";
@@ -141,7 +142,7 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
           weirdnessClass,
         ].join(" ")}
         role="img"
-        aria-label={`3/4 café room on Day ${gameState.day}: counter, coffee machine, register, queue, two tables, door, window, storage shelf, and menu board.`}
+        aria-label={`3/4 café room on Day ${gameState.day}: counter, coffee machine, register, queue, ${gameState.equipment.seating >= 1 ? "two tables, " : "standing room only, "}door, window, storage shelf, and menu board.`}
       >
         {coinTick && (
           <span key={coinTick.key} className="cafe-coin-tick" aria-hidden="true">
@@ -149,6 +150,7 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
           </span>
         )}
         <div className="cafe-world">
+          <img className="cafe-stage-base" src={stageBaseAsset} alt="" aria-hidden="true" />
           {isDusty && <div className="cafe-dust" aria-hidden="true" />}
 
           {/* Décor props — positioned absolute via CSS, tier drives sprite */}
@@ -231,23 +233,26 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
               <div className="cafe-service-mat" />
             </div>
 
-            {/* Left table */}
-            <div className="cafe-table cafe-table--left" aria-hidden="true">
-              <span className="cafe-table__top" />
-              <span className="cafe-chair cafe-chair--front" />
-              <span className="cafe-chair cafe-chair--side" />
-              {tablesDirty && <span className="cafe-cup cafe-cup--dirty" />}
-            </div>
+            {/* Tables — only visible once furniture is owned (seating tier >= 1) */}
+            {gameState.equipment.seating >= 1 && (
+              <>
+                <div className="cafe-table cafe-table--left" aria-hidden="true">
+                  <span className="cafe-table__top" />
+                  <span className="cafe-chair cafe-chair--front" />
+                  <span className="cafe-chair cafe-chair--side" />
+                  {tablesDirty && <span className="cafe-cup cafe-cup--dirty" />}
+                </div>
 
-            {/* Right table */}
-            <div className="cafe-table cafe-table--right" aria-hidden="true">
-              <span className="cafe-table__top" />
-              <span className="cafe-chair cafe-chair--front" />
-              <span className="cafe-chair cafe-chair--side" />
-              {tablesDirty && visibleGuests.mira && (
-                <span className="cafe-cup cafe-cup--dirty" />
-              )}
-            </div>
+                <div className="cafe-table cafe-table--right" aria-hidden="true">
+                  <span className="cafe-table__top" />
+                  <span className="cafe-chair cafe-chair--front" />
+                  <span className="cafe-chair cafe-chair--side" />
+                  {tablesDirty && visibleGuests.mira && (
+                    <span className="cafe-cup cafe-cup--dirty" />
+                  )}
+                </div>
+              </>
+            )}
 
             {/* Queue */}
             <div className="cafe-queue" aria-hidden="true">

@@ -8,7 +8,7 @@ import type {
 } from "./content";
 import type { DayNumber } from "./content";
 
-export type GameStateVersion = 12;
+export type GameStateVersion = 13;
 
 export type ContentCatalogVersion = "week-one-v1";
 
@@ -16,9 +16,10 @@ export type MoodLevel = "calm" | "busy" | "strained";
 export type IngredientKey = "coffee" | "milk" | "pastries";
 export type CleanlinessStateLabel = "Clean" | "Tidy" | "Messy" | "Chaotic";
 export type StressStateLabel = "Calm" | "Busy" | "Tense" | "Overloaded";
-export type DayPhase = "day_start" | "open" | "day_end";
+export type DayPhase = "setup" | "day_start" | "open" | "day_end";
 export type ClosureReason = "money" | "reputation";
 export type DecorSlotId = "plant" | "shelf" | "clock" | "lamp" | "cups";
+export type EquipmentSlotId = "machine" | "seating";
 export type HelperTaskId = "cleaning" | "service" | "barista" | "counter" | "marketing";
 export type EmployeeLevel = 1 | 2 | 3;
 
@@ -74,6 +75,12 @@ export interface DayManagementState {
   extraAdvertisingActions: number;
   /** Per-day count of guest-appreciation reputation bonuses already awarded (capped). */
   appreciationBonusesGiven: number;
+  /** Remaining patience (0..max) of the guest currently at the counter. 0 while the café is not open. */
+  currentGuestPatience: number;
+  /** Full patience of the current guest when they reached the counter (0 while not open). */
+  currentGuestPatienceMax: number;
+  /** Guests who walked out unserved today. Advances the queue without counting as served. */
+  guestsLost: number;
 }
 
 export interface GuestMemoryEntry {
@@ -98,6 +105,8 @@ export interface DaySummary {
   /** Fixed daily overhead (rent, utilities) deducted at day end. */
   dailyOverhead: number;
   customersServed: number;
+  /** Guests who walked out unserved during the day (patience ran out). */
+  guestsLost: number;
   suppliesUsed: SupplyState;
   suppliesRestocked: SupplyState;
   suppliesRemaining: SupplyState;
@@ -160,6 +169,8 @@ export interface GameState {
   reputationZeroStreak: number;
   /** Current owned tier per décor slot (1 = shabby default). See #57. */
   decor: Record<DecorSlotId, number>;
+  /** Current owned tier per core equipment slot (0 = not yet bought). See #setup. */
+  equipment: Record<EquipmentSlotId, number>;
   /** Soft-run structure: deterministic week modifiers plus KASSANDRA memory fragments. */
   run: RunState;
   /** Guest preferences learned by play, used to teach without a separate tutorial. */
@@ -194,4 +205,6 @@ export type GameAction =
   | { type: "set_supply_purchase"; ingredient: IngredientKey; quantity: number }
   | { type: "confirm_supply_purchase" }
   | { type: "upgrade_decor"; slot: DecorSlotId }
+  | { type: "buy_equipment"; slot: EquipmentSlotId }
+  | { type: "finish_setup" }
   | { type: "reset_game" };

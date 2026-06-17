@@ -3,10 +3,16 @@ import {
   addUniqueDayAction,
   addUniqueEventIds,
   addUniqueGuestIds,
+  createFreshRunState,
   createInitialGameState
 } from "./gameState";
 import { weekOneAchievements } from "../data";
 import { getDecorDailyBonuses, getDecorTier, getMaxDecorTier } from "../data/decor";
+import {
+  getEquipmentDailyBonuses,
+  getEquipmentTier,
+  getMaxEquipmentTier
+} from "../data/equipment";
 import {
   getCurrentDayDefinition,
   getCurrentDayModifier,
@@ -33,12 +39,17 @@ import {
   getDefaultProductForState,
   getEarnedPrice,
   getHelperLabel,
+  getGuestPatienceMax,
   getMissingIngredients,
   getProductById,
   getStressLabel,
+  guestsCanWalkOut,
   MUNDANE_STRESS_EVENT_LINES,
+  PATIENCE_TICK,
   SUPPLY_CAPS,
-  SUPPLY_UNIT_COSTS
+  SUPPLY_UNIT_COSTS,
+  WALKOUT_REPUTATION_PENALTY,
+  WALKOUT_STRESS
 } from "./management";
 import type {
   AchievementId,
@@ -50,6 +61,7 @@ import type {
 } from "../types/content";
 import type {
   DecorSlotId,
+  EquipmentSlotId,
   GameAction,
   GameState,
   GuestMemoryEntry,
@@ -159,8 +171,14 @@ function applyAction(state: GameState, action: GameAction): GameState {
     case "upgrade_decor":
       return upgradeDecor(state, action.slot);
 
+    case "buy_equipment":
+      return buyEquipment(state, action.slot);
+
+    case "finish_setup":
+      return finishSetup(state);
+
     case "reset_game":
-      return createInitialGameState();
+      return createFreshRunState();
 
     default:
       return state;
@@ -341,7 +359,7 @@ function applySuccessfulServe(
     };
   }
 
-  const servedCustomerIndex = Math.max(0, management.customersServed - 1);
+  const servedCustomerIndex = Math.max(0, management.customersServed + management.guestsLost - 1);
   const serveLine = getServeLineForCustomer(workingState, servedCustomerIndex);
 
   // Guest appreciation (#56): a guest who values the product just served gives a
@@ -380,7 +398,7 @@ function applySuccessfulServe(
     (part) => part.length > 0
   );
 
-  return {
+  const servedState: GameState = {
     ...workingState,
     supplies,
     resources: {
@@ -392,6 +410,7 @@ function applySuccessfulServe(
     completedActions: addUniqueDayAction(workingState.completedActions, "take_order"),
     statusMessage: statusParts.join(" ")
   };
+  return setNextGuestPatience(servedState);
 }
 
 function applyServeModifier(
@@ -482,32 +501,35 @@ function cleanTables(state: GameState): GameState {
     return noActionCapacityState(state);
   }
 
-  const capacity = COMFORTABLE_CAPACITY_BY_DAY[actionState.day];
+  const { state: tickedState, walkoutLine } = applyPatienceTick(actionState);
+  const capacity = COMFORTABLE_CAPACITY_BY_DAY[tickedState.day];
   const slowWindowReduction =
-    actionState.dayManagement.customersServed < capacity &&
-    !actionState.dayManagement.slowCleaningStressReductionUsed
+    tickedState.dayManagement.customersServed < capacity &&
+    !tickedState.dayManagement.slowCleaningStressReductionUsed
       ? 5
       : 0;
 
+  const cleanMessage =
+    slowWindowReduction > 0
+      ? "Tables cleaned during a quiet window. Cleanliness rises and stress drops slightly."
+      : "Tables cleaned. Cleanliness rises.";
+
   return {
-    ...actionState,
-    completedActions: addUniqueDayAction(actionState.completedActions, "clean_tables"),
+    ...tickedState,
+    completedActions: addUniqueDayAction(tickedState.completedActions, "clean_tables"),
     resources: {
-      ...actionState.resources,
-      cleanliness: clampMeter(actionState.resources.cleanliness + 12),
-      stress: clampMeter(actionState.resources.stress - slowWindowReduction),
+      ...tickedState.resources,
+      cleanliness: clampMeter(tickedState.resources.cleanliness + 12),
+      stress: clampMeter(tickedState.resources.stress - slowWindowReduction),
       mood: "calm"
     },
     dayManagement: {
-      ...actionState.dayManagement,
-      cleaningActions: actionState.dayManagement.cleaningActions + 1,
+      ...tickedState.dayManagement,
+      cleaningActions: tickedState.dayManagement.cleaningActions + 1,
       slowCleaningStressReductionUsed:
-        actionState.dayManagement.slowCleaningStressReductionUsed || slowWindowReduction > 0
+        tickedState.dayManagement.slowCleaningStressReductionUsed || slowWindowReduction > 0
     },
-    statusMessage:
-      slowWindowReduction > 0
-        ? "Tables cleaned during a quiet window. Cleanliness rises and stress drops slightly."
-        : "Tables cleaned. Cleanliness rises."
+    statusMessage: [cleanMessage, walkoutLine].filter(Boolean).join(" ")
   };
 }
 
@@ -524,28 +546,29 @@ function checkSupplies(state: GameState): GameState {
     return noActionCapacityState(state);
   }
 
-  const modifier = getCurrentDayModifier(actionState);
+  const { state: tickedState, walkoutLine } = applyPatienceTick(actionState);
+  const modifier = getCurrentDayModifier(tickedState);
   const firstSupplyCheck = !state.completedActions.includes("check_supplies");
   const allSuppliesAvailable = (Object.keys(SUPPLY_CAPS) as IngredientKey[]).every(
-    (ingredient) => actionState.supplies[ingredient] > 0
+    (ingredient) => tickedState.supplies[ingredient] > 0
   );
   const auditBonusApplies =
     modifier.id === "inventory-audit" && firstSupplyCheck && allSuppliesAvailable;
 
+  const supplyMessage =
+    `Supply check: coffee ${tickedState.supplies.coffee}/${SUPPLY_CAPS.coffee}, milk ${tickedState.supplies.milk}/${SUPPLY_CAPS.milk}, pastries ${tickedState.supplies.pastries}/${SUPPLY_CAPS.pastries}.` +
+    (auditBonusApplies ? " The tidy shelf calms the offer board. Ruf +1." : "");
+
   return {
-    ...actionState,
-    completedActions: addUniqueDayAction(
-      actionState.completedActions,
-      "check_supplies"
-    ),
+    ...tickedState,
+    completedActions: addUniqueDayAction(tickedState.completedActions, "check_supplies"),
     resources: auditBonusApplies
       ? {
-          ...actionState.resources,
-          reputation: clampMeter(actionState.resources.reputation + 1)
+          ...tickedState.resources,
+          reputation: clampMeter(tickedState.resources.reputation + 1)
         }
-      : actionState.resources,
-    statusMessage: `Supply check: coffee ${actionState.supplies.coffee}/${SUPPLY_CAPS.coffee}, milk ${actionState.supplies.milk}/${SUPPLY_CAPS.milk}, pastries ${actionState.supplies.pastries}/${SUPPLY_CAPS.pastries}.`
-      + (auditBonusApplies ? " The tidy shelf calms the offer board. Ruf +1." : "")
+      : tickedState.resources,
+    statusMessage: [supplyMessage, walkoutLine].filter(Boolean).join(" ")
   };
 }
 
@@ -569,19 +592,23 @@ function adjustOffer(state: GameState): GameState {
     return noActionCapacityState(state);
   }
 
+  const { state: tickedState, walkoutLine } = applyPatienceTick(actionState);
+
   return {
-    ...actionState,
-    completedActions: addUniqueDayAction(actionState.completedActions, "adjust_offer"),
+    ...tickedState,
+    completedActions: addUniqueDayAction(tickedState.completedActions, "adjust_offer"),
     resources: {
-      ...actionState.resources,
-      reputation: clampMeter(actionState.resources.reputation + 1)
+      ...tickedState.resources,
+      reputation: clampMeter(tickedState.resources.reputation + 1)
     },
     dayManagement: {
-      ...actionState.dayManagement,
+      ...tickedState.dayManagement,
       offerReviewed: true
     },
-    statusMessage:
-      "Offer board reviewed. All orders today earn 10 % more than base price. Rep +1."
+    statusMessage: [
+      "Offer board reviewed. All orders today earn 10 % more than base price. Rep +1.",
+      walkoutLine
+    ].filter(Boolean).join(" ")
   };
 }
 
@@ -633,37 +660,45 @@ function runAdvertising(state: GameState, adType: "flyer" | "social"): GameState
     return noActionCapacityState(state);
   }
 
+  // Patience only ticks when a real action point was spent (not a free bonus slot)
+  const { state: tickedState, walkoutLine } = hasBonusAdvertisingAction
+    ? { state: actionState, walkoutLine: "" }
+    : applyPatienceTick(actionState);
+
   const posterEchoApplies =
     adType === "flyer" &&
-    getCurrentDayModifier(actionState).id === "poster-echo" &&
+    getCurrentDayModifier(tickedState).id === "poster-echo" &&
     !state.dayManagement.advertisingRun;
 
   const baseRepGain = adType === "social" ? 3 : 1;
   const reputationGain = posterEchoApplies ? baseRepGain + 1 : baseRepGain;
   const stressGain = posterEchoApplies ? 2 : 0;
+  const newStress = clampMeter(tickedState.resources.stress + stressGain);
+
+  const adMessage =
+    adType === "social"
+      ? `Social post out. €${SOCIAL_AD_COST} spent — wider reach, stronger signal. Rep +3. Guests who find you this way may linger longer.`
+      : posterEchoApplies
+        ? `Flyer out, and today's modifier makes it land harder than usual. €${FLYER_COST} spent. Rep +2. The extra attention adds a little pressure. Stress +2.`
+        : `Flyer out in the neighbourhood. €${FLYER_COST} spent. Rep +1. Expect a modest uptick in foot traffic.`;
 
   return {
-    ...actionState,
-    completedActions: addUniqueDayAction(actionState.completedActions, "run_advertising"),
+    ...tickedState,
+    completedActions: addUniqueDayAction(tickedState.completedActions, "run_advertising"),
     resources: {
-      ...actionState.resources,
-      money: clampResource(actionState.resources.money - cost),
-      reputation: clampMeter(actionState.resources.reputation + reputationGain),
-      stress: clampMeter(actionState.resources.stress + stressGain),
-      mood: getMoodForStress(clampMeter(actionState.resources.stress + stressGain))
+      ...tickedState.resources,
+      money: clampResource(tickedState.resources.money - cost),
+      reputation: clampMeter(tickedState.resources.reputation + reputationGain),
+      stress: newStress,
+      mood: getMoodForStress(newStress)
     },
     dayManagement: {
-      ...actionState.dayManagement,
-      moneySpent: clampResource(actionState.dayManagement.moneySpent + cost),
-      advertisingRun: adType === "flyer" ? true : actionState.dayManagement.advertisingRun,
-      socialAdRun: adType === "social" ? true : actionState.dayManagement.socialAdRun
+      ...tickedState.dayManagement,
+      moneySpent: clampResource(tickedState.dayManagement.moneySpent + cost),
+      advertisingRun: adType === "flyer" ? true : tickedState.dayManagement.advertisingRun,
+      socialAdRun: adType === "social" ? true : tickedState.dayManagement.socialAdRun
     },
-    statusMessage:
-      adType === "social"
-        ? `Social post out. €${SOCIAL_AD_COST} spent — wider reach, stronger signal. Rep +3. Guests who find you this way may linger longer.`
-        : posterEchoApplies
-          ? `Flyer out, and today's modifier makes it land harder than usual. €${FLYER_COST} spent. Rep +2. The extra attention adds a little pressure. Stress +2.`
-          : `Flyer out in the neighbourhood. €${FLYER_COST} spent. Rep +1. Expect a modest uptick in foot traffic.`
+    statusMessage: [adMessage, walkoutLine].filter(Boolean).join(" ")
   };
 }
 
@@ -687,30 +722,31 @@ function consultKassandra(state: GameState): GameState {
     return noActionCapacityState(state);
   }
 
+  const { state: tickedState, walkoutLine } = applyPatienceTick(actionState);
+
   const earlyForecastRefund =
-    getCurrentDayModifier(actionState).id === "forecast-static" &&
+    getCurrentDayModifier(tickedState).id === "forecast-static" &&
     !state.dayManagement.kassandraConsulted &&
     state.dayManagement.customersServed === 0;
 
+  const kassandraMessage = `KASSANDRA: ${getKassandraConsultLine(tickedState)}${
+    earlyForecastRefund ? " Early forecast logged. Action refunded." : ""
+  }`;
+
   return {
-    ...actionState,
-    completedActions: addUniqueDayAction(
-      actionState.completedActions,
-      "consult_kassandra"
-    ),
+    ...tickedState,
+    completedActions: addUniqueDayAction(tickedState.completedActions, "consult_kassandra"),
     dayManagement: {
-      ...actionState.dayManagement,
+      ...tickedState.dayManagement,
       actionPointsRemaining: earlyForecastRefund
-        ? actionState.dayManagement.actionPointsRemaining + 1
-        : actionState.dayManagement.actionPointsRemaining,
+        ? tickedState.dayManagement.actionPointsRemaining + 1
+        : tickedState.dayManagement.actionPointsRemaining,
       actionPointsSpent: earlyForecastRefund
-        ? Math.max(0, actionState.dayManagement.actionPointsSpent - 1)
-        : actionState.dayManagement.actionPointsSpent,
+        ? Math.max(0, tickedState.dayManagement.actionPointsSpent - 1)
+        : tickedState.dayManagement.actionPointsSpent,
       kassandraConsulted: true
     },
-    statusMessage: `KASSANDRA: ${getKassandraConsultLine(actionState)}${
-      earlyForecastRefund ? " Early forecast logged. Action refunded." : ""
-    }`
+    statusMessage: [kassandraMessage, walkoutLine].filter(Boolean).join(" ")
   };
 }
 
@@ -815,7 +851,7 @@ function openDay(state: GameState): GameState {
     };
   }
 
-  return {
+  const openedState: GameState = {
     ...state,
     dayPhase: "open",
     resources,
@@ -827,6 +863,7 @@ function openDay(state: GameState): GameState {
       ? `Day opened with ${getHelperLabel(state.helperAssignment)}. ${state.helperAssignment.flavorLine}`
       : "Day opened without temporary help."
   };
+  return setNextGuestPatience(openedState);
 }
 
 function completeCurrentDay(state: GameState): GameState {
@@ -885,9 +922,14 @@ function completeCurrentDay(state: GameState): GameState {
         ? `Day ${state.day} closed. Reputation has bottomed out — one more day like this and the café closes.`
         : `Day ${state.day} closed. Review the summary, then buy supplies for tomorrow.`;
 
+  const closedPhaseLabel = daySevenClose
+    ? "End of week"
+    : `Day ${state.day} closed`;
+
   return {
     ...closedState,
     dayPhase: "day_end",
+    phaseLabel: closedPhaseLabel,
     daySummary: closedState.daySummary
       ? {
           ...closedState.daySummary,
@@ -1040,6 +1082,7 @@ function applyDayEndConsequences(state: GameState): GameState {
       moneySpent: management.moneySpent,
       dailyOverhead,
       customersServed: management.customersServed,
+      guestsLost: management.guestsLost,
       suppliesUsed: { ...management.suppliesUsed },
       suppliesRestocked: { coffee: 0, milk: 0, pastries: 0 },
       suppliesRemaining: { ...state.supplies },
@@ -1179,6 +1222,103 @@ function upgradeDecor(state: GameState, slot: DecorSlotId): GameState {
       tierDefinition.reputationBonus > 0
         ? `New look: ${tierDefinition.name}. The café feels a little warmer. Rep +${tierDefinition.reputationBonus}.`
         : `New look: ${tierDefinition.name}.`
+  };
+}
+
+/**
+ * Buy the next tier of a core equipment slot (coffee machine or seating).
+ * Mirrors upgradeDecor: spends cash, bumps the tier, grants a one-time
+ * reputation bonus. Allowed during the pre-opening "setup" phase and during the
+ * day-end review (so the player can upgrade used gear later).
+ */
+function buyEquipment(state: GameState, slot: EquipmentSlotId): GameState {
+  if (state.demoComplete) {
+    return state;
+  }
+
+  if (state.dayPhase !== "setup" && state.dayPhase !== "day_end") {
+    return {
+      ...state,
+      statusMessage: "Equipment is bought before opening or during the day-end review."
+    };
+  }
+
+  const nextTier = state.equipment[slot] + 1;
+  const tierDefinition = getEquipmentTier(slot, nextTier);
+
+  if (!tierDefinition || state.equipment[slot] >= getMaxEquipmentTier(slot)) {
+    return {
+      ...state,
+      statusMessage: "That is already the best equipment you can buy."
+    };
+  }
+
+  if (tierDefinition.cost > state.resources.money) {
+    return {
+      ...state,
+      statusMessage: `Not enough money for ${tierDefinition.name} (€${tierDefinition.cost}).`
+    };
+  }
+
+  return {
+    ...state,
+    equipment: { ...state.equipment, [slot]: nextTier },
+    resources: {
+      ...state.resources,
+      money: clampResource(state.resources.money - tierDefinition.cost),
+      reputation: clampMeter(state.resources.reputation + tierDefinition.reputationBonus)
+    },
+    dayManagement: {
+      ...state.dayManagement,
+      moneySpent: clampResource(state.dayManagement.moneySpent + tierDefinition.cost)
+    },
+    statusMessage:
+      tierDefinition.reputationBonus > 0
+        ? `Bought: ${tierDefinition.name}. Rep +${tierDefinition.reputationBonus}.`
+        : `Bought: ${tierDefinition.name}.`
+  };
+}
+
+/**
+ * Leave the pre-opening "setup" phase and open Day 1. Requires a coffee machine
+ * (no machine, no café); seating is optional — opening bare means guests order
+ * at the counter and stand. Applies the same morning décor/equipment bonuses as
+ * openDay so a furnished room already feels a touch warmer on opening.
+ */
+function finishSetup(state: GameState): GameState {
+  if (state.dayPhase !== "setup") {
+    return {
+      ...state,
+      statusMessage: "The café is already set up."
+    };
+  }
+
+  if (state.equipment.machine < 1) {
+    return {
+      ...state,
+      statusMessage: "You need at least a used coffee machine before you can open."
+    };
+  }
+
+  const decorBonuses = getDecorDailyBonuses(state.decor);
+  const equipmentBonuses = getEquipmentDailyBonuses(state.equipment);
+  const reputationGain = decorBonuses.reputation + equipmentBonuses.reputation;
+
+  const resources: ResourceState = {
+    ...state.resources,
+    cleanliness: clampMeter(state.resources.cleanliness + decorBonuses.cleanliness),
+    reputation: clampMeter(state.resources.reputation + reputationGain)
+  };
+
+  return {
+    ...state,
+    dayPhase: "open",
+    phaseLabel: "Opening setup",
+    resources,
+    statusMessage:
+      state.equipment.seating >= 1
+        ? "Doors open. The room is bare but the machine hisses and the first guest is already at the counter."
+        : "Doors open with standing room only — guests order at the counter and take their coffee to go."
   };
 }
 
@@ -1413,4 +1553,68 @@ function formatMissingSupply(ingredients: readonly IngredientKey[]): string {
   };
 
   return ingredients.map((ingredient) => labels[ingredient]).join(". ") + ".";
+}
+
+/**
+ * Set patience for whichever guest is now at the counter.
+ * Queue position = customersServed + guestsLost (served + walked out).
+ * Called after openDay, after a successful serve, and after a walkout.
+ */
+function setNextGuestPatience(state: GameState): GameState {
+  const queuePos = state.dayManagement.customersServed + state.dayManagement.guestsLost;
+  const guest = getGuestForCustomer(state, queuePos);
+  const max = guest ? getGuestPatienceMax(guest) : 0;
+  return {
+    ...state,
+    dayManagement: {
+      ...state.dayManagement,
+      currentGuestPatience: max,
+      currentGuestPatienceMax: max
+    }
+  };
+}
+
+/**
+ * Decrement patience by one tick for a non-serve action.
+ * Returns the updated state and an optional walkout narrative line.
+ * On Day 1–3 patience still drains (teaching the mechanic) but no one leaves.
+ */
+function applyPatienceTick(state: GameState): { state: GameState; walkoutLine: string } {
+  const { dayManagement: management } = state;
+  if (management.currentGuestPatienceMax === 0) {
+    return { state, walkoutLine: "" };
+  }
+
+  const newPatience = Math.max(0, management.currentGuestPatience - PATIENCE_TICK);
+
+  if (newPatience > 0 || !guestsCanWalkOut(state.day)) {
+    return {
+      state: { ...state, dayManagement: { ...management, currentGuestPatience: newPatience } },
+      walkoutLine: ""
+    };
+  }
+
+  // Patience exhausted and walkouts are active
+  const queuePos = management.customersServed + management.guestsLost;
+  const guest = getGuestForCustomer(state, queuePos);
+  const guestName = guest?.name ?? "The guest";
+
+  const afterWalkout: GameState = {
+    ...state,
+    resources: {
+      ...state.resources,
+      stress: clampMeter(state.resources.stress + WALKOUT_STRESS),
+      reputation: clampMeter(state.resources.reputation - WALKOUT_REPUTATION_PENALTY)
+    },
+    dayManagement: {
+      ...management,
+      currentGuestPatience: 0,
+      guestsLost: management.guestsLost + 1
+    }
+  };
+
+  return {
+    state: setNextGuestPatience(afterWalkout),
+    walkoutLine: `${guestName} ran out of patience and left without ordering. Stress +${WALKOUT_STRESS}, Rep −1.`
+  };
 }

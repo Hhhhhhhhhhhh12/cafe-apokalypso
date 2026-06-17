@@ -11,13 +11,17 @@ import {
 import {
   ACTION_BUDGET_BY_DAY,
   getCleanlinessLabel,
+  getGuestPatienceLabel,
   getHelperLabel,
   getProductById,
   getStressLabel,
+  guestsCanWalkOut,
   SUPPLY_CAPS,
   SUPPLY_UNIT_COSTS
 } from "./management";
+import type { GuestPatienceLabel } from "./management";
 import { decorSlots, getDecorTier, getMaxDecorTier } from "../data/decor";
+import { equipmentSlots, getEquipmentTier, getMaxEquipmentTier } from "../data/equipment";
 import { getCurrentObjective, getObjectiveStatus } from "./objectives";
 import type {
   DayDefinition,
@@ -33,6 +37,7 @@ import type {
   DayActionId,
   DayShiftRating,
   DecorSlotId,
+  EquipmentSlotId,
   GameState,
   IngredientKey,
   SupplyState
@@ -157,7 +162,8 @@ export function getNextGuestPreview(state: GameState): NextGuestPreview | null {
     return null;
   }
 
-  const guest = getGuestForCustomer(state, state.dayManagement.customersServed);
+  const queuePos = state.dayManagement.customersServed + state.dayManagement.guestsLost;
+  const guest = getGuestForCustomer(state, queuePos);
   if (!guest) {
     return null;
   }
@@ -223,6 +229,19 @@ export function getDioramaGuestVisibility(
   state: GameState
 ): DioramaGuestVisibility {
   const { customersServed } = state.dayManagement;
+
+  // No furniture, no sitting: until seating is bought, guests order at the
+  // counter and stand / take away, so no one is shown seated.
+  if (state.equipment.seating < 1) {
+    return {
+      cem: false,
+      mira: false,
+      lukas: false,
+      christa: false,
+      bohn: false,
+      strange: false
+    };
+  }
 
   return {
     cem: customersServed >= 1,
@@ -415,6 +434,48 @@ export function getDecorUpgradeOptions(state: GameState): DecorUpgradeOption[] {
   });
 }
 
+export interface EquipmentShopOption {
+  id: EquipmentSlotId;
+  label: string;
+  /** Owned-tier name, or the "empty" hint while the slot is still unowned (tier 0). */
+  currentTierName: string;
+  /** True while nothing is owned yet (tier 0) — used to nudge the required machine purchase. */
+  unowned: boolean;
+  /** The next purchasable tier, or null when the slot is maxed. */
+  next: {
+    name: string;
+    cost: number;
+    reputationBonus: number;
+    affordable: boolean;
+  } | null;
+}
+
+/** Equipment shop rows for the setup phase and the day-end review. */
+export function getEquipmentShopOptions(state: GameState): EquipmentShopOption[] {
+  return equipmentSlots.map((slot) => {
+    const currentTier = state.equipment[slot.id];
+    const currentTierDef = getEquipmentTier(slot.id, currentTier);
+    const nextTierDef = getEquipmentTier(slot.id, currentTier + 1);
+
+    return {
+      id: slot.id,
+      label: slot.label,
+      currentTierName:
+        currentTier <= 0 ? slot.emptyHint : currentTierDef?.name ?? slot.emptyHint,
+      unowned: currentTier <= 0,
+      next:
+        nextTierDef && currentTier < getMaxEquipmentTier(slot.id)
+          ? {
+              name: nextTierDef.name,
+              cost: nextTierDef.cost,
+              reputationBonus: nextTierDef.reputationBonus,
+              affordable: nextTierDef.cost <= state.resources.money
+            }
+          : null
+    };
+  });
+}
+
 export function getManagementHudLabels(state: GameState) {
   return {
     cleanliness: getCleanlinessLabel(state.resources.cleanliness),
@@ -474,4 +535,26 @@ function getReputationLabel(reputation: number): string {
     return "building";
   }
   return "fragile";
+}
+
+export interface GuestPatienceState {
+  patience: number;
+  max: number;
+  label: GuestPatienceLabel;
+  /** True once walkouts are active and patience is critically low (< 34 %). */
+  critical: boolean;
+}
+
+/**
+ * Current patience state for the guest at the counter.
+ * Returns null when the café is closed, in day_start phase, or no guest is queued.
+ */
+export function getGuestPatienceState(state: GameState): GuestPatienceState | null {
+  if (state.dayPhase !== "open" || state.dayManagement.currentGuestPatienceMax === 0) {
+    return null;
+  }
+  const { currentGuestPatience: patience, currentGuestPatienceMax: max } = state.dayManagement;
+  const label = getGuestPatienceLabel(patience, max);
+  const critical = guestsCanWalkOut(state.day) && patience < max * 0.34;
+  return { patience, max, label, critical };
 }

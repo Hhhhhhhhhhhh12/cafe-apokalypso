@@ -248,4 +248,25 @@ describe("save migration", () => {
     expect(migrateRawSave("string")).toBe("string");
     expect(migrateRawSave(42)).toBe(42);
   });
+
+  it("migrateRawSave v12 → v13: adds equipment {machine:1, seating:1} to an old open-café save", () => {
+    const raw = { ...createInitialGameState(), version: 12 } as Record<string, unknown>;
+    delete (raw as Record<string, unknown>).equipment;
+    const migrated = migrateRawSave(raw) as {
+      version: number;
+      equipment: Record<string, number>;
+    };
+    expect(migrated.version).toBe(CURRENT_GAME_STATE_VERSION);
+    expect(migrated.equipment).toEqual({ machine: 1, seating: 1 });
+  });
+
+  it("migrateRawSave v12 → v13: does not overwrite equipment that already exists", () => {
+    const raw = {
+      ...createInitialGameState(),
+      version: 12,
+      equipment: { machine: 2, seating: 0 }
+    } as Record<string, unknown>;
+    const migrated = migrateRawSave(raw) as { equipment: Record<string, number> };
+    expect(migrated.equipment).toEqual({ machine: 2, seating: 0 });
+  });
 });

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Hintergrund-Vergleich</title>
+<style>
+  body { margin: 0; background: #f5ede4; font-family: sans-serif; padding: 24px; }
+  h1 { font-size: 1.1rem; margin: 0 0 20px; color: #3d2a1e; }
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; max-width: 1200px; }
+  .card { background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+  .card img { width: 100%; display: block; }
+  .label { padding: 10px 14px; font-size: .85rem; color: #5a3d2b; font-weight: 600; }
+  .sub { font-size: .75rem; color: #8a6a55; font-weight: 400; }
+</style>
+</head>
+<body>
+<h1>Café Apokalypso — Hintergrund-Vergleich</h1>
+<div class="grid">
+  <div class="card">
+    <img src="/cafe-apokalypso/assets/backgrounds/placeholder-cafe-stage-base-v04.png" alt="Glatt">
+    <div class="label">v04.png — Glatt <span class="sub">(Original, Cartoon)</span></div>
+  </div>
+  <div class="card">
+    <img src="/cafe-apokalypso/assets/backgrounds/placeholder-cafe-stage-base-v04-mid.png" alt="2×2">
+    <div class="label">v04-mid.png — Zwischenstufe 2×2 <span class="sub">(leicht strukturiert)</span></div>
+  </div>
+  <div class="card">
+    <img src="/cafe-apokalypso/assets/backgrounds/placeholder-cafe-stage-base-v04-mid3.png" alt="3×3">
+    <div class="label">v04-mid3.png — Zwischenstufe 3×3 <span class="sub">(etwas gröber)</span></div>
+  </div>
+  <div class="card">
+    <img src="/cafe-apokalypso/assets/backgrounds/placeholder-cafe-stage-base-v04-px.png" style="image-rendering:pixelated" alt="Pixeliert">
+    <div class="label">v04-px.png — Vollpixeliert <span class="sub">(4×4, zu grob laut dir)</span></div>
+  </div>
+</div>
+</body>
+</html>

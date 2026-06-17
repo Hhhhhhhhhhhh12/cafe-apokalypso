@@ -1,5 +1,10 @@
 import { weekOneProducts, weekOneStaffOptions } from "../data";
-import type { ProductDefinition, ProductId, StaffOptionId } from "../types/content";
+import type {
+  GuestDefinition,
+  ProductDefinition,
+  ProductId,
+  StaffOptionId
+} from "../types/content";
 import type {
   CleanlinessStateLabel,
   DayManagementState,
@@ -85,6 +90,65 @@ export const ACTION_BUDGET_BY_DAY: Record<GameState["day"], number> = {
 };
 
 /**
+ * Guest patience & queue (#PATIENCE). The guest at the counter loses one tick of
+ * patience for every open-day action the player spends on something *other* than
+ * serving them. When it reaches zero the guest leaves unserved (a walkout).
+ *
+ * Patience is stored 0..max where max = ticks · PATIENCE_TICK, so `max / TICK`
+ * equals the number of non-serve actions the guest tolerates before walking out.
+ * Everything is derived from behaviorTags — fully deterministic, no randomness.
+ */
+export const PATIENCE_TICK = 25;
+
+/** Walkouts only bite from Day 4 on; Days 1–3 keep the cozy onboarding window —
+ *  the patience bar still ticks down (teaching the mechanic) but nobody leaves. */
+export const WALKOUT_FROM_DAY = 4;
+
+/** Stress added and reputation removed when a guest gives up and walks out. */
+export const WALKOUT_STRESS = 4;
+export const WALKOUT_REPUTATION_PENALTY = 1;
+
+/** Number of non-serve actions a guest tolerates, from their behavior tags. */
+export function getGuestPatienceTicks(guest: GuestDefinition): number {
+  const tags = guest.behaviorTags;
+  if (tags.some((tag) => tag === "impatient" || tag === "quick-service")) {
+    return 2;
+  }
+  if (
+    tags.some(
+      (tag) => tag === "patient" || tag === "regular" || tag === "calm" || tag === "still"
+    )
+  ) {
+    return 4;
+  }
+  return 3;
+}
+
+/** Full patience value (0..max) for a guest at the moment they reach the counter. */
+export function getGuestPatienceMax(guest: GuestDefinition): number {
+  return getGuestPatienceTicks(guest) * PATIENCE_TICK;
+}
+
+export function guestsCanWalkOut(day: GameState["day"]): boolean {
+  return day >= WALKOUT_FROM_DAY;
+}
+
+export type GuestPatienceLabel = "Relaxed" | "Waiting" | "Restless" | "Leaving";
+
+export function getGuestPatienceLabel(value: number, max: number): GuestPatienceLabel {
+  if (max <= 0 || value >= max * 0.66) {
+    return "Relaxed";
+  }
+  if (value >= max * 0.33) {
+    return "Waiting";
+  }
+  if (value > 0) {
+    return "Restless";
+  }
+  return "Leaving";
+}
+
+/**
  * Everyday end-of-day strain lines, shown when stress is high (>= 61).
  * Tone: dry, warm, understated — grounded café mishaps with one small,
  * deniable thing slightly off. Not horror, not obvious anomalies yet.
@@ -124,7 +188,10 @@ export function createInitialDayManagement(
     baristaReputationBonus: 0,
     helperExtraOrdersRemaining: 0,
     extraAdvertisingActions: 0,
-    appreciationBonusesGiven: 0
+    appreciationBonusesGiven: 0,
+    currentGuestPatience: 0,
+    currentGuestPatienceMax: 0,
+    guestsLost: 0
   };
 }
 
