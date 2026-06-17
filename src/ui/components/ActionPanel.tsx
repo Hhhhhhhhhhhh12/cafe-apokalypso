@@ -433,7 +433,7 @@ function EquipmentShop({
               className="secondary-button"
               disabled={!option.next.affordable}
               onClick={() => onBuyEquipment(option.id)}
-              title={option.next.reputationBonus > 0 ? `Ruf +${option.next.reputationBonus}` : undefined}
+              title={option.next.reputationBonus > 0 ? `Rep +${option.next.reputationBonus}` : undefined}
             >
               {option.next.name} · €{option.next.cost}
               {option.next.reputationBonus > 0 ? ` · ★${option.next.reputationBonus}` : ""}
@@ -630,7 +630,7 @@ function RestockPanel({
       </button>
 
       <div className="decor-shop" aria-label="Upgrade café décor">
-        <h3>Einrichtung</h3>
+        <h3>Décor</h3>
         {decorOptions.map((option) => (
           <div className="decor-row" key={option.id}>
             <span className="decor-row__label">
@@ -643,7 +643,7 @@ function RestockPanel({
                 className="secondary-button"
                 disabled={!option.next.affordable}
                 onClick={() => onUpgradeDecor(option.id)}
-                title={option.next.reputationBonus > 0 ? `Ruf +${option.next.reputationBonus}` : undefined}
+                title={option.next.reputationBonus > 0 ? `Rep +${option.next.reputationBonus}` : undefined}
               >
                 {option.next.name} · €{option.next.cost}
                 {option.next.reputationBonus > 0 ? ` · ★${option.next.reputationBonus}` : ""}

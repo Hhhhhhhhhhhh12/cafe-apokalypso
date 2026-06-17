@@ -12,7 +12,7 @@ export type DayModifierId =
   | "inspection-pressure";
 
 export type GuestId =
-  | "pendlerin-paula"
+  | "pendler-kemal"
   | "laptop-lukas"
   | "lieferfahrer-cem"
   | "cappuccino-christa"
@@ -53,7 +53,7 @@ export type EventId =
   | "day-1-first-cup"
   | "day-2-herr-bohn-memory"
   | "day-2-rehearsed-rhythm"
-  | "day-2-paula-fast-order"
+  | "day-2-kemal-fast-order"
   | "day-3-cash-register-suggestion"
   | "day-3-guest-checks-in"
   | "day-3-supply-tally"

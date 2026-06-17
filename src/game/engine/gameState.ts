@@ -406,7 +406,7 @@ const PRODUCT_IDS = [
 ] as const;
 
 const GUEST_IDS = [
-  "pendlerin-paula",
+  "pendler-kemal",
   "laptop-lukas",
   "lieferfahrer-cem",
   "cappuccino-christa",

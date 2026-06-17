@@ -57,9 +57,9 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
     "at-door" | "walking" | "idle" | "walking-to-counter" | "exiting-east"
   >("at-door");
 
-  const QUEUE_ROTATION = ["paula", "cem", "mira", "lukas", "christa"] as const;
+  const QUEUE_ROTATION = ["kemal", "cem", "mira", "lukas", "christa"] as const;
   type QueueGuest = (typeof QUEUE_ROTATION)[number];
-  const [queueGuest, setQueueGuest] = useState<QueueGuest>("paula");
+  const [queueGuest, setQueueGuest] = useState<QueueGuest>("kemal");
 
   useEffect(() => {
     if (!showQueueGuest) {
@@ -311,23 +311,7 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
                   }}
                 >
                   <span
-                    className={[
-                      "cafe-pilot-asset",
-                      queueGuest === "paula"
-                        ? "cafe-pilot-asset--paula"
-                        : `cafe-pilot-asset--${queueGuest}-standing`,
-                      paulaPhase === "walking" && queueGuest === "paula"
-                        ? "cafe-pilot-asset--paula-walking"
-                        : "",
-                      paulaPhase === "walking-to-counter" && queueGuest === "paula"
-                        ? "cafe-pilot-asset--paula-walking-north"
-                        : "",
-                      paulaPhase === "exiting-east" && queueGuest === "paula"
-                        ? "cafe-pilot-asset--paula-walking-east"
-                        : "",
-                    ]
-                      .filter(Boolean)
-                      .join(" ")}
+                    className={`cafe-pilot-asset cafe-pilot-asset--${queueGuest}-standing`}
                     aria-hidden="true"
                   />
                   {paulaPhase === "idle" && (

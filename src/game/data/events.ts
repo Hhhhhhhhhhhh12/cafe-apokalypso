@@ -72,17 +72,17 @@ export const weekOneEvents = [
     relatedGuestIds: ["herr-bohn"]
   },
   {
-    id: "day-2-paula-fast-order",
+    id: "day-2-kemal-fast-order",
     day: 2,
-    title: "Paula, On Schedule",
+    title: "Kemal, On Schedule",
     tone: "anomaly",
     kicker: "On the floor",
-    trigger: "Pendlerin Paula's quick morning order on Day 2.",
-    text: "Paula orders before she reaches the counter, pays in exact change, and is gone before the cup is warm. Her change was exact for a price you have not set yet.",
+    trigger: "Pendler Kemal's quick morning order on Day 2.",
+    text: "Kemal orders before he reaches the counter, pays in exact change, and is through the door before the cup is warm. The change was exact for a price you have not set yet.",
     flavorLines: [
-      "She did not look at the menu. You have not put the menu out yet."
+      "He did not look at the menu. You have not put the menu out yet."
     ],
-    relatedGuestIds: ["pendlerin-paula"]
+    relatedGuestIds: ["pendler-kemal"]
   },
   {
     id: "day-2-rehearsed-rhythm",

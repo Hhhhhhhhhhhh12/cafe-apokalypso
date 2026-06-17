@@ -718,9 +718,9 @@ describe("fail-state and reputation-scaled income", () => {
   it("previews the next guest (and a wants-hint) only while the café is open", () => {
     const open = createInitialGameState();
     const preview = getNextGuestPreview(open);
-    expect(preview?.name).toBe("Pendlerin Paula");
-    expect(preview?.orderLine).toContain("Just coffee");
-    expect(preview?.learningCue).toContain("never looks at the pastry shelf");
+    expect(preview?.name).toBe("Pendler Kemal");
+    expect(preview?.orderLine).toContain("Filter coffee");
+    expect(preview?.learningCue).toContain("glances at the door before the order");
     expect(preview?.wants).toBe("Filter Coffee");
 
     // No preview once the day's actions are spent.
@@ -767,8 +767,8 @@ describe("fail-state and reputation-scaled income", () => {
     };
     const preview = getNextGuestPreview(rememberedPaula);
 
-    expect(learned.guestMemory["pendlerin-paula"]?.visits).toBe(1);
-    expect(learned.guestMemory["pendlerin-paula"]?.knownPreferenceId).toBe(
+    expect(learned.guestMemory["pendler-kemal"]?.visits).toBe(1);
+    expect(learned.guestMemory["pendler-kemal"]?.knownPreferenceId).toBe(
       "filterkaffee"
     );
     expect(learned.statusMessage).toContain("You write it down");

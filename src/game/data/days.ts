@@ -15,7 +15,7 @@ export const weekOneDays = [
       completionHint: "Serve 2 customers and clean the tables before closing."
     },
     unlocks: ["take order", "prepare coffee", "accept payment", "clean tables"],
-    guestIds: ["pendlerin-paula", "freelancerin-nele"],
+    guestIds: ["pendler-kemal", "freelancerin-nele"],
     eventIds: ["day-1-opening-rhythm", "day-1-coffee-machine-flicker"]
   },
   {
@@ -30,11 +30,11 @@ export const weekOneDays = [
       day: 2,
       title: "Keep the regular rhythm",
       description: "Serve a small morning crowd without letting the room feel strained.",
-      completionHint: "Serve 3 customers and finish with stress at Ruhig or Geschäftig."
+      completionHint: "Serve 3 customers and finish with stress at Calm or Busy."
     },
     unlocks: ["guest behavior differences"],
     guestIds: [
-      "pendlerin-paula",
+      "pendler-kemal",
       "laptop-lukas",
       "lieferfahrer-cem",
       "cappuccino-christa",
@@ -60,7 +60,7 @@ export const weekOneDays = [
     },
     unlocks: ["ingredient purchasing", "price adjustment", "daily offers"],
     guestIds: [
-      "pendlerin-paula",
+      "pendler-kemal",
       "laptop-lukas",
       "lieferfahrer-cem",
       "cappuccino-christa",
@@ -86,7 +86,7 @@ export const weekOneDays = [
     },
     unlocks: ["flyers", "student discount", "social media post"],
     guestIds: [
-      "pendlerin-paula",
+      "pendler-kemal",
       "laptop-lukas",
       "lieferfahrer-cem",
       "cappuccino-christa",
@@ -113,7 +113,7 @@ export const weekOneDays = [
     },
     unlocks: ["stronger delegation pressure", "staff-flavored narrative beat"],
     guestIds: [
-      "pendlerin-paula",
+      "pendler-kemal",
       "laptop-lukas",
       "lieferfahrer-cem",
       "cappuccino-christa",
@@ -141,7 +141,7 @@ export const weekOneDays = [
     },
     unlocks: ["KASSANDRA update", "automatic audience targeting"],
     guestIds: [
-      "pendlerin-paula",
+      "pendler-kemal",
       "laptop-lukas",
       "lieferfahrer-cem",
       "cappuccino-christa",
@@ -168,7 +168,7 @@ export const weekOneDays = [
     },
     unlocks: ["visible weirdness after hook", "apocalypse operations foreshadowing"],
     guestIds: [
-      "pendlerin-paula",
+      "pendler-kemal",
       "laptop-lukas",
       "lieferfahrer-cem",
       "cappuccino-christa",

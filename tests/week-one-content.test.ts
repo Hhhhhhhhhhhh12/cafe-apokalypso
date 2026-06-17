@@ -15,7 +15,7 @@ import {
 import type { DayDefinition } from "../src/game/types/content";
 
 const requiredNormalGuests = [
-  "Pendlerin Paula",
+  "Pendler Kemal",
   "Laptop-Lukas",
   "Lieferfahrer Cem",
   "Cappuccino-Christa",

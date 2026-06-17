@@ -1385,6 +1385,15 @@ h3 {
   background-size: 92px 92px;
 }
 
+.cafe-pilot-asset--kemal-standing {
+  width: 88px;
+  height: 88px;
+  background-image: url("../../assets/sprites/guests/placeholder-guest-kemal.png");
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  background-size: 88px 88px;
+}
+
 /* Seated guests slide up on first appearance (one-shot on DOM mount). */
 @keyframes guest-seat-in {
   from {
@@ -1668,7 +1677,7 @@ h3 {
 .cafe-decor-clock {
   position: absolute;
   left: 54.0%;
-  top: 35.2%;
+  top: 32.0%;
   z-index: 8;
   width: 56px;
   height: 56px;
@@ -1698,8 +1707,8 @@ h3 {
  */
 .cafe-decor-lamp {
   position: absolute;
-  left: 18.9%;
-  top: 36.0%;
+  left: 24.5%;
+  top: 33.0%;
   z-index: 4;
   width: 48px;
   height: 64px;
@@ -1728,8 +1737,8 @@ h3 {
  */
 .cafe-decor-cups {
   position: absolute;
-  left: 66.7%;
-  top: 41.2%;
+  left: 62.0%;
+  top: 40.0%;
   z-index: 6;
   width: 48px;
   height: 40px;

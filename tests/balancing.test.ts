@@ -22,7 +22,7 @@ import {
 } from "../src/game/engine/management";
 import { weekOneProducts } from "../src/game/data";
 import type { DayNumber } from "../src/game/types/content";
-import type { GameState } from "../src/game/types/game";
+import type { DayActionId, GameState } from "../src/game/types/game";
 
 // ---------------------------------------------------------------------------
 // Helper: same canonical pattern as management-tradeoff.test.ts
@@ -490,7 +490,7 @@ describe("balancing: reputation feedback loop", () => {
       ...createInitialGameState(),
       reputationZeroStreak: 1,
       dayPhase: "open" as const,
-      completedActions: ["take_order"] as string[],
+      completedActions: ["take_order"] as DayActionId[],
       dayManagement: {
         ...createInitialGameState().dayManagement,
         customersServed: 1,
