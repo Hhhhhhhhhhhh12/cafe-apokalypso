@@ -189,6 +189,7 @@ export function createInitialDayManagement(
     helperExtraOrdersRemaining: 0,
     extraAdvertisingActions: 0,
     appreciationBonusesGiven: 0,
+    decorBonusesGiven: 0,
     currentGuestPatience: 0,
     currentGuestPatienceMax: 0,
     guestsLost: 0
@@ -396,7 +397,7 @@ export function getHelperTaskHint(taskId: HelperTaskId): string {
     cleaning: "Keeps the tables tidy — cleanliness stays above 45 without spending an action. Each serve still drops cleanliness by 2; Jana resets it quietly.",
     service: "Serves a second guest on each order — doubles income per action point while the extra-orders pool lasts.",
     barista: "Espresso and cappuccino earn +1 Rep each (up to 3 times today). Nino also uses slightly less milk on milk drinks.",
-    counter: "Steady hands at the till reduce opening stress — Nino saves 8 Stress on arrival, Nele 5.",
+    counter: "Steady hands at the till reduce opening stress — Nino saves 8 Stress on arrival, Nele saves 5.",
     marketing: "Adds a free advertising action today. Nele's post can reach further than a standard flyer."
   };
 

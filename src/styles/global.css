@@ -1679,10 +1679,10 @@ h3 {
   left: 54.0%;
   top: 32.0%;
   z-index: 8;
-  width: 56px;
-  height: 56px;
+  width: 36px;
+  height: 36px;
   background: url("../../assets/sprites/props/placeholder-cafe-clock.png") center / contain no-repeat;
-  image-rendering: pixelated;
+  image-rendering: auto;
 }
 
 .cafe-decor-clock.cafe-decor--tier-1 {
@@ -1697,23 +1697,17 @@ h3 {
 .cafe-decor-clock.cafe-decor--tier-3 {
   opacity: 1;
   background-image: url("../../assets/sprites/props/placeholder-cafe-clock-t3.png");
-  width: 52px;
-  height: 68px; /* pendulum clock is taller */
+  width: 40px;
+  height: 52px;
 }
 
 /*
- * Floor lamp (Pixellab shabby tier-1). Positioned near the left table area,
- * giving the seating corner some warmth even in the starter state.
+ * Lamp slot hidden until floor lamp sprites exist.
+ * Ceiling/pendant lamp removed — doesn't fit the painted background perspective.
+ * See GitHub issue for floor lamp replacement sprites.
  */
 .cafe-decor-lamp {
-  position: absolute;
-  left: 24.5%;
-  top: 33.0%;
-  z-index: 4;
-  width: 48px;
-  height: 64px;
-  background: url("../../assets/sprites/props/placeholder-cafe-lamp.png") center top / contain no-repeat;
-  image-rendering: pixelated;
+  display: none;
 }
 
 .cafe-decor-lamp.cafe-decor--tier-1 {
@@ -1737,8 +1731,8 @@ h3 {
  */
 .cafe-decor-cups {
   position: absolute;
-  left: 62.0%;
-  top: 40.0%;
+  left: 68.5%;
+  top: 46.5%;
   z-index: 6;
   width: 48px;
   height: 40px;
@@ -2158,6 +2152,18 @@ h3 {
   margin-top: 0;
   border-top: none;
   padding-top: 0;
+}
+
+/* In setup context the hint text is long — stack label above button. */
+.setup-panel .decor-row {
+  grid-template-columns: 1fr;
+  gap: 6px;
+}
+
+.setup-panel .decor-row .secondary-button,
+.setup-panel .decor-row .decor-row__maxed {
+  justify-self: stretch;
+  text-align: center;
 }
 
 .helper-picker fieldset {
@@ -2924,15 +2930,7 @@ h3 {
     animation: cafe-clock-sway 2.6s ease-in-out infinite alternate;
   }
 
-  /* Lamp light breathes; opacity (not filter) so tier looks stay intact */
-  .cafe-decor-lamp {
-    animation: cafe-lamp-breathe 6s ease-in-out infinite alternate;
-  }
-
-  /* Once the weirdness shows, the lamp flickers nervously */
-  .cafe-diorama--weirdness-visible .cafe-decor-lamp {
-    animation: cafe-lamp-flicker 4.5s steps(1, end) infinite;
-  }
+    /* Lamp animations disabled until floor lamp sprites land */
 }
 
 @keyframes cafe-dust-drift {

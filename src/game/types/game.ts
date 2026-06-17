@@ -75,6 +75,8 @@ export interface DayManagementState {
   extraAdvertisingActions: number;
   /** Per-day count of guest-appreciation reputation bonuses already awarded (capped). */
   appreciationBonusesGiven: number;
+  /** Per-day count of decor atmosphere reputation bonuses already awarded (capped). */
+  decorBonusesGiven: number;
   /** Remaining patience (0..max) of the guest currently at the counter. 0 while the café is not open. */
   currentGuestPatience: number;
   /** Full patience of the current guest when they reached the counter (0 while not open). */

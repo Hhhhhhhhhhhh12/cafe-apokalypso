@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createInitialGameState } from "../src/game/engine/gameState";
+import { createFreshRunState, createInitialGameState } from "../src/game/engine/gameState";
 import { gameReducer } from "../src/game/engine/reducer";
 import {
   getCurrentDayModifier,
@@ -544,7 +544,7 @@ describe("management tradeoff system", () => {
 
   it("falls back from malformed saves and persists new management fields", () => {
     const malformedStorage = createMemoryStorage("{nope");
-    expect(loadGameState(malformedStorage)).toEqual(createInitialGameState());
+    expect(loadGameState(malformedStorage)).toEqual(createFreshRunState());
 
     const storage = createMemoryStorage();
     const savedState = gameReducer(createOpenHelperState("nele", "counter"), {
