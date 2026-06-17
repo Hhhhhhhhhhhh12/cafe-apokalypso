@@ -3,6 +3,8 @@ import {
   getAvailableProducts,
   getDayCoachHint,
   getDecorUpgradeOptions,
+  getEquipmentShopOptions,
+  getGuestPatienceState,
   getIngredientLabel,
   getMissingRequiredActions,
   getNextGuestPreview,
@@ -20,6 +22,7 @@ import {
 import type { ProductId, StaffOptionId } from "../../game/types/content";
 import type {
   DecorSlotId,
+  EquipmentSlotId,
   GameState,
   HelperTaskId,
   IngredientKey
@@ -43,6 +46,8 @@ interface ActionPanelProps {
   onSetSupplyPurchase: (ingredient: IngredientKey, quantity: number) => void;
   onConfirmSupplyPurchase: () => void;
   onUpgradeDecor: (slot: DecorSlotId) => void;
+  onBuyEquipment: (slot: EquipmentSlotId) => void;
+  onFinishSetup: () => void;
   onResetGame: () => void;
 }
 
@@ -72,6 +77,8 @@ export function ActionPanel({
   onSetSupplyPurchase,
   onConfirmSupplyPurchase,
   onUpgradeDecor,
+  onBuyEquipment,
+  onFinishSetup,
   onResetGame
 }: ActionPanelProps) {
   const canCloseDay = canCompleteCurrentDay(gameState);
@@ -83,6 +90,14 @@ export function ActionPanel({
         <p className="eyebrow">Shift</p>
         <h2 id="actions-title">Actions</h2>
       </div>
+
+      {gameState.dayPhase === "setup" ? (
+        <SetupPanel
+          gameState={gameState}
+          onBuyEquipment={onBuyEquipment}
+          onFinishSetup={onFinishSetup}
+        />
+      ) : null}
 
       {gameState.dayPhase === "day_start" ? (
         <HelperStartPanel
@@ -115,6 +130,7 @@ export function ActionPanel({
           onSetSupplyPurchase={onSetSupplyPurchase}
           onConfirmSupplyPurchase={onConfirmSupplyPurchase}
           onUpgradeDecor={onUpgradeDecor}
+          onBuyEquipment={onBuyEquipment}
         />
       ) : null}
 
@@ -133,7 +149,7 @@ export function ActionPanel({
       <p id="close-day-requirements" className="action-hint">
         {gameState.demoComplete
           ? "Demo complete. Reset to replay the seven-day loop."
-          : gameState.dayPhase === "day_start"
+          : gameState.dayPhase === "day_start" || gameState.dayPhase === "setup"
             ? null
             : !canCloseDay
               ? `Before closing: ${formatMissingActions(missingActions)}.`
@@ -181,6 +197,7 @@ function OpenDayControls({
   canCloseDay: boolean;
 }) {
   const nextGuest = getNextGuestPreview(gameState);
+  const patienceState = getGuestPatienceState(gameState);
   const canAct = hasActionCapacity(gameState);
   const products = getAvailableProducts(gameState);
   const advertisingCanUseBonus = gameState.dayManagement.extraAdvertisingActions > 0;
@@ -351,6 +368,24 @@ function OpenDayControls({
           <span>
             Next in line: <strong>{nextGuest.name}</strong>
           </span>
+          {patienceState ? (
+            <span
+              className={`next-guest__patience${patienceState.critical ? " next-guest__patience--critical" : ""}`}
+              aria-label={`Guest patience: ${patienceState.label}`}
+            >
+              <span className="next-guest__patience-label">{patienceState.label}</span>
+              <span className="next-guest__patience-bar" aria-hidden="true">
+                {Array.from({ length: patienceState.max / 25 }, (_, i) => (
+                  <span
+                    key={i}
+                    className={`next-guest__patience-pip${
+                      i * 25 < patienceState.patience ? " next-guest__patience-pip--filled" : ""
+                    }`}
+                  />
+                ))}
+              </span>
+            </span>
+          ) : null}
           {nextGuest.orderLine ? (
             <span className="next-guest__order">Says: "{nextGuest.orderLine}"</span>
           ) : null}
@@ -369,6 +404,85 @@ function OpenDayControls({
         </p>
       ) : null}
     </>
+  );
+}
+
+function EquipmentShop({
+  gameState,
+  onBuyEquipment,
+  heading
+}: {
+  gameState: GameState;
+  onBuyEquipment: (slot: EquipmentSlotId) => void;
+  heading: string;
+}) {
+  const options = getEquipmentShopOptions(gameState);
+
+  return (
+    <div className="decor-shop equipment-shop" aria-label="Buy café equipment">
+      <h3>{heading}</h3>
+      {options.map((option) => (
+        <div className="decor-row" key={option.id}>
+          <span className="decor-row__label">
+            <strong>{option.label}</strong>
+            <em>{option.currentTierName}</em>
+          </span>
+          {option.next ? (
+            <button
+              type="button"
+              className="secondary-button"
+              disabled={!option.next.affordable}
+              onClick={() => onBuyEquipment(option.id)}
+              title={option.next.reputationBonus > 0 ? `Rep +${option.next.reputationBonus}` : undefined}
+            >
+              {option.next.name} · €{option.next.cost}
+              {option.next.reputationBonus > 0 ? ` · ★${option.next.reputationBonus}` : ""}
+            </button>
+          ) : (
+            <span className="decor-row__maxed">Best available</span>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function SetupPanel({
+  gameState,
+  onBuyEquipment,
+  onFinishSetup
+}: {
+  gameState: GameState;
+  onBuyEquipment: (slot: EquipmentSlotId) => void;
+  onFinishSetup: () => void;
+}) {
+  const hasMachine = gameState.equipment.machine >= 1;
+  const hasSeating = gameState.equipment.seating >= 1;
+
+  return (
+    <div className="setup-panel" aria-label="Set up the café before opening">
+      <p className="setup-panel__intro">
+        Before you open, kit out the café. The till is small — expect the cheapest
+        used machine and second-hand furniture. A coffee machine is required; you
+        can open without seating, but guests will order at the counter and stand.
+      </p>
+
+      <EquipmentShop
+        gameState={gameState}
+        onBuyEquipment={onBuyEquipment}
+        heading="Equipment"
+      />
+
+      <p className="action-hint">Till: €{gameState.resources.money}</p>
+
+      <button type="button" onClick={onFinishSetup} disabled={!hasMachine}>
+        {hasMachine
+          ? hasSeating
+            ? "Open the café"
+            : "Open with standing room only"
+          : "Buy a coffee machine to open"}
+      </button>
+    </div>
   );
 }
 
@@ -440,12 +554,14 @@ function RestockPanel({
   gameState,
   onSetSupplyPurchase,
   onConfirmSupplyPurchase,
-  onUpgradeDecor
+  onUpgradeDecor,
+  onBuyEquipment
 }: {
   gameState: GameState;
   onSetSupplyPurchase: (ingredient: IngredientKey, quantity: number) => void;
   onConfirmSupplyPurchase: () => void;
   onUpgradeDecor: (slot: DecorSlotId) => void;
+  onBuyEquipment: (slot: EquipmentSlotId) => void;
 }) {
   const preview = getRestockPreview(gameState);
   const decorOptions = getDecorUpgradeOptions(gameState);
@@ -514,7 +630,7 @@ function RestockPanel({
       </button>
 
       <div className="decor-shop" aria-label="Upgrade café décor">
-        <h3>Einrichtung</h3>
+        <h3>Décor</h3>
         {decorOptions.map((option) => (
           <div className="decor-row" key={option.id}>
             <span className="decor-row__label">
@@ -527,7 +643,7 @@ function RestockPanel({
                 className="secondary-button"
                 disabled={!option.next.affordable}
                 onClick={() => onUpgradeDecor(option.id)}
-                title={option.next.reputationBonus > 0 ? `Ruf +${option.next.reputationBonus}` : undefined}
+                title={option.next.reputationBonus > 0 ? `Rep +${option.next.reputationBonus}` : undefined}
               >
                 {option.next.name} · €{option.next.cost}
                 {option.next.reputationBonus > 0 ? ` · ★${option.next.reputationBonus}` : ""}
@@ -538,6 +654,12 @@ function RestockPanel({
           </div>
         ))}
       </div>
+
+      <EquipmentShop
+        gameState={gameState}
+        onBuyEquipment={onBuyEquipment}
+        heading="Equipment upgrades"
+      />
     </div>
   );
 }

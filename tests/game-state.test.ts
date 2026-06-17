@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createInitialGameState } from "../src/game/engine/gameState";
+import { createFreshRunState, createInitialGameState } from "../src/game/engine/gameState";
 import { gameReducer } from "../src/game/engine/reducer";
 import { getEmployeeLevel, getEmployeeLevelBonuses } from "../src/game/engine/management";
 import {
@@ -14,7 +14,7 @@ describe("initial game state", () => {
   it("starts as a serializable day-one café state", () => {
     const state = createInitialGameState();
 
-    expect(state.version).toBe(12);
+    expect(state.version).toBe(13);
     expect(state.decor).toEqual({ plant: 1, shelf: 1, clock: 1, lamp: 1, cups: 1 });
     expect(state.run.runNumber).toBe(1);
     expect(state.run.modifierIds).toHaveLength(7);
@@ -105,11 +105,11 @@ describe("initial game state", () => {
     expect(getVisibleKassandraMessages(state).length).toBeGreaterThan(0);
   });
 
-  it("resets the progression loop back to Day 1", () => {
+  it("resets the progression loop back to a fresh setup phase", () => {
     const progressedState = closeCurrentDay(closeCurrentDay(createInitialGameState()));
     const resetState = gameReducer(progressedState, { type: "reset_game" });
 
-    expect(resetState).toEqual(createInitialGameState());
+    expect(resetState).toEqual(createFreshRunState());
   });
 
   it("records soft-run memory fragments without ending the week", () => {

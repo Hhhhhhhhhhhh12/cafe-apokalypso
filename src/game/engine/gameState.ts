@@ -18,7 +18,7 @@ import type {
 } from "../types/game";
 import { createInitialDayManagement, STARTING_REPUTATION, SUPPLY_CAPS } from "./management";
 
-export const CURRENT_GAME_STATE_VERSION = 12;
+export const CURRENT_GAME_STATE_VERSION = 13;
 export const CURRENT_CONTENT_CATALOG_VERSION = "week-one-v1";
 
 const initialResources: ResourceState = {
@@ -79,6 +79,7 @@ export function createInitialGameState(): GameState {
     closureReason: null,
     reputationZeroStreak: 0,
     decor: { plant: 1, shelf: 1, clock: 1, lamp: 1, cups: 1 },
+    equipment: { machine: 1, seating: 1 },
     run: { ...initialRun, modifierIds: [...initialRun.modifierIds], memoryFragments: [] },
     guestMemory: {},
     completedActions: [],
@@ -89,6 +90,24 @@ export function createInitialGameState(): GameState {
     unlockedAchievements: [],
     statusMessage:
       "The café opens. The guestbook quietly writes: Previous runs: [REDACTED]."
+  };
+}
+
+/**
+ * The real start of a fresh café week: Day 1 begins in the "setup" phase with
+ * no equipment owned. The player buys a coffee machine and (optionally) used
+ * furniture from the setup shop, then opens. Used by the app initializer and
+ * reset_game; createInitialGameState() stays the already-open baseline that the
+ * existing test suite builds on. See the "setup" phase and #setup.
+ */
+export function createFreshRunState(): GameState {
+  return {
+    ...createInitialGameState(),
+    dayPhase: "setup",
+    phaseLabel: "Before opening",
+    equipment: { machine: 0, seating: 0 },
+    statusMessage:
+      "An empty room and a small till. Buy a coffee machine and some furniture, then open the doors."
   };
 }
 
@@ -119,6 +138,7 @@ export function isValidGameState(value: unknown): value is GameState {
       candidate.closureReason === "reputation") &&
     typeof candidate.reputationZeroStreak === "number" &&
     isValidDecor(candidate.decor) &&
+    isValidEquipment(candidate.equipment) &&
     isValidRun(candidate.run) &&
     isValidGuestMemory(candidate.guestMemory) &&
     isValidResources(candidate.resources) &&
@@ -204,7 +224,10 @@ function isValidDayManagement(value: unknown): value is DayManagementState {
     typeof management.baristaReputationBonus === "number" &&
     typeof management.helperExtraOrdersRemaining === "number" &&
     typeof management.extraAdvertisingActions === "number" &&
-    typeof management.appreciationBonusesGiven === "number"
+    typeof management.appreciationBonusesGiven === "number" &&
+    typeof management.currentGuestPatience === "number" &&
+    typeof management.currentGuestPatienceMax === "number" &&
+    typeof management.guestsLost === "number"
   );
 }
 
@@ -289,7 +312,26 @@ function isValidObjectiveResults(value: unknown): value is DayObjectiveResult[] 
 
 function isValidDayPhase(value: unknown): value is DayPhase {
   return (
-    typeof value === "string" && ["day_start", "open", "day_end"].includes(value)
+    typeof value === "string" &&
+    ["setup", "day_start", "open", "day_end"].includes(value)
+  );
+}
+
+/** All equipment slot keys that must exist in a valid save (tier >= 0). */
+const EQUIPMENT_SLOT_KEYS = ["machine", "seating"] as const;
+
+function isValidEquipment(
+  value: unknown
+): value is Record<typeof EQUIPMENT_SLOT_KEYS[number], number> {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+  const equipment = value as Record<string, unknown>;
+  return EQUIPMENT_SLOT_KEYS.every(
+    (slot) =>
+      typeof equipment[slot] === "number" &&
+      Number.isInteger(equipment[slot]) &&
+      (equipment[slot] as number) >= 0
   );
 }
 
@@ -364,7 +406,7 @@ const PRODUCT_IDS = [
 ] as const;
 
 const GUEST_IDS = [
-  "pendlerin-paula",
+  "pendler-kemal",
   "laptop-lukas",
   "lieferfahrer-cem",
   "cappuccino-christa",
@@ -422,6 +464,8 @@ function isValidGuestMemory(value: unknown): value is Partial<Record<GuestId, Gu
  * v9 -> v10: `staffXp` object added (defaults to empty {}).
  * v10 -> v11: soft-run metadata and guest memory added.
  * v11 -> v12: `socialAdRun` added to dayManagement.
+ * v12 -> v13: core `equipment` slots added. Old saves were already-open cafés
+ *   with tables, so they migrate to machine 1 / seating 1.
  * Older versions may also lack décor slots added after the save was written
  * (clock/lamp/cups).
  */
@@ -495,6 +539,41 @@ export function migrateRawSave(raw: unknown): unknown {
     }
   }
 
+  if (obj.version === 12) {
+    obj.version = 13;
+    patched = true;
+
+    if (
+      !obj.equipment ||
+      typeof obj.equipment !== "object" ||
+      Array.isArray(obj.equipment)
+    ) {
+      // Pre-equipment saves were already-open cafés with tables in the room.
+      obj.equipment = { machine: 1, seating: 1 };
+    }
+
+    if (obj.dayManagement && typeof obj.dayManagement === "object" && !Array.isArray(obj.dayManagement)) {
+      const dm = obj.dayManagement as Record<string, unknown>;
+      if (typeof dm.currentGuestPatience !== "number") {
+        dm.currentGuestPatience = 0;
+      }
+      if (typeof dm.currentGuestPatienceMax !== "number") {
+        dm.currentGuestPatienceMax = 0;
+      }
+      if (typeof dm.guestsLost !== "number") {
+        dm.guestsLost = 0;
+      }
+      obj.dayManagement = dm;
+    }
+
+    if (obj.daySummary && typeof obj.daySummary === "object" && !Array.isArray(obj.daySummary)) {
+      const s = obj.daySummary as Record<string, unknown>;
+      if (typeof s.guestsLost !== "number") {
+        obj.daySummary = { ...s, guestsLost: 0 };
+      }
+    }
+  }
+
   if (obj.decor && typeof obj.decor === "object" && !Array.isArray(obj.decor)) {
     const decor = { ...(obj.decor as Record<string, unknown>) };
     for (const slot of DECOR_SLOT_KEYS) {
@@ -504,6 +583,17 @@ export function migrateRawSave(raw: unknown): unknown {
       }
     }
     obj.decor = decor;
+  }
+
+  if (obj.equipment && typeof obj.equipment === "object" && !Array.isArray(obj.equipment)) {
+    const equipment = { ...(obj.equipment as Record<string, unknown>) };
+    for (const slot of EQUIPMENT_SLOT_KEYS) {
+      if (typeof equipment[slot] !== "number") {
+        equipment[slot] = 1;
+        patched = true;
+      }
+    }
+    obj.equipment = equipment;
   }
 
   if (obj.run && typeof obj.run === "object" && !Array.isArray(obj.run)) {

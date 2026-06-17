@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { KassandraBootScreen } from "../src/ui/components/KassandraBootScreen";
+import { IntroSequence } from "../src/ui/components/IntroSequence";
 import { App } from "../src/app/App";
 import { createInitialGameState } from "../src/game/engine/gameState";
 import { saveGameState, type StorageLike } from "../src/game/engine/save";
@@ -20,26 +20,19 @@ function createMemoryStorage(): StorageLike {
   };
 }
 
-describe("KASSANDRA boot splash", () => {
-  it("shows the [REDACTED] previous-runs line as the meta hook", () => {
-    const markup = renderToStaticMarkup(
-      <KassandraBootScreen onDismiss={() => {}} />
-    );
-    const text = visibleText(markup);
+describe("Diegetic cinematic intro (IntroSequence)", () => {
+  it("renders the cinematic overlay with a skip button", () => {
+    const markup = renderToStaticMarkup(<IntroSequence onComplete={() => {}} />);
 
-    expect(markup).toContain("kassandra-boot");
-    expect(text).toContain("Previous runs: [REDACTED]");
-    expect(text).toContain("Open the café");
+    expect(markup).toContain("intro-cinema");
+    expect(visibleText(markup)).toContain("Skip");
   });
 
-  it("is a modal dialog with an accessible label", () => {
-    const markup = renderToStaticMarkup(
-      <KassandraBootScreen onDismiss={() => {}} />
-    );
+  it("opens fully dark — veil starts at opacity 1", () => {
+    const markup = renderToStaticMarkup(<IntroSequence onComplete={() => {}} />);
 
-    expect(markup).toContain('role="dialog"');
-    expect(markup).toContain('aria-modal="true"');
-    expect(markup).toContain('aria-labelledby="kassandra-boot-title"');
+    // The veil div gets an inline opacity:1 on the first beat (full black).
+    expect(markup).toContain("opacity:1");
   });
 });
 
@@ -53,14 +46,14 @@ describe("App intro/outro screens", () => {
     return renderToStaticMarkup(<App />);
   }
 
-  it("shows the boot splash on a fresh Day 1 run", () => {
+  it("shows the cinematic intro on a fresh Day 1 run", () => {
     const markup = renderAppWith(createMemoryStorage());
 
-    expect(markup).toContain("kassandra-boot");
-    expect(visibleText(markup)).toContain("Previous runs: [REDACTED]");
+    expect(markup).toContain("intro-cinema");
+    expect(visibleText(markup)).toContain("Skip");
   });
 
-  it("shows the demo-complete banner after Day 7 and hides the boot splash", () => {
+  it("shows the demo-complete banner after Day 7 and hides the intro", () => {
     const storage = createMemoryStorage();
     saveGameState(
       {
@@ -79,6 +72,6 @@ describe("App intro/outro screens", () => {
     expect(markup).toContain("demo-complete-banner");
     expect(text).toContain("The first café week is over");
     expect(text).toContain("Start the next café week");
-    expect(markup).not.toContain("kassandra-boot");
+    expect(markup).not.toContain("intro-cinema");
   });
 });

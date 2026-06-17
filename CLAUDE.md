@@ -6,7 +6,7 @@ KRITISCHE Regel: Immer auf gescheite Diversität der Figuren achten (Hauttöne, 
 ## Befehle
 
 - Dev-Server: `preview_start` mit Name `cafe-apokalypso` (Port 5173, definiert in `.claude/launch.json`)
-- Tests: `npx vitest run` (113 Tests, müssen grün bleiben)
+- Tests: `npx vitest run` (219 Tests, müssen grün bleiben)
 - Für Preview-/Kalibrier-Arbeit: Skill `.claude/skills/cafe-preview/SKILL.md` lesen und befolgen
 
 ## Token-Arbeitsregeln
@@ -19,13 +19,13 @@ KRITISCHE Regel: Immer auf gescheite Diversität der Figuren achten (Hauttöne, 
 
 ## Diorama-Geometrie (nicht neu herleiten!)
 
-**Aktueller Raum: reines CSS-Diorama** — kein gemaltes PNG mehr. Stage Base v03 ist deaktiviert (`.cafe-stage-base { display: none }`). Décor-Sprites (clock/lamp/cups/shelf/plant) ebenfalls deaktiviert (`display: none` auf alle `.cafe-decor-*`). Gemischte Renderebenen sind abgelehnt — siehe `docs/ART_STYLEGUIDE.md` → "Visual QA".
+**Aktueller Raum: reines CSS-Diorama** — kein gemaltes PNG. `.cafe-stage-base { display: none }`. Décor-Sprites (clock/lamp/cups/shelf/plant) sind aktiv. Lamp: `top: 18%` in `.cafe-decor-lamp`.
 
 - `.cafe-back-wall` = CSS-Hintergrundwand (`inset: 0 20% 39% 0`, z 0, `--wall` Farbe). Enthält: `.cafe-window` (links), `.cafe-menu-board` (Mitte), `.cafe-storage` (rechts). **Nicht auf display:none setzen.**
 - `.cafe-side-wall` = linke CSS-Seitenwand mit `.cafe-door` (`width: 29%`, z 1, `--side-wall` Farbe). **Nicht auf display:none setzen.**
 - `.cafe-floor` = Positionierungs-Container für Gäste: left 5 % / right 6 % / bottom 4 % / height 65 % des Dioramas, `clip-path: polygon(9% 1%, 100% 15%, 88% 100%, 0 84%)`, sichtbare Füllung `var(--floor)`. Umrechnung Diorama-% → Floor-%: `floorX = (dioX − 5) / 89 · 100`, `floorY = (dioY − 31) / 65 · 100`.
 - `.cafe-counter` = CSS-Theken-Slab (Floor-Koordinaten left 59.6 % / top 53.8 % / w 43.8 % / h 33.8 %), sichtbarer `background: linear-gradient(#b8774f → #7f2f2c)`. Kaffeemaschine + KASSANDRA-Kasse sind seine Kinder (Sprites).
-- Décor-Tier-Klassen (`cafe-decor--tier-N`) existieren noch im DOM (wird von Hooks eingefügt), sind aber per CSS unsichtbar. Das Gameplay-State `decor` bleibt erhalten — nur die Sprite-Overlays sind deaktiviert.
+- Décor-Tier-Klassen (`cafe-decor--tier-N`) existieren im DOM und sind per CSS sichtbar (Sprites aktiv seit feat/pixel-props-pixellab).
 - Serve-Menü (Produktliste) ist aus dem Diorama heraus in die ActionPanel-Sidebar verlagert (`.serve-menu`). Kein floating UI über dem Spielbereich mehr.
 - Paula-Walk-Choreografie: Phasen-Maschine in CafePlaceholder.tsx (`at-door` → `walking` → `idle`), Tür-Startposition ist relativ zu `.cafe-queue` (left −195 % / bottom 130 %).
 

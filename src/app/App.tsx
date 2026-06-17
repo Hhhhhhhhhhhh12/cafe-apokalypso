@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { gameReducer } from "../game/engine/reducer";
-import { createInitialGameState } from "../game/engine/gameState";
+import { createFreshRunState } from "../game/engine/gameState";
 import {
   getBrowserStorage,
   loadGameState,
@@ -13,7 +13,7 @@ import type { AchievementDefinition } from "../game/types/content";
 import { AchievementToast } from "../ui/components/AchievementToast";
 import { ActionPanel } from "../ui/components/ActionPanel";
 import { CafePlaceholder } from "../ui/cafe/CafePlaceholder";
-import { KassandraBootScreen } from "../ui/components/KassandraBootScreen";
+import { IntroSequence } from "../ui/components/IntroSequence";
 import { DayProgressPanel } from "../ui/panels/DayProgressPanel";
 import { ResourceHud } from "../ui/panels/ResourceHud";
 
@@ -37,7 +37,7 @@ export function App() {
     gameReducer,
     storage,
     (availableStorage) =>
-      availableStorage ? loadGameState(availableStorage) : createInitialGameState()
+      availableStorage ? loadGameState(availableStorage) : createFreshRunState()
   );
 
   useEffect(() => {
@@ -108,7 +108,11 @@ export function App() {
 
   return (
     <main className="app-shell" data-day={dayDataAttr}>
-      {showBoot ? <KassandraBootScreen onDismiss={dismissBoot} /> : null}
+      {showBoot ? (
+        <IntroSequence
+          onComplete={dismissBoot}
+        />
+      ) : null}
       <AchievementToast
         queue={achievementQueue}
         onDequeue={() => setAchievementQueue(q => q.slice(1))}
@@ -201,6 +205,8 @@ export function App() {
           }
           onConfirmSupplyPurchase={() => dispatch({ type: "confirm_supply_purchase" })}
           onUpgradeDecor={(slot) => dispatch({ type: "upgrade_decor", slot })}
+          onBuyEquipment={(slot) => dispatch({ type: "buy_equipment", slot })}
+          onFinishSetup={() => dispatch({ type: "finish_setup" })}
           onResetGame={handleReset}
         />
         <DayProgressPanel gameState={gameState} />
@@ -228,7 +234,7 @@ function DayTransitionBanner({
   dayPhase
 }: {
   day: number;
-  dayPhase: "day_start" | "open" | "day_end";
+  dayPhase: "setup" | "day_start" | "open" | "day_end";
 }) {
   const previousPhase = useRef(dayPhase);
   const tickRef = useRef(0);

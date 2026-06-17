@@ -20,9 +20,9 @@ function stateForDay(day: DayNumber, overrides: Partial<GameState> = {}): GameSt
 describe("guest serve lines", () => {
   it("returns the served guest's narrative serve line, not developer copy", () => {
     const line = getServeLineForCustomer(stateForDay(1), 0);
-    const paula = weekOneGuests.find((guest) => guest.id === "pendlerin-paula");
+    const kemal = weekOneGuests.find((guest) => guest.id === "pendler-kemal");
 
-    expect(line).toBe(paula?.serveLine);
+    expect(line).toBe(kemal?.serveLine);
     expect(line).not.toContain("Supplies, cleanliness, money, and stress");
   });
 
@@ -40,8 +40,8 @@ describe("guest serve lines", () => {
     }
 
     const preview = getNextGuestPreview(stateForDay(1));
-    expect(preview?.orderLine).toContain("Just coffee");
-    expect(preview?.learningCue).toContain("Paula");
+    expect(preview?.orderLine).toContain("Filter coffee");
+    expect(preview?.learningCue).toContain("Kemal");
     expect(preview?.wants).toBe("Filter Coffee");
   });
 
@@ -60,9 +60,9 @@ describe("guest serve lines", () => {
 
   it("stays in the normal pool when no strange guests are present that day", () => {
     const dayOne = stateForDay(1);
-    // Day 1 has only normal guests (Paula, Nele), so even index >= 3 stays normal.
+    // Day 1 has only normal guests (Kemal, Nele), so even index >= 3 stays normal.
     const dayOneNormalLines = weekOneGuests
-      .filter((g) => g.category === "normal" && ["pendlerin-paula", "freelancerin-nele"].includes(g.id))
+      .filter((g) => g.category === "normal" && ["pendler-kemal", "freelancerin-nele"].includes(g.id))
       .map((g) => g.serveLine);
 
     expect(dayOneNormalLines).toContain(getServeLineForCustomer(dayOne, 5));
@@ -72,9 +72,9 @@ describe("guest serve lines", () => {
 describe("serve flow status message", () => {
   it("sets the status message to the served guest's serve line", () => {
     const next = gameReducer(stateForDay(1), { type: "take_order" });
-    const paula = weekOneGuests.find((guest) => guest.id === "pendlerin-paula");
+    const kemal = weekOneGuests.find((guest) => guest.id === "pendler-kemal");
 
-    expect(next.statusMessage).toContain(paula?.serveLine ?? "__missing__");
+    expect(next.statusMessage).toContain(kemal?.serveLine ?? "__missing__");
     expect(next.statusMessage).not.toContain(
       "Supplies, cleanliness, money, and stress have been updated"
     );

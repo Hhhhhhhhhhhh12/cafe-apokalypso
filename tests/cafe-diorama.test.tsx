@@ -57,7 +57,7 @@ describe("café diorama view", () => {
     expect(markup).toContain("placeholder-cafe-coffee-machine.png");
     expect(markup).toContain("placeholder-kassandra-register.png");
     // Paula renders via CSS sprite-sheet background, identified by class
-    expect(markup).toContain("cafe-pilot-asset--paula");
+    expect(markup).toContain("cafe-pilot-asset--kemal-standing");
     expect(markup).toContain("cafe-coffee-machine");
     expect(markup).toContain("cafe-register");
     expect(markup).toContain("placeholder-guest-normal-01");
@@ -86,8 +86,8 @@ describe("café diorama view", () => {
     const dayEnd = renderCafe({ ...base, dayPhase: "day_end" });
 
     expect(openWithActions).toContain("placeholder-guest-normal-01");
-    expect(openWithActions).toContain("cafe-pilot-asset--paula");
-    expect(dayEnd).not.toContain("cafe-pilot-asset--paula");
+    expect(openWithActions).toContain("cafe-pilot-asset--kemal-standing");
+    expect(dayEnd).not.toContain("cafe-pilot-asset--kemal-standing");
   });
 
   it("shows seated guests based on customersServed count", () => {

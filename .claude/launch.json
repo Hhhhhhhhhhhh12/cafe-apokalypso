@@ -5,7 +5,8 @@
       "name": "cafe-apokalypso",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
-      "port": 5173
+      "port": 5173,
+      "url": "http://localhost:5173/cafe-apokalypso/"
     }
   ]
 }

@@ -2,20 +2,20 @@ import type { GuestDefinition } from "../types/content";
 
 export const weekOneGuests = [
   {
-    id: "pendlerin-paula",
-    name: "Pendlerin Paula",
+    id: "pendler-kemal",
+    name: "Pendler Kemal",
     category: "normal",
     firstDay: 1,
     behaviorTags: ["fast", "practical", "low-seat-time"],
-    summary: "Quick coffee customer who wants to survive Monday.",
-    sampleLines: ["Just coffee. The train already took the rest of my patience."],
-    orderLine: "Just coffee. The train already took the rest of my patience.",
-    learningCue: "Paula keeps one hand near the door and never looks at the pastry shelf.",
+    summary: "Fast commuter who treats the café like a pit stop.",
+    sampleLines: ["Filter coffee, please. And quickly — the S-Bahn does not wait."],
+    orderLine: "Filter coffee, please. And quickly — the S-Bahn does not wait.",
+    learningCue: "Kemal keeps his jacket on and glances at the door before the order is finished.",
     preferredProductId: "filterkaffee",
-    serveLine: "She takes the coffee without slowing down. The train was already late.",
-    matchedPreferenceLine: "Filter Coffee suits the rhythm: quick, warm, done.",
+    serveLine: "He takes the cup mid-stride and is already halfway to the door.",
+    matchedPreferenceLine: "Filter coffee. Exactly what he came for, no detour required.",
     missedPreferenceLine:
-      "She takes it, but the extra ceremony costs her another glance at the clock."
+      "He takes it, but the extra step shows in the way he checks his watch twice."
   },
   {
     id: "laptop-lukas",
