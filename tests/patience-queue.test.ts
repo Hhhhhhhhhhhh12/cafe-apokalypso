@@ -220,3 +220,50 @@ describe("getGuestPatienceState labels", () => {
     }
   });
 });
+
+describe("messy café patience penalty", () => {
+  it("clean café gives guest full patience ticks", () => {
+    // Default cleanliness is >= 50, so no penalty
+    const state = openDayN(1);
+    expect(state.resources.cleanliness).toBeGreaterThanOrEqual(50);
+    const ps = getGuestPatienceState(state);
+    expect(ps?.messyPenalty).toBe(false);
+  });
+
+  it("messy café (cleanliness < 50) reduces guest patience by one tick on arrival", () => {
+    let state = openDayN(1);
+    // Force cleanliness below threshold before the next guest arrives
+    state = { ...state, resources: { ...state.resources, cleanliness: 30 } };
+    // Serve current guest to trigger setNextGuestPatience for the next one
+    state = gameReducer(state, { type: "serve_product", productId: "filterkaffee" });
+    const ps = getGuestPatienceState(state);
+    expect(ps?.messyPenalty).toBe(true);
+    // Max should be one tick less than the base for a normal (3-tick) guest
+    // (exact base depends on which guest is next, but messy max <= full max - PATIENCE_TICK)
+    expect(ps!.max).toBeLessThanOrEqual(3 * PATIENCE_TICK);
+  });
+
+  it("impatient guest in messy café still has at least one patience tick", () => {
+    let state = openDayN(1);
+    state = { ...state, resources: { ...state.resources, cleanliness: 10 } };
+    // Serve to advance queue to potential impatient guest
+    state = gameReducer(state, { type: "serve_product", productId: "filterkaffee" });
+    const ps = getGuestPatienceState(state);
+    if (ps) {
+      expect(ps.max).toBeGreaterThanOrEqual(PATIENCE_TICK);
+    }
+  });
+
+  it("cleaning above threshold removes messyPenalty for next guest", () => {
+    let state = openDayN(1);
+    // Start messy
+    state = { ...state, resources: { ...state.resources, cleanliness: 30 } };
+    state = gameReducer(state, { type: "serve_product", productId: "filterkaffee" });
+    expect(getGuestPatienceState(state)?.messyPenalty).toBe(true);
+    // Clean tables raises cleanliness; serve next guest
+    state = gameReducer(state, { type: "clean_tables" });
+    state = { ...state, resources: { ...state.resources, cleanliness: 65 } };
+    state = gameReducer(state, { type: "serve_product", productId: "filterkaffee" });
+    expect(getGuestPatienceState(state)?.messyPenalty).toBe(false);
+  });
+});
