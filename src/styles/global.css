@@ -1388,7 +1388,10 @@ h3 {
 .cafe-pilot-asset--kemal-standing {
   width: 88px;
   height: 88px;
-  /* sprite pending — no background-image until placeholder-guest-kemal.png is added */
+  background-image: url("../../assets/sprites/guests/placeholder-guest-kemal.png");
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  background-size: 88px 88px;
 }
 
 /* Seated guests slide up on first appearance (one-shot on DOM mount). */
@@ -1699,14 +1702,13 @@ h3 {
 }
 
 /*
- * Lamp slot hidden until floor lamp sprites exist.
- * Ceiling/pendant lamp removed — doesn't fit the painted background perspective.
- * See GitHub issue for floor lamp replacement sprites.
+ * Pendant lamp hangs top-left. top:22% raises the cord to the diorama's top
+ * edge so it reads as ceiling-hung, not floating mid-window (was top:33%).
  */
 .cafe-decor-lamp {
   position: absolute;
   left: 24.5%;
-  top: 33.0%;
+  top: 22.0%;
   z-index: 4;
   width: 48px;
   height: 64px;
@@ -1731,12 +1733,13 @@ h3 {
 
 /*
  * Counter cups (Pixellab shabby tier-1). A stack of mismatched cups sitting
- * on the counter clutter area. Small accent, adds life to the counter.
+ * on the counter's top-left corner. left/top tuned to the painted counter
+ * surface (was 62%/40%, which floated them over the right window).
  */
 .cafe-decor-cups {
   position: absolute;
-  left: 62.0%;
-  top: 40.0%;
+  left: 58.8%;
+  top: 50.8%;
   z-index: 6;
   width: 48px;
   height: 40px;

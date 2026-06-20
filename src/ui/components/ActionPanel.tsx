@@ -15,9 +15,7 @@ import {
 } from "../../game/engine/selectors";
 import {
   getHelperTaskHint,
-  getHelperTaskLabel,
-  SUPPLY_CAPS,
-  SUPPLY_UNIT_COSTS
+  getHelperTaskLabel
 } from "../../game/engine/management";
 import type { ProductId, StaffOptionId } from "../../game/types/content";
 import type {

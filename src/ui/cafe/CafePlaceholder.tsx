@@ -12,6 +12,9 @@ import miraGuestAsset from "../../../assets/sprites/guests/placeholder-guest-mir
 import lukasGuestAsset from "../../../assets/sprites/guests/placeholder-guest-lukas.png";
 import christaGuestAsset from "../../../assets/sprites/guests/placeholder-guest-christa.png";
 
+const QUEUE_ROTATION = ["kemal", "cem", "mira", "lukas", "christa"] as const;
+type QueueGuest = (typeof QUEUE_ROTATION)[number];
+
 interface CafePlaceholderProps {
   gameState: GameState;
   onServeProduct?: (productId: ProductId) => void;
@@ -57,8 +60,6 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
     "at-door" | "walking" | "idle" | "walking-to-counter" | "exiting-east"
   >("at-door");
 
-  const QUEUE_ROTATION = ["kemal", "cem", "mira", "lukas", "christa"] as const;
-  type QueueGuest = (typeof QUEUE_ROTATION)[number];
   const [queueGuest, setQueueGuest] = useState<QueueGuest>("kemal");
 
   useEffect(() => {
@@ -80,6 +81,7 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
       cancelAnimationFrame(raf1);
       cancelAnimationFrame(raf2);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- customersServed intentionally omitted: adding it would re-trigger Paula's entrance on every serve
   }, [showQueueGuest]);
 
   const prevServedRef = useRef(customersServed);
@@ -100,6 +102,7 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
   useEffect(() => {
     prevMoneyEarnedRef.current = gameState.dayManagement.moneyEarned;
     prevRepRef.current = gameState.resources.reputation;
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- snapshots baseline on phase change only; money/rep in deps would defeat the purpose
   }, [gameState.dayPhase]);
 
   useEffect(() => {
@@ -111,6 +114,7 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
     }
     prevMoneyEarnedRef.current = gameState.dayManagement.moneyEarned;
     prevRepRef.current = gameState.resources.reputation;
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- fires per serve event only; dayPhase/money/rep read at call time via refs to compute deltas
   }, [gameState.dayManagement.customersServed]);
 
   const visibleGuests = getDioramaGuestVisibility(gameState);
