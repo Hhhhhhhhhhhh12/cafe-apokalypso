@@ -225,6 +225,7 @@ function isValidDayManagement(value: unknown): value is DayManagementState {
     typeof management.helperExtraOrdersRemaining === "number" &&
     typeof management.extraAdvertisingActions === "number" &&
     typeof management.appreciationBonusesGiven === "number" &&
+    typeof management.decorBonusesGiven === "number" &&
     typeof management.currentGuestPatience === "number" &&
     typeof management.currentGuestPatienceMax === "number" &&
     typeof management.guestsLost === "number"

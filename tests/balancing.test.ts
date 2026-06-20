@@ -21,8 +21,15 @@ import {
   getReputationIncomeFactor
 } from "../src/game/engine/management";
 import { weekOneProducts } from "../src/game/data";
-import type { DayNumber } from "../src/game/types/content";
-import type { DayActionId, GameState } from "../src/game/types/game";
+import type { DayNumber, ProductId, StaffOptionId } from "../src/game/types/content";
+import type {
+  DayActionId,
+  GameAction,
+  GameState,
+  HelperTaskId,
+  IngredientKey,
+  SupplyState
+} from "../src/game/types/game";
 
 // ---------------------------------------------------------------------------
 // Helper: same canonical pattern as management-tradeoff.test.ts
@@ -514,3 +521,407 @@ describe("balancing: reputation feedback loop", () => {
     }
   });
 });
+
+// ---------------------------------------------------------------------------
+// Deterministic strategy simulations
+// ---------------------------------------------------------------------------
+type StrategyName = "conservative" | "balanced" | "aggressive";
+
+interface HelperPlan {
+  helperId: StaffOptionId;
+  taskId: HelperTaskId;
+}
+
+interface StrategyCheckpoint {
+  day: DayNumber;
+  summary: NonNullable<GameState["daySummary"]>;
+  resources: GameState["resources"];
+  supplies: SupplyState;
+  memoryFragments: number;
+}
+
+interface StrategyRun {
+  finalState: GameState;
+  checkpoints: StrategyCheckpoint[];
+  totals: {
+    customersServed: number;
+    guestsLost: number;
+    moneyEarned: number;
+    objectivesCompleted: number;
+    peakStress: number;
+    lowestCleanliness: number;
+  };
+}
+
+const helperDailyCosts: Record<StaffOptionId, number> = {
+  jana: 18,
+  nino: 22,
+  nele: 20
+};
+
+const restockTargets: Record<StrategyName, SupplyState> = {
+  conservative: { coffee: 12, milk: 8, pastries: 6 },
+  balanced: { coffee: 14, milk: 8, pastries: 6 },
+  aggressive: { coffee: 20, milk: 14, pastries: 10 }
+};
+
+describe("balancing: deterministic seven-day strategy simulations", () => {
+  it("keeps multiple management styles playable while exposing clear trade-offs", () => {
+    const conservative = simulateStrategy("conservative");
+    const balanced = simulateStrategy("balanced");
+    const aggressive = simulateStrategy("aggressive");
+
+    for (const run of [conservative, balanced, aggressive]) {
+      expect(run.finalState.day).toBe(7);
+      expect(run.finalState.dayPhase).toBe("day_end");
+      expect(run.finalState.demoComplete).toBe(true);
+      expect(run.finalState.cafeClosed).toBe(false);
+      expect(run.finalState.closureReason).toBeNull();
+      expect(run.finalState.resources.money).toBeGreaterThan(0);
+      expect(run.finalState.resources.reputation).toBeGreaterThan(0);
+      expect(run.totals.customersServed).toBeGreaterThanOrEqual(20);
+    }
+
+    expect(balanced.totals.objectivesCompleted).toBe(7);
+    expect(balanced.finalState.run.memoryFragments).toEqual(
+      expect.arrayContaining([
+        "guest-preference-ledger",
+        "advertising-pattern-logged",
+        "delegation-pattern-logged",
+        "office-letter-arrived"
+      ])
+    );
+
+    expect(aggressive.totals.moneyEarned).toBeGreaterThan(
+      conservative.totals.moneyEarned
+    );
+    expect(aggressive.totals.peakStress).toBeGreaterThan(balanced.totals.peakStress);
+    expect(aggressive.totals.lowestCleanliness).toBeLessThan(
+      balanced.totals.lowestCleanliness
+    );
+    expect(aggressive.totals.objectivesCompleted).toBeLessThan(
+      balanced.totals.objectivesCompleted
+    );
+
+    expect(conservative.finalState.resources.stress).toBeLessThanOrEqual(
+      aggressive.finalState.resources.stress
+    );
+  });
+
+  it("keeps simulated checkpoints inside resource and supply bounds", () => {
+    for (const strategy of ["conservative", "balanced", "aggressive"] as const) {
+      const run = simulateStrategy(strategy);
+
+      expect(run.checkpoints).toHaveLength(7);
+
+      for (const checkpoint of run.checkpoints) {
+        expect(checkpoint.resources.money).toBeGreaterThanOrEqual(0);
+        expect(checkpoint.resources.reputation).toBeGreaterThanOrEqual(0);
+        expect(checkpoint.resources.reputation).toBeLessThanOrEqual(100);
+        expect(checkpoint.resources.cleanliness).toBeGreaterThanOrEqual(0);
+        expect(checkpoint.resources.cleanliness).toBeLessThanOrEqual(100);
+        expect(checkpoint.resources.stress).toBeGreaterThanOrEqual(0);
+        expect(checkpoint.resources.stress).toBeLessThanOrEqual(100);
+        expect(checkpoint.supplies.coffee).toBeGreaterThanOrEqual(0);
+        expect(checkpoint.supplies.coffee).toBeLessThanOrEqual(SUPPLY_CAPS.coffee);
+        expect(checkpoint.supplies.milk).toBeGreaterThanOrEqual(0);
+        expect(checkpoint.supplies.milk).toBeLessThanOrEqual(SUPPLY_CAPS.milk);
+        expect(checkpoint.supplies.pastries).toBeGreaterThanOrEqual(0);
+        expect(checkpoint.supplies.pastries).toBeLessThanOrEqual(SUPPLY_CAPS.pastries);
+        expect(checkpoint.summary.moneyEarned).toBeGreaterThan(0);
+        expect(checkpoint.memoryFragments).toBeGreaterThanOrEqual(checkpoint.day);
+      }
+    }
+  });
+});
+
+function simulateStrategy(strategy: StrategyName): StrategyRun {
+  let state = createInitialGameState();
+  const checkpoints: StrategyCheckpoint[] = [];
+
+  for (let day = 1; day <= 7; day += 1) {
+    const currentDay = day as DayNumber;
+    state = playStrategyDay(state, strategy, currentDay);
+    checkpoints.push(toCheckpoint(state));
+
+    if (currentDay < 7) {
+      state = restockForStrategy(state, strategy);
+    }
+  }
+
+  const summaries = checkpoints.map((checkpoint) => checkpoint.summary);
+
+  return {
+    finalState: state,
+    checkpoints,
+    totals: {
+      customersServed: summaries.reduce(
+        (sum, summary) => sum + summary.customersServed,
+        0
+      ),
+      guestsLost: summaries.reduce((sum, summary) => sum + summary.guestsLost, 0),
+      moneyEarned: summaries.reduce((sum, summary) => sum + summary.moneyEarned, 0),
+      objectivesCompleted: state.objectiveResults.filter(
+        (result) => result.status === "completed"
+      ).length,
+      peakStress: Math.max(
+        ...checkpoints.map((checkpoint) => checkpoint.resources.stress)
+      ),
+      lowestCleanliness: Math.min(
+        ...checkpoints.map((checkpoint) => checkpoint.resources.cleanliness)
+      )
+    }
+  };
+}
+
+function playStrategyDay(
+  state: GameState,
+  strategy: StrategyName,
+  day: DayNumber
+): GameState {
+  let workingState = state;
+  const helper = getHelperPlan(strategy, day, workingState);
+
+  if (helper) {
+    workingState = gameReducer(workingState, {
+      type: "select_helper",
+      helperId: helper.helperId,
+      taskId: helper.taskId
+    });
+  }
+
+  if (workingState.dayPhase === "day_start") {
+    workingState = gameReducer(workingState, { type: "open_day" });
+  }
+
+  expect(workingState.day).toBe(day);
+  expect(workingState.dayPhase).toBe("open");
+
+  for (const action of getStrategyActions(strategy, day)) {
+    if (workingState.dayManagement.actionPointsRemaining <= 0) {
+      break;
+    }
+
+    if (!canAffordAction(workingState, action)) {
+      continue;
+    }
+
+    const before = workingState;
+    workingState = gameReducer(workingState, action);
+
+    expect(workingState.day).toBe(before.day);
+    expect(workingState.dayPhase).toBe("open");
+    expect(workingState.statusMessage).not.toContain("No action capacity");
+    expect(workingState.statusMessage).not.toContain("Not enough money");
+    expect(workingState.cafeClosed).toBe(false);
+  }
+
+  const closedState = gameReducer(workingState, { type: "complete_day" });
+  expect(closedState.dayPhase).toBe("day_end");
+  expect(closedState.daySummary).not.toBeNull();
+  return closedState;
+}
+
+function getHelperPlan(
+  strategy: StrategyName,
+  day: DayNumber,
+  state: GameState
+): HelperPlan | null {
+  if (day < 3) {
+    return null;
+  }
+
+  const planByStrategy: Record<StrategyName, Partial<Record<DayNumber, HelperPlan>>> = {
+    conservative: {
+      5: { helperId: "jana", taskId: "cleaning" },
+      7: { helperId: "jana", taskId: "cleaning" }
+    },
+    balanced: {
+      3: { helperId: "jana", taskId: "service" },
+      5: { helperId: "jana", taskId: "cleaning" },
+      6: { helperId: "nino", taskId: "barista" },
+      7: { helperId: "jana", taskId: "cleaning" }
+    },
+    aggressive: {
+      3: { helperId: "jana", taskId: "service" },
+      5: { helperId: "nele", taskId: "marketing" },
+      6: { helperId: "nele", taskId: "marketing" }
+    }
+  };
+
+  const plan = planByStrategy[strategy][day] ?? null;
+  if (!plan || state.resources.money < helperDailyCosts[plan.helperId]) {
+    return null;
+  }
+
+  return plan;
+}
+
+function getStrategyActions(strategy: StrategyName, day: DayNumber): GameAction[] {
+  const sharedServeQueue: Record<DayNumber, ProductId[]> = {
+    1: ["filterkaffee", "espresso", "cappuccino"],
+    2: ["filterkaffee", "espresso", "cappuccino", "filterkaffee"],
+    3: ["kaffee-croissant", "filterkaffee", "espresso"],
+    4: ["filterkaffee", "espresso", "handfilter", "cappuccino"],
+    5: ["kaffee-croissant", "espresso", "cappuccino", "handfilter"],
+    6: ["filterkaffee", "espresso", "cappuccino", "handfilter"],
+    7: ["filterkaffee", "espresso", "cappuccino", "handfilter", "kaffee-croissant"]
+  };
+
+  if (strategy === "conservative") {
+    const actions: GameAction[] = [];
+    if (day === 3) {
+      actions.push({ type: "adjust_offer" });
+    }
+    if (day === 4) {
+      actions.push({ type: "run_advertising", adType: "flyer" });
+    }
+    if (day === 6) {
+      actions.push({ type: "consult_kassandra" });
+    }
+    actions.push(...sharedServeQueue[day].slice(0, day === 1 ? 2 : 3).map(serve));
+    actions.push({ type: "clean_tables" });
+    return actions;
+  }
+
+  if (strategy === "balanced") {
+    const actions: GameAction[] = [];
+    if (day === 3) {
+      actions.push({ type: "adjust_offer" });
+    }
+    if (day === 4 || day === 5) {
+      actions.push({ type: "run_advertising", adType: "flyer" });
+    }
+    if (day >= 6) {
+      actions.push({ type: "consult_kassandra" });
+    }
+    actions.push(
+      ...sharedServeQueue[day].slice(0, day === 1 ? 2 : day === 7 ? 4 : 3).map(serve)
+    );
+    actions.push({ type: "clean_tables" });
+    return actions;
+  }
+
+  const aggressiveServeQueue: Record<DayNumber, ProductId[]> = {
+    1: ["cappuccino", "espresso", "croissant"],
+    2: ["cappuccino", "espresso", "cappuccino", "filterkaffee"],
+    3: ["kaffee-croissant", "cappuccino", "kaffee-croissant", "espresso"],
+    4: ["handfilter", "cappuccino", "handfilter", "kaffee-croissant"],
+    5: ["handfilter", "cappuccino", "kaffee-croissant", "handfilter"],
+    6: ["handfilter", "cappuccino", "kaffee-croissant", "handfilter"],
+    7: [
+      "handfilter",
+      "cappuccino",
+      "kaffee-croissant",
+      "handfilter",
+      "cappuccino",
+      "espresso"
+    ]
+  };
+
+  const actions: GameAction[] = [];
+  if (day >= 4) {
+    actions.push({ type: "run_advertising", adType: "flyer" });
+  }
+  if (day >= 5) {
+    actions.push({ type: "run_advertising", adType: "social" });
+  }
+  if (day >= 6) {
+    actions.push({ type: "consult_kassandra" });
+  }
+  if (day === 3) {
+    actions.push({ type: "adjust_offer" });
+  }
+  actions.push(...aggressiveServeQueue[day].map(serve));
+  return actions;
+}
+
+function serve(productId: ProductId): GameAction {
+  return { type: "serve_product", productId };
+}
+
+function canAffordAction(state: GameState, action: GameAction): boolean {
+  if (action.type !== "run_advertising") {
+    return true;
+  }
+
+  const cost = action.adType === "social" ? 5 : 2;
+  return state.resources.money >= cost;
+}
+
+function restockForStrategy(state: GameState, strategy: StrategyName): GameState {
+  let workingState = state;
+  const target = restockTargets[strategy];
+  const purchase = (Object.keys(target) as IngredientKey[]).reduce(
+    (acc, ingredient) => ({
+      ...acc,
+      [ingredient]: Math.max(
+        0,
+        Math.min(SUPPLY_CAPS[ingredient] - workingState.supplies[ingredient], target[ingredient] - workingState.supplies[ingredient])
+      )
+    }),
+    { coffee: 0, milk: 0, pastries: 0 } as SupplyState
+  );
+  const affordablePurchase = reducePurchaseToBudget(purchase, workingState.resources.money);
+
+  for (const ingredient of Object.keys(affordablePurchase) as IngredientKey[]) {
+    workingState = gameReducer(workingState, {
+      type: "set_supply_purchase",
+      ingredient,
+      quantity: affordablePurchase[ingredient]
+    });
+  }
+
+  const nextState = gameReducer(workingState, { type: "confirm_supply_purchase" });
+  if (!(nextState.dayPhase === "open" || nextState.dayPhase === "day_start")) {
+    console.log({
+      strategy,
+      day: state.day,
+      statusMessage: nextState.statusMessage,
+      money: nextState.resources.money,
+      purchase: affordablePurchase,
+      phase: nextState.dayPhase
+    });
+  }
+  expect(nextState.statusMessage).not.toContain("Not enough money");
+  expect(nextState.dayPhase === "open" || nextState.dayPhase === "day_start").toBe(true);
+  return nextState;
+}
+
+function reducePurchaseToBudget(purchase: SupplyState, budget: number): SupplyState {
+  const reduced = { ...purchase };
+  const reductionOrder: IngredientKey[] = ["pastries", "milk", "coffee"];
+
+  while (getPurchaseCostForTest(reduced) > budget) {
+    const ingredient = reductionOrder.find((candidate) => reduced[candidate] > 0);
+
+    if (!ingredient) {
+      return reduced;
+    }
+
+    reduced[ingredient] -= 1;
+  }
+
+  return reduced;
+}
+
+function getPurchaseCostForTest(purchase: SupplyState): number {
+  return Math.round(
+    (purchase.coffee * SUPPLY_UNIT_COSTS.coffee +
+      purchase.milk * SUPPLY_UNIT_COSTS.milk +
+      purchase.pastries * SUPPLY_UNIT_COSTS.pastries) *
+      100
+  ) / 100;
+}
+
+function toCheckpoint(state: GameState): StrategyCheckpoint {
+  expect(state.daySummary).not.toBeNull();
+
+  return {
+    day: state.day,
+    summary: state.daySummary!,
+    resources: state.resources,
+    supplies: state.supplies,
+    memoryFragments: state.run.memoryFragments.length
+  };
+}

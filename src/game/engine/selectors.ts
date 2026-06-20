@@ -543,6 +543,8 @@ export interface GuestPatienceState {
   label: GuestPatienceLabel;
   /** True once walkouts are active and patience is critically low (< 34 %). */
   critical: boolean;
+  /** True when cleanliness < 50 reduced this guest's starting patience by one tick. */
+  messyPenalty: boolean;
 }
 
 /**
@@ -556,5 +558,6 @@ export function getGuestPatienceState(state: GameState): GuestPatienceState | nu
   const { currentGuestPatience: patience, currentGuestPatienceMax: max } = state.dayManagement;
   const label = getGuestPatienceLabel(patience, max);
   const critical = guestsCanWalkOut(state.day) && patience < max * 0.34;
-  return { patience, max, label, critical };
+  const messyPenalty = state.resources.cleanliness < 50;
+  return { patience, max, label, critical, messyPenalty };
 }
