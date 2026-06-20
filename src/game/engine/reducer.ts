@@ -1091,9 +1091,16 @@ function applyDayEndConsequences(state: GameState): GameState {
 
   const dailyOverhead = DAILY_FIXED_COST;
 
+  const suggestedRestock = {
+    coffee: Math.min(management.suppliesUsed.coffee, SUPPLY_CAPS.coffee - state.supplies.coffee),
+    milk: Math.min(management.suppliesUsed.milk, SUPPLY_CAPS.milk - state.supplies.milk),
+    pastries: Math.min(management.suppliesUsed.pastries, SUPPLY_CAPS.pastries - state.supplies.pastries),
+  };
+
   return {
     ...state,
     staffXp,
+    pendingSupplyPurchase: suggestedRestock,
     resources: {
       ...resources,
       mood: resources.stress >= 61 ? "strained" : resources.stress >= 41 ? "busy" : "calm"
