@@ -212,6 +212,46 @@ function OpenDayControls({
 
   return (
     <>
+      {nextGuest ? (
+        <div className="next-guest" role="status">
+          <div className="next-guest__header">
+            <span className="next-guest__label">Next in line:</span>
+            <strong>{nextGuest.name}</strong>
+          </div>
+          {patienceState ? (
+            <span
+              className={`next-guest__patience${patienceState.critical ? " next-guest__patience--critical" : ""}`}
+              aria-label={`Guest patience: ${patienceState.label}`}
+            >
+              <span className="next-guest__patience-label">{patienceState.label}</span>
+              <span className="next-guest__patience-bar" aria-hidden="true">
+                {Array.from({ length: patienceState.max / PATIENCE_TICK }, (_, i) => (
+                  <span
+                    key={i}
+                    className={`next-guest__patience-pip${
+                      i * PATIENCE_TICK < patienceState.patience ? " next-guest__patience-pip--filled" : ""
+                    }`}
+                  />
+                ))}
+              </span>
+              {patienceState.messyPenalty ? (
+                <span className="next-guest__patience-messy" aria-label="Messy tables reduced patience">
+                  messy tables
+                </span>
+              ) : null}
+            </span>
+          ) : null}
+          {nextGuest.orderLine ? (
+            <span className="next-guest__order">"{nextGuest.orderLine}"</span>
+          ) : null}
+          {nextGuest.learningCue ? (
+            <span className="next-guest__cue">{nextGuest.learningCue}</span>
+          ) : nextGuest.wants ? (
+            <span className="next-guest__fit">Likely order: {nextGuest.wants}.</span>
+          ) : null}
+        </div>
+      ) : null}
+
       {products.length > 0 && (
         <div className="serve-menu" aria-label="Serve a product">
           <p className="serve-menu__label">Serve</p>
@@ -220,7 +260,7 @@ function OpenDayControls({
               <button
                 key={product.id}
                 type="button"
-                className="serve-menu__item"
+                className={`serve-menu__item${product.name === nextGuest?.wants ? " serve-menu__item--suggested" : ""}`}
                 onClick={() => onServeProduct(product.id)}
                 disabled={!canAct}
                 title={!canAct ? "No actions left this shift." : undefined}
@@ -362,45 +402,6 @@ function OpenDayControls({
         </button>
       </div>
 
-      {nextGuest ? (
-        <p className="next-guest" role="status">
-          <span>
-            Next in line: <strong>{nextGuest.name}</strong>
-          </span>
-          {patienceState ? (
-            <span
-              className={`next-guest__patience${patienceState.critical ? " next-guest__patience--critical" : ""}`}
-              aria-label={`Guest patience: ${patienceState.label}`}
-            >
-              <span className="next-guest__patience-label">{patienceState.label}</span>
-              <span className="next-guest__patience-bar" aria-hidden="true">
-                {Array.from({ length: patienceState.max / PATIENCE_TICK }, (_, i) => (
-                  <span
-                    key={i}
-                    className={`next-guest__patience-pip${
-                      i * PATIENCE_TICK < patienceState.patience ? " next-guest__patience-pip--filled" : ""
-                    }`}
-                  />
-                ))}
-              </span>
-              {patienceState.messyPenalty ? (
-                <span className="next-guest__patience-messy" aria-label="Messy tables reduced patience">
-                  messy tables
-                </span>
-              ) : null}
-            </span>
-          ) : null}
-          {nextGuest.orderLine ? (
-            <span className="next-guest__order">Says: "{nextGuest.orderLine}"</span>
-          ) : null}
-          {nextGuest.learningCue ? (
-            <span className="next-guest__cue">You notice: {nextGuest.learningCue}</span>
-          ) : null}
-          {nextGuest.wants ? (
-            <span className="next-guest__fit">Likely order: {nextGuest.wants}.</span>
-          ) : null}
-        </p>
-      ) : null}
 
       {!canAct ? (
         <p className="action-capacity-warn" role="status">
