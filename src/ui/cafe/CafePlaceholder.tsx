@@ -11,6 +11,9 @@ import cemGuestAsset from "../../../assets/sprites/guests/placeholder-guest-cem.
 import miraGuestAsset from "../../../assets/sprites/guests/placeholder-guest-mira.png";
 import lukasGuestAsset from "../../../assets/sprites/guests/placeholder-guest-lukas.png";
 import christaGuestAsset from "../../../assets/sprites/guests/placeholder-guest-christa.png";
+import neleGuestAsset from "../../../assets/sprites/guests/placeholder-guest-nele.png";
+import medaGuestAsset from "../../../assets/sprites/guests/placeholder-guest-meda.png";
+import roterRegenschirmGuestAsset from "../../../assets/sprites/guests/placeholder-guest-roter-regenschirm.png";
 
 const QUEUE_ROTATION = ["kemal", "cem", "mira", "lukas", "christa"] as const;
 type QueueGuest = (typeof QUEUE_ROTATION)[number];
@@ -418,6 +421,51 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
                 <img
                   className="cafe-pilot-asset cafe-pilot-asset--guest cafe-pilot-asset--strange"
                   src={strangeGuestAsset}
+                  alt=""
+                  aria-hidden="true"
+                />
+                <span className="guest-status guest-status--seated">Seated</span>
+              </span>
+            )}
+
+            {visibleGuests.nele && (
+              <span
+                className="placeholder-guest placeholder-guest-seated placeholder-guest-normal-08"
+                aria-hidden="true"
+              >
+                <img
+                  className="cafe-pilot-asset cafe-pilot-asset--guest cafe-pilot-asset--nele"
+                  src={neleGuestAsset}
+                  alt=""
+                  aria-hidden="true"
+                />
+                <span className="guest-status guest-status--seated">Nele · Seated</span>
+              </span>
+            )}
+
+            {visibleGuests.meda && (
+              <span
+                className="placeholder-guest placeholder-guest-seated placeholder-guest-strange-02"
+                aria-hidden="true"
+              >
+                <img
+                  className="cafe-pilot-asset cafe-pilot-asset--guest cafe-pilot-asset--meda"
+                  src={medaGuestAsset}
+                  alt=""
+                  aria-hidden="true"
+                />
+                <span className="guest-status guest-status--seated">Seated</span>
+              </span>
+            )}
+
+            {visibleGuests.roterRegenschirm && (
+              <span
+                className="placeholder-guest placeholder-guest-seated placeholder-guest-strange-03"
+                aria-hidden="true"
+              >
+                <img
+                  className="cafe-pilot-asset cafe-pilot-asset--guest cafe-pilot-asset--roter-regenschirm"
+                  src={roterRegenschirmGuestAsset}
                   alt=""
                   aria-hidden="true"
                 />
