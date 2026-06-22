@@ -15,7 +15,8 @@ import {
 } from "../../game/engine/selectors";
 import {
   getHelperTaskHint,
-  getHelperTaskLabel
+  getHelperTaskLabel,
+  PATIENCE_TICK
 } from "../../game/engine/management";
 import type { ProductId, StaffOptionId } from "../../game/types/content";
 import type {
@@ -373,11 +374,11 @@ function OpenDayControls({
             >
               <span className="next-guest__patience-label">{patienceState.label}</span>
               <span className="next-guest__patience-bar" aria-hidden="true">
-                {Array.from({ length: patienceState.max / 25 }, (_, i) => (
+                {Array.from({ length: patienceState.max / PATIENCE_TICK }, (_, i) => (
                   <span
                     key={i}
                     className={`next-guest__patience-pip${
-                      i * 25 < patienceState.patience ? " next-guest__patience-pip--filled" : ""
+                      i * PATIENCE_TICK < patienceState.patience ? " next-guest__patience-pip--filled" : ""
                     }`}
                   />
                 ))}

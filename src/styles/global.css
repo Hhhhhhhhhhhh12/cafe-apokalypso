@@ -1349,50 +1349,88 @@ h3 {
 /* Standing poses for queue rotation — each guest's single static frame shown
    while waiting to order. Only Paula has dedicated walk sheets; other guests
    slide via CSS position transition with their static standing sprite. */
+/* Standing queue sprites — 7-frame idle sheets; Frame 0 shown as static fallback.
+   Staggered negative animation-delay so guests don't blink in unison. */
 .cafe-pilot-asset--cem-standing {
   width: 88px;
   height: 88px;
-  background-image: url("../../assets/sprites/guests/placeholder-guest-cem.png");
+  background-image: url("../../assets/sprites/guests/placeholder-guest-cem-idle.png");
   background-repeat: no-repeat;
-  background-position: center bottom;
-  background-size: 88px 88px;
+  background-position: 0 0;
+  background-size: 616px 88px;
 }
 
 .cafe-pilot-asset--mira-standing {
   width: 96px;
   height: 96px;
-  background-image: url("../../assets/sprites/guests/placeholder-guest-mira.png");
+  background-image: url("../../assets/sprites/guests/placeholder-guest-mira-idle.png");
   background-repeat: no-repeat;
-  background-position: center bottom;
-  background-size: 96px 96px;
+  background-position: 0 0;
+  background-size: 672px 96px;
 }
 
 .cafe-pilot-asset--lukas-standing {
   width: 96px;
   height: 96px;
-  background-image: url("../../assets/sprites/guests/placeholder-guest-lukas.png");
+  background-image: url("../../assets/sprites/guests/placeholder-guest-lukas-idle.png");
   background-repeat: no-repeat;
-  background-position: center bottom;
-  background-size: 96px 96px;
+  background-position: 0 0;
+  background-size: 672px 96px;
 }
 
 .cafe-pilot-asset--christa-standing {
   width: 92px;
   height: 92px;
-  background-image: url("../../assets/sprites/guests/placeholder-guest-christa.png");
+  background-image: url("../../assets/sprites/guests/placeholder-guest-christa-idle.png");
   background-repeat: no-repeat;
-  background-position: center bottom;
-  background-size: 92px 92px;
+  background-position: 0 0;
+  background-size: 644px 92px;
 }
 
 .cafe-pilot-asset--kemal-standing {
   width: 88px;
   height: 88px;
-  background-image: url("../../assets/sprites/guests/placeholder-guest-kemal.png");
+  background-image: url("../../assets/sprites/guests/placeholder-guest-kemal-idle.png");
   background-repeat: no-repeat;
-  background-position: center bottom;
-  background-size: 88px 88px;
+  background-position: 0 0;
+  background-size: 616px 88px;
 }
+
+.cafe-pilot-asset--bohn-standing {
+  width: 96px;
+  height: 96px;
+  background-image: url("../../assets/sprites/guests/placeholder-guest-bohn-idle.png");
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: 672px 96px;
+}
+
+.cafe-pilot-asset--grau-standing {
+  width: 88px;
+  height: 88px;
+  background-image: url("../../assets/sprites/guests/placeholder-guest-grau-idle.png");
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: 616px 88px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cafe-pilot-asset--cem-standing     { animation: cafe-cem-idle     2.8s steps(7) infinite; animation-delay: -0.9s; }
+  .cafe-pilot-asset--mira-standing    { animation: cafe-mira-idle    3.6s steps(7) infinite; animation-delay: -1.4s; }
+  .cafe-pilot-asset--lukas-standing   { animation: cafe-lukas-idle   3.2s steps(7) infinite; animation-delay: -2.1s; }
+  .cafe-pilot-asset--christa-standing { animation: cafe-christa-idle 4.0s steps(7) infinite; animation-delay: -0.6s; }
+  .cafe-pilot-asset--kemal-standing   { animation: cafe-kemal-idle   3.0s steps(7) infinite; animation-delay: -0.4s; }
+  .cafe-pilot-asset--bohn-standing    { animation: cafe-bohn-idle    2.4s steps(7) infinite; animation-delay: -1.7s; }
+  .cafe-pilot-asset--grau-standing    { animation: cafe-grau-idle    5.6s steps(7) infinite; animation-delay: -3.2s; }
+}
+
+@keyframes cafe-cem-idle     { to { background-position: -616px 0; } }
+@keyframes cafe-mira-idle    { to { background-position: -672px 0; } }
+@keyframes cafe-lukas-idle   { to { background-position: -672px 0; } }
+@keyframes cafe-christa-idle { to { background-position: -644px 0; } }
+@keyframes cafe-kemal-idle   { to { background-position: -616px 0; } }
+@keyframes cafe-bohn-idle    { to { background-position: -672px 0; } }
+@keyframes cafe-grau-idle    { to { background-position: -616px 0; } }
 
 /* Seated guests slide up on first appearance (one-shot on DOM mount). */
 @keyframes guest-seat-in {

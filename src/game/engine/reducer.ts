@@ -810,6 +810,20 @@ function selectHelper(
   };
 }
 
+function applyMorningBonuses(resources: ResourceState, state: GameState): ResourceState {
+  const decorBonuses = getDecorDailyBonuses(state.decor);
+  const equipmentBonuses = getEquipmentDailyBonuses(state.equipment);
+  const repGain = decorBonuses.reputation + equipmentBonuses.reputation;
+  if (decorBonuses.cleanliness === 0 && repGain === 0) {
+    return resources;
+  }
+  return {
+    ...resources,
+    cleanliness: clampMeter(resources.cleanliness + decorBonuses.cleanliness),
+    reputation: clampMeter(resources.reputation + repGain)
+  };
+}
+
 function openDay(state: GameState): GameState {
   if (state.dayPhase !== "day_start") {
     return {
@@ -860,15 +874,7 @@ function openDay(state: GameState): GameState {
     }
   }
 
-  // Décor daily bonuses: nicer furniture keeps the place feeling cared-for.
-  const decorBonuses = getDecorDailyBonuses(state.decor);
-  if (decorBonuses.cleanliness > 0 || decorBonuses.reputation > 0) {
-    resources = {
-      ...resources,
-      cleanliness: clampMeter(resources.cleanliness + decorBonuses.cleanliness),
-      reputation: clampMeter(resources.reputation + decorBonuses.reputation)
-    };
-  }
+  resources = applyMorningBonuses(resources, state);
 
   const openedState: GameState = {
     ...state,
@@ -1334,15 +1340,7 @@ function finishSetup(state: GameState): GameState {
     };
   }
 
-  const decorBonuses = getDecorDailyBonuses(state.decor);
-  const equipmentBonuses = getEquipmentDailyBonuses(state.equipment);
-  const reputationGain = decorBonuses.reputation + equipmentBonuses.reputation;
-
-  const resources: ResourceState = {
-    ...state.resources,
-    cleanliness: clampMeter(state.resources.cleanliness + decorBonuses.cleanliness),
-    reputation: clampMeter(state.resources.reputation + reputationGain)
-  };
+  const resources = applyMorningBonuses({ ...state.resources }, state);
 
   const openedState: GameState = {
     ...state,
