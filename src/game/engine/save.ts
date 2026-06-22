@@ -1,4 +1,4 @@
-import { createFreshRunState, createInitialGameState, isValidGameState, migrateRawSave } from "./gameState";
+import { createFreshRunState, isValidGameState, migrateRawSave } from "./gameState";
 import type { GameState } from "../types/game";
 
 export const SAVE_KEY = "cafe-apokalypso.save.v4";
