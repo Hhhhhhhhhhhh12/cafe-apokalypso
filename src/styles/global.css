@@ -1591,15 +1591,24 @@ h3 {
 /* When a real guest sprite is present, hide the CSS blob backing (fill, border,
    head dot) so only the sprite reads. Shadow (::after) is kept as a soft anchor. */
 .placeholder-guest:has(.cafe-pilot-asset--guest),
-.placeholder-guest:has(.cafe-pilot-asset--paula) {
+.placeholder-guest:has(.cafe-pilot-asset--paula),
+.placeholder-guest:has(.cafe-pilot-asset--standing) {
   background: transparent;
   border-color: transparent;
   box-shadow: none;
 }
 
 .placeholder-guest:has(.cafe-pilot-asset--guest)::before,
-.placeholder-guest:has(.cafe-pilot-asset--paula)::before {
+.placeholder-guest:has(.cafe-pilot-asset--paula)::before,
+.placeholder-guest:has(.cafe-pilot-asset--standing)::before {
   display: none;
+}
+
+/* Center standing queue sprites on the placeholder anchor point. */
+.cafe-pilot-asset--standing {
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .placeholder-guest-normal-02 {
@@ -1761,11 +1770,11 @@ h3 {
    ── */
 .cafe-decor-clock {
   position: absolute;
-  left: 43.2%;
-  top: 27.0%;
+  left: 54.0%;
+  top: 32.0%;
   z-index: 8;
-  width: 38px;
-  height: 38px;
+  width: 56px;
+  height: 56px;
   background: url("../../assets/sprites/props/placeholder-cafe-clock.png") center / contain no-repeat;
   image-rendering: pixelated;
 }
@@ -1782,8 +1791,8 @@ h3 {
 .cafe-decor-clock.cafe-decor--tier-3 {
   opacity: 1;
   background-image: url("../../assets/sprites/props/placeholder-cafe-clock-t3.png");
-  width: 27px;
-  height: 35px;
+  width: 40px;
+  height: 52px;
 }
 
 /*

@@ -246,7 +246,8 @@ function OpenDayControls({
           ) : null}
           {nextGuest.learningCue ? (
             <span className="next-guest__cue">{nextGuest.learningCue}</span>
-          ) : nextGuest.wants ? (
+          ) : null}
+          {nextGuest.wants ? (
             <span className="next-guest__fit">Likely order: {nextGuest.wants}.</span>
           ) : null}
         </div>
