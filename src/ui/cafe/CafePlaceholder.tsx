@@ -12,6 +12,9 @@ import miraGuestAsset from "../../../assets/sprites/guests/placeholder-guest-mir
 import lukasGuestAsset from "../../../assets/sprites/guests/placeholder-guest-lukas.png";
 import christaGuestAsset from "../../../assets/sprites/guests/placeholder-guest-christa.png";
 
+const QUEUE_ROTATION = ["kemal", "cem", "mira", "lukas", "christa"] as const;
+type QueueGuest = (typeof QUEUE_ROTATION)[number];
+
 interface CafePlaceholderProps {
   gameState: GameState;
   onServeProduct?: (productId: ProductId) => void;
@@ -57,16 +60,18 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
     "at-door" | "walking" | "idle" | "walking-to-counter" | "exiting-east"
   >("at-door");
 
-  const QUEUE_ROTATION = ["kemal", "cem", "mira", "lukas", "christa"] as const;
-  type QueueGuest = (typeof QUEUE_ROTATION)[number];
   const [queueGuest, setQueueGuest] = useState<QueueGuest>("kemal");
+
+  // Stable ref so the entrance effect can read the latest value without it being a dep
+  const customersServedForQueueRef = useRef(customersServed);
+  customersServedForQueueRef.current = customersServed;
 
   useEffect(() => {
     if (!showQueueGuest) {
       setPaulaPhase("at-door");
       return;
     }
-    setQueueGuest(QUEUE_ROTATION[customersServed % QUEUE_ROTATION.length]);
+    setQueueGuest(QUEUE_ROTATION[customersServedForQueueRef.current % QUEUE_ROTATION.length]);
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       setPaulaPhase("idle");
       return;
@@ -97,10 +102,15 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
   const prevRepRef = useRef(gameState.resources.reputation);
   const [coinTick, setCoinTick] = useState<{ money: number; rep: number; key: number } | null>(null);
 
+  // Snapshot baseline when the day phase changes; prevDayPhaseRef guards against running on
+  // money/rep changes that share the same deps array.
+  const prevDayPhaseRef = useRef(gameState.dayPhase);
   useEffect(() => {
+    if (gameState.dayPhase === prevDayPhaseRef.current) return;
+    prevDayPhaseRef.current = gameState.dayPhase;
     prevMoneyEarnedRef.current = gameState.dayManagement.moneyEarned;
     prevRepRef.current = gameState.resources.reputation;
-  }, [gameState.dayPhase]);
+  }, [gameState.dayPhase, gameState.dayManagement.moneyEarned, gameState.resources.reputation]);
 
   useEffect(() => {
     if (gameState.dayPhase !== "open") return;
@@ -111,7 +121,7 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
     }
     prevMoneyEarnedRef.current = gameState.dayManagement.moneyEarned;
     prevRepRef.current = gameState.resources.reputation;
-  }, [gameState.dayManagement.customersServed]);
+  }, [gameState.dayManagement.customersServed, gameState.dayManagement.moneyEarned, gameState.dayPhase, gameState.resources.reputation]);
 
   const visibleGuests = getDioramaGuestVisibility(gameState);
 
