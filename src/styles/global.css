@@ -478,6 +478,35 @@ h3 {
   text-transform: none;
 }
 
+/* Moderate threshold warning (stress Tense, cleanliness Messy, reputation building) */
+.resource-item--warn {
+  border-color: #c28a30;
+  background: #fdf3dc;
+}
+
+.resource-item--warn dt {
+  color: #7a5010;
+}
+
+/* Severe threshold (stress Overloaded, cleanliness Chaotic, reputation fragile, no actions) */
+.resource-item--critical {
+  border-color: #c03828;
+  background: #fce6e2;
+}
+
+.resource-item--critical dt {
+  color: #8a2010;
+}
+
+/* Small subscript after main value (e.g. "/ 12" for actions total) */
+.resource-sub {
+  margin-left: 2px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #7a6050;
+  opacity: 0.75;
+}
+
 /* Value change flash — replays via key remount */
 .resource-value {
   display: inline-block;
@@ -1733,7 +1762,7 @@ h3 {
 .cafe-decor-clock {
   position: absolute;
   left: 43.2%;
-  top: 34.1%;
+  top: 27.0%;
   z-index: 8;
   width: 38px;
   height: 38px;
