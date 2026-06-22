@@ -1187,7 +1187,7 @@ function confirmSupplyPurchase(state: GameState): GameState {
     mood: getMoodForStress(restedStress)
   };
 
-  return {
+  const nextDayState: GameState = {
     ...state,
     day: nextDay,
     dayPhase: nextDay >= 3 ? "day_start" : "open",
@@ -1208,6 +1208,7 @@ function confirmSupplyPurchase(state: GameState): GameState {
           ? `Restock confirmed. Day 2 begins: ${nextDayDefinition.milestone} Daily overhead (€${DAILY_FIXED_COST}) deducts at closing.`
           : `Restock confirmed. Day ${nextDay} begins: ${nextDayDefinition.milestone}`
   };
+  return nextDay < 3 ? setNextGuestPatience(nextDayState) : nextDayState;
 }
 
 function upgradeDecor(state: GameState, slot: DecorSlotId): GameState {
@@ -1343,7 +1344,7 @@ function finishSetup(state: GameState): GameState {
     reputation: clampMeter(state.resources.reputation + reputationGain)
   };
 
-  return {
+  const openedState: GameState = {
     ...state,
     dayPhase: "open",
     phaseLabel: "Opening setup",
@@ -1355,6 +1356,7 @@ function finishSetup(state: GameState): GameState {
       getCurrentDayModifier(state).learningHint
     ].join(" ")
   };
+  return setNextGuestPatience(openedState);
 }
 
 function applyEmptySupplyStress(
@@ -1598,7 +1600,11 @@ function formatMissingSupply(ingredients: readonly IngredientKey[]): string {
 function setNextGuestPatience(state: GameState): GameState {
   const queuePos = state.dayManagement.customersServed + state.dayManagement.guestsLost;
   const guest = getGuestForCustomer(state, queuePos);
-  const max = guest ? getGuestPatienceMax(guest) : 0;
+  const baseMax = guest ? getGuestPatienceMax(guest) : 0;
+  // Messy café (cleanliness < 50) costs every arriving guest one patience tick —
+  // they're already irritated before they even order.
+  const messyPenalty = baseMax > 0 && state.resources.cleanliness < 50 ? PATIENCE_TICK : 0;
+  const max = baseMax > 0 ? Math.max(PATIENCE_TICK, baseMax - messyPenalty) : 0;
   return {
     ...state,
     dayManagement: {

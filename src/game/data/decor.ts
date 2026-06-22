@@ -60,11 +60,11 @@ export const decorSlots = [
   },
   {
     id: "lamp",
-    label: "Floor Lamp",
+    label: "Wall Lamp",
     tiers: [
-      { tier: 1, name: "Bare Bulb on a Pole", cost: 0, reputationBonus: 0, dailyCleanBonus: 0, dailyRepBonus: 0 },
-      { tier: 2, name: "Fabric Shade Lamp", cost: 12, reputationBonus: 1, dailyCleanBonus: 2, dailyRepBonus: 0 },
-      { tier: 3, name: "Warm Arc Lamp", cost: 26, reputationBonus: 2, dailyCleanBonus: 2, dailyRepBonus: 1 }
+      { tier: 1, name: "Bare Bulb Bracket", cost: 0, reputationBonus: 0, dailyCleanBonus: 0, dailyRepBonus: 0 },
+      { tier: 2, name: "Glass Shade Sconce", cost: 12, reputationBonus: 1, dailyCleanBonus: 2, dailyRepBonus: 0 },
+      { tier: 3, name: "Brass Wall Lamp", cost: 26, reputationBonus: 2, dailyCleanBonus: 2, dailyRepBonus: 1 }
     ]
   },
   {

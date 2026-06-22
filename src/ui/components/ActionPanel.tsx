@@ -382,6 +382,11 @@ function OpenDayControls({
                   />
                 ))}
               </span>
+              {patienceState.messyPenalty ? (
+                <span className="next-guest__patience-messy" aria-label="Messy tables reduced patience">
+                  messy tables
+                </span>
+              ) : null}
             </span>
           ) : null}
           {nextGuest.orderLine ? (
