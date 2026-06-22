@@ -62,12 +62,16 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
 
   const [queueGuest, setQueueGuest] = useState<QueueGuest>("kemal");
 
+  // Stable ref so the entrance effect can read the latest value without it being a dep
+  const customersServedForQueueRef = useRef(customersServed);
+  customersServedForQueueRef.current = customersServed;
+
   useEffect(() => {
     if (!showQueueGuest) {
       setPaulaPhase("at-door");
       return;
     }
-    setQueueGuest(QUEUE_ROTATION[customersServed % QUEUE_ROTATION.length]);
+    setQueueGuest(QUEUE_ROTATION[customersServedForQueueRef.current % QUEUE_ROTATION.length]);
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       setPaulaPhase("idle");
       return;
@@ -81,7 +85,6 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
       cancelAnimationFrame(raf1);
       cancelAnimationFrame(raf2);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- customersServed intentionally omitted: adding it would re-trigger Paula's entrance on every serve
   }, [showQueueGuest]);
 
   const prevServedRef = useRef(customersServed);
@@ -99,11 +102,15 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
   const prevRepRef = useRef(gameState.resources.reputation);
   const [coinTick, setCoinTick] = useState<{ money: number; rep: number; key: number } | null>(null);
 
+  // Snapshot baseline when the day phase changes; prevDayPhaseRef guards against running on
+  // money/rep changes that share the same deps array.
+  const prevDayPhaseRef = useRef(gameState.dayPhase);
   useEffect(() => {
+    if (gameState.dayPhase === prevDayPhaseRef.current) return;
+    prevDayPhaseRef.current = gameState.dayPhase;
     prevMoneyEarnedRef.current = gameState.dayManagement.moneyEarned;
     prevRepRef.current = gameState.resources.reputation;
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- snapshots baseline on phase change only; money/rep in deps would defeat the purpose
-  }, [gameState.dayPhase]);
+  }, [gameState.dayPhase, gameState.dayManagement.moneyEarned, gameState.resources.reputation]);
 
   useEffect(() => {
     if (gameState.dayPhase !== "open") return;
@@ -114,8 +121,7 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
     }
     prevMoneyEarnedRef.current = gameState.dayManagement.moneyEarned;
     prevRepRef.current = gameState.resources.reputation;
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- fires per serve event only; dayPhase/money/rep read at call time via refs to compute deltas
-  }, [gameState.dayManagement.customersServed]);
+  }, [gameState.dayManagement.customersServed, gameState.dayManagement.moneyEarned, gameState.dayPhase, gameState.resources.reputation]);
 
   const visibleGuests = getDioramaGuestVisibility(gameState);
 
