@@ -1750,8 +1750,8 @@ h3 {
    ── */
 .cafe-decor-clock {
   position: absolute;
-  left: 55.0%;
-  top: 33.0%;
+  left: 43.2%;
+  top: 34.1%;
   z-index: 8;
   width: 38px;
   height: 38px;
@@ -1776,17 +1776,18 @@ h3 {
 }
 
 /*
- * Pendant lamp hangs top-left. top:22% raises the cord to the diorama's top
- * edge so it reads as ceiling-hung, not floating mid-window (was top:33%).
+ * Floor lamp. Stands in the back-left corner between the door and the left
+ * window. Base anchored to the CSS bottom edge (center bottom / contain) so
+ * the pole base sits on the floor regardless of tier size change.
  */
 .cafe-decor-lamp {
   position: absolute;
-  left: 41.0%;
-  top: 37.0%;
+  left: 23.0%;
+  top: 44.0%;
   z-index: 4;
   width: 36px;
-  height: 48px;
-  background: url("../../assets/sprites/props/placeholder-cafe-lamp.png") center top / contain no-repeat;
+  height: 56px;
+  background: url("../../assets/sprites/props/placeholder-cafe-lamp.png") center bottom / contain no-repeat;
   image-rendering: pixelated;
 }
 
@@ -1803,6 +1804,7 @@ h3 {
   opacity: 1;
   background-image: url("../../assets/sprites/props/placeholder-cafe-lamp-t3.png");
   width: 42px;
+  height: 64px;
 }
 
 /*
@@ -1812,8 +1814,8 @@ h3 {
  */
 .cafe-decor-cups {
   position: absolute;
-  left: 59.7%;
-  top: 52.9%;
+  left: 55.5%;
+  top: 49.8%;
   z-index: 6;
   width: 32px;
   height: 27px;
