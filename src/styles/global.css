@@ -1500,6 +1500,24 @@ h3 {
     animation: cafe-guest-lean 11.5s ease-in-out infinite;
     animation-delay: -5.8s;
   }
+
+  /* Nele (normal-08) — trocken/beobachtend → breathe, gleichmäßig und konzentriert */
+  .placeholder-guest-normal-08 .cafe-pilot-asset--guest {
+    animation: cafe-guest-breathe 4.6s linear infinite;
+    animation-delay: -1.3s;
+  }
+
+  /* Meda (strange-02) — still/mythologisch → lean, sehr langsam und unheimlich */
+  .placeholder-guest-strange-02 .cafe-pilot-asset--guest {
+    animation: cafe-guest-lean 14s ease-in-out infinite;
+    animation-delay: -7.2s;
+  }
+
+  /* Frau mit rotem Regenschirm (strange-03) — elegant/ausweichend → breathe, dezent */
+  .placeholder-guest-strange-03 .cafe-pilot-asset--guest {
+    animation: cafe-guest-breathe 5.2s linear infinite;
+    animation-delay: -2.6s;
+  }
 }
 
 /* Base breathe: discrete 1px vertical bob, snaps at 55% like a soft breath hold */
