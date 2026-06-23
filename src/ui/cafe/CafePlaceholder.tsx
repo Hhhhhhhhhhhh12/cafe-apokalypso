@@ -324,7 +324,7 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
                   }}
                 >
                   <span
-                    className={`cafe-pilot-asset cafe-pilot-asset--${queueGuest}-standing`}
+                    className={`cafe-pilot-asset cafe-pilot-asset--standing cafe-pilot-asset--${queueGuest}-standing`}
                     aria-hidden="true"
                   />
                   {paulaPhase === "idle" && (
