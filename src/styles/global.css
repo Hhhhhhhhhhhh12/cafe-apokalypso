@@ -680,48 +680,26 @@ h3 {
   position: absolute;
 }
 
-.cafe-back-wall,
-.cafe-side-wall {
-  display: none;
-}
-
+/* CSS diorama mode — structural elements supply walls/floor/counter. PNG off. */
 .cafe-stage-base {
-  display: block;
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  width: 100%;
-  height: 100%;
-  object-fit: fill;
-  image-rendering: auto;
+  display: none;
 }
 
-.cafe-back-wall,
+.cafe-back-wall {
+  inset: 0 20% 39% 0;
+  z-index: 0;
+  background: var(--wall);
+  box-shadow: inset 0 -12px 24px rgba(61, 42, 35, 0.16);
+}
+
 .cafe-side-wall {
-  display: none;
-}
-
-/* Stage-base PNG supplies walls, floor, counter visually — containers kept for positioning */
-.cafe-floor {
-  background: transparent;
-  border-color: transparent;
-  box-shadow: none;
-}
-.cafe-floor__tiles {
-  display: none;
-}
-.cafe-counter {
-  background: transparent;
-  border-color: transparent;
-  box-shadow: none;
-}
-.cafe-counter__front,
-.cafe-counter__ledge {
-  display: none;
-}
-.cafe-window,
-.cafe-room-shadow {
-  display: none;
+  top: 0;
+  left: 0;
+  bottom: 39%;
+  width: 29%;
+  z-index: 1;
+  background: var(--side-wall);
+  box-shadow: inset -10px 0 22px rgba(61, 42, 35, 0.22);
 }
 
 .cafe-window {
@@ -852,8 +830,8 @@ h3 {
   clip-path: polygon(9% 1%, 100% 15%, 88% 100%, 0 84%);
   overflow: hidden;
   border: 3px solid transparent;
-  background: transparent;
-  box-shadow: none;
+  background: var(--floor);
+  box-shadow: inset 0 0 40px rgba(61, 42, 35, 0.12);
 }
 
 .cafe-floor__tiles {
@@ -888,8 +866,8 @@ h3 {
   height: 33.8%;
   border: none;
   border-radius: 7px;
-  background: transparent;
-  box-shadow: none;
+  background: linear-gradient(180deg, #b8774f, #7f2f2c);
+  box-shadow: 4px 6px 0 rgba(66, 39, 31, 0.18);
 }
 
 .cafe-counter__front {
@@ -1425,6 +1403,15 @@ h3 {
   background-size: 616px 88px;
 }
 
+.cafe-pilot-asset--fatou-standing {
+  width: 68px;
+  height: 68px;
+  background-image: url("../../assets/sprites/guests/placeholder-guest-fatou.png");
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: 68px 68px;
+}
+
 .cafe-pilot-asset--bohn-standing {
   width: 96px;
   height: 96px;
@@ -1540,6 +1527,12 @@ h3 {
   .placeholder-guest-strange-02 .cafe-pilot-asset--guest {
     animation: cafe-guest-lean 14s ease-in-out infinite;
     animation-delay: -7.2s;
+  }
+
+  /* Fatou (normal-09) — ruhig/geerdet → breathe, gleichmäßig */
+  .placeholder-guest-normal-09 .cafe-pilot-asset--guest {
+    animation: cafe-guest-breathe 3.8s linear infinite;
+    animation-delay: -1.6s;
   }
 
   /* Frau mit rotem Regenschirm (strange-03) — elegant/ausweichend → breathe, dezent */
@@ -1722,6 +1715,12 @@ h3 {
   bottom: 52%;
 }
 
+/* Fatou — Mitte rechts, ruhiger Stammplatz ab Tag 2 */
+.placeholder-guest-normal-09 {
+  left: 54%;
+  bottom: 28%;
+}
+
 /*
  * Real plant prop (Pixellab, shabby tier-1 default). Positioned relative to the
  * diorama image, not .cafe-floor, so save-injected tier changes stay anchored to
@@ -1852,8 +1851,8 @@ h3 {
  */
 .cafe-decor-cups {
   position: absolute;
-  left: 55.5%;
-  top: 49.8%;
+  left: 68.0%;
+  top: 57.0%;
   z-index: 6;
   width: 32px;
   height: 27px;
@@ -3559,6 +3558,76 @@ h3 {
 /* .placeholder-guest is already position:absolute (line ~573), which creates
    a positioning context for the .guest-status child — no override needed. */
 
+/* ── Guest thought bubble ─────────────────────────────────────────────────
+   Floats above the standing queue guest and shows what they want to order.
+   Fades in when the guest reaches idle stance (paulaPhase === "idle").
+   The ::before/::after pair draws a speech-bubble tail pointing downward.   */
+
+@keyframes cafe-thought-bubble-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(4px) scale(0.92); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0)    scale(1);   }
+}
+
+.cafe-guest-thought-bubble {
+  /* Sit ~14 px above the sprite's top edge; parent is .placeholder-guest-normal-01
+     which has position:absolute and acts as the positioning context. */
+  position: absolute;
+  bottom: calc(100% + 14px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 12;
+
+  /* Creamy off-white card with a warm subtle border */
+  background: #fdf6ec;
+  border: 1.5px solid rgba(160, 100, 45, 0.35);
+  border-radius: 8px;
+  box-shadow: 0 3px 10px rgba(40, 20, 5, 0.18);
+
+  /* Typography */
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #3b2010;
+  white-space: nowrap;
+  padding: 3px 7px;
+  pointer-events: none;
+  line-height: 1.5;
+
+  /* Fade-and-rise when the guest settles into idle */
+  animation: cafe-thought-bubble-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Tail border layer — drawn slightly larger, sits behind the fill layer */
+.cafe-guest-thought-bubble::before {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: rgba(160, 100, 45, 0.35);
+  pointer-events: none;
+}
+
+/* Tail fill layer — sits on top, matches bubble background */
+.cafe-guest-thought-bubble::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: -1px; /* pull up so fill overlaps the border triangle's base */
+  border: 5px solid transparent;
+  border-top-color: #fdf6ec;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cafe-guest-thought-bubble {
+    animation: none;
+  }
+}
+
 /* ── PHASE 4: Coin tick + stress consequence visuals ─────────────────────── */
 
 @keyframes cafe-coin-float {
@@ -3612,5 +3681,39 @@ h3 {
   .cafe-diorama--strained .cafe-world {
     animation: none;
     filter: saturate(1.12);
+  }
+}
+
+/* -----------------------------------------------------------------------
+   Patience signal — queue guest trembles when patience drops below 30 %.
+   Subtle uneven twitch, not a UI bar. No color, no number.
+   Applied to .placeholder-guest-normal-01 via JS class cafe-guest--impatient.
+   Behind prefers-reduced-motion guard; fallback is a static desaturation.
+   ----------------------------------------------------------------------- */
+
+@keyframes cafe-guest-impatient-twitch {
+  0%        { transform: translateX(-50%) translateX(0px); }
+  /* long pause at rest — twitch happens only ~once per 2 s cycle */
+  72%       { transform: translateX(-50%) translateX(0px); }
+  75%       { transform: translateX(-50%) translateX(-3px); }
+  78%       { transform: translateX(-50%) translateX(2px); }
+  81%       { transform: translateX(-50%) translateX(-2px); }
+  84%       { transform: translateX(-50%) translateX(1px); }
+  87%       { transform: translateX(-50%) translateX(0px); }
+  100%      { transform: translateX(-50%) translateX(0px); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cafe-guest--impatient .cafe-pilot-asset--standing {
+    animation: cafe-guest-impatient-twitch 2.2s ease-in-out infinite;
+    /* override the idle sprite-sheet animation that runs on the standing asset */
+    animation-fill-mode: both;
+  }
+}
+
+/* Reduced-motion: a barely-there desaturation hint, no movement */
+@media (prefers-reduced-motion: reduce) {
+  .cafe-guest--impatient .cafe-pilot-asset--standing {
+    filter: saturate(0.7) brightness(0.94);
   }
 }

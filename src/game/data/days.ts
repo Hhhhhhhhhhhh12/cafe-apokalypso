@@ -39,7 +39,8 @@ export const weekOneDays = [
       "lieferfahrer-cem",
       "cappuccino-christa",
       "herr-bohn",
-      "freelancerin-nele"
+      "freelancerin-nele",
+      "pendlerin-fatou"
     ],
     eventIds: ["day-2-herr-bohn-memory", "day-2-rehearsed-rhythm"]
   },
@@ -65,7 +66,8 @@ export const weekOneDays = [
       "lieferfahrer-cem",
       "cappuccino-christa",
       "herr-bohn",
-      "freelancerin-nele"
+      "freelancerin-nele",
+      "pendlerin-fatou"
     ],
     eventIds: ["day-3-cash-register-suggestion", "day-3-supply-tally", "day-3-guest-checks-in"]
   },
@@ -92,6 +94,7 @@ export const weekOneDays = [
       "cappuccino-christa",
       "herr-bohn",
       "freelancerin-nele",
+      "pendlerin-fatou",
       "herr-grau"
     ],
     eventIds: ["day-4-herr-grau-coin", "day-4-poster-before-printed", "day-4-flyer-wrong-address", "day-4-bohn-recognizes-coin"]
@@ -119,6 +122,7 @@ export const weekOneDays = [
       "cappuccino-christa",
       "herr-bohn",
       "freelancerin-nele",
+      "pendlerin-fatou",
       "herr-grau",
       "meda"
     ],
@@ -147,6 +151,7 @@ export const weekOneDays = [
       "cappuccino-christa",
       "herr-bohn",
       "freelancerin-nele",
+      "pendlerin-fatou",
       "herr-grau",
       "meda"
     ],
@@ -174,6 +179,7 @@ export const weekOneDays = [
       "cappuccino-christa",
       "herr-bohn",
       "freelancerin-nele",
+      "pendlerin-fatou",
       "herr-grau",
       "meda",
       "frau-roter-regenschirm"

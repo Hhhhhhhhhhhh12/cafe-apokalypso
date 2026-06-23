@@ -16,6 +16,7 @@ import type { DayDefinition } from "../src/game/types/content";
 
 const requiredNormalGuests = [
   "Pendler Kemal",
+  "Pendlerin Fatou",
   "Laptop-Lukas",
   "Lieferfahrer Cem",
   "Cappuccino-Christa",
@@ -45,7 +46,7 @@ describe("week-one content data", () => {
       (guest) => guest.category === "subtly_strange"
     );
 
-    expect(normalGuests).toHaveLength(6);
+    expect(normalGuests).toHaveLength(7);
     expect(strangeGuests).toHaveLength(3);
     expect(normalGuests.map((guest) => guest.name)).toEqual(requiredNormalGuests);
     expect(strangeGuests.map((guest) => guest.name)).toEqual(requiredStrangeGuests);

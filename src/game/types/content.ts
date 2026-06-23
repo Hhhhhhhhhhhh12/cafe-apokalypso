@@ -13,6 +13,7 @@ export type DayModifierId =
 
 export type GuestId =
   | "pendler-kemal"
+  | "pendlerin-fatou"
   | "laptop-lukas"
   | "lieferfahrer-cem"
   | "cappuccino-christa"

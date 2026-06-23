@@ -18,6 +18,21 @@ export const weekOneGuests = [
       "He takes it, but the extra step shows in the way he checks his watch twice."
   },
   {
+    id: "pendlerin-fatou",
+    name: "Pendlerin Fatou",
+    category: "normal",
+    firstDay: 2,
+    behaviorTags: ["steady", "practical", "patient"],
+    summary: "Calm commuter who comes in without fuss and leaves without lingering.",
+    sampleLines: ["Filter coffee, and maybe something to read if you have it."],
+    orderLine: "Filter coffee, please. Whatever is freshest.",
+    learningCue: "Fatou waits without looking at the door. She is in no hurry, but she is watching.",
+    preferredProductId: "filterkaffee",
+    serveLine: "She thanks you, takes the cup with both hands, and finds a table without checking if one is free.",
+    matchedPreferenceLine: "Filter coffee. The right call. She settles in without comment.",
+    missedPreferenceLine: "She accepts it without complaint, which somehow makes it harder to forget."
+  },
+  {
     id: "laptop-lukas",
     name: "Laptop-Lukas",
     category: "normal",

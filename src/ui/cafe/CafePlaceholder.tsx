@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { GameState } from "../../game/types/game";
 import type { ProductId } from "../../game/types/content";
-import { getDioramaGuestVisibility } from "../../game/engine/selectors";
+import { getDioramaGuestVisibility, getNextGuestPreview } from "../../game/engine/selectors";
 import stageBaseAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v04-mid.png";
 import coffeeMachineAsset from "../../../assets/sprites/props/placeholder-cafe-coffee-machine.png";
 import kassandraRegisterAsset from "../../../assets/sprites/props/placeholder-kassandra-register.png";
@@ -14,8 +14,9 @@ import christaGuestAsset from "../../../assets/sprites/guests/placeholder-guest-
 import neleGuestAsset from "../../../assets/sprites/guests/placeholder-guest-nele.png";
 import medaGuestAsset from "../../../assets/sprites/guests/placeholder-guest-meda.png";
 import roterRegenschirmGuestAsset from "../../../assets/sprites/guests/placeholder-guest-roter-regenschirm.png";
+import fatouGuestAsset from "../../../assets/sprites/guests/placeholder-guest-fatou.png";
 
-const QUEUE_ROTATION = ["kemal", "cem", "mira", "lukas", "christa"] as const;
+const QUEUE_ROTATION = ["kemal", "cem", "mira", "lukas", "christa", "fatou"] as const;
 type QueueGuest = (typeof QUEUE_ROTATION)[number];
 
 interface CafePlaceholderProps {
@@ -61,6 +62,14 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
   const isDayEnd = gameState.dayPhase === "day_end";
 
   const showQueueGuest = isOpen && actionPointsRemaining > 0;
+
+  // Patience signal — add impatient class when guest has < 30 % patience left
+  const { currentGuestPatience, currentGuestPatienceMax } = gameState.dayManagement;
+  const patienceRatio =
+    isOpen && currentGuestPatienceMax > 0
+      ? currentGuestPatience / currentGuestPatienceMax
+      : 1;
+  const guestIsImpatient = isOpen && showQueueGuest && patienceRatio < 0.3;
 
   // Paula entrance phases
   const [paulaPhase, setPaulaPhase] = useState<
@@ -131,6 +140,7 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
   }, [gameState.dayManagement.customersServed, gameState.dayManagement.moneyEarned, gameState.dayPhase, gameState.resources.reputation]);
 
   const visibleGuests = getDioramaGuestVisibility(gameState);
+  const nextGuest = getNextGuestPreview(gameState);
 
   const tablesDirty =
     gameState.resources.cleanliness < 70 && (isOpen || isDayEnd) && customersServed >= 1;
@@ -286,6 +296,9 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
                       : paulaPhase === "exiting-east"
                         ? "placeholder-guest--exiting-east"
                         : "",
+                    guestIsImpatient && paulaPhase === "idle"
+                      ? "cafe-guest--impatient"
+                      : "",
                   ]
                     .filter(Boolean)
                     .join(" ")}
@@ -331,6 +344,14 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
                     className={`cafe-pilot-asset cafe-pilot-asset--standing cafe-pilot-asset--${queueGuest}-standing`}
                     aria-hidden="true"
                   />
+                  {paulaPhase === "idle" && nextGuest?.wants && (
+                    <span
+                      className="cafe-guest-thought-bubble"
+                      aria-label={`Guest wants: ${nextGuest.wants}`}
+                    >
+                      {nextGuest.wants}
+                    </span>
+                  )}
                   {paulaPhase === "idle" && (
                     <span className="guest-status guest-status--waiting">Waiting</span>
                   )}
@@ -474,6 +495,21 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
                   aria-hidden="true"
                 />
                 <span className="guest-status guest-status--seated">Seated</span>
+              </span>
+            )}
+
+            {visibleGuests.fatou && (
+              <span
+                className="placeholder-guest placeholder-guest-seated placeholder-guest-normal-09"
+                aria-hidden="true"
+              >
+                <img
+                  className="cafe-pilot-asset cafe-pilot-asset--guest cafe-pilot-asset--fatou"
+                  src={fatouGuestAsset}
+                  alt=""
+                  aria-hidden="true"
+                />
+                <span className="guest-status guest-status--seated">Fatou · Seated</span>
               </span>
             )}
 
