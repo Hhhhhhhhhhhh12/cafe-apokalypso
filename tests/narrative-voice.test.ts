@@ -103,7 +103,14 @@ describe("narrative event cards", () => {
     const ids = cards.map((event) => event.id);
 
     expect(ids).not.toContain("day-1-opening-rhythm");
-    expect(ids).toContain("day-1-coffee-machine-flicker");
+  });
+
+  it("gates Closing-kicker events to day_end phase only", () => {
+    const openCards = getNarrativeEventCards(stateForDay(1));
+    const closingCards = getNarrativeEventCards(stateForDay(1, { dayPhase: "day_end" }));
+
+    expect(openCards.map((e) => e.id)).not.toContain("day-1-coffee-machine-flicker");
+    expect(closingCards.map((e) => e.id)).toContain("day-1-coffee-machine-flicker");
   });
 
   it("never includes tone:'normal' events for any day", () => {
