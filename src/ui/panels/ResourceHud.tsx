@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { getManagementHudLabels } from "../../game/engine/selectors";
+import { ACTION_BUDGET_BY_DAY } from "../../game/engine/management";
 import type { GameState } from "../../game/types/game";
 
 interface ResourceHudProps {
@@ -10,13 +11,12 @@ const LOW_SUPPLY_THRESHOLD = 3;
 
 export function ResourceHud({ gameState }: ResourceHudProps) {
   const labels = getManagementHudLabels(gameState);
+  const { cleanliness, stress, reputation } = gameState.resources;
+  const actionsRemaining = gameState.dayManagement.actionPointsRemaining;
+  const actionsTotal = ACTION_BUDGET_BY_DAY[gameState.day] ?? actionsRemaining;
 
   return (
-    <section className="panel resource-panel" aria-labelledby="resources-title">
-      <div className="panel-heading">
-        <h2 id="resources-title">Café HUD</h2>
-      </div>
-
+    <section className="panel resource-panel" aria-label="Café resources">
       <dl className="resource-list">
         <ResourceItem label="Cash" value={`€${gameState.resources.money}`} numericValue={gameState.resources.money} />
         <ResourceItem
@@ -40,25 +40,38 @@ export function ResourceHud({ gameState }: ResourceHudProps) {
         <ResourceItem
           label="Cleanliness"
           value={labels.cleanliness}
-          numericValue={gameState.resources.cleanliness}
-          meter={gameState.resources.cleanliness}
+          numericValue={cleanliness}
+          meter={cleanliness}
           meterTone="positive"
+          warn={cleanliness < 50}
+          critical={cleanliness < 25}
         />
         <ResourceItem
           label="Stress"
           value={labels.stress}
-          numericValue={gameState.resources.stress}
-          meter={gameState.resources.stress}
+          numericValue={stress}
+          meter={stress}
           meterTone="negative"
+          warn={stress >= 61}
+          critical={stress >= 81}
         />
         <ResourceItem
           label="Reputation"
-          value={gameState.resources.reputation}
-          numericValue={gameState.resources.reputation}
-          meter={gameState.resources.reputation}
+          value={labels.reputation}
+          numericValue={reputation}
+          meter={reputation}
           meterTone="positive"
+          warn={reputation < 35}
+          critical={reputation < 10}
         />
-        <ResourceItem label="Actions" value={labels.actionCapacity} />
+        <ResourceItem
+          label="Actions"
+          value={actionsRemaining}
+          numericValue={actionsRemaining}
+          sub={`/ ${actionsTotal}`}
+          warn={actionsRemaining <= 2 && actionsRemaining > 0}
+          critical={actionsRemaining === 0}
+        />
       </dl>
     </section>
   );
@@ -69,25 +82,33 @@ interface ResourceItemProps {
   value: string | number;
   /** Raw number used to detect increase/decrease for the change-flash. */
   numericValue?: number;
+  /** Small subscript shown after the value (e.g. "/ 12" for actions). */
+  sub?: string;
   /** When true, the item is flagged as a low/empty supply. */
   low?: boolean;
+  /** Amber warning state — moderate threshold crossed. */
+  warn?: boolean;
+  /** Red critical state — severe threshold crossed. */
+  critical?: boolean;
   /** 0-100 meter value; renders a small bar when provided. */
   meter?: number;
   meterTone?: "positive" | "negative";
 }
 
-function ResourceItem({ label, value, numericValue, low, meter, meterTone }: ResourceItemProps) {
+function ResourceItem({ label, value, numericValue, sub, low, warn, critical, meter, meterTone }: ResourceItemProps) {
   const flash = useChangeFlash(numericValue);
+  const stateClass = critical ? " resource-item--critical" : warn ? " resource-item--warn" : low ? " resource-item--low" : "";
 
   return (
-    <div className={`resource-item${low ? " resource-item--low" : ""}`}>
+    <div className={`resource-item${stateClass}`}>
       <dt>{label}</dt>
       <dd>
         {/* key forces a remount on change so the flash animation replays */}
         <span key={`${value}-${flash.tick}`} className={`resource-value ${flash.className}`}>
           {value}
         </span>
-        {low ? <span className="resource-low-tag" role="status"> · low</span> : null}
+        {sub ? <span className="resource-sub">{sub}</span> : null}
+        {low && !warn && !critical ? <span className="resource-low-tag" role="status"> · low</span> : null}
         {typeof meter === "number" ? (
           <span
             className={`resource-meter resource-meter--${meterTone ?? "positive"}`}

@@ -223,6 +223,9 @@ export interface DioramaGuestVisibility {
   christa: boolean;
   bohn: boolean;
   strange: boolean;
+  nele: boolean;
+  meda: boolean;
+  roterRegenschirm: boolean;
 }
 
 export function getDioramaGuestVisibility(
@@ -239,7 +242,10 @@ export function getDioramaGuestVisibility(
       lukas: false,
       christa: false,
       bohn: false,
-      strange: false
+      strange: false,
+      nele: false,
+      meda: false,
+      roterRegenschirm: false
     };
   }
 
@@ -249,7 +255,10 @@ export function getDioramaGuestVisibility(
     lukas: customersServed >= 3,
     christa: state.day >= 2 && customersServed >= 2,
     bohn: state.day >= 3 && customersServed >= 1,
-    strange: state.day >= 4 && customersServed >= 3
+    strange: state.day >= 4 && customersServed >= 3,
+    nele: customersServed >= 1,
+    meda: state.day >= 5 && customersServed >= 1,
+    roterRegenschirm: state.day >= 7 && customersServed >= 2
   };
 }
 
