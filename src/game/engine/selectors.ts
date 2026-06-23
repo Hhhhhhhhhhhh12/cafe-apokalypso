@@ -84,13 +84,23 @@ export function getCurrentDayEvents(state: GameState): readonly EventDefinition[
 
 /**
  * Player-facing narrative event cards for the current day.
- * Process/structural beats (tone "normal", e.g. day-1-opening-rhythm) are
- * intentionally excluded — they are authoring metadata, not story moments.
+ * Process/structural beats (tone "normal") are authoring metadata, not story
+ * moments. "Closing" kicker events only appear after the day has ended.
+ * Events tied to specific guests only surface once at least one guest has
+ * been served today (coarse proxy for "the guest has appeared").
  */
 export function getNarrativeEventCards(
   state: GameState
 ): readonly EventDefinition[] {
-  return getCurrentDayEvents(state).filter((event) => event.tone !== "normal");
+  const isClosing = state.dayPhase === "day_end";
+  const anyGuestServed = state.dayManagement.customersServed > 0;
+
+  return getCurrentDayEvents(state).filter((event) => {
+    if (event.tone === "normal") return false;
+    if (event.kicker === "Closing" && !isClosing) return false;
+    if (event.relatedGuestIds && event.relatedGuestIds.length > 0 && !anyGuestServed) return false;
+    return true;
+  });
 }
 
 /**

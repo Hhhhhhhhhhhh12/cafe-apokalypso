@@ -49,7 +49,11 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
       : "cafe-diorama--kassandra-quiet";
   const weirdnessClass = gameState.weirdnessVisible
     ? "cafe-diorama--weirdness-visible"
-    : "cafe-diorama--weirdness-deniable";
+    : gameState.hiddenWeirdness >= 10
+      ? "cafe-diorama--weirdness-deep cafe-diorama--weirdness-deniable"
+      : gameState.hiddenWeirdness >= 3
+        ? "cafe-diorama--weirdness-low cafe-diorama--weirdness-deniable"
+        : "cafe-diorama--weirdness-deniable";
 
   // --- State-driven guest + prop visibility ---
   const { customersServed, actionPointsRemaining } = gameState.dayManagement;
@@ -324,7 +328,7 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
                   }}
                 >
                   <span
-                    className={`cafe-pilot-asset cafe-pilot-asset--${queueGuest}-standing`}
+                    className={`cafe-pilot-asset cafe-pilot-asset--standing cafe-pilot-asset--${queueGuest}-standing`}
                     aria-hidden="true"
                   />
                   {paulaPhase === "idle" && (

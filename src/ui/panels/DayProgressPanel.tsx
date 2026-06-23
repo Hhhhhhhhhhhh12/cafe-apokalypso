@@ -89,12 +89,16 @@ export function DayProgressPanel({ gameState }: DayProgressPanelProps) {
         <div className="event-card-list" aria-label="Today in the café">
           {eventCards.map((event) => (
             <section
-              className="inline-callout event-card"
+              className={`inline-callout event-card${event.tone === "anomaly" ? " event-card--anomaly" : ""}`}
               key={event.id}
               aria-label={event.title}
             >
+              {event.kicker ? <p className="eyebrow event-card-kicker">{event.kicker}</p> : null}
               <h3>{event.title}</h3>
               <p>{event.text}</p>
+              {event.flavorLines?.[0] ? (
+                <p className="event-card-flavor">{event.flavorLines[0]}</p>
+              ) : null}
             </section>
           ))}
         </div>

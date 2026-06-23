@@ -1529,6 +1529,24 @@ h3 {
     animation: cafe-guest-lean 11.5s ease-in-out infinite;
     animation-delay: -5.8s;
   }
+
+  /* Nele (normal-08) — trocken/beobachtend → breathe, gleichmäßig und konzentriert */
+  .placeholder-guest-normal-08 .cafe-pilot-asset--guest {
+    animation: cafe-guest-breathe 4.6s linear infinite;
+    animation-delay: -1.3s;
+  }
+
+  /* Meda (strange-02) — still/mythologisch → lean, sehr langsam und unheimlich */
+  .placeholder-guest-strange-02 .cafe-pilot-asset--guest {
+    animation: cafe-guest-lean 14s ease-in-out infinite;
+    animation-delay: -7.2s;
+  }
+
+  /* Frau mit rotem Regenschirm (strange-03) — elegant/ausweichend → breathe, dezent */
+  .placeholder-guest-strange-03 .cafe-pilot-asset--guest {
+    animation: cafe-guest-breathe 5.2s linear infinite;
+    animation-delay: -2.6s;
+  }
 }
 
 /* Base breathe: discrete 1px vertical bob, snaps at 55% like a soft breath hold */
@@ -1770,8 +1788,8 @@ h3 {
    ── */
 .cafe-decor-clock {
   position: absolute;
-  left: 54.0%;
-  top: 32.0%;
+  left: 81.7%;
+  top: 30.0%;
   z-index: 8;
   width: 56px;
   height: 56px;
@@ -2751,6 +2769,54 @@ h3 {
 .event-card p {
   margin: 0.5rem 0 0;
   color: #3d2a23;
+}
+
+.event-card-kicker {
+  margin: 0 0 3px;
+  font-size: 0.62rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: #7f2f2c;
+  opacity: 0.65;
+}
+
+.event-card-flavor {
+  margin: 0.4rem 0 0;
+  font-style: italic;
+  font-size: 0.82rem;
+  color: #5c3a30;
+  opacity: 0.8;
+}
+
+.event-card--anomaly {
+  border-left-color: #4d3a6b;
+  background: #f5f0fa;
+}
+
+.event-card--anomaly h3 {
+  color: #2e1f4a;
+}
+
+.event-card--anomaly p,
+.event-card--anomaly .event-card-flavor {
+  color: #3a2f50;
+}
+
+.event-card--anomaly .event-card-kicker {
+  color: #4d3a6b;
+}
+
+/* Progressive hidden weirdness — very subtle diorama shifts before Day 7 reveal */
+.cafe-diorama--weirdness-low .cafe-back-wall {
+  filter: saturate(0.97);
+}
+
+.cafe-diorama--weirdness-deep .cafe-back-wall {
+  filter: saturate(0.93) hue-rotate(1deg);
+}
+
+.cafe-diorama--weirdness-deep .cafe-floor {
+  filter: saturate(0.96);
 }
 
 .objective-card {
