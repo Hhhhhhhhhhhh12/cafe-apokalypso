@@ -977,6 +977,9 @@ function completeCurrentDay(state: GameState): GameState {
     },
     demoComplete: daySevenClose,
     weirdnessVisible: daySevenClose ? true : false,
+    unlocks: daySevenClose
+      ? { ...closedState.unlocks, apocalypseOperations: true }
+      : closedState.unlocks,
     reputationZeroStreak,
     cafeClosed: closeForReputation,
     closureReason: closeForReputation ? "reputation" : closedState.closureReason,
