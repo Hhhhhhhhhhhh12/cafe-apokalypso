@@ -26,7 +26,7 @@ describe("café diorama view", () => {
     expect(markup).toContain("cafe-stage");
     expect(markup).toContain("action-panel");
     expect(markup).toContain("day-progress-panel");
-    expect(text).toContain("Café HUD");
+    expect(markup).toContain("aria-label=\"Café resources\"");
     expect(text).toContain("The Café");
     expect(text).toContain("Actions");
     expect(text).toContain("Day 1:");
