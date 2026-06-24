@@ -19,12 +19,14 @@ KRITISCHE Regel: Immer auf gescheite Diversität der Figuren achten (Hauttöne, 
 
 ## Diorama-Geometrie (nicht neu herleiten!)
 
-**Aktueller Raum: reines CSS-Diorama** — kein gemaltes PNG. `.cafe-stage-base { display: none }`. Décor-Sprites (clock/lamp/cups/shelf/plant) sind aktiv. Lamp: `top: 18%` in `.cafe-decor-lamp`.
+**Aktueller Raum: Stage-PNG-Diorama** — gemaltes PNG als Hintergrund. `.cafe-stage-base { display: block }`. Décor-Sprites (clock/lamp/cups/shelf/plant) sind aktiv als CSS-Overlays. Lamp: `top: 18%` in `.cafe-decor-lamp`.
 
-- `.cafe-back-wall` = CSS-Hintergrundwand (`inset: 0 20% 39% 0`, z 0, `--wall` Farbe). Enthält: `.cafe-window` (links), `.cafe-menu-board` (Mitte), `.cafe-storage` (rechts). **Nicht auf display:none setzen.**
-- `.cafe-side-wall` = linke CSS-Seitenwand mit `.cafe-door` (`width: 29%`, z 1, `--side-wall` Farbe). **Nicht auf display:none setzen.**
-- `.cafe-floor` = Positionierungs-Container für Gäste: left 5 % / right 6 % / bottom 4 % / height 65 % des Dioramas, `clip-path: polygon(9% 1%, 100% 15%, 88% 100%, 0 84%)`, sichtbare Füllung `var(--floor)`. Umrechnung Diorama-% → Floor-%: `floorX = (dioX − 5) / 89 · 100`, `floorY = (dioY − 31) / 65 · 100`.
-- `.cafe-counter` = CSS-Theken-Slab (Floor-Koordinaten left 59.6 % / top 53.8 % / w 43.8 % / h 33.8 %), sichtbarer `background: linear-gradient(#b8774f → #7f2f2c)`. Kaffeemaschine + KASSANDRA-Kasse sind seine Kinder (Sprites).
+**WICHTIG: NIEMALS `.cafe-back-wall` oder `.cafe-side-wall` sichtbar machen oder `.cafe-stage-base` auf `display:none` setzen** — das bricht das Diorama-Layout komplett. Diese sind Positionierungs-Container, nicht visuelle Layer.
+
+- `.cafe-back-wall` = Positionierungs-Container, `display: none` (visuell durch Stage-PNG geliefert). Enthält: `.cafe-window` (display:none), `.cafe-menu-board` (display:none), `.cafe-storage` (rechts, sichtbar als Décor-Slot).
+- `.cafe-side-wall` = Positionierungs-Container, `display: none` (visuell durch Stage-PNG geliefert).
+- `.cafe-floor` = Positionierungs-Container für Gäste: left 5 % / right 6 % / bottom 4 % / height 65 % des Dioramas, `clip-path: polygon(9% 1%, 100% 15%, 88% 100%, 0 84%)`, `background: transparent`. Umrechnung Diorama-% → Floor-%: `floorX = (dioX − 5) / 89 · 100`, `floorY = (dioY − 31) / 65 · 100`.
+- `.cafe-counter` = Positionierungs-Container, `background: transparent` (visuell durch Stage-PNG geliefert). Kaffeemaschine + KASSANDRA-Kasse sind seine Kinder (Sprites).
 - Décor-Tier-Klassen (`cafe-decor--tier-N`) existieren im DOM und sind per CSS sichtbar (Sprites aktiv seit feat/pixel-props-pixellab).
 - Serve-Menü (Produktliste) ist aus dem Diorama heraus in die ActionPanel-Sidebar verlagert (`.serve-menu`). Kein floating UI über dem Spielbereich mehr.
 - Paula-Walk-Choreografie: Phasen-Maschine in CafePlaceholder.tsx (`at-door` → `walking` → `idle`), Tür-Startposition ist relativ zu `.cafe-queue` (left −195 % / bottom 130 %).
