@@ -408,6 +408,7 @@ const PRODUCT_IDS = [
 
 const GUEST_IDS = [
   "pendler-kemal",
+  "pendlerin-fatou",
   "laptop-lukas",
   "lieferfahrer-cem",
   "cappuccino-christa",

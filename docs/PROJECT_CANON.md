@@ -59,9 +59,15 @@ The ideal reaction is:
 
 ## Core characters/systems
 
+### Paula
+
+Paula is the player character and café owner. She has no recoverable memories and no established backstory — she simply wanted to open a café. Her blankness is intentional and canonical: she knows exactly as much as the player does. This absence of history is a distinct phenomenon from Nele's run-persistence; the two must not be conflated or merged.
+
+The canonical introduction is the `IntroSequence` component (5-beat Day 1 overlay in `src/ui/components/IntroSequence.tsx`). Any future story content that touches Paula's inner life must stay consistent with this intro.
+
 ### Nele
 
-Nele is an early recurring guest, tone anchor, and save-state-persistent character. She appears from Day 1. Unlike all other guests, she persists across runs — she has been here in previous weeks and previous collapses. Her dry humor is recognition, not observation.
+Nele is a recurring guest, tone anchor, and save-state-persistent character. She appears later in the week — not from Day 1. Unlike all other guests, she persists across runs — she has been here in previous weeks and previous collapses. Her dry humor is recognition, not observation.
 
 KASSANDRA does not classify her. Her entry is blank or absent. This is intentional and must not be fixed.
 

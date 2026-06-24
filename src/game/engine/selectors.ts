@@ -236,6 +236,7 @@ export interface DioramaGuestVisibility {
   nele: boolean;
   meda: boolean;
   roterRegenschirm: boolean;
+  fatou: boolean;
 }
 
 export function getDioramaGuestVisibility(
@@ -255,7 +256,8 @@ export function getDioramaGuestVisibility(
       strange: false,
       nele: false,
       meda: false,
-      roterRegenschirm: false
+      roterRegenschirm: false,
+      fatou: false
     };
   }
 
@@ -268,7 +270,8 @@ export function getDioramaGuestVisibility(
     strange: state.day >= 4 && customersServed >= 3,
     nele: customersServed >= 1,
     meda: state.day >= 5 && customersServed >= 1,
-    roterRegenschirm: state.day >= 7 && customersServed >= 2
+    roterRegenschirm: state.day >= 7 && customersServed >= 2,
+    fatou: state.day >= 2 && customersServed >= 1
   };
 }
 
