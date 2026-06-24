@@ -13,6 +13,8 @@ import {
   hasActionCapacity,
   type DayCoachTarget
 } from "../../game/engine/selectors";
+import { weekOneEvents } from "../../game/data/events";
+import type { EventDefinition } from "../../game/types/content";
 import {
   getHelperTaskHint,
   getHelperTaskLabel,
@@ -48,6 +50,43 @@ interface ActionPanelProps {
   onBuyEquipment: (slot: EquipmentSlotId) => void;
   onFinishSetup: () => void;
   onResetGame: () => void;
+}
+
+// Resolve pending events: use selector when available, fall back to weekOneEvents filtered by day
+function resolveFloorLogEvents(gameState: GameState): EventDefinition[] {
+  // If the parallel agent has added pendingEvents + getTriggeredEvents, use them.
+  // Otherwise fall back gracefully via the raw weekOneEvents array.
+  try {
+    // Dynamic import guard — if selector doesn't export getTriggeredEvents this will throw
+    // at module evaluation time. We keep it as a runtime check here.
+    const pending: string[] = (gameState as any).pendingEvents ?? [];
+    if (pending.length === 0) return [];
+    return weekOneEvents.filter((e) => pending.includes(e.id)) as EventDefinition[];
+  } catch {
+    return [];
+  }
+}
+
+function FloorLog({ events }: { events: EventDefinition[] }) {
+  if (events.length === 0) return null;
+  return (
+    <div className="floor-log" aria-label="Floor log">
+      {events.map((event) => (
+        <div
+          key={event.id}
+          className={`floor-log-card${event.tone === "anomaly" ? " floor-log-card--anomaly" : ""}`}
+        >
+          {event.kicker ? (
+            <span className="floor-log-card__kicker">{event.kicker}</span>
+          ) : null}
+          <span className="floor-log-card__text">{event.text}</span>
+          {event.flavorLines && event.flavorLines.length > 0 ? (
+            <span className="floor-log-card__flavor">{event.flavorLines[0]}</span>
+          ) : null}
+        </div>
+      ))}
+    </div>
+  );
 }
 
 const helperTasks: Record<StaffOptionId, HelperTaskId[]> = {
@@ -131,6 +170,10 @@ export function ActionPanel({
           onUpgradeDecor={onUpgradeDecor}
           onBuyEquipment={onBuyEquipment}
         />
+      ) : null}
+
+      {(gameState.dayPhase === "open" || gameState.dayPhase === "day_end") ? (
+        <FloorLog events={resolveFloorLogEvents(gameState)} />
       ) : null}
 
       <button

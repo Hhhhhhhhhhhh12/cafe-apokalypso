@@ -87,6 +87,7 @@ export function createInitialGameState(): GameState {
     staffXp: {},
     guestHistory: [],
     eventHistory: [],
+    pendingEvents: [],
     unlockedAchievements: [],
     statusMessage:
       "The café opens. The guestbook quietly writes: Previous runs: [REDACTED]."
@@ -153,6 +154,7 @@ export function isValidGameState(value: unknown): value is GameState {
     isStringArray(candidate.completedActions) &&
     isStringArray(candidate.guestHistory) &&
     isStringArray(candidate.eventHistory) &&
+    isStringArray(candidate.pendingEvents) &&
     isStringArray(candidate.unlockedAchievements) &&
     isValidStaffXp(candidate.staffXp)
   );
@@ -596,6 +598,11 @@ export function migrateRawSave(raw: unknown): unknown {
       }
     }
     obj.equipment = equipment;
+  }
+
+  if (!Array.isArray(obj.pendingEvents)) {
+    obj.pendingEvents = [];
+    patched = true;
   }
 
   if (obj.run && typeof obj.run === "object" && !Array.isArray(obj.run)) {
