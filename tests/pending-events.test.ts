@@ -17,7 +17,7 @@ import { gameReducer } from "../src/game/engine/reducer";
 import { getTriggeredEvents } from "../src/game/engine/selectors";
 import { weekOneDays, weekOneEvents } from "../src/game/data";
 import type { GameState } from "../src/game/types/game";
-import type { DayNumber } from "../src/game/types/content";
+import type { DayNumber, EventDefinition } from "../src/game/types/content";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -73,7 +73,7 @@ describe("pendingEvents: open_day", () => {
 
   it("does NOT enqueue a 'Closing' kicker event at open_day", () => {
     const state = openDayFrom(dayStartState(1));
-    const closingEvents = weekOneEvents.filter((e) => e.kicker === "Closing").map((e) => e.id);
+    const closingEvents = weekOneEvents.filter((e) => (e as EventDefinition).kicker === "Closing").map((e) => e.id);
     for (const id of closingEvents) {
       expect(state.pendingEvents).not.toContain(id);
     }
@@ -190,7 +190,7 @@ describe("pendingEvents: complete_day (Closing kicker)", () => {
     let state = openDayFrom(dayStartState(1));
     state = gameReducer(state, { type: "take_order" });
 
-    const closingEvents = weekOneEvents.filter((e) => e.kicker === "Closing").map((e) => e.id);
+    const closingEvents = weekOneEvents.filter((e) => (e as EventDefinition).kicker === "Closing").map((e) => e.id);
     for (const id of closingEvents) {
       expect(state.pendingEvents).not.toContain(id);
     }

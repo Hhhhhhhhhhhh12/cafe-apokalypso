@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import type { GameState } from "../../game/types/game";
 import type { ProductId } from "../../game/types/content";
-import { getDioramaGuestVisibility, getNextGuestPreview } from "../../game/engine/selectors";
+import { getDioramaGuestVisibility, getNextGuestPreview, getNarrativeEventCards } from "../../game/engine/selectors";
 import { kassandraMessages } from "../../game/data/kassandra";
-import stageBaseAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v04-mid3.png";
+import stageBaseAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v04-mid.png";
 import coffeeMachineAsset from "../../../assets/sprites/props/placeholder-cafe-coffee-machine.png";
 import kassandraRegisterAsset from "../../../assets/sprites/props/placeholder-kassandra-register.png";
 import bohnGuestAsset from "../../../assets/sprites/guests/placeholder-guest-bohn.png";
@@ -122,10 +122,14 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
   const [kassandraAside, setKassandraAside] = useState<{ text: string; key: number } | null>(null);
   const kassandraAsideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // B1: Ambient event overlay — "On the floor" events shown every 2nd serve, 3 s
+  const [ambientEvent, setAmbientEvent] = useState<{ text: string; key: number } | null>(null);
+  const ambientEventTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const prevServedForFeedbackRef = useRef(customersServed);
   useEffect(() => {
     if (customersServed > prevServedForFeedbackRef.current) {
-      // A2
+      // A2: serve reaction
       const firstSentence = gameState.statusMessage?.split(/\.\s+/)[0]?.trim() ?? null;
       if (firstSentence) {
         if (serveReactionTimerRef.current) clearTimeout(serveReactionTimerRef.current);
@@ -140,11 +144,23 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
         setKassandraAside(prev => ({ text, key: (prev?.key ?? 0) + 1 }));
         kassandraAsideTimerRef.current = setTimeout(() => setKassandraAside(null), 4000);
       }
+      // B1 — every 2nd serve, pick a floor event
+      if (customersServed % 2 === 0) {
+        const floorEvents = getNarrativeEventCards(gameState).filter(
+          e => e.kicker === "On the floor"
+        );
+        if (floorEvents.length > 0) {
+          const evt = floorEvents[Math.floor(customersServed / 2) % floorEvents.length];
+          const text = evt.flavorLines?.[0] ?? evt.text;
+          if (ambientEventTimerRef.current) clearTimeout(ambientEventTimerRef.current);
+          setAmbientEvent(prev => ({ text, key: (prev?.key ?? 0) + 1 }));
+          ambientEventTimerRef.current = setTimeout(() => setAmbientEvent(null), 3500);
+        }
+      }
     }
     prevServedForFeedbackRef.current = customersServed;
   // statusMessage changes with every serve — including it ensures we read the fresh value
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [customersServed, gameState.statusMessage]);
+  }, [customersServed, gameState.statusMessage]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Coin tick: track money + rep deltas on each serve
   const prevMoneyEarnedRef = useRef(gameState.dayManagement.moneyEarned);
@@ -212,6 +228,11 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
         {serveReaction && (
           <span key={serveReaction.key} className="cafe-serve-reaction" aria-hidden="true">
             {serveReaction.text}
+          </span>
+        )}
+        {ambientEvent && (
+          <span key={ambientEvent.key} className="cafe-ambient-event" aria-hidden="true">
+            {ambientEvent.text}
           </span>
         )}
         {kassandraAside && (

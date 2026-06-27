@@ -144,6 +144,7 @@ export function DayProgressPanel({ gameState }: DayProgressPanelProps) {
           className="inline-callout day-result-card"
           aria-labelledby="day-summary-title"
         >
+          <p className="eyebrow">Day complete</p>
           <h3 id="day-summary-title">Day {gameState.daySummary.day} closed</h3>
           <div className="day-result-headline">
             <div className="day-result-headline__item">
@@ -170,7 +171,6 @@ export function DayProgressPanel({ gameState }: DayProgressPanelProps) {
               { label: "Money earned", value: `€${gameState.daySummary.moneyEarned}` },
               { label: "Money spent", value: `€${gameState.daySummary.moneySpent}` },
               { label: "Daily overhead", value: `-€${gameState.daySummary.dailyOverhead}` },
-              { label: "Net profit / loss", value: (() => { const net = Math.round((gameState.daySummary!.moneyEarned - gameState.daySummary!.moneySpent - gameState.daySummary!.dailyOverhead) * 100) / 100; return net >= 0 ? `+€${net}` : `-€${Math.abs(net)}`; })() },
               { label: "Customers served", value: String(gameState.daySummary.customersServed) },
               ...(gameState.daySummary.guestsLost > 0 ? [{ label: "Walked out", value: String(gameState.daySummary.guestsLost) }] : []),
               { label: "Supplies used", value: `Coffee ${gameState.daySummary.suppliesUsed.coffee}, Milk ${gameState.daySummary.suppliesUsed.milk}, Pastries ${gameState.daySummary.suppliesUsed.pastries}` },
@@ -178,7 +178,7 @@ export function DayProgressPanel({ gameState }: DayProgressPanelProps) {
               { label: "Supplies left", value: `Coffee ${gameState.daySummary.suppliesRemaining.coffee}, Milk ${gameState.daySummary.suppliesRemaining.milk}, Pastries ${gameState.daySummary.suppliesRemaining.pastries}` },
               { label: "Cleanliness", value: gameState.daySummary.cleanlinessLabel },
               { label: "Stress", value: gameState.daySummary.stressLabel },
-              { label: "Reputation change", value: String(gameState.daySummary.reputationDelta) },
+              { label: "Reputation change", value: gameState.daySummary.reputationDelta > 0 ? `+${gameState.daySummary.reputationDelta}` : String(gameState.daySummary.reputationDelta) },
               { label: "Helper", value: gameState.daySummary.helperRecap ?? "None" },
             ].map(({ label, value }, i) => (
               <div key={label} style={{ "--i": i } as React.CSSProperties}>
@@ -188,11 +188,11 @@ export function DayProgressPanel({ gameState }: DayProgressPanelProps) {
             ))}
           </dl>
           {gameState.daySummary.flavorLines.length > 0 ? (
-            <ul>
+            <div className="day-flavor-lines">
               {gameState.daySummary.flavorLines.map((line) => (
-                <li key={line}>{line}</li>
+                <p key={line} className="day-flavor-line">{line}</p>
               ))}
-            </ul>
+            </div>
           ) : null}
         </section>
       ) : null}

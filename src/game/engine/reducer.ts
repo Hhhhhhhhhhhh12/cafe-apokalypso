@@ -53,6 +53,7 @@ import {
 import type {
   AchievementId,
   DayNumber,
+  EventDefinition,
   EventId,
   GuestDefinition,
   GuestId,
@@ -1658,8 +1659,9 @@ function getEventsToQueue(
       continue;
     }
 
-    const isClosing = eventDef.kicker === "Closing";
-    const hasGuestIds = Boolean(eventDef.relatedGuestIds && eventDef.relatedGuestIds.length > 0);
+    const def = eventDef as EventDefinition;
+    const isClosing = def.kicker === "Closing";
+    const hasGuestIds = Boolean(def.relatedGuestIds?.length);
 
     if (context === "open_day" && i === 0 && !isClosing) {
       result.push(id);
@@ -1675,7 +1677,7 @@ function getEventsToQueue(
       // Guest-related events: fire as soon as we have any served guest today
       // or the guest appears in the cross-day guestHistory
       if (hasGuestIds) {
-        const guestIds = eventDef.relatedGuestIds as readonly GuestId[];
+        const guestIds = def.relatedGuestIds as readonly GuestId[];
         const guestKnown =
           state.dayManagement.customersServed > 0 ||
           guestIds.some((gid) => state.guestHistory.includes(gid));
