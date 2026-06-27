@@ -143,7 +143,6 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
     }
     prevServedForFeedbackRef.current = customersServed;
   // statusMessage changes with every serve — including it ensures we read the fresh value
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [customersServed, gameState.statusMessage]);
 
   // Coin tick: track money + rep deltas on each serve
