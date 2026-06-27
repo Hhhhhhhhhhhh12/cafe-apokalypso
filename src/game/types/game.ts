@@ -183,6 +183,8 @@ export interface GameState {
   staffXp: Partial<Record<StaffOptionId, number>>;
   guestHistory: GuestId[];
   eventHistory: EventId[];
+  /** Events triggered during the current open day, in the order they fired. Reset on open_day. */
+  pendingEvents: EventId[];
   unlockedAchievements: AchievementId[];
   statusMessage: string;
 }

@@ -83,6 +83,20 @@ export function getCurrentDayEvents(state: GameState): readonly EventDefinition[
 }
 
 /**
+ * Returns the EventDefinitions for all events that have fired today, in the
+ * order they were queued in `state.pendingEvents`. Only includes events that
+ * are present in `weekOneEvents` (unknown ids are silently dropped).
+ */
+export function getTriggeredEvents(state: GameState): EventDefinition[] {
+  const eventMap = new Map<string, EventDefinition>(
+    weekOneEvents.map((event) => [event.id, event] as [string, EventDefinition])
+  );
+  return state.pendingEvents
+    .map((id) => eventMap.get(id))
+    .filter((event): event is EventDefinition => event !== undefined);
+}
+
+/**
  * Player-facing narrative event cards for the current day.
  * Process/structural beats (tone "normal") are authoring metadata, not story
  * moments. "Closing" kicker events only appear after the day has ended.

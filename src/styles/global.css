@@ -2656,6 +2656,57 @@ h3 {
   padding-top: 16px;
 }
 
+/* --- Floor Log (story event feed) --- */
+.floor-log {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #d5bda5;
+}
+
+.floor-log-card {
+  padding: 8px 10px;
+  border-radius: 5px;
+  background: #f8f2ec;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: #4a3322;
+  border-left: 3px solid transparent;
+}
+
+.floor-log-card--anomaly {
+  border-left-color: #b5800a;
+  background: #faf5ea;
+}
+
+.floor-log-card__kicker {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #8a6a3a;
+  margin-bottom: 3px;
+}
+
+.floor-log-card--anomaly .floor-log-card__kicker {
+  color: #b5800a;
+}
+
+.floor-log-card__text {
+  display: block;
+  margin: 0;
+}
+
+.floor-log-card__flavor {
+  display: block;
+  margin-top: 4px;
+  opacity: 0.65;
+  font-style: italic;
+}
+
 .data-summary-list {
   display: grid;
   gap: 8px;
@@ -3738,4 +3789,120 @@ h3 {
   .cafe-guest--impatient .cafe-pilot-asset--standing {
     filter: saturate(0.7) brightness(0.94);
   }
+}
+
+
+/* ── A2: Serve reaction — floats near the counter after each serve ─────────── */
+
+@keyframes cafe-serve-reaction-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes cafe-serve-reaction-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+.cafe-serve-reaction {
+  position: absolute;
+  right: 22%;
+  bottom: 44%;
+  z-index: 18;
+  max-width: 160px;
+  background: rgba(253, 246, 236, 0.92);
+  border: 1px solid rgba(140, 80, 30, 0.28);
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 0.55rem;
+  font-style: italic;
+  color: #4a2c10;
+  pointer-events: none;
+  white-space: normal;
+  line-height: 1.4;
+  animation:
+    cafe-serve-reaction-in 0.25s ease-out both,
+    cafe-serve-reaction-out 0.4s ease-in 2.1s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cafe-serve-reaction { animation: none; }
+}
+
+/* ── B2: Kassandra passive aside — murmurs every 3rd serve ────────────────── */
+
+@keyframes cafe-kassandra-aside-in {
+  from { opacity: 0; transform: translateY(3px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes cafe-kassandra-aside-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+.cafe-kassandra-aside {
+  position: absolute;
+  right: 2%;
+  bottom: 28%;
+  z-index: 18;
+  max-width: 140px;
+  font-size: 0.5rem;
+  font-style: italic;
+  color: #3a2550;
+  opacity: 0.88;
+  pointer-events: none;
+  white-space: normal;
+  line-height: 1.45;
+  text-align: right;
+  animation:
+    cafe-kassandra-aside-in 0.4s ease-out both,
+    cafe-kassandra-aside-out 0.5s ease-in 3.5s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cafe-kassandra-aside { animation: none; }
+}
+.cafe-back-wall,
+.cafe-side-wall,
+.cafe-window,
+.cafe-window__light,
+.cafe-menu-board,
+.cafe-storage,
+.cafe-door,
+.cafe-floor__tiles,
+.cafe-room-shadow,
+.cafe-counter__front,
+.cafe-counter__ledge {
+  display: none !important;
+}
+.cafe-floor,
+.cafe-counter {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+
+/* === CSS-Diorama dauerhaft deaktiviert — nur das PNG (.cafe-stage-base) ist Hintergrund ===
+   Hard-Override: der gemalte Hintergrund ist die einzige Raumdarstellung. Die
+   Struktur-Container (.cafe-floor/.cafe-counter) bleiben als unsichtbare
+   Positionierungs-Boxen erhalten, damit Maschine/Kasse/Props weiter ankern. */
+.cafe-stage-base { display: block !important; }
+.cafe-back-wall,
+.cafe-side-wall,
+.cafe-window,
+.cafe-window__light,
+.cafe-menu-board,
+.cafe-storage,
+.cafe-door,
+.cafe-floor__tiles,
+.cafe-room-shadow,
+.cafe-counter__front,
+.cafe-counter__ledge {
+  display: none !important;
+}
+.cafe-floor,
+.cafe-counter {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
 }

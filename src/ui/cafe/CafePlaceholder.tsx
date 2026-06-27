@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import type { GameState } from "../../game/types/game";
 import type { ProductId } from "../../game/types/content";
 import { getDioramaGuestVisibility, getNextGuestPreview } from "../../game/engine/selectors";
-import stageBaseAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v04-mid.png";
+import { kassandraMessages } from "../../game/data/kassandra";
+import stageBaseAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v04-mid3.png";
 import coffeeMachineAsset from "../../../assets/sprites/props/placeholder-cafe-coffee-machine.png";
 import kassandraRegisterAsset from "../../../assets/sprites/props/placeholder-kassandra-register.png";
 import bohnGuestAsset from "../../../assets/sprites/guests/placeholder-guest-bohn.png";
@@ -113,6 +114,38 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
     prevServedRef.current = customersServed;
   }, [customersServed]);
 
+  // A2: Serve reaction bubble — first sentence of statusMessage, shown 2.5 s
+  const [serveReaction, setServeReaction] = useState<{ text: string; key: number } | null>(null);
+  const serveReactionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // B2: Kassandra passive aside — every 3rd serve, shown 4 s
+  const [kassandraAside, setKassandraAside] = useState<{ text: string; key: number } | null>(null);
+  const kassandraAsideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const prevServedForFeedbackRef = useRef(customersServed);
+  useEffect(() => {
+    if (customersServed > prevServedForFeedbackRef.current) {
+      // A2
+      const firstSentence = gameState.statusMessage?.split(/\.\s+/)[0]?.trim() ?? null;
+      if (firstSentence) {
+        if (serveReactionTimerRef.current) clearTimeout(serveReactionTimerRef.current);
+        setServeReaction(prev => ({ text: firstSentence, key: (prev?.key ?? 0) + 1 }));
+        serveReactionTimerRef.current = setTimeout(() => setServeReaction(null), 2500);
+      }
+      // B2 — every 3rd serve
+      if (customersServed % 3 === 0) {
+        const idx = (Math.floor(customersServed / 3) - 1 + kassandraMessages.length) % kassandraMessages.length;
+        const text = kassandraMessages[idx].text;
+        if (kassandraAsideTimerRef.current) clearTimeout(kassandraAsideTimerRef.current);
+        setKassandraAside(prev => ({ text, key: (prev?.key ?? 0) + 1 }));
+        kassandraAsideTimerRef.current = setTimeout(() => setKassandraAside(null), 4000);
+      }
+    }
+    prevServedForFeedbackRef.current = customersServed;
+  // statusMessage changes with every serve — including it ensures we read the fresh value
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [customersServed, gameState.statusMessage]);
+
   // Coin tick: track money + rep deltas on each serve
   const prevMoneyEarnedRef = useRef(gameState.dayManagement.moneyEarned);
   const prevRepRef = useRef(gameState.resources.reputation);
@@ -174,6 +207,16 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
         {coinTick && (
           <span key={coinTick.key} className="cafe-coin-tick" aria-hidden="true">
             +€{coinTick.money.toFixed(2)}{coinTick.rep > 0 ? " ★" : ""}
+          </span>
+        )}
+        {serveReaction && (
+          <span key={serveReaction.key} className="cafe-serve-reaction" aria-hidden="true">
+            {serveReaction.text}
+          </span>
+        )}
+        {kassandraAside && (
+          <span key={kassandraAside.key} className="cafe-kassandra-aside" aria-hidden="true">
+            {kassandraAside.text}
           </span>
         )}
         <div className="cafe-world">

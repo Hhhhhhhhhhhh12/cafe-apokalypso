@@ -5,7 +5,7 @@ import {
   addUniqueGuestIds,
   createFreshRunState
 } from "./gameState";
-import { weekOneAchievements } from "../data";
+import { weekOneAchievements, weekOneDays, weekOneEvents } from "../data";
 import { getDecorDailyBonuses, getDecorTier, getMaxDecorTier } from "../data/decor";
 import {
   getEquipmentDailyBonuses,
@@ -53,6 +53,7 @@ import {
 import type {
   AchievementId,
   DayNumber,
+  EventId,
   GuestDefinition,
   GuestId,
   ProductId,
@@ -415,7 +416,7 @@ function applySuccessfulServe(
     (part) => part.length > 0
   );
 
-  const servedState: GameState = {
+  const servedStateBase: GameState = {
     ...workingState,
     supplies,
     resources: {
@@ -426,6 +427,16 @@ function applySuccessfulServe(
     dayManagement: management,
     completedActions: addUniqueDayAction(workingState.completedActions, "take_order"),
     statusMessage: statusParts.join(" ")
+  };
+
+  // Enqueue any mid-day or guest-related events now that customersServed has advanced.
+  const serveEventIds = getEventsToQueue(servedStateBase, "serve_product");
+  const servedState: GameState = {
+    ...servedStateBase,
+    pendingEvents: serveEventIds.reduce(
+      (acc, id) => enqueuePendingEvent(acc, id),
+      servedStateBase.pendingEvents
+    )
   };
   return setNextGuestPatience(servedState);
 }
@@ -876,7 +887,7 @@ function openDay(state: GameState): GameState {
 
   resources = applyMorningBonuses(resources, state);
 
-  const openedState: GameState = {
+  const openedStateBase: GameState = {
     ...state,
     dayPhase: "open",
     resources,
@@ -884,6 +895,7 @@ function openDay(state: GameState): GameState {
       ? { ...state.helperAssignment, locked: true }
       : null,
     dayManagement: management,
+    pendingEvents: [],
     statusMessage: [
       state.helperAssignment
         ? `Day opened with ${getHelperLabel(state.helperAssignment)}. ${state.helperAssignment.flavorLine}`
@@ -892,6 +904,16 @@ function openDay(state: GameState): GameState {
           : "Day opened without temporary help.",
       modifier.learningHint
     ].join(" ")
+  };
+
+  // Enqueue the opening event (position 0) for this day.
+  const openingEventIds = getEventsToQueue(openedStateBase, "open_day");
+  const openedState: GameState = {
+    ...openedStateBase,
+    pendingEvents: openingEventIds.reduce(
+      (acc, id) => enqueuePendingEvent(acc, id),
+      openedStateBase.pendingEvents
+    )
   };
   return setNextGuestPatience(openedState);
 }
@@ -956,10 +978,18 @@ function completeCurrentDay(state: GameState): GameState {
     ? "End of week"
     : `Day ${state.day} closed`;
 
+  // Enqueue Closing-kicker events now that the day is ending.
+  const closingEventIds = getEventsToQueue(closedState, "complete_day");
+  const pendingEventsAfterClose = closingEventIds.reduce(
+    (acc, id) => enqueuePendingEvent(acc, id),
+    closedState.pendingEvents
+  );
+
   return {
     ...closedState,
     dayPhase: "day_end",
     phaseLabel: closedPhaseLabel,
+    pendingEvents: pendingEventsAfterClose,
     daySummary: closedState.daySummary
       ? {
           ...closedState.daySummary,
@@ -1577,6 +1607,99 @@ function addUniqueStrings(current: readonly string[], additions: readonly string
   for (const addition of additions) {
     if (!result.includes(addition)) {
       result.push(addition);
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Push eventId into pendingEvents if it is not already present.
+ * Returns a new array (does not mutate).
+ */
+function enqueuePendingEvent(pending: readonly EventId[], id: EventId): EventId[] {
+  if (pending.includes(id)) {
+    return [...pending];
+  }
+  return [...pending, id];
+}
+
+/**
+ * Determine which events for the current day should fire given the current
+ * game state and an action context ("open_day", "serve_product", "complete_day").
+ *
+ * Trigger rules (deterministic, positional):
+ * - Position 0 in the day's eventIds → fires on "open_day"
+ * - Events with kicker === "Closing" → fire on "complete_day" (regardless of position)
+ * - Events with relatedGuestIds → fire on "serve_product" if any id appears in
+ *   state.guestHistory (cross-day memory) or state.dayManagement.customersServed > 0
+ * - Middle positions 1..N-2 (not first, not Closing) → fire on "serve_product"
+ *   when customersServed >= position
+ *
+ * Returns only ids not already in pendingEvents (no duplicates).
+ */
+function getEventsToQueue(
+  state: GameState,
+  context: "open_day" | "serve_product" | "complete_day"
+): EventId[] {
+  const currentDay = weekOneDays[state.day - 1];
+  const eventIds = currentDay.eventIds as readonly EventId[];
+  const N = eventIds.length;
+  const result: EventId[] = [];
+
+  for (let i = 0; i < N; i++) {
+    const id = eventIds[i];
+    if (state.pendingEvents.includes(id)) {
+      continue;
+    }
+
+    const eventDef = weekOneEvents.find((e) => e.id === id);
+    if (!eventDef) {
+      continue;
+    }
+
+    const isClosing = eventDef.kicker === "Closing";
+    const hasGuestIds = Boolean(eventDef.relatedGuestIds && eventDef.relatedGuestIds.length > 0);
+
+    if (context === "open_day" && i === 0 && !isClosing) {
+      result.push(id);
+      continue;
+    }
+
+    if (context === "complete_day" && isClosing) {
+      result.push(id);
+      continue;
+    }
+
+    if (context === "serve_product" && !isClosing) {
+      // Guest-related events: fire as soon as we have any served guest today
+      // or the guest appears in the cross-day guestHistory
+      if (hasGuestIds) {
+        const guestIds = eventDef.relatedGuestIds as readonly GuestId[];
+        const guestKnown =
+          state.dayManagement.customersServed > 0 ||
+          guestIds.some((gid) => state.guestHistory.includes(gid));
+        if (guestKnown) {
+          result.push(id);
+          continue;
+        }
+      }
+
+      // Middle positional events (i > 0, not closing, not already fired)
+      if (i > 0 && i < N - 1 && !hasGuestIds) {
+        if (state.dayManagement.customersServed >= i) {
+          result.push(id);
+          continue;
+        }
+      }
+
+      // Last event (N-1) that is not Closing and has no guest ids
+      if (i === N - 1 && !hasGuestIds && N > 1) {
+        if (state.dayManagement.customersServed >= i) {
+          result.push(id);
+          continue;
+        }
+      }
     }
   }
 
