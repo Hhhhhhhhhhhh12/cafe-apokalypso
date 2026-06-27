@@ -2927,6 +2927,22 @@ h3 {
   line-height: 1.45;
 }
 
+.day-flavor-lines {
+  margin: 0.9rem 0 0;
+  padding: 0.6rem 0.75rem;
+  border-left: 3px solid #c4a882;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.day-flavor-line {
+  margin: 0;
+  color: #4a3b34;
+  font-size: 0.9rem;
+  font-style: italic;
+  line-height: 1.4;
+}
+
 .rating-line {
   margin: 0.5rem 0 0;
   color: #35241e;
@@ -3905,4 +3921,69 @@ h3 {
   background: transparent !important;
   border-color: transparent !important;
   box-shadow: none !important;
+}
+
+/* ── B1: Ambient event overlay — floor events shown during service ─────────── */
+
+@keyframes cafe-ambient-event-in {
+  from { opacity: 0; transform: translateY(6px) translateX(-50%); }
+  to   { opacity: 1; transform: translateY(0) translateX(-50%); }
+}
+@keyframes cafe-ambient-event-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+.cafe-ambient-event {
+  position: absolute;
+  left: 50%;
+  top: 14%;
+  transform: translateX(-50%);
+  z-index: 16;
+  max-width: 200px;
+  background: rgba(240, 232, 218, 0.92);
+  border: 1px solid rgba(100, 70, 40, 0.22);
+  border-radius: 5px;
+  padding: 5px 10px;
+  font-size: 0.52rem;
+  font-style: italic;
+  color: #3b2710;
+  pointer-events: none;
+  white-space: normal;
+  line-height: 1.5;
+  text-align: center;
+  animation:
+    cafe-ambient-event-in 0.4s ease-out both,
+    cafe-ambient-event-out 0.5s ease-in 3.0s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cafe-ambient-event { animation: none; }
+}
+
+/* ── A3: Day-end reveal — result card fades in as a moment ─────────────────── */
+
+@keyframes day-result-reveal {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.day-result-card {
+  animation: day-result-reveal 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.day-result-headline__item:first-child strong {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .summary-list div {
+    animation: day-result-reveal 0.35s cubic-bezier(0.22, 1, 0.36, 1) calc(0.15s + var(--i, 0) * 0.04s) both;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .day-result-card { animation: none; }
 }
