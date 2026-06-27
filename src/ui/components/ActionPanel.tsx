@@ -52,19 +52,10 @@ interface ActionPanelProps {
   onResetGame: () => void;
 }
 
-// Resolve pending events: use selector when available, fall back to weekOneEvents filtered by day
 function resolveFloorLogEvents(gameState: GameState): EventDefinition[] {
-  // If the parallel agent has added pendingEvents + getTriggeredEvents, use them.
-  // Otherwise fall back gracefully via the raw weekOneEvents array.
-  try {
-    // Dynamic import guard — if selector doesn't export getTriggeredEvents this will throw
-    // at module evaluation time. We keep it as a runtime check here.
-    const pending: string[] = (gameState as any).pendingEvents ?? [];
-    if (pending.length === 0) return [];
-    return weekOneEvents.filter((e) => pending.includes(e.id)) as EventDefinition[];
-  } catch {
-    return [];
-  }
+  const pending = gameState.pendingEvents;
+  if (!pending || pending.length === 0) return [];
+  return weekOneEvents.filter((e) => pending.includes(e.id)) as EventDefinition[];
 }
 
 function FloorLog({ events }: { events: EventDefinition[] }) {

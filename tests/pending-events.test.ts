@@ -23,10 +23,6 @@ import type { DayNumber } from "../src/game/types/content";
 // Helpers
 // ---------------------------------------------------------------------------
 
-function openState(day: DayNumber = 1): GameState {
-  return { ...createInitialGameState(), day, dayPhase: "open", pendingEvents: [] };
-}
-
 function dayStartState(day: DayNumber = 1): GameState {
   return { ...createInitialGameState(), day, dayPhase: "day_start", pendingEvents: [] };
 }

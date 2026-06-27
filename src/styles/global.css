@@ -3880,3 +3880,29 @@ h3 {
   border-color: transparent !important;
   box-shadow: none !important;
 }
+
+
+/* === CSS-Diorama dauerhaft deaktiviert — nur das PNG (.cafe-stage-base) ist Hintergrund ===
+   Hard-Override: der gemalte Hintergrund ist die einzige Raumdarstellung. Die
+   Struktur-Container (.cafe-floor/.cafe-counter) bleiben als unsichtbare
+   Positionierungs-Boxen erhalten, damit Maschine/Kasse/Props weiter ankern. */
+.cafe-stage-base { display: block !important; }
+.cafe-back-wall,
+.cafe-side-wall,
+.cafe-window,
+.cafe-window__light,
+.cafe-menu-board,
+.cafe-storage,
+.cafe-door,
+.cafe-floor__tiles,
+.cafe-room-shadow,
+.cafe-counter__front,
+.cafe-counter__ledge {
+  display: none !important;
+}
+.cafe-floor,
+.cafe-counter {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
