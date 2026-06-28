@@ -323,6 +323,18 @@ function OpenDayControls({
         </small>
       </div>
 
+      {gameState.dayManagement.serveStreak >= 2 ? (
+        <div
+          className={`flow-meter${gameState.dayManagement.serveStreak >= 5 ? " flow-meter--hot" : ""}`}
+          role="status"
+          aria-label={`Flow streak: ${gameState.dayManagement.serveStreak} matched orders in a row`}
+        >
+          <span className="flow-meter__icon" aria-hidden="true">≈</span>
+          <span className="flow-meter__label">Flow</span>
+          <span className="flow-meter__count">×{gameState.dayManagement.serveStreak}</span>
+        </div>
+      ) : null}
+
       {gameState.helperAssignment ? (
         <div className="helper-slot" aria-label="Current helper assignment">
           {gameState.helperAssignment.flavorLine}

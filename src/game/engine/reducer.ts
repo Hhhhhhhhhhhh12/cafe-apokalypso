@@ -81,6 +81,31 @@ const APPRECIATION_DAILY_CAP = 4;
 /** Max decor atmosphere reputation bonuses awarded per day. */
 const DECOR_ATMOSPHERE_DAILY_CAP = 2;
 
+/** Flow streak: a tip lands at each odd milestone from 5 up to this streak length (5, 7, 9, 11). */
+const FLOW_TIP_MAX_STREAK = 11;
+/** Cash tip handed over at each flow milestone — small, warm, never game-breaking. */
+const FLOW_TIP = 1;
+
+/**
+ * Flavor for the "flow" streak — consecutive orders that matched the guest's
+ * preference. Lines escalate; the tipped ones name the coin that just landed.
+ */
+function getFlowLine(streak: number, tip: number): string {
+  if (streak === 3) {
+    return "Three orders, no missteps — your hands find the rhythm before your head does.";
+  }
+  if (streak === 5) {
+    return `Five in a row. Cup, machine, timing — one motion now. A regular slides a coin across the counter. Tip +€${tip.toFixed(0)}.`;
+  }
+  if (streak === 7) {
+    return `Seven straight. For a moment the café runs itself and you are just part of it. Tip +€${tip.toFixed(0)}.`;
+  }
+  if (tip > 0) {
+    return `${streak} in flow. The counter hums and the tips keep landing. Tip +€${tip.toFixed(0)}.`;
+  }
+  return `${streak} in flow. The morning has a current and you are riding it.`;
+}
+
 export function gameReducer(state: GameState, action: GameAction): GameState {
   if (state.cafeClosed && action.type !== "reset_game") {
     return {
@@ -413,7 +438,40 @@ function applySuccessfulServe(
     }
   }
 
-  const statusParts = [serveLine, appreciationLine, decorAtmosphereLine, ...flavorLines].filter(
+  // Flow streak: orders that land a guest's preference build a rhythm. Each odd
+  // milestone (3, 5, 7, …) drops a small tip and an escalating flavor line. A miss
+  // on a guest who *had* a preference breaks the flow; serving a guest with no
+  // preference at all is neutral and neither builds nor breaks it.
+  const guestHadPreference =
+    guestPreferences.length > 0 || Boolean(servedGuest?.preferredProductId);
+  const servedWell = appreciates || matchesSoftPreference;
+  let flowLine = "";
+  if (servedWell) {
+    const newStreak = management.serveStreak + 1;
+    management = {
+      ...management,
+      serveStreak: newStreak,
+      bestServeStreak: Math.max(management.bestServeStreak, newStreak)
+    };
+    if (newStreak >= 3 && newStreak % 2 === 1) {
+      const tip = newStreak >= 5 && newStreak <= FLOW_TIP_MAX_STREAK ? FLOW_TIP : 0;
+      if (tip > 0) {
+        resources = { ...resources, money: clampResource(resources.money + tip) };
+        management = {
+          ...management,
+          moneyEarned: clampResource(management.moneyEarned + tip)
+        };
+      }
+      flowLine = getFlowLine(newStreak, tip);
+    }
+  } else if (guestHadPreference) {
+    if (management.serveStreak >= 3) {
+      flowLine = "The rhythm breaks — this order pulls you out of the flow.";
+    }
+    management = { ...management, serveStreak: 0 };
+  }
+
+  const statusParts = [serveLine, appreciationLine, decorAtmosphereLine, flowLine, ...flavorLines].filter(
     (part) => part.length > 0
   );
 
@@ -1118,6 +1176,12 @@ function applyDayEndConsequences(state: GameState): GameState {
   resources = { ...resources, money: clampResource(resources.money - DAILY_FIXED_COST) };
   flavorLines.push(`Daily costs (rent, utilities): −€${DAILY_FIXED_COST}.`);
 
+  if (management.bestServeStreak >= 5) {
+    flavorLines.push(
+      `Best flow today: ${management.bestServeStreak} orders in a row without a missed preference.`
+    );
+  }
+
   const stressEvent = getStressEvent(resources.stress, state.stressEventLog.length);
 
   if (stressEvent && resources.stress >= 81) {
@@ -1154,6 +1218,7 @@ function applyDayEndConsequences(state: GameState): GameState {
       dailyOverhead,
       customersServed: management.customersServed,
       guestsLost: management.guestsLost,
+      bestServeStreak: management.bestServeStreak,
       suppliesUsed: { ...management.suppliesUsed },
       suppliesRestocked: { coffee: 0, milk: 0, pastries: 0 },
       suppliesRemaining: { ...state.supplies },

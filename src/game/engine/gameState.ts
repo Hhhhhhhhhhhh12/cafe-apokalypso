@@ -230,7 +230,9 @@ function isValidDayManagement(value: unknown): value is DayManagementState {
     typeof management.decorBonusesGiven === "number" &&
     typeof management.currentGuestPatience === "number" &&
     typeof management.currentGuestPatienceMax === "number" &&
-    typeof management.guestsLost === "number"
+    typeof management.guestsLost === "number" &&
+    typeof management.serveStreak === "number" &&
+    typeof management.bestServeStreak === "number"
   );
 }
 
@@ -567,13 +569,29 @@ export function migrateRawSave(raw: unknown): unknown {
       if (typeof dm.guestsLost !== "number") {
         dm.guestsLost = 0;
       }
+      if (typeof dm.serveStreak !== "number") {
+        dm.serveStreak = 0;
+      }
+      if (typeof dm.bestServeStreak !== "number") {
+        dm.bestServeStreak = 0;
+      }
       obj.dayManagement = dm;
     }
 
     if (obj.daySummary && typeof obj.daySummary === "object" && !Array.isArray(obj.daySummary)) {
       const s = obj.daySummary as Record<string, unknown>;
+      const patchedSummary: Record<string, unknown> = { ...s };
+      let summaryPatched = false;
       if (typeof s.guestsLost !== "number") {
-        obj.daySummary = { ...s, guestsLost: 0 };
+        patchedSummary.guestsLost = 0;
+        summaryPatched = true;
+      }
+      if (typeof s.bestServeStreak !== "number") {
+        patchedSummary.bestServeStreak = 0;
+        summaryPatched = true;
+      }
+      if (summaryPatched) {
+        obj.daySummary = patchedSummary;
       }
     }
   }
