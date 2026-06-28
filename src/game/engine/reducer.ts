@@ -425,6 +425,27 @@ function applySuccessfulServe(
     appreciationLine = servedGuest.missedPreferenceLine ?? "";
   }
 
+  // Mild waste (#56): the craft of a premium drink is lost on a guest who neither
+  // values it nor reached for it, and whose own taste runs simpler. No reputation
+  // penalty — the cost is the wasted beans and effort — but the line makes the
+  // over-serve legible, so "give everyone the fanciest cup" is not a free strategy.
+  let wasteLine = "";
+  const servedTier = product.qualityTier ?? 1;
+  const preferredProduct = servedGuest?.preferredProductId
+    ? getProductById(servedGuest.preferredProductId)
+    : undefined;
+  const preferredTier = preferredProduct?.qualityTier ?? 1;
+  const overServedPremium =
+    servedGuest != null &&
+    servedTier >= 3 &&
+    !appreciates &&
+    !matchesSoftPreference &&
+    preferredProduct != null &&
+    servedTier > preferredTier;
+  if (overServedPremium) {
+    wasteLine = `${servedGuest.name} drinks the ${product.name.toLowerCase()} without ceremony. The slow craft — and the extra supplies — are lost on someone who only wanted a ${preferredProduct.name.toLowerCase()}.`;
+  }
+
   // Decor atmosphere bonus: atmosphere-sensitive guests notice a well-maintained café.
   let decorAtmosphereLine = "";
   const decorBonusDef = servedGuest?.decorAtmosphereBonus;
@@ -471,7 +492,7 @@ function applySuccessfulServe(
     management = { ...management, serveStreak: 0 };
   }
 
-  const statusParts = [serveLine, appreciationLine, decorAtmosphereLine, flowLine, ...flavorLines].filter(
+  const statusParts = [serveLine, appreciationLine, decorAtmosphereLine, wasteLine, flowLine, ...flavorLines].filter(
     (part) => part.length > 0
   );
 
