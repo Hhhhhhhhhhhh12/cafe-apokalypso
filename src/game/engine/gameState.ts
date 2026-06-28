@@ -79,7 +79,7 @@ export function createInitialGameState(): GameState {
     closureReason: null,
     reputationZeroStreak: 0,
     decor: { plant: 1, shelf: 1, clock: 1, lamp: 1, cups: 1 },
-    equipment: { machine: 1, seating: 1 },
+    equipment: { machine: 1, seating: 1, register: 1 },
     run: { ...initialRun, modifierIds: [...initialRun.modifierIds], memoryFragments: [] },
     guestMemory: {},
     completedActions: [],
@@ -106,7 +106,7 @@ export function createFreshRunState(): GameState {
     ...createInitialGameState(),
     dayPhase: "setup",
     phaseLabel: "Before opening",
-    equipment: { machine: 0, seating: 0 },
+    equipment: { machine: 0, seating: 0, register: 1 },
     statusMessage:
       "An empty room and a small till. Buy a coffee machine and some furniture, then open the doors."
   };
@@ -321,7 +321,7 @@ function isValidDayPhase(value: unknown): value is DayPhase {
 }
 
 /** All equipment slot keys that must exist in a valid save (tier >= 0). */
-const EQUIPMENT_SLOT_KEYS = ["machine", "seating"] as const;
+const EQUIPMENT_SLOT_KEYS = ["machine", "seating", "register"] as const;
 
 function isValidEquipment(
   value: unknown

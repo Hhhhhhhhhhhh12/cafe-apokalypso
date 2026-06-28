@@ -19,7 +19,7 @@ export type StressStateLabel = "Calm" | "Busy" | "Tense" | "Overloaded";
 export type DayPhase = "setup" | "day_start" | "open" | "day_end";
 export type ClosureReason = "money" | "reputation";
 export type DecorSlotId = "plant" | "shelf" | "clock" | "lamp" | "cups";
-export type EquipmentSlotId = "machine" | "seating";
+export type EquipmentSlotId = "machine" | "seating" | "register";
 export type HelperTaskId = "cleaning" | "service" | "barista" | "counter" | "marketing";
 export type EmployeeLevel = 1 | 2 | 3;
 
