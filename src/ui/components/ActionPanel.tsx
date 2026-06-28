@@ -250,7 +250,10 @@ function OpenDayControls({
         <div className="next-guest" role="status">
           <div className="next-guest__header">
             <span className="next-guest__label">Next in line:</span>
-            <strong>{nextGuest.name}</strong>
+            {/* Guest names are German proper nouns/titles (Pendler, Herr, Frau mit rotem
+                Regenschirm…) in an otherwise-English UI; mark them so screen readers
+                pronounce them in German. See GitHub #71. */}
+            <strong lang="de">{nextGuest.name}</strong>
           </div>
           {patienceState ? (
             <span
