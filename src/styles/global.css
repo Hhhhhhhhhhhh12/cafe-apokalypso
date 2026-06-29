@@ -1719,10 +1719,11 @@ h3 {
   bottom: 31%;
 }
 
-/* Nele — linkes Fenster, zurückgezogener Arbeitsplatz */
+/* Nele — linke Mitte, zurückgezogener Arbeitsplatz (nach rechts versetzt, damit
+   sie nicht mehr mit der Eck-Pflanze kollidiert) */
 .placeholder-guest-normal-08 {
-  left: 17%;
-  bottom: 50%;
+  left: 33%;
+  bottom: 48%;
 }
 
 /* Meda — Ecke hinten rechts, ab Tag 5 */
@@ -1830,8 +1831,9 @@ h3 {
 .cafe-decor-clock.cafe-decor--tier-3 {
   opacity: 1;
   background-image: url("../../assets/sprites/props/placeholder-cafe-clock-t3.png");
-  width: 40px;
-  height: 52px;
+  left: 75%;
+  width: 56px;
+  height: 72px;
 }
 
 /*
@@ -1841,11 +1843,11 @@ h3 {
  */
 .cafe-decor-lamp {
   position: absolute;
-  left: 23.0%;
-  top: 44.0%;
+  left: 16.0%;
+  top: 27.0%;
   z-index: 4;
-  width: 36px;
-  height: 56px;
+  width: 40px;
+  height: 64px;
   background: url("../../assets/sprites/props/placeholder-cafe-lamp.png") center bottom / contain no-repeat;
   image-rendering: pixelated;
 }
@@ -1857,6 +1859,8 @@ h3 {
 .cafe-decor-lamp.cafe-decor--tier-2 {
   opacity: 1;
   background-image: url("../../assets/sprites/props/placeholder-cafe-lamp-t2.png");
+  width: 46px;
+  height: 72px;
 }
 
 .cafe-decor-lamp.cafe-decor--tier-3 {
@@ -1873,8 +1877,8 @@ h3 {
  */
 .cafe-decor-cups {
   position: absolute;
-  left: 68.0%;
-  top: 57.0%;
+  left: 55.0%;
+  top: 60.0%;
   z-index: 6;
   width: 32px;
   height: 27px;
@@ -2063,6 +2067,67 @@ h3 {
   color: #7f2f2c;
   font-size: 1.2rem;
   line-height: 1;
+}
+
+/* Flow meter — the live "rhythm" streak chip shown while a run of matched
+   orders builds. Warm and quiet at first, brighter once it catches fire. */
+.flow-meter {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: -2px 0 2px;
+  padding: 0.32rem 0.6rem;
+  border: 1px solid #d8b27a;
+  border-radius: 999px;
+  background: #fbf0db;
+  color: #6b4a1f;
+  font-size: 0.82rem;
+  font-weight: 700;
+  width: fit-content;
+}
+
+.flow-meter__icon {
+  font-size: 1rem;
+  line-height: 1;
+  color: #c98a2e;
+}
+
+.flow-meter__label {
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+}
+
+.flow-meter__count {
+  font-size: 1rem;
+  color: #b5651d;
+}
+
+.flow-meter--hot {
+  border-color: #e08a2b;
+  background: linear-gradient(100deg, #fde6c2, #fbd49a);
+  color: #7c3a05;
+  box-shadow: 0 0 0 1px rgba(224, 138, 43, 0.25), 0 2px 8px rgba(224, 138, 43, 0.28);
+}
+
+.flow-meter--hot .flow-meter__icon,
+.flow-meter--hot .flow-meter__count {
+  color: #a4470a;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .flow-meter--hot {
+    animation: flow-meter-pulse 1.8s ease-in-out infinite;
+  }
+
+  @keyframes flow-meter-pulse {
+    0%, 100% {
+      box-shadow: 0 0 0 1px rgba(224, 138, 43, 0.25), 0 2px 8px rgba(224, 138, 43, 0.22);
+    }
+    50% {
+      box-shadow: 0 0 0 1px rgba(224, 138, 43, 0.45), 0 3px 12px rgba(224, 138, 43, 0.4);
+    }
+  }
 }
 
 .next-guest {

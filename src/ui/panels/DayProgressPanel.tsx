@@ -173,6 +173,7 @@ export function DayProgressPanel({ gameState }: DayProgressPanelProps) {
               { label: "Daily overhead", value: `-€${gameState.daySummary.dailyOverhead}` },
               { label: "Customers served", value: String(gameState.daySummary.customersServed) },
               ...(gameState.daySummary.guestsLost > 0 ? [{ label: "Walked out", value: String(gameState.daySummary.guestsLost) }] : []),
+              ...(gameState.daySummary.bestServeStreak >= 3 ? [{ label: "Best flow", value: `×${gameState.daySummary.bestServeStreak}` }] : []),
               { label: "Supplies used", value: `Coffee ${gameState.daySummary.suppliesUsed.coffee}, Milk ${gameState.daySummary.suppliesUsed.milk}, Pastries ${gameState.daySummary.suppliesUsed.pastries}` },
               ...(gameState.pendingSupplyPurchase && (gameState.pendingSupplyPurchase.coffee > 0 || gameState.pendingSupplyPurchase.milk > 0 || gameState.pendingSupplyPurchase.pastries > 0) ? [{ label: "Restock planned", value: `Coffee ${gameState.pendingSupplyPurchase.coffee}, Milk ${gameState.pendingSupplyPurchase.milk}, Pastries ${gameState.pendingSupplyPurchase.pastries}` }] : []),
               { label: "Supplies left", value: `Coffee ${gameState.daySummary.suppliesRemaining.coffee}, Milk ${gameState.daySummary.suppliesRemaining.milk}, Pastries ${gameState.daySummary.suppliesRemaining.pastries}` },

@@ -83,6 +83,10 @@ export interface DayManagementState {
   currentGuestPatienceMax: number;
   /** Guests who walked out unserved today. Advances the queue without counting as served. */
   guestsLost: number;
+  /** Consecutive orders that matched the guest's preference — the current "flow" streak. Resets on a miss. */
+  serveStreak: number;
+  /** Highest flow streak reached today. Surfaced in the day-end recap. */
+  bestServeStreak: number;
 }
 
 export interface GuestMemoryEntry {
@@ -109,6 +113,8 @@ export interface DaySummary {
   customersServed: number;
   /** Guests who walked out unserved during the day (patience ran out). */
   guestsLost: number;
+  /** Highest flow streak (consecutive matched orders) reached during the day. */
+  bestServeStreak: number;
   suppliesUsed: SupplyState;
   suppliesRestocked: SupplyState;
   suppliesRemaining: SupplyState;
