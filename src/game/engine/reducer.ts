@@ -379,6 +379,35 @@ function applySuccessfulServe(
     if (memoryResult.line) {
       flavorLines.push(memoryResult.line);
     }
+
+    // Flow streak: runs per served guest so helper double-serves both count.
+    const loopGuestPreferences = servedGuest?.appreciatedProductIds ?? [];
+    const loopGuestHadPreference =
+      loopGuestPreferences.length > 0 || Boolean(servedGuest?.preferredProductId);
+    const loopServedWell =
+      loopGuestPreferences.includes(product.id) ||
+      servedGuest?.preferredProductId === product.id;
+    if (loopServedWell) {
+      const newStreak = management.serveStreak + 1;
+      management = {
+        ...management,
+        serveStreak: newStreak,
+        bestServeStreak: Math.max(management.bestServeStreak, newStreak)
+      };
+      if (newStreak >= 3 && newStreak % 2 === 1) {
+        const tip = newStreak >= 5 && newStreak <= FLOW_TIP_MAX_STREAK ? FLOW_TIP : 0;
+        if (tip > 0) {
+          resources = { ...resources, money: clampResource(resources.money + tip) };
+          management = { ...management, moneyEarned: clampResource(management.moneyEarned + tip) };
+        }
+        flavorLines.push(getFlowLine(newStreak, tip));
+      }
+    } else if (loopGuestHadPreference) {
+      if (management.serveStreak >= 3) {
+        flavorLines.push("The rhythm breaks — this order pulls you out of the flow.");
+      }
+      management = { ...management, serveStreak: 0 };
+    }
   }
 
   if (management.helperExtraOrdersRemaining > 0) {
@@ -459,40 +488,7 @@ function applySuccessfulServe(
     }
   }
 
-  // Flow streak: orders that land a guest's preference build a rhythm. Each odd
-  // milestone (3, 5, 7, …) drops a small tip and an escalating flavor line. A miss
-  // on a guest who *had* a preference breaks the flow; serving a guest with no
-  // preference at all is neutral and neither builds nor breaks it.
-  const guestHadPreference =
-    guestPreferences.length > 0 || Boolean(servedGuest?.preferredProductId);
-  const servedWell = appreciates || matchesSoftPreference;
-  let flowLine = "";
-  if (servedWell) {
-    const newStreak = management.serveStreak + 1;
-    management = {
-      ...management,
-      serveStreak: newStreak,
-      bestServeStreak: Math.max(management.bestServeStreak, newStreak)
-    };
-    if (newStreak >= 3 && newStreak % 2 === 1) {
-      const tip = newStreak >= 5 && newStreak <= FLOW_TIP_MAX_STREAK ? FLOW_TIP : 0;
-      if (tip > 0) {
-        resources = { ...resources, money: clampResource(resources.money + tip) };
-        management = {
-          ...management,
-          moneyEarned: clampResource(management.moneyEarned + tip)
-        };
-      }
-      flowLine = getFlowLine(newStreak, tip);
-    }
-  } else if (guestHadPreference) {
-    if (management.serveStreak >= 3) {
-      flowLine = "The rhythm breaks — this order pulls you out of the flow.";
-    }
-    management = { ...management, serveStreak: 0 };
-  }
-
-  const statusParts = [serveLine, appreciationLine, decorAtmosphereLine, wasteLine, flowLine, ...flavorLines].filter(
+  const statusParts = [serveLine, appreciationLine, decorAtmosphereLine, wasteLine, ...flavorLines].filter(
     (part) => part.length > 0
   );
 
@@ -1400,6 +1396,13 @@ function buyEquipment(state: GameState, slot: EquipmentSlotId): GameState {
     return {
       ...state,
       statusMessage: "Equipment is bought before opening or during the day-end review."
+    };
+  }
+
+  if (state.dayPhase === "setup" && slot === "register") {
+    return {
+      ...state,
+      statusMessage: "Register upgrades are available after opening."
     };
   }
 

@@ -1375,100 +1375,18 @@ h3 {
     bottom 0.5s ease-in;
 }
 
-/* Standing poses for queue rotation — each guest's single static frame shown
-   while waiting to order. Only Paula has dedicated walk sheets; other guests
-   slide via CSS position transition with their static standing sprite. */
-/* Standing queue sprites — 7-frame idle sheets; Frame 0 shown as static fallback.
-   Staggered negative animation-delay so guests don't blink in unison. */
-.cafe-pilot-asset--cem-standing {
-  width: 88px;
-  height: 88px;
-  background-image: url("../../assets/sprites/guests/placeholder-guest-cem-idle.png");
-  background-repeat: no-repeat;
-  background-position: 0 0;
-  background-size: 616px 88px;
-}
-
-.cafe-pilot-asset--mira-standing {
-  width: 96px;
-  height: 96px;
-  background-image: url("../../assets/sprites/guests/placeholder-guest-mira-idle.png");
-  background-repeat: no-repeat;
-  background-position: 0 0;
-  background-size: 672px 96px;
-}
-
-.cafe-pilot-asset--lukas-standing {
-  width: 96px;
-  height: 96px;
-  background-image: url("../../assets/sprites/guests/placeholder-guest-lukas-idle.png");
-  background-repeat: no-repeat;
-  background-position: 0 0;
-  background-size: 672px 96px;
-}
-
-.cafe-pilot-asset--christa-standing {
-  width: 92px;
-  height: 92px;
-  background-image: url("../../assets/sprites/guests/placeholder-guest-christa-idle.png");
-  background-repeat: no-repeat;
-  background-position: 0 0;
-  background-size: 644px 92px;
-}
-
-.cafe-pilot-asset--kemal-standing {
-  width: 88px;
-  height: 88px;
-  background-image: url("../../assets/sprites/guests/placeholder-guest-kemal-idle.png");
-  background-repeat: no-repeat;
-  background-position: 0 0;
-  background-size: 616px 88px;
-}
-
-.cafe-pilot-asset--fatou-standing {
-  width: 68px;
-  height: 68px;
-  background-image: url("../../assets/sprites/guests/placeholder-guest-fatou.png");
-  background-repeat: no-repeat;
-  background-position: 0 0;
-  background-size: 68px 68px;
-}
-
-.cafe-pilot-asset--bohn-standing {
-  width: 96px;
-  height: 96px;
-  background-image: url("../../assets/sprites/guests/placeholder-guest-bohn-idle.png");
-  background-repeat: no-repeat;
-  background-position: 0 0;
-  background-size: 672px 96px;
-}
-
-.cafe-pilot-asset--grau-standing {
-  width: 88px;
-  height: 88px;
-  background-image: url("../../assets/sprites/guests/placeholder-guest-grau-idle.png");
-  background-repeat: no-repeat;
-  background-position: 0 0;
-  background-size: 616px 88px;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .cafe-pilot-asset--cem-standing     { animation: cafe-cem-idle     2.8s steps(7) infinite; animation-delay: -0.9s; }
-  .cafe-pilot-asset--mira-standing    { animation: cafe-mira-idle    3.6s steps(7) infinite; animation-delay: -1.4s; }
-  .cafe-pilot-asset--lukas-standing   { animation: cafe-lukas-idle   3.2s steps(7) infinite; animation-delay: -2.1s; }
-  .cafe-pilot-asset--christa-standing { animation: cafe-christa-idle 4.0s steps(7) infinite; animation-delay: -0.6s; }
-  .cafe-pilot-asset--kemal-standing   { animation: cafe-kemal-idle   3.0s steps(7) infinite; animation-delay: -0.4s; }
-  .cafe-pilot-asset--bohn-standing    { animation: cafe-bohn-idle    2.4s steps(7) infinite; animation-delay: -1.7s; }
-  .cafe-pilot-asset--grau-standing    { animation: cafe-grau-idle    5.6s steps(7) infinite; animation-delay: -3.2s; }
-}
-
-@keyframes cafe-cem-idle     { to { background-position: -616px 0; } }
-@keyframes cafe-mira-idle    { to { background-position: -672px 0; } }
-@keyframes cafe-lukas-idle   { to { background-position: -672px 0; } }
-@keyframes cafe-christa-idle { to { background-position: -644px 0; } }
-@keyframes cafe-kemal-idle   { to { background-position: -616px 0; } }
-@keyframes cafe-bohn-idle    { to { background-position: -672px 0; } }
-@keyframes cafe-grau-idle    { to { background-position: -616px 0; } }
+/* Standing queue sprites — all guests share one fine-style 68×68 static sprite,
+   rendered at the same scale as the seated guests (see .cafe-pilot-asset--standing
+   base rule below). Idle motion is the shared CSS breathe, so the whole roster
+   reads at one consistent size/proportion/pixel scale. */
+.cafe-pilot-asset--cem-standing     { background-image: url("../../assets/sprites/guests/placeholder-guest-cem.png"); }
+.cafe-pilot-asset--mira-standing    { background-image: url("../../assets/sprites/guests/placeholder-guest-mira.png"); }
+.cafe-pilot-asset--lukas-standing   { background-image: url("../../assets/sprites/guests/placeholder-guest-lukas.png"); }
+.cafe-pilot-asset--christa-standing { background-image: url("../../assets/sprites/guests/placeholder-guest-christa.png"); }
+.cafe-pilot-asset--kemal-standing   { background-image: url("../../assets/sprites/guests/placeholder-guest-kemal.png"); }
+.cafe-pilot-asset--fatou-standing   { background-image: url("../../assets/sprites/guests/placeholder-guest-fatou.png"); }
+.cafe-pilot-asset--bohn-standing    { background-image: url("../../assets/sprites/guests/placeholder-guest-bohn.png"); }
+.cafe-pilot-asset--grau-standing    { background-image: url("../../assets/sprites/guests/placeholder-guest-grau.png"); }
 
 /* Seated guests slide up on first appearance (one-shot on DOM mount). */
 @keyframes guest-seat-in {
@@ -1637,11 +1555,26 @@ h3 {
   display: none;
 }
 
-/* Center standing queue sprites on the placeholder anchor point. */
+/* Center standing queue sprites on the placeholder anchor point. Rendered at the
+   same 108px box / contain scale as the seated guests so queue and seat read at
+   one uniform size. Idle motion = shared CSS breathe (set below). */
 .cafe-pilot-asset--standing {
+  width: 108px;
+  height: 108px;
   bottom: 0;
   left: 50%;
+  z-index: 2;
   transform: translateX(-50%);
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  background-size: contain;
+  image-rendering: pixelated;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cafe-pilot-asset--standing {
+    animation: cafe-guest-breathe 3.4s linear infinite;
+  }
 }
 
 .placeholder-guest-normal-02 {
