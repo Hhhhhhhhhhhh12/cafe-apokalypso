@@ -1865,7 +1865,8 @@ function applyPatienceTick(state: GameState): { state: GameState; walkoutLine: s
     dayManagement: {
       ...management,
       currentGuestPatience: 0,
-      guestsLost: management.guestsLost + 1
+      guestsLost: management.guestsLost + 1,
+      serveStreak: 0
     }
   };
 
