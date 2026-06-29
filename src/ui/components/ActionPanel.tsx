@@ -195,8 +195,14 @@ export function ActionPanel({
                   : "Core café tasks complete. The day can be closed."}
       </p>
 
-      <p key={statusMessage} className="status-message" role="status" aria-live="polite">
-        {statusMessage}
+      {/* Persistent live region: the <p> stays mounted so screen readers
+          announce every status change (serve lines, KASSANDRA, supply warnings).
+          The inner span remounts via key to replay the slide-in animation for
+          sighted users without disturbing the live region. See GitHub #70. */}
+      <p className="status-message" role="status" aria-live="polite" aria-atomic="true">
+        <span key={statusMessage} className="status-message__text">
+          {statusMessage}
+        </span>
       </p>
     </section>
   );
@@ -247,7 +253,10 @@ function OpenDayControls({
   return (
     <>
       {nextGuest ? (
-        <div className="next-guest" role="status">
+        // Not a live region: the next-guest preview updates on every serve, so
+        // announcing it would pile up on the status line. It stays a labelled,
+        // navigable block instead. See GitHub #70.
+        <div className="next-guest" aria-label="Next guest in line">
           <div className="next-guest__header">
             <span className="next-guest__label">Next in line:</span>
             {/* Guest names are German proper nouns/titles (Pendler, Herr, Frau mit rotem
@@ -326,7 +335,6 @@ function OpenDayControls({
       {gameState.dayManagement.serveStreak >= 2 ? (
         <div
           className={`flow-meter${gameState.dayManagement.serveStreak >= 5 ? " flow-meter--hot" : ""}`}
-          role="status"
           aria-label={`Flow streak: ${gameState.dayManagement.serveStreak} matched orders in a row`}
         >
           <span className="flow-meter__icon" aria-hidden="true">≈</span>
@@ -342,7 +350,9 @@ function OpenDayControls({
       ) : null}
 
       {coach ? (
-        <p key={coach.text} className="cafe-coach" role="status">
+        // Coaching hint, not a beat — kept visible but out of the live region so
+        // it doesn't compete with the status line for announcements. See #70.
+        <p key={coach.text} className="cafe-coach">
           <span className="cafe-coach__icon" aria-hidden="true">☞</span>
           {coach.text}
         </p>

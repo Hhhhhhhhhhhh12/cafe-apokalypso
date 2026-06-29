@@ -2502,6 +2502,13 @@ h3 {
   background: #eef3e7;
   color: #273a2d;
   font-weight: 650;
+}
+
+/* The inner span remounts on each new message (keyed) to replay the slide-in.
+   The outer .status-message stays mounted as a persistent aria-live region so
+   screen readers announce every change. See GitHub #70. */
+.status-message__text {
+  display: inline-block;
   animation: status-slide-in 0.22s ease-out both;
 }
 
@@ -2517,7 +2524,7 @@ h3 {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .status-message {
+  .status-message__text {
     animation: none;
   }
 }
