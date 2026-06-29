@@ -623,6 +623,20 @@ export function migrateRawSave(raw: unknown): unknown {
     patched = true;
   }
 
+  // Stale v13 saves written before the serve-flow streak was introduced are
+  // missing these two fields. Patch them unconditionally so they pass validation.
+  if (obj.dayManagement && typeof obj.dayManagement === "object" && !Array.isArray(obj.dayManagement)) {
+    const dm = obj.dayManagement as Record<string, unknown>;
+    if (typeof dm.serveStreak !== "number" || typeof dm.bestServeStreak !== "number") {
+      obj.dayManagement = {
+        ...dm,
+        ...(typeof dm.serveStreak !== "number" ? { serveStreak: 0 } : {}),
+        ...(typeof dm.bestServeStreak !== "number" ? { bestServeStreak: 0 } : {})
+      };
+      patched = true;
+    }
+  }
+
   if (obj.run && typeof obj.run === "object" && !Array.isArray(obj.run)) {
     const run = { ...(obj.run as Record<string, unknown>) };
     if (!Array.isArray(run.modifierIds) || run.modifierIds.length !== 7) {

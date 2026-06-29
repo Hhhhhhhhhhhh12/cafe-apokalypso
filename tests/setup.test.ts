@@ -160,8 +160,14 @@ describe("getEquipmentShopOptions", () => {
     expect(options.every((o) => o.next === null)).toBe(true);
   });
 
-  it("offers the register as an upgradable slot starting from the basic till", () => {
-    const state = createFreshRunState();
+  it("hides the register from the setup shop (available after opening)", () => {
+    const setupState = createFreshRunState();
+    const setupOptions = getEquipmentShopOptions(setupState);
+    expect(setupOptions.find((o) => o.id === "register")).toBeUndefined();
+  });
+
+  it("offers the register as an upgradable slot once the café is open", () => {
+    const state = createInitialGameState();
     const options = getEquipmentShopOptions(state);
     const register = options.find((o) => o.id === "register");
     expect(register).toBeDefined();

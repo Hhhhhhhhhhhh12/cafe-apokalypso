@@ -379,6 +379,35 @@ function applySuccessfulServe(
     if (memoryResult.line) {
       flavorLines.push(memoryResult.line);
     }
+
+    // Flow streak: runs per served guest so helper double-serves both count.
+    const loopGuestPreferences = servedGuest?.appreciatedProductIds ?? [];
+    const loopGuestHadPreference =
+      loopGuestPreferences.length > 0 || Boolean(servedGuest?.preferredProductId);
+    const loopServedWell =
+      loopGuestPreferences.includes(product.id) ||
+      servedGuest?.preferredProductId === product.id;
+    if (loopServedWell) {
+      const newStreak = management.serveStreak + 1;
+      management = {
+        ...management,
+        serveStreak: newStreak,
+        bestServeStreak: Math.max(management.bestServeStreak, newStreak)
+      };
+      if (newStreak >= 3 && newStreak % 2 === 1) {
+        const tip = newStreak >= 5 && newStreak <= FLOW_TIP_MAX_STREAK ? FLOW_TIP : 0;
+        if (tip > 0) {
+          resources = { ...resources, money: clampResource(resources.money + tip) };
+          management = { ...management, moneyEarned: clampResource(management.moneyEarned + tip) };
+        }
+        flavorLines.push(getFlowLine(newStreak, tip));
+      }
+    } else if (loopGuestHadPreference) {
+      if (management.serveStreak >= 3) {
+        flavorLines.push("The rhythm breaks — this order pulls you out of the flow.");
+      }
+      management = { ...management, serveStreak: 0 };
+    }
   }
 
   if (management.helperExtraOrdersRemaining > 0) {
@@ -425,6 +454,27 @@ function applySuccessfulServe(
     appreciationLine = servedGuest.missedPreferenceLine ?? "";
   }
 
+  // Mild waste (#56): the craft of a premium drink is lost on a guest who neither
+  // values it nor reached for it, and whose own taste runs simpler. No reputation
+  // penalty — the cost is the wasted beans and effort — but the line makes the
+  // over-serve legible, so "give everyone the fanciest cup" is not a free strategy.
+  let wasteLine = "";
+  const servedTier = product.qualityTier ?? 1;
+  const preferredProduct = servedGuest?.preferredProductId
+    ? getProductById(servedGuest.preferredProductId)
+    : undefined;
+  const preferredTier = preferredProduct?.qualityTier ?? 1;
+  const overServedPremium =
+    servedGuest != null &&
+    servedTier >= 3 &&
+    !appreciates &&
+    !matchesSoftPreference &&
+    preferredProduct != null &&
+    servedTier > preferredTier;
+  if (overServedPremium) {
+    wasteLine = `${servedGuest.name} drinks the ${product.name.toLowerCase()} without ceremony. The slow craft — and the extra supplies — are lost on someone who only wanted a ${preferredProduct.name.toLowerCase()}.`;
+  }
+
   // Decor atmosphere bonus: atmosphere-sensitive guests notice a well-maintained café.
   let decorAtmosphereLine = "";
   const decorBonusDef = servedGuest?.decorAtmosphereBonus;
@@ -438,40 +488,7 @@ function applySuccessfulServe(
     }
   }
 
-  // Flow streak: orders that land a guest's preference build a rhythm. Each odd
-  // milestone (3, 5, 7, …) drops a small tip and an escalating flavor line. A miss
-  // on a guest who *had* a preference breaks the flow; serving a guest with no
-  // preference at all is neutral and neither builds nor breaks it.
-  const guestHadPreference =
-    guestPreferences.length > 0 || Boolean(servedGuest?.preferredProductId);
-  const servedWell = appreciates || matchesSoftPreference;
-  let flowLine = "";
-  if (servedWell) {
-    const newStreak = management.serveStreak + 1;
-    management = {
-      ...management,
-      serveStreak: newStreak,
-      bestServeStreak: Math.max(management.bestServeStreak, newStreak)
-    };
-    if (newStreak >= 3 && newStreak % 2 === 1) {
-      const tip = newStreak >= 5 && newStreak <= FLOW_TIP_MAX_STREAK ? FLOW_TIP : 0;
-      if (tip > 0) {
-        resources = { ...resources, money: clampResource(resources.money + tip) };
-        management = {
-          ...management,
-          moneyEarned: clampResource(management.moneyEarned + tip)
-        };
-      }
-      flowLine = getFlowLine(newStreak, tip);
-    }
-  } else if (guestHadPreference) {
-    if (management.serveStreak >= 3) {
-      flowLine = "The rhythm breaks — this order pulls you out of the flow.";
-    }
-    management = { ...management, serveStreak: 0 };
-  }
-
-  const statusParts = [serveLine, appreciationLine, decorAtmosphereLine, flowLine, ...flavorLines].filter(
+  const statusParts = [serveLine, appreciationLine, decorAtmosphereLine, wasteLine, ...flavorLines].filter(
     (part) => part.length > 0
   );
 
@@ -1382,6 +1399,13 @@ function buyEquipment(state: GameState, slot: EquipmentSlotId): GameState {
     };
   }
 
+  if (state.dayPhase === "setup" && slot === "register") {
+    return {
+      ...state,
+      statusMessage: "Register upgrades are available after opening."
+    };
+  }
+
   const nextTier = state.equipment[slot] + 1;
   const tierDefinition = getEquipmentTier(slot, nextTier);
 
@@ -1841,7 +1865,8 @@ function applyPatienceTick(state: GameState): { state: GameState; walkoutLine: s
     dayManagement: {
       ...management,
       currentGuestPatience: 0,
-      guestsLost: management.guestsLost + 1
+      guestsLost: management.guestsLost + 1,
+      serveStreak: 0
     }
   };
 
