@@ -922,8 +922,8 @@ h3 {
 .cafe-coffee-machine {
   position: absolute;
   /* Stands on the painted counter top at the L-junction (left end of the bar). */
-  top: -28%;
-  left: 7%;
+  top: -68%;
+  left: 0%;
   width: 22%;
   height: 52%;
   border: 3px solid transparent;
@@ -987,8 +987,8 @@ h3 {
 .cafe-register {
   position: absolute;
   /* Stands on the right end of the painted counter top. */
-  top: -16%;
-  right: 16%;
+  top: -58%;
+  right: 34%;
   width: 21%;
   height: 48%;
   transform: skewY(2deg);
@@ -1809,7 +1809,7 @@ h3 {
    ── */
 .cafe-decor-clock {
   position: absolute;
-  left: 81.7%;
+  left: 74.0%;
   top: 30.0%;
   z-index: 8;
   width: 56px;
