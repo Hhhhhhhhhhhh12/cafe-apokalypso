@@ -4153,3 +4153,127 @@ h3 {
   color: #6c5146;
   font-size: 0.78rem;
 }
+
+/* Toggle for interactive options */
+.options-menu__toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.options-menu__toggle-input {
+  width: 1rem;
+  height: 1rem;
+  cursor: pointer;
+}
+
+.options-menu__toggle-input:focus-visible {
+  outline: 2px solid #16606c;
+  outline-offset: 1px;
+}
+
+.options-menu__toggle-label {
+  color: #35241e;
+  font-size: 0.84rem;
+  font-weight: 700;
+  flex: 1;
+}
+
+/* Colourblind-friendly palette (GitHub #68) */
+/* High contrast, hue-independent (blue-yellow, blue-black focus) */
+html.cafe-colorblind-mode {
+  --color-primary-dark: #000000;
+  --color-primary-mid: #1a1a1a;
+  --color-primary-light: #333333;
+  --color-accent-teal: #0066cc;
+  --color-accent-warm: #ff8800;
+  --color-neutral-light: #ffffff;
+  --color-neutral-mid: #e6e6e6;
+  --color-neutral-dark: #cccccc;
+  --color-text-primary: #000000;
+  --color-text-secondary: #333333;
+  --color-text-tertiary: #666666;
+  --color-border-strong: #000000;
+  --color-border-mid: #333333;
+  --color-background-main: #ffffff;
+  --color-background-alt: #f0f0f0;
+  --color-button-bg: #e6e6e6;
+  --color-button-hover: #cccccc;
+  --color-status-good: #0066cc;
+  --color-status-warning: #ff8800;
+  --color-status-caution: #ff6600;
+}
+
+html.cafe-colorblind-mode h1,
+html.cafe-colorblind-mode h2,
+html.cafe-colorblind-mode h3 {
+  color: #000000;
+}
+
+html.cafe-colorblind-mode .eyebrow {
+  color: #0066cc;
+}
+
+html.cafe-colorblind-mode .hero-bar {
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.1) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.1) 1px, transparent 1px),
+    #ffffff;
+  border-bottom-color: #333333;
+}
+
+html.cafe-colorblind-mode .day-card,
+html.cafe-colorblind-mode .panel {
+  border-color: #000000;
+  background: #ffffff;
+  box-shadow: 0 6px 0 #cccccc, 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+html.cafe-colorblind-mode .day-card__label {
+  color: #333333;
+}
+
+html.cafe-colorblind-mode .day-card strong {
+  color: #000000;
+}
+
+html.cafe-colorblind-mode .options-menu__button {
+  border-color: #333333;
+  background: #ffffff;
+  color: #000000;
+}
+
+html.cafe-colorblind-mode .options-menu__button:hover {
+  border-color: #0066cc;
+  color: #0066cc;
+}
+
+html.cafe-colorblind-mode .options-menu__panel {
+  border-color: #000000;
+  background: #ffffff;
+  box-shadow: 0 6px 0 #cccccc, 0 10px 20px rgba(0, 0, 0, 0.18);
+}
+
+html.cafe-colorblind-mode .options-menu__lead {
+  color: #000000;
+}
+
+html.cafe-colorblind-mode .options-menu__item-label {
+  color: #000000;
+}
+
+html.cafe-colorblind-mode .options-menu__item-detail {
+  color: #333333;
+}
+
+html.cafe-colorblind-mode .options-menu__tag--respected {
+  background: #e6f2ff;
+  color: #003d99;
+}
+
+html.cafe-colorblind-mode .options-menu__tag--coming-soon {
+  background: #fff5e6;
+  color: #664400;
+}

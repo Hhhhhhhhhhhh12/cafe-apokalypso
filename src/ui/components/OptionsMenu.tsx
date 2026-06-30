@@ -1,21 +1,25 @@
 import { useEffect, useId, useRef, useState } from "react";
 
 /**
- * Scaffold for the in-game Display & Accessibility options (GitHub #67).
+ * Display & Accessibility options menu.
  *
- * The vertical slice only *hints* that options are coming: a subtle header
- * affordance that discloses the planned toggles. The toggles' actual logic
- * (colourblind palette #68, text size, …) lands in their own issues, so this
- * panel previews them as "coming soon" and truthfully marks reduced motion as
- * already respected (the app honours prefers-reduced-motion today).
+ * Active toggles: Colourblind-friendly palette (#68).
+ * Passive status: Reduced motion (already honoured by prefers-reduced-motion).
+ * Future toggles: Text size, contrast, …
  */
-interface PlannedOption {
-  label: string;
-  status: "respected" | "coming-soon";
-  detail: string;
+const OPTIONS_STORAGE_KEY = "cafe-apokalypso.options.v1";
+
+interface StoredOptions {
+  colourblindMode?: boolean;
 }
 
-const PLANNED_OPTIONS: readonly PlannedOption[] = [
+interface Option {
+  label: string;
+  detail: string;
+  status: "interactive" | "respected" | "coming-soon";
+}
+
+const OPTIONS: readonly Option[] = [
   {
     label: "Reduced motion",
     status: "respected",
@@ -23,7 +27,7 @@ const PLANNED_OPTIONS: readonly PlannedOption[] = [
   },
   {
     label: "Colourblind-friendly palette",
-    status: "coming-soon",
+    status: "interactive",
     detail: "A higher-contrast, hue-independent mode."
   },
   {
@@ -33,10 +37,49 @@ const PLANNED_OPTIONS: readonly PlannedOption[] = [
   }
 ];
 
+function loadOptions(): StoredOptions {
+  try {
+    const stored = localStorage.getItem(OPTIONS_STORAGE_KEY);
+    return stored ? JSON.parse(stored) : {};
+  } catch {
+    return {};
+  }
+}
+
+function saveOptions(opts: StoredOptions): void {
+  try {
+    localStorage.setItem(OPTIONS_STORAGE_KEY, JSON.stringify(opts));
+  } catch (e) {
+    console.warn("Failed to save options:", e);
+  }
+}
+
 export function OptionsMenu({ defaultOpen = false }: { defaultOpen?: boolean }) {
   const [open, setOpen] = useState(defaultOpen);
+  const [colourblindMode, setColourblindMode] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const panelId = useId();
+  const colourblindCheckboxId = useId();
+
+  // Load persisted options on mount.
+  useEffect(() => {
+    const stored = loadOptions();
+    if (stored.colourblindMode) {
+      setColourblindMode(true);
+      document.documentElement.classList.add("cafe-colorblind-mode");
+    }
+  }, []);
+
+  // Apply/remove colourblind mode on the document root.
+  useEffect(() => {
+    if (colourblindMode) {
+      document.documentElement.classList.add("cafe-colorblind-mode");
+    } else {
+      document.documentElement.classList.remove("cafe-colorblind-mode");
+    }
+    // Persist to localStorage.
+    saveOptions({ colourblindMode });
+  }, [colourblindMode]);
 
   // Esc closes the panel and returns focus to the trigger.
   useEffect(() => {
@@ -74,21 +117,37 @@ export function OptionsMenu({ defaultOpen = false }: { defaultOpen?: boolean }) 
           role="group"
           aria-label="Display and accessibility options"
         >
-          <p className="options-menu__lead">
-            Display &amp; accessibility options are on the way.
-          </p>
           <ul className="options-menu__list">
-            {PLANNED_OPTIONS.map((option) => (
-              <li key={option.label} className="options-menu__item">
-                <span className="options-menu__item-head">
-                  <span className="options-menu__item-label">{option.label}</span>
-                  <span className={`options-menu__tag options-menu__tag--${option.status}`}>
-                    {option.status === "respected" ? "Respected" : "Coming soon"}
+            {OPTIONS.map((option) => {
+              if (option.status === "interactive") {
+                return (
+                  <li key={option.label} className="options-menu__item">
+                    <label htmlFor={colourblindCheckboxId} className="options-menu__toggle">
+                      <input
+                        id={colourblindCheckboxId}
+                        type="checkbox"
+                        checked={colourblindMode}
+                        onChange={() => setColourblindMode((v) => !v)}
+                        className="options-menu__toggle-input"
+                      />
+                      <span className="options-menu__toggle-label">{option.label}</span>
+                    </label>
+                    <span className="options-menu__item-detail">{option.detail}</span>
+                  </li>
+                );
+              }
+              return (
+                <li key={option.label} className="options-menu__item">
+                  <span className="options-menu__item-head">
+                    <span className="options-menu__item-label">{option.label}</span>
+                    <span className={`options-menu__tag options-menu__tag--${option.status}`}>
+                      {option.status === "respected" ? "Respected" : "Coming soon"}
+                    </span>
                   </span>
-                </span>
-                <span className="options-menu__item-detail">{option.detail}</span>
-              </li>
-            ))}
+                  <span className="options-menu__item-detail">{option.detail}</span>
+                </li>
+              );
+            })}
           </ul>
         </div>
       ) : null}
