@@ -364,7 +364,12 @@ h3 {
   position: absolute;
   inset: 0;
   background: #0a0605;
-  transition: opacity 2s ease-out;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .intro-cinema__veil {
+    transition: opacity 2s ease-out;
+  }
 }
 
 .intro-cinema__subtitle {
@@ -378,8 +383,13 @@ h3 {
   letter-spacing: 0.03em;
   padding: 0 2rem;
   opacity: 0;
-  transition: opacity 0.9s ease;
   pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .intro-cinema__subtitle {
+    transition: opacity 0.9s ease;
+  }
 }
 
 .intro-cinema__subtitle--visible {
