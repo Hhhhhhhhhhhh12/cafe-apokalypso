@@ -715,10 +715,6 @@ h3 {
   border-color: transparent;
   box-shadow: none;
 }
-.cafe-counter__front,
-.cafe-counter__ledge {
-  display: none;
-}
 .cafe-window,
 .cafe-room-shadow {
   display: none;
@@ -2876,17 +2872,72 @@ h3 {
   color: #4d3a6b;
 }
 
-/* Progressive hidden weirdness — very subtle diorama shifts before Day 7 reveal */
-.cafe-diorama--weirdness-low .cafe-back-wall {
-  filter: saturate(0.97);
+/* Progressive hidden weirdness — diorama shifts across three buckets.
+   Low (hiddenWeirdness 3–9): barely deniable; deep (10+): noticeable; visible: Day 7 reveal. */
+
+/* --- Low bucket --- */
+.cafe-diorama--weirdness-low .cafe-stage-base {
+  filter: saturate(0.91) brightness(0.985);
 }
 
-.cafe-diorama--weirdness-deep .cafe-back-wall {
-  filter: saturate(0.93) hue-rotate(1deg);
+.cafe-diorama--weirdness-low .cafe-weirdness-hint {
+  opacity: 0.16;
 }
 
-.cafe-diorama--weirdness-deep .cafe-floor {
-  filter: saturate(0.96);
+@media (prefers-reduced-motion: no-preference) {
+  .cafe-diorama--weirdness-low .cafe-clock::before {
+    animation: cafe-clock-reverse-minute 30s linear infinite;
+  }
+  .cafe-diorama--weirdness-low .cafe-clock::after {
+    animation: cafe-clock-reverse-hour 240s linear infinite;
+  }
+}
+
+/* --- Deep bucket --- */
+.cafe-diorama--weirdness-deep .cafe-stage-base {
+  filter: saturate(0.80) hue-rotate(-4deg) brightness(0.97);
+}
+
+.cafe-diorama--weirdness-deep .cafe-weirdness-hint {
+  opacity: 0.36;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cafe-diorama--weirdness-deep .cafe-clock::before {
+    animation: cafe-clock-reverse-minute 8s linear infinite;
+  }
+  .cafe-diorama--weirdness-deep .cafe-clock::after {
+    animation: cafe-clock-reverse-hour 66s linear infinite;
+  }
+  .cafe-diorama--weirdness-deep .cafe-decor-lamp {
+    animation: cafe-lamp-flicker 9s ease-in-out infinite;
+  }
+}
+
+/* --- Visible (Day 7 reveal) --- */
+@media (prefers-reduced-motion: no-preference) {
+  .cafe-diorama--weirdness-visible .cafe-clock::before {
+    animation: cafe-clock-reverse-minute 4s linear infinite;
+  }
+  .cafe-diorama--weirdness-visible .cafe-clock::after {
+    animation: cafe-clock-reverse-hour 32s linear infinite;
+  }
+}
+
+@keyframes cafe-clock-reverse-minute {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(-360deg); }
+}
+
+@keyframes cafe-clock-reverse-hour {
+  from { transform: rotate(74deg); }
+  to   { transform: rotate(-286deg); }
+}
+
+@keyframes cafe-lamp-flicker {
+  0%, 78%, 100% { opacity: 1; }
+  83%           { opacity: 0.58; }
+  91%           { opacity: 0.84; }
 }
 
 .objective-card {
@@ -3883,9 +3934,7 @@ h3 {
 .cafe-storage,
 .cafe-door,
 .cafe-floor__tiles,
-.cafe-room-shadow,
-.cafe-counter__front,
-.cafe-counter__ledge {
+.cafe-room-shadow {
   display: none !important;
 }
 .cafe-floor,
@@ -3895,11 +3944,11 @@ h3 {
   box-shadow: none !important;
 }
 
-
 /* === CSS-Diorama dauerhaft deaktiviert — nur das PNG (.cafe-stage-base) ist Hintergrund ===
    Hard-Override: der gemalte Hintergrund ist die einzige Raumdarstellung. Die
    Struktur-Container (.cafe-floor/.cafe-counter) bleiben als unsichtbare
-   Positionierungs-Boxen erhalten, damit Maschine/Kasse/Props weiter ankern. */
+   Positionierungs-Boxen erhalten, damit Maschine/Kasse/Props weiter ankern.
+   cafe-counter__front/ledge bleiben sichtbar (furniture-free Hintergrund hat keine gemalte Theke). */
 .cafe-stage-base { display: block !important; }
 .cafe-back-wall,
 .cafe-side-wall,
@@ -3909,9 +3958,7 @@ h3 {
 .cafe-storage,
 .cafe-door,
 .cafe-floor__tiles,
-.cafe-room-shadow,
-.cafe-counter__front,
-.cafe-counter__ledge {
+.cafe-room-shadow {
   display: none !important;
 }
 .cafe-floor,

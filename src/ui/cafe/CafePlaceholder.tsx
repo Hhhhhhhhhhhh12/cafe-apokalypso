@@ -194,7 +194,7 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
   const tablesDirty =
     gameState.resources.cleanliness < 70 && (isOpen || isDayEnd) && customersServed >= 1;
 
-  const showWeirdness = gameState.weirdnessVisible || gameState.day >= 7;
+  const showWeirdness = gameState.weirdnessVisible || gameState.day >= 7 || gameState.hiddenWeirdness >= 3;
   const kassandraAwake = gameState.kassandraInstalled || gameState.day >= 6;
   const isDusty = gameState.day <= 2;
 
