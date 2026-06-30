@@ -20,7 +20,7 @@ import {
   getHelperTaskLabel,
   PATIENCE_TICK
 } from "../../game/engine/management";
-import type { ProductId, StaffOptionId } from "../../game/types/content";
+import type { ProductId, StaffOptionId, UpgradeId } from "../../game/types/content";
 import type {
   DecorSlotId,
   EquipmentSlotId,
@@ -28,6 +28,7 @@ import type {
   HelperTaskId,
   IngredientKey
 } from "../../game/types/game";
+import { weekOneUpgrades } from "../../game/data/upgrades";
 
 interface ActionPanelProps {
   gameState: GameState;
@@ -48,6 +49,7 @@ interface ActionPanelProps {
   onConfirmSupplyPurchase: () => void;
   onUpgradeDecor: (slot: DecorSlotId) => void;
   onBuyEquipment: (slot: EquipmentSlotId) => void;
+  onBuyUpgrade: (upgradeId: UpgradeId) => void;
   onFinishSetup: () => void;
   onResetGame: () => void;
 }
@@ -107,6 +109,7 @@ export function ActionPanel({
   onConfirmSupplyPurchase,
   onUpgradeDecor,
   onBuyEquipment,
+  onBuyUpgrade,
   onFinishSetup,
   onResetGame
 }: ActionPanelProps) {
@@ -160,6 +163,7 @@ export function ActionPanel({
           onConfirmSupplyPurchase={onConfirmSupplyPurchase}
           onUpgradeDecor={onUpgradeDecor}
           onBuyEquipment={onBuyEquipment}
+          onBuyUpgrade={onBuyUpgrade}
         />
       ) : null}
 
@@ -610,13 +614,15 @@ function RestockPanel({
   onSetSupplyPurchase,
   onConfirmSupplyPurchase,
   onUpgradeDecor,
-  onBuyEquipment
+  onBuyEquipment,
+  onBuyUpgrade
 }: {
   gameState: GameState;
   onSetSupplyPurchase: (ingredient: IngredientKey, quantity: number) => void;
   onConfirmSupplyPurchase: () => void;
   onUpgradeDecor: (slot: DecorSlotId) => void;
   onBuyEquipment: (slot: EquipmentSlotId) => void;
+  onBuyUpgrade: (upgradeId: UpgradeId) => void;
 }) {
   const preview = getRestockPreview(gameState);
   const decorOptions = getDecorUpgradeOptions(gameState);
@@ -712,6 +718,54 @@ function RestockPanel({
         onBuyEquipment={onBuyEquipment}
         heading="Equipment upgrades"
       />
+
+      <UpgradeShop gameState={gameState} onBuyUpgrade={onBuyUpgrade} />
+    </div>
+  );
+}
+
+function UpgradeShop({
+  gameState,
+  onBuyUpgrade
+}: {
+  gameState: GameState;
+  onBuyUpgrade: (upgradeId: UpgradeId) => void;
+}) {
+  const available = weekOneUpgrades.filter(
+    (upgrade) =>
+      upgrade.cost > 0 &&
+      upgrade.unlockDay <= gameState.day + 1 &&
+      !gameState.purchasedUpgrades.includes(upgrade.id)
+  );
+
+  if (available.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="decor-shop upgrade-shop" aria-label="Buy café upgrades">
+      <h3>Upgrades</h3>
+      <p className="action-hint">Invest before tomorrow's opening.</p>
+      {available.map((upgrade) => {
+        const affordable = upgrade.cost <= gameState.resources.money;
+        return (
+          <div className="decor-row" key={upgrade.id}>
+            <span className="decor-row__label">
+              <strong>{upgrade.name}</strong>
+              <em>{upgrade.summary}</em>
+            </span>
+            <button
+              type="button"
+              className="secondary-button"
+              disabled={!affordable}
+              onClick={() => onBuyUpgrade(upgrade.id)}
+              title={!affordable ? `€${upgrade.cost} needed` : upgrade.summary}
+            >
+              Buy: {upgrade.name} · €{upgrade.cost}
+            </button>
+          </div>
+        );
+      })}
     </div>
   );
 }

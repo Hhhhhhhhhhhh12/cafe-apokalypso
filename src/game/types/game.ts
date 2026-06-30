@@ -4,11 +4,12 @@ import type {
   EventId,
   GuestId,
   ProductId,
-  StaffOptionId
+  StaffOptionId,
+  UpgradeId
 } from "./content";
 import type { DayNumber } from "./content";
 
-export type GameStateVersion = 13;
+export type GameStateVersion = 14;
 
 export type ContentCatalogVersion = "week-one-v1";
 
@@ -192,6 +193,8 @@ export interface GameState {
   /** Events triggered during the current open day, in the order they fired. Reset on open_day. */
   pendingEvents: EventId[];
   unlockedAchievements: AchievementId[];
+  /** Upgrades bought from the day-end shop. Each id appears at most once. */
+  purchasedUpgrades: UpgradeId[];
   statusMessage: string;
 }
 
@@ -216,5 +219,6 @@ export type GameAction =
   | { type: "confirm_supply_purchase" }
   | { type: "upgrade_decor"; slot: DecorSlotId }
   | { type: "buy_equipment"; slot: EquipmentSlotId }
+  | { type: "buy_upgrade"; upgradeId: UpgradeId }
   | { type: "finish_setup" }
   | { type: "reset_game" };

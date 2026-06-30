@@ -206,6 +206,7 @@ export function App() {
           onConfirmSupplyPurchase={() => dispatch({ type: "confirm_supply_purchase" })}
           onUpgradeDecor={(slot) => dispatch({ type: "upgrade_decor", slot })}
           onBuyEquipment={(slot) => dispatch({ type: "buy_equipment", slot })}
+          onBuyUpgrade={(upgradeId) => dispatch({ type: "buy_upgrade", upgradeId })}
           onFinishSetup={() => dispatch({ type: "finish_setup" })}
           onResetGame={handleReset}
         />

@@ -5,7 +5,7 @@ import {
   addUniqueGuestIds,
   createFreshRunState
 } from "./gameState";
-import { weekOneAchievements, weekOneDays, weekOneEvents } from "../data";
+import { weekOneAchievements, weekOneDays, weekOneEvents, weekOneUpgrades } from "../data";
 import { getDecorDailyBonuses, getDecorTier, getMaxDecorTier } from "../data/decor";
 import {
   getEquipmentDailyBonuses,
@@ -58,7 +58,8 @@ import type {
   GuestDefinition,
   GuestId,
   ProductId,
-  StaffOptionId
+  StaffOptionId,
+  UpgradeId
 } from "../types/content";
 import type {
   DecorSlotId,
@@ -203,6 +204,9 @@ function applyAction(state: GameState, action: GameAction): GameState {
     case "buy_equipment":
       return buyEquipment(state, action.slot);
 
+    case "buy_upgrade":
+      return buyUpgrade(state, action.upgradeId);
+
     case "finish_setup":
       return finishSetup(state);
 
@@ -319,10 +323,12 @@ function applySuccessfulServe(
     // Income scales with reputation; offer review adds a 10 % daily boost.
     const offerMultiplier = workingState.dayManagement.offerReviewed ? 1.1 : 1;
     const earned = getEarnedPrice(product.basePrice * offerMultiplier, resources.reputation);
+    // cleaning-kit upgrade halves the cleanliness cost per serve (2 → 1).
+    const cleanlinessDrop = workingState.purchasedUpgrades.includes("cleaning-kit") ? 1 : 2;
     resources = {
       ...resources,
       money: clampResource(resources.money + earned),
-      cleanliness: clampMeter(resources.cleanliness - 2),
+      cleanliness: clampMeter(resources.cleanliness - cleanlinessDrop),
       stress: applyCapacityStress(resources.stress, management.customersServed, workingState.day)
     };
 
@@ -488,7 +494,18 @@ function applySuccessfulServe(
     }
   }
 
-  const statusParts = [serveLine, appreciationLine, decorAtmosphereLine, wasteLine, ...flavorLines].filter(
+  // better-beans upgrade: quality-sensitive guests notice the improved roast — +1 rep,
+  // stacks with the appreciation bonus. Capped at the existing meter max.
+  let betterBeansLine = "";
+  if (
+    workingState.purchasedUpgrades.includes("better-beans") &&
+    servedGuest?.behaviorTags.includes("quality-expectations")
+  ) {
+    resources = { ...resources, reputation: clampMeter(resources.reputation + 1) };
+    betterBeansLine = "The beans speak for themselves. Rep +1.";
+  }
+
+  const statusParts = [serveLine, appreciationLine, decorAtmosphereLine, betterBeansLine, wasteLine, ...flavorLines].filter(
     (part) => part.length > 0
   );
 
@@ -944,7 +961,12 @@ function openDay(state: GameState): GameState {
         ? 1
         : 0,
     helperDecisionMade: true,
-    actionPointsRemaining: state.dayManagement.actionPointsRemaining + levelBonuses.extraAP - shortStaffedPenalty
+    // second-table upgrade: the extra seating enables one additional order per shift.
+    actionPointsRemaining:
+      state.dayManagement.actionPointsRemaining +
+      levelBonuses.extraAP -
+      shortStaffedPenalty +
+      (state.purchasedUpgrades.includes("second-table") ? 1 : 0)
   };
 
   if (state.helperAssignment) {
@@ -1439,6 +1461,53 @@ function buyEquipment(state: GameState, slot: EquipmentSlotId): GameState {
       tierDefinition.reputationBonus > 0
         ? `Bought: ${tierDefinition.name}. Rep +${tierDefinition.reputationBonus}.`
         : `Bought: ${tierDefinition.name}.`
+  };
+}
+
+/**
+ * Buy a one-time upgrade from the day-end shop. Upgrades have passive gameplay
+ * effects that activate in other action handlers once purchased.
+ *   cleaning-kit  → reduces cleanliness drop per serve (2 → 1)
+ *   better-beans  → grants +1 rep when a quality-expectations guest is served
+ *   second-table  → adds +1 action point at the next open_day
+ */
+function buyUpgrade(state: GameState, upgradeId: UpgradeId): GameState {
+  if (state.demoComplete) {
+    return state;
+  }
+
+  const upgrade = weekOneUpgrades.find((u) => u.id === upgradeId);
+  if (!upgrade) {
+    return state;
+  }
+
+  if (state.purchasedUpgrades.includes(upgradeId)) {
+    return { ...state, statusMessage: "Already purchased." };
+  }
+
+  if (state.day < upgrade.unlockDay) {
+    return { ...state, statusMessage: "Not available yet." };
+  }
+
+  if (upgrade.cost > state.resources.money) {
+    return {
+      ...state,
+      statusMessage: `Not enough money (€${upgrade.cost} needed).`
+    };
+  }
+
+  return {
+    ...state,
+    purchasedUpgrades: [...state.purchasedUpgrades, upgradeId],
+    resources: {
+      ...state.resources,
+      money: clampResource(state.resources.money - upgrade.cost)
+    },
+    dayManagement: {
+      ...state.dayManagement,
+      moneySpent: clampResource(state.dayManagement.moneySpent + upgrade.cost)
+    },
+    statusMessage: `${upgrade.name} — added to the café.`
   };
 }
 
