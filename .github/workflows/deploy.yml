@@ -31,7 +31,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - name: Install dependencies
@@ -41,11 +41,9 @@ jobs:
         run: npm run build
 
       - name: Configure Pages
+        # Requires Pages to be enabled once with Source = "GitHub Actions"
+        # (Settings → Pages). The Actions token cannot create the site itself.
         uses: actions/configure-pages@v5
-        with:
-          # Auto-create the Pages site if it does not exist yet, so no manual
-          # Settings → Pages toggle is needed for the first deploy.
-          enablement: true
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
