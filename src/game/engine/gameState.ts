@@ -18,7 +18,7 @@ import type {
 } from "../types/game";
 import { createInitialDayManagement, STARTING_REPUTATION, SUPPLY_CAPS } from "./management";
 
-export const CURRENT_GAME_STATE_VERSION = 13;
+export const CURRENT_GAME_STATE_VERSION = 14;
 export const CURRENT_CONTENT_CATALOG_VERSION = "week-one-v1";
 
 const initialResources: ResourceState = {
@@ -89,6 +89,7 @@ export function createInitialGameState(): GameState {
     eventHistory: [],
     pendingEvents: [],
     unlockedAchievements: [],
+    purchasedUpgrades: [],
     statusMessage:
       "The café opens. The guestbook quietly writes: Previous runs: [REDACTED]."
   };
@@ -156,6 +157,7 @@ export function isValidGameState(value: unknown): value is GameState {
     isStringArray(candidate.eventHistory) &&
     isStringArray(candidate.pendingEvents) &&
     isStringArray(candidate.unlockedAchievements) &&
+    isStringArray(candidate.purchasedUpgrades) &&
     isValidStaffXp(candidate.staffXp)
   );
 }
@@ -472,6 +474,7 @@ function isValidGuestMemory(value: unknown): value is Partial<Record<GuestId, Gu
  * v11 -> v12: `socialAdRun` added to dayManagement.
  * v12 -> v13: core `equipment` slots added. Old saves were already-open cafés
  *   with tables, so they migrate to machine 1 / seating 1.
+ * v13 -> v14: `purchasedUpgrades` array added (defaults to []).
  * Older versions may also lack décor slots added after the save was written
  * (clock/lamp/cups).
  */
@@ -593,6 +596,15 @@ export function migrateRawSave(raw: unknown): unknown {
       if (summaryPatched) {
         obj.daySummary = patchedSummary;
       }
+    }
+  }
+
+  if (obj.version === 13) {
+    obj.version = 14;
+    patched = true;
+
+    if (!Array.isArray(obj.purchasedUpgrades)) {
+      obj.purchasedUpgrades = [];
     }
   }
 

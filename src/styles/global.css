@@ -1091,12 +1091,24 @@ h3 {
  */
 .cafe-table {
   z-index: 5;
-  width: 20%;
-  height: 25%;
-  transform: skewY(-5deg);
-  /* Hidden: the painted Stage Base already furnishes the room; the faded CSS
-     tables read as ghost boxes over the floor. Kept as fallback structure. */
-  opacity: 0;
+  width: 22%;
+  height: 26%;
+  /* Furniture-free Stage Base (nofurniture-fix) paints no tables, so the bought
+     seating shows the real pixel sprite instead of the old CSS ghost boxes.
+     Sub-shapes (__top / chairs / pseudo legs) are neutralised below. */
+  background-image: url("../../assets/sprites/props/placeholder-table-chair-set.png");
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  background-size: contain;
+  image-rendering: pixelated;
+}
+
+/* CSS-drawn table/chair shapes replaced by the sprite above */
+.cafe-table__top,
+.cafe-chair,
+.cafe-table::after,
+.cafe-table::before {
+  display: none;
 }
 
 .cafe-table--left {
@@ -1739,7 +1751,7 @@ h3 {
    ── */
 .cafe-decor-clock {
   position: absolute;
-  left: 81.7%;
+  left: 23.0%;
   top: 30.0%;
   z-index: 8;
   width: 56px;
@@ -1760,20 +1772,19 @@ h3 {
 .cafe-decor-clock.cafe-decor--tier-3 {
   opacity: 1;
   background-image: url("../../assets/sprites/props/placeholder-cafe-clock-t3.png");
-  left: 75%;
   width: 56px;
   height: 72px;
 }
 
 /*
- * Floor lamp. Stands in the back-left corner between the door and the left
- * window. Base anchored to the CSS bottom edge (center bottom / contain) so
+ * Floor lamp. Stands between the two back-wall windows (right side).
+ * Base anchored to the CSS bottom edge (center bottom / contain) so
  * the pole base sits on the floor regardless of tier size change.
  */
 .cafe-decor-lamp {
   position: absolute;
-  left: 16.0%;
-  top: 27.0%;
+  left: 65.0%;
+  top: 26.0%;
   z-index: 4;
   width: 40px;
   height: 64px;
@@ -1806,8 +1817,8 @@ h3 {
  */
 .cafe-decor-cups {
   position: absolute;
-  left: 55.0%;
-  top: 60.0%;
+  left: 61.0%;
+  top: 72.0%;
   z-index: 6;
   width: 32px;
   height: 27px;
