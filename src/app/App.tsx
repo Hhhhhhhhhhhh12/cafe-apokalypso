@@ -14,6 +14,7 @@ import { AchievementToast } from "../ui/components/AchievementToast";
 import { ActionPanel } from "../ui/components/ActionPanel";
 import { CafePlaceholder } from "../ui/cafe/CafePlaceholder";
 import { IntroSequence } from "../ui/components/IntroSequence";
+import { OptionsMenu } from "../ui/components/OptionsMenu";
 import { DayProgressPanel } from "../ui/panels/DayProgressPanel";
 import { ResourceHud } from "../ui/panels/ResourceHud";
 
@@ -126,10 +127,13 @@ export function App() {
             A cozy café. Seven days. Something is not quite right.
           </p>
         </div>
-        <div className="day-card" aria-label={`Current status: Day ${gameState.day}`}>
-          <span className="day-card__label">Current day</span>
-          <strong>Day {gameState.day}</strong>
-          <span>{gameState.phaseLabel}</span>
+        <div className="hero-bar__aside">
+          <OptionsMenu />
+          <div className="day-card" aria-label={`Current status: Day ${gameState.day}`}>
+            <span className="day-card__label">Current day</span>
+            <strong>Day {gameState.day}</strong>
+            <span>{gameState.phaseLabel}</span>
+          </div>
         </div>
       </header>
 
