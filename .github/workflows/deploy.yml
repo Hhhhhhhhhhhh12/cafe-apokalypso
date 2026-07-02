@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - main
-      # Temporary: lets the site be previewed from this feature branch before
-      # it is merged. Remove once the branch is merged so only main deploys.
-      - claude/diorama-artifact-characters-zb0dof
   workflow_dispatch:
 
 # Allow the workflow to publish to Pages.
