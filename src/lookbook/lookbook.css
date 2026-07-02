@@ -1,0 +1,158 @@
+/* Lookbook chrome — scoped to .lookbook so it never leaks into the game shell.
+   The diorama and sprites inside reuse global.css; this only styles the page
+   around them. */
+
+.lookbook {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 24px 80px;
+  color: #3d2a23;
+}
+
+.lookbook__hero {
+  margin-bottom: 36px;
+}
+
+.lookbook__eyebrow {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.75rem;
+  color: #8f342f;
+}
+
+.lookbook__hero h1 {
+  margin: 4px 0 10px;
+  font-size: 2.4rem;
+}
+
+.lookbook__lede {
+  margin: 0;
+  max-width: 60ch;
+  line-height: 1.5;
+  color: #5a463c;
+}
+
+.lookbook__section {
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 2px dashed #cdab86;
+}
+
+.lookbook__section > h2 {
+  margin: 0 0 4px;
+  font-size: 1.5rem;
+}
+
+.lookbook__hint {
+  margin: 0 0 16px;
+  color: #6b554a;
+}
+
+.lookbook__hint code,
+.lookbook__card code {
+  font-size: 0.85em;
+  background: rgba(143, 52, 47, 0.08);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+/* --- Diorama state tabs --- */
+.lookbook__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.lookbook__tab {
+  border: 2px solid #b98e6a;
+  background: #fff6ea;
+  color: #5a463c;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
+}
+
+.lookbook__tab:hover {
+  transform: translateY(-1px);
+}
+
+.lookbook__tab--active {
+  background: #8f342f;
+  border-color: #8f342f;
+  color: #fff3e2;
+}
+
+.lookbook__scene-note {
+  margin: 0 0 16px;
+  font-style: italic;
+  color: #6b554a;
+}
+
+.lookbook__diorama-frame {
+  max-width: 720px;
+}
+
+/* --- Sprite grids --- */
+.lookbook__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 16px;
+}
+
+.lookbook__card {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  background: #fff6ea;
+  border: 2px solid #e0c4a2;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 0 #d9b58e;
+}
+
+.lookbook__card-stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 130px;
+  padding: 10px;
+  /* checkerboard so transparent sprite edges read clearly */
+  background-color: #f4e6d2;
+  background-image:
+    linear-gradient(45deg, #e7d2b6 25%, transparent 25%),
+    linear-gradient(-45deg, #e7d2b6 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #e7d2b6 75%),
+    linear-gradient(-45deg, transparent 75%, #e7d2b6 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+}
+
+.lookbook__card-stage img {
+  max-width: 100%;
+  max-height: 110px;
+  image-rendering: pixelated;
+}
+
+.lookbook__card figcaption {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 8px 10px 10px;
+  border-top: 1px solid #e0c4a2;
+}
+
+.lookbook__card figcaption strong {
+  text-transform: capitalize;
+  font-size: 0.9rem;
+}
+
+.lookbook__card figcaption code {
+  font-size: 0.7rem;
+  color: #8a6f5e;
+  word-break: break-all;
+}

@@ -35,6 +35,7 @@ function renderActionPanel(state: GameState, statusMessage = "A test status beat
       onConfirmSupplyPurchase={noop}
       onUpgradeDecor={noop}
       onBuyEquipment={noop}
+      onBuyUpgrade={noop}
       onFinishSetup={noop}
       onResetGame={noop}
     />
