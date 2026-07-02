@@ -20,7 +20,7 @@ import {
   getHelperTaskLabel,
   PATIENCE_TICK
 } from "../../game/engine/management";
-import type { ProductId, StaffOptionId } from "../../game/types/content";
+import type { ProductId, StaffOptionId, UpgradeId } from "../../game/types/content";
 import type {
   DecorSlotId,
   EquipmentSlotId,
@@ -28,6 +28,7 @@ import type {
   HelperTaskId,
   IngredientKey
 } from "../../game/types/game";
+import { weekOneUpgrades } from "../../game/data/upgrades";
 
 interface ActionPanelProps {
   gameState: GameState;
@@ -48,6 +49,7 @@ interface ActionPanelProps {
   onConfirmSupplyPurchase: () => void;
   onUpgradeDecor: (slot: DecorSlotId) => void;
   onBuyEquipment: (slot: EquipmentSlotId) => void;
+  onBuyUpgrade: (upgradeId: UpgradeId) => void;
   onFinishSetup: () => void;
   onResetGame: () => void;
 }
@@ -107,6 +109,7 @@ export function ActionPanel({
   onConfirmSupplyPurchase,
   onUpgradeDecor,
   onBuyEquipment,
+  onBuyUpgrade,
   onFinishSetup,
   onResetGame
 }: ActionPanelProps) {
@@ -160,6 +163,7 @@ export function ActionPanel({
           onConfirmSupplyPurchase={onConfirmSupplyPurchase}
           onUpgradeDecor={onUpgradeDecor}
           onBuyEquipment={onBuyEquipment}
+          onBuyUpgrade={onBuyUpgrade}
         />
       ) : null}
 
@@ -195,8 +199,14 @@ export function ActionPanel({
                   : "Core café tasks complete. The day can be closed."}
       </p>
 
-      <p key={statusMessage} className="status-message" role="status" aria-live="polite">
-        {statusMessage}
+      {/* Persistent live region: the <p> stays mounted so screen readers
+          announce every status change (serve lines, KASSANDRA, supply warnings).
+          The inner span remounts via key to replay the slide-in animation for
+          sighted users without disturbing the live region. See GitHub #70. */}
+      <p className="status-message" role="status" aria-live="polite" aria-atomic="true">
+        <span key={statusMessage} className="status-message__text">
+          {statusMessage}
+        </span>
       </p>
     </section>
   );
@@ -247,10 +257,16 @@ function OpenDayControls({
   return (
     <>
       {nextGuest ? (
-        <div className="next-guest" role="status">
+        // Not a live region: the next-guest preview updates on every serve, so
+        // announcing it would pile up on the status line. It stays a labelled,
+        // navigable block instead. See GitHub #70.
+        <div className="next-guest" aria-label="Next guest in line">
           <div className="next-guest__header">
             <span className="next-guest__label">Next in line:</span>
-            <strong>{nextGuest.name}</strong>
+            {/* Guest names are German proper nouns/titles (Pendler, Herr, Frau mit rotem
+                Regenschirm…) in an otherwise-English UI; mark them so screen readers
+                pronounce them in German. See GitHub #71. */}
+            <strong lang="de">{nextGuest.name}</strong>
           </div>
           {patienceState ? (
             <span
@@ -320,6 +336,17 @@ function OpenDayControls({
         </small>
       </div>
 
+      {gameState.dayManagement.serveStreak >= 2 ? (
+        <div
+          className={`flow-meter${gameState.dayManagement.serveStreak >= 5 ? " flow-meter--hot" : ""}`}
+          aria-label={`Flow streak: ${gameState.dayManagement.serveStreak} matched orders in a row`}
+        >
+          <span className="flow-meter__icon" aria-hidden="true">≈</span>
+          <span className="flow-meter__label">Flow</span>
+          <span className="flow-meter__count">×{gameState.dayManagement.serveStreak}</span>
+        </div>
+      ) : null}
+
       {gameState.helperAssignment ? (
         <div className="helper-slot" aria-label="Current helper assignment">
           {gameState.helperAssignment.flavorLine}
@@ -327,7 +354,9 @@ function OpenDayControls({
       ) : null}
 
       {coach ? (
-        <p key={coach.text} className="cafe-coach" role="status">
+        // Coaching hint, not a beat — kept visible but out of the live region so
+        // it doesn't compete with the status line for announcements. See #70.
+        <p key={coach.text} className="cafe-coach">
           <span className="cafe-coach__icon" aria-hidden="true">☞</span>
           {coach.text}
         </p>
@@ -595,13 +624,15 @@ function RestockPanel({
   onSetSupplyPurchase,
   onConfirmSupplyPurchase,
   onUpgradeDecor,
-  onBuyEquipment
+  onBuyEquipment,
+  onBuyUpgrade
 }: {
   gameState: GameState;
   onSetSupplyPurchase: (ingredient: IngredientKey, quantity: number) => void;
   onConfirmSupplyPurchase: () => void;
   onUpgradeDecor: (slot: DecorSlotId) => void;
   onBuyEquipment: (slot: EquipmentSlotId) => void;
+  onBuyUpgrade: (upgradeId: UpgradeId) => void;
 }) {
   const preview = getRestockPreview(gameState);
   const decorOptions = getDecorUpgradeOptions(gameState);
@@ -697,6 +728,54 @@ function RestockPanel({
         onBuyEquipment={onBuyEquipment}
         heading="Equipment upgrades"
       />
+
+      <UpgradeShop gameState={gameState} onBuyUpgrade={onBuyUpgrade} />
+    </div>
+  );
+}
+
+function UpgradeShop({
+  gameState,
+  onBuyUpgrade
+}: {
+  gameState: GameState;
+  onBuyUpgrade: (upgradeId: UpgradeId) => void;
+}) {
+  const available = weekOneUpgrades.filter(
+    (upgrade) =>
+      upgrade.cost > 0 &&
+      upgrade.unlockDay <= gameState.day + 1 &&
+      !gameState.purchasedUpgrades.includes(upgrade.id)
+  );
+
+  if (available.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="decor-shop upgrade-shop" aria-label="Buy café upgrades">
+      <h3>Upgrades</h3>
+      <p className="action-hint">Invest before tomorrow's opening.</p>
+      {available.map((upgrade) => {
+        const affordable = upgrade.cost <= gameState.resources.money;
+        return (
+          <div className="decor-row" key={upgrade.id}>
+            <span className="decor-row__label">
+              <strong>{upgrade.name}</strong>
+              <em>{upgrade.summary}</em>
+            </span>
+            <button
+              type="button"
+              className="secondary-button"
+              disabled={!affordable}
+              onClick={() => onBuyUpgrade(upgrade.id)}
+              title={!affordable ? `€${upgrade.cost} needed` : upgrade.summary}
+            >
+              Buy: {upgrade.name} · €{upgrade.cost}
+            </button>
+          </div>
+        );
+      })}
     </div>
   );
 }

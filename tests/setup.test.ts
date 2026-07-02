@@ -2,13 +2,16 @@ import { describe, expect, it } from "vitest";
 import { createFreshRunState, createInitialGameState } from "../src/game/engine/gameState";
 import { gameReducer } from "../src/game/engine/reducer";
 import { getDioramaGuestVisibility, getEquipmentShopOptions } from "../src/game/engine/selectors";
+import { getEquipmentDailyBonuses } from "../src/game/data/equipment";
 
 describe("createFreshRunState", () => {
-  it("starts in setup phase with no equipment owned", () => {
+  it("starts in setup phase with no machine/seating but the basic till already on the counter", () => {
     const state = createFreshRunState();
     expect(state.dayPhase).toBe("setup");
     expect(state.equipment.machine).toBe(0);
     expect(state.equipment.seating).toBe(0);
+    // The register is never unowned — every café opens with the small till (tier 1).
+    expect(state.equipment.register).toBe(1);
   });
 
   it("has the same starting money as createInitialGameState", () => {
@@ -93,7 +96,7 @@ describe("buy_equipment action", () => {
     const state = {
       ...createInitialGameState(),
       dayPhase: "day_end" as const,
-      equipment: { machine: 3, seating: 1 }
+      equipment: { machine: 3, seating: 1, register: 1 }
     };
     const next = gameReducer(state, { type: "buy_equipment", slot: "machine" });
     expect(next.equipment.machine).toBe(3);
@@ -151,9 +154,48 @@ describe("getEquipmentShopOptions", () => {
   it("shows null next when at max tier", () => {
     const state = {
       ...createInitialGameState(),
-      equipment: { machine: 3, seating: 3 }
+      equipment: { machine: 3, seating: 3, register: 3 }
     };
     const options = getEquipmentShopOptions(state);
     expect(options.every((o) => o.next === null)).toBe(true);
+  });
+
+  it("hides the register from the setup shop (available after opening)", () => {
+    const setupState = createFreshRunState();
+    const setupOptions = getEquipmentShopOptions(setupState);
+    expect(setupOptions.find((o) => o.id === "register")).toBeUndefined();
+  });
+
+  it("offers the register as an upgradable slot once the café is open", () => {
+    const state = createInitialGameState();
+    const options = getEquipmentShopOptions(state);
+    const register = options.find((o) => o.id === "register");
+    expect(register).toBeDefined();
+    // Owned from the start (tier 1), so it is never flagged as unowned...
+    expect(register?.unowned).toBe(false);
+    // ...but a next tier (Card Terminal) is still purchasable.
+    expect(register?.next?.name).toBe("Card Terminal");
+  });
+});
+
+describe("register equipment upgrades", () => {
+  it("buys the next register tier and grants its reputation bonus", () => {
+    // Basic Till (tier 1) → Card Terminal (tier 2, reputationBonus 2).
+    let state = createInitialGameState();
+    state = {
+      ...state,
+      dayPhase: "day_end" as const,
+      resources: { ...state.resources, money: 100 }
+    };
+    const repBefore = state.resources.reputation;
+    state = gameReducer(state, { type: "buy_equipment", slot: "register" });
+    expect(state.equipment.register).toBe(2);
+    expect(state.resources.reputation).toBe(repBefore + 2);
+  });
+
+  it("feeds the register's daily reputation bonus into the morning open", () => {
+    const bonuses = getEquipmentDailyBonuses({ machine: 1, seating: 1, register: 3 });
+    // Pro POS (tier 3) gives dailyRepBonus 2; machine/seating tier 1 give 0.
+    expect(bonuses.reputation).toBe(2);
   });
 });

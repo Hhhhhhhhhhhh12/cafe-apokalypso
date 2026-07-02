@@ -4,11 +4,12 @@ import type {
   EventId,
   GuestId,
   ProductId,
-  StaffOptionId
+  StaffOptionId,
+  UpgradeId
 } from "./content";
 import type { DayNumber } from "./content";
 
-export type GameStateVersion = 13;
+export type GameStateVersion = 14;
 
 export type ContentCatalogVersion = "week-one-v1";
 
@@ -19,7 +20,7 @@ export type StressStateLabel = "Calm" | "Busy" | "Tense" | "Overloaded";
 export type DayPhase = "setup" | "day_start" | "open" | "day_end";
 export type ClosureReason = "money" | "reputation";
 export type DecorSlotId = "plant" | "shelf" | "clock" | "lamp" | "cups";
-export type EquipmentSlotId = "machine" | "seating";
+export type EquipmentSlotId = "machine" | "seating" | "register";
 export type HelperTaskId = "cleaning" | "service" | "barista" | "counter" | "marketing";
 export type EmployeeLevel = 1 | 2 | 3;
 
@@ -83,6 +84,10 @@ export interface DayManagementState {
   currentGuestPatienceMax: number;
   /** Guests who walked out unserved today. Advances the queue without counting as served. */
   guestsLost: number;
+  /** Consecutive orders that matched the guest's preference — the current "flow" streak. Resets on a miss. */
+  serveStreak: number;
+  /** Highest flow streak reached today. Surfaced in the day-end recap. */
+  bestServeStreak: number;
 }
 
 export interface GuestMemoryEntry {
@@ -109,6 +114,8 @@ export interface DaySummary {
   customersServed: number;
   /** Guests who walked out unserved during the day (patience ran out). */
   guestsLost: number;
+  /** Highest flow streak (consecutive matched orders) reached during the day. */
+  bestServeStreak: number;
   suppliesUsed: SupplyState;
   suppliesRestocked: SupplyState;
   suppliesRemaining: SupplyState;
@@ -186,6 +193,8 @@ export interface GameState {
   /** Events triggered during the current open day, in the order they fired. Reset on open_day. */
   pendingEvents: EventId[];
   unlockedAchievements: AchievementId[];
+  /** Upgrades bought from the day-end shop. Each id appears at most once. */
+  purchasedUpgrades: UpgradeId[];
   statusMessage: string;
 }
 
@@ -210,5 +219,6 @@ export type GameAction =
   | { type: "confirm_supply_purchase" }
   | { type: "upgrade_decor"; slot: DecorSlotId }
   | { type: "buy_equipment"; slot: EquipmentSlotId }
+  | { type: "buy_upgrade"; upgradeId: UpgradeId }
   | { type: "finish_setup" }
   | { type: "reset_game" };

@@ -5,7 +5,7 @@ import {
   addUniqueGuestIds,
   createFreshRunState
 } from "./gameState";
-import { weekOneAchievements, weekOneDays, weekOneEvents } from "../data";
+import { weekOneAchievements, weekOneDays, weekOneEvents, weekOneUpgrades } from "../data";
 import { getDecorDailyBonuses, getDecorTier, getMaxDecorTier } from "../data/decor";
 import {
   getEquipmentDailyBonuses,
@@ -58,7 +58,8 @@ import type {
   GuestDefinition,
   GuestId,
   ProductId,
-  StaffOptionId
+  StaffOptionId,
+  UpgradeId
 } from "../types/content";
 import type {
   DecorSlotId,
@@ -80,6 +81,31 @@ const APPRECIATION_DAILY_CAP = 4;
 
 /** Max decor atmosphere reputation bonuses awarded per day. */
 const DECOR_ATMOSPHERE_DAILY_CAP = 2;
+
+/** Flow streak: a tip lands at each odd milestone from 5 up to this streak length (5, 7, 9, 11). */
+const FLOW_TIP_MAX_STREAK = 11;
+/** Cash tip handed over at each flow milestone — small, warm, never game-breaking. */
+const FLOW_TIP = 1;
+
+/**
+ * Flavor for the "flow" streak — consecutive orders that matched the guest's
+ * preference. Lines escalate; the tipped ones name the coin that just landed.
+ */
+function getFlowLine(streak: number, tip: number): string {
+  if (streak === 3) {
+    return "Three orders, no missteps — your hands find the rhythm before your head does.";
+  }
+  if (streak === 5) {
+    return `Five in a row. Cup, machine, timing — one motion now. A regular slides a coin across the counter. Tip +€${tip.toFixed(0)}.`;
+  }
+  if (streak === 7) {
+    return `Seven straight. For a moment the café runs itself and you are just part of it. Tip +€${tip.toFixed(0)}.`;
+  }
+  if (tip > 0) {
+    return `${streak} in flow. The counter hums and the tips keep landing. Tip +€${tip.toFixed(0)}.`;
+  }
+  return `${streak} in flow. The morning has a current and you are riding it.`;
+}
 
 export function gameReducer(state: GameState, action: GameAction): GameState {
   if (state.cafeClosed && action.type !== "reset_game") {
@@ -177,6 +203,9 @@ function applyAction(state: GameState, action: GameAction): GameState {
 
     case "buy_equipment":
       return buyEquipment(state, action.slot);
+
+    case "buy_upgrade":
+      return buyUpgrade(state, action.upgradeId);
 
     case "finish_setup":
       return finishSetup(state);
@@ -294,10 +323,12 @@ function applySuccessfulServe(
     // Income scales with reputation; offer review adds a 10 % daily boost.
     const offerMultiplier = workingState.dayManagement.offerReviewed ? 1.1 : 1;
     const earned = getEarnedPrice(product.basePrice * offerMultiplier, resources.reputation);
+    // cleaning-kit upgrade halves the cleanliness cost per serve (2 → 1).
+    const cleanlinessDrop = workingState.purchasedUpgrades.includes("cleaning-kit") ? 1 : 2;
     resources = {
       ...resources,
       money: clampResource(resources.money + earned),
-      cleanliness: clampMeter(resources.cleanliness - 2),
+      cleanliness: clampMeter(resources.cleanliness - cleanlinessDrop),
       stress: applyCapacityStress(resources.stress, management.customersServed, workingState.day)
     };
 
@@ -354,6 +385,35 @@ function applySuccessfulServe(
     if (memoryResult.line) {
       flavorLines.push(memoryResult.line);
     }
+
+    // Flow streak: runs per served guest so helper double-serves both count.
+    const loopGuestPreferences = servedGuest?.appreciatedProductIds ?? [];
+    const loopGuestHadPreference =
+      loopGuestPreferences.length > 0 || Boolean(servedGuest?.preferredProductId);
+    const loopServedWell =
+      loopGuestPreferences.includes(product.id) ||
+      servedGuest?.preferredProductId === product.id;
+    if (loopServedWell) {
+      const newStreak = management.serveStreak + 1;
+      management = {
+        ...management,
+        serveStreak: newStreak,
+        bestServeStreak: Math.max(management.bestServeStreak, newStreak)
+      };
+      if (newStreak >= 3 && newStreak % 2 === 1) {
+        const tip = newStreak >= 5 && newStreak <= FLOW_TIP_MAX_STREAK ? FLOW_TIP : 0;
+        if (tip > 0) {
+          resources = { ...resources, money: clampResource(resources.money + tip) };
+          management = { ...management, moneyEarned: clampResource(management.moneyEarned + tip) };
+        }
+        flavorLines.push(getFlowLine(newStreak, tip));
+      }
+    } else if (loopGuestHadPreference) {
+      if (management.serveStreak >= 3) {
+        flavorLines.push("The rhythm breaks — this order pulls you out of the flow.");
+      }
+      management = { ...management, serveStreak: 0 };
+    }
   }
 
   if (management.helperExtraOrdersRemaining > 0) {
@@ -400,6 +460,27 @@ function applySuccessfulServe(
     appreciationLine = servedGuest.missedPreferenceLine ?? "";
   }
 
+  // Mild waste (#56): the craft of a premium drink is lost on a guest who neither
+  // values it nor reached for it, and whose own taste runs simpler. No reputation
+  // penalty — the cost is the wasted beans and effort — but the line makes the
+  // over-serve legible, so "give everyone the fanciest cup" is not a free strategy.
+  let wasteLine = "";
+  const servedTier = product.qualityTier ?? 1;
+  const preferredProduct = servedGuest?.preferredProductId
+    ? getProductById(servedGuest.preferredProductId)
+    : undefined;
+  const preferredTier = preferredProduct?.qualityTier ?? 1;
+  const overServedPremium =
+    servedGuest != null &&
+    servedTier >= 3 &&
+    !appreciates &&
+    !matchesSoftPreference &&
+    preferredProduct != null &&
+    servedTier > preferredTier;
+  if (overServedPremium) {
+    wasteLine = `${servedGuest.name} drinks the ${product.name.toLowerCase()} without ceremony. The slow craft — and the extra supplies — are lost on someone who only wanted a ${preferredProduct.name.toLowerCase()}.`;
+  }
+
   // Decor atmosphere bonus: atmosphere-sensitive guests notice a well-maintained café.
   let decorAtmosphereLine = "";
   const decorBonusDef = servedGuest?.decorAtmosphereBonus;
@@ -413,7 +494,18 @@ function applySuccessfulServe(
     }
   }
 
-  const statusParts = [serveLine, appreciationLine, decorAtmosphereLine, ...flavorLines].filter(
+  // better-beans upgrade: quality-sensitive guests notice the improved roast — +1 rep,
+  // stacks with the appreciation bonus. Capped at the existing meter max.
+  let betterBeansLine = "";
+  if (
+    workingState.purchasedUpgrades.includes("better-beans") &&
+    servedGuest?.behaviorTags.includes("quality-expectations")
+  ) {
+    resources = { ...resources, reputation: clampMeter(resources.reputation + 1) };
+    betterBeansLine = "The beans speak for themselves. Rep +1.";
+  }
+
+  const statusParts = [serveLine, appreciationLine, decorAtmosphereLine, betterBeansLine, wasteLine, ...flavorLines].filter(
     (part) => part.length > 0
   );
 
@@ -869,7 +961,12 @@ function openDay(state: GameState): GameState {
         ? 1
         : 0,
     helperDecisionMade: true,
-    actionPointsRemaining: state.dayManagement.actionPointsRemaining + levelBonuses.extraAP - shortStaffedPenalty
+    // second-table upgrade: the extra seating enables one additional order per shift.
+    actionPointsRemaining:
+      state.dayManagement.actionPointsRemaining +
+      levelBonuses.extraAP -
+      shortStaffedPenalty +
+      (state.purchasedUpgrades.includes("second-table") ? 1 : 0)
   };
 
   if (state.helperAssignment) {
@@ -1118,6 +1215,12 @@ function applyDayEndConsequences(state: GameState): GameState {
   resources = { ...resources, money: clampResource(resources.money - DAILY_FIXED_COST) };
   flavorLines.push(`Daily costs (rent, utilities): −€${DAILY_FIXED_COST}.`);
 
+  if (management.bestServeStreak >= 5) {
+    flavorLines.push(
+      `Best flow today: ${management.bestServeStreak} orders in a row without a missed preference.`
+    );
+  }
+
   const stressEvent = getStressEvent(resources.stress, state.stressEventLog.length);
 
   if (stressEvent && resources.stress >= 81) {
@@ -1154,6 +1257,7 @@ function applyDayEndConsequences(state: GameState): GameState {
       dailyOverhead,
       customersServed: management.customersServed,
       guestsLost: management.guestsLost,
+      bestServeStreak: management.bestServeStreak,
       suppliesUsed: { ...management.suppliesUsed },
       suppliesRestocked: { coffee: 0, milk: 0, pastries: 0 },
       suppliesRemaining: { ...state.supplies },
@@ -1317,6 +1421,13 @@ function buyEquipment(state: GameState, slot: EquipmentSlotId): GameState {
     };
   }
 
+  if (state.dayPhase === "setup" && slot === "register") {
+    return {
+      ...state,
+      statusMessage: "Register upgrades are available after opening."
+    };
+  }
+
   const nextTier = state.equipment[slot] + 1;
   const tierDefinition = getEquipmentTier(slot, nextTier);
 
@@ -1350,6 +1461,53 @@ function buyEquipment(state: GameState, slot: EquipmentSlotId): GameState {
       tierDefinition.reputationBonus > 0
         ? `Bought: ${tierDefinition.name}. Rep +${tierDefinition.reputationBonus}.`
         : `Bought: ${tierDefinition.name}.`
+  };
+}
+
+/**
+ * Buy a one-time upgrade from the day-end shop. Upgrades have passive gameplay
+ * effects that activate in other action handlers once purchased.
+ *   cleaning-kit  → reduces cleanliness drop per serve (2 → 1)
+ *   better-beans  → grants +1 rep when a quality-expectations guest is served
+ *   second-table  → adds +1 action point at the next open_day
+ */
+function buyUpgrade(state: GameState, upgradeId: UpgradeId): GameState {
+  if (state.demoComplete) {
+    return state;
+  }
+
+  const upgrade = weekOneUpgrades.find((u) => u.id === upgradeId);
+  if (!upgrade) {
+    return state;
+  }
+
+  if (state.purchasedUpgrades.includes(upgradeId)) {
+    return { ...state, statusMessage: "Already purchased." };
+  }
+
+  if (state.day < upgrade.unlockDay) {
+    return { ...state, statusMessage: "Not available yet." };
+  }
+
+  if (upgrade.cost > state.resources.money) {
+    return {
+      ...state,
+      statusMessage: `Not enough money (€${upgrade.cost} needed).`
+    };
+  }
+
+  return {
+    ...state,
+    purchasedUpgrades: [...state.purchasedUpgrades, upgradeId],
+    resources: {
+      ...state.resources,
+      money: clampResource(state.resources.money - upgrade.cost)
+    },
+    dayManagement: {
+      ...state.dayManagement,
+      moneySpent: clampResource(state.dayManagement.moneySpent + upgrade.cost)
+    },
+    statusMessage: `${upgrade.name} — added to the café.`
   };
 }
 
@@ -1776,7 +1934,8 @@ function applyPatienceTick(state: GameState): { state: GameState; walkoutLine: s
     dayManagement: {
       ...management,
       currentGuestPatience: 0,
-      guestsLost: management.guestsLost + 1
+      guestsLost: management.guestsLost + 1,
+      serveStreak: 0
     }
   };
 

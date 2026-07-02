@@ -18,7 +18,7 @@ import type {
 } from "../types/game";
 import { createInitialDayManagement, STARTING_REPUTATION, SUPPLY_CAPS } from "./management";
 
-export const CURRENT_GAME_STATE_VERSION = 13;
+export const CURRENT_GAME_STATE_VERSION = 14;
 export const CURRENT_CONTENT_CATALOG_VERSION = "week-one-v1";
 
 const initialResources: ResourceState = {
@@ -79,7 +79,7 @@ export function createInitialGameState(): GameState {
     closureReason: null,
     reputationZeroStreak: 0,
     decor: { plant: 1, shelf: 1, clock: 1, lamp: 1, cups: 1 },
-    equipment: { machine: 1, seating: 1 },
+    equipment: { machine: 1, seating: 1, register: 1 },
     run: { ...initialRun, modifierIds: [...initialRun.modifierIds], memoryFragments: [] },
     guestMemory: {},
     completedActions: [],
@@ -89,6 +89,7 @@ export function createInitialGameState(): GameState {
     eventHistory: [],
     pendingEvents: [],
     unlockedAchievements: [],
+    purchasedUpgrades: [],
     statusMessage:
       "The café opens. The guestbook quietly writes: Previous runs: [REDACTED]."
   };
@@ -106,7 +107,7 @@ export function createFreshRunState(): GameState {
     ...createInitialGameState(),
     dayPhase: "setup",
     phaseLabel: "Before opening",
-    equipment: { machine: 0, seating: 0 },
+    equipment: { machine: 0, seating: 0, register: 1 },
     statusMessage:
       "An empty room and a small till. Buy a coffee machine and some furniture, then open the doors."
   };
@@ -156,6 +157,7 @@ export function isValidGameState(value: unknown): value is GameState {
     isStringArray(candidate.eventHistory) &&
     isStringArray(candidate.pendingEvents) &&
     isStringArray(candidate.unlockedAchievements) &&
+    isStringArray(candidate.purchasedUpgrades) &&
     isValidStaffXp(candidate.staffXp)
   );
 }
@@ -230,7 +232,9 @@ function isValidDayManagement(value: unknown): value is DayManagementState {
     typeof management.decorBonusesGiven === "number" &&
     typeof management.currentGuestPatience === "number" &&
     typeof management.currentGuestPatienceMax === "number" &&
-    typeof management.guestsLost === "number"
+    typeof management.guestsLost === "number" &&
+    typeof management.serveStreak === "number" &&
+    typeof management.bestServeStreak === "number"
   );
 }
 
@@ -321,7 +325,7 @@ function isValidDayPhase(value: unknown): value is DayPhase {
 }
 
 /** All equipment slot keys that must exist in a valid save (tier >= 0). */
-const EQUIPMENT_SLOT_KEYS = ["machine", "seating"] as const;
+const EQUIPMENT_SLOT_KEYS = ["machine", "seating", "register"] as const;
 
 function isValidEquipment(
   value: unknown
@@ -470,6 +474,7 @@ function isValidGuestMemory(value: unknown): value is Partial<Record<GuestId, Gu
  * v11 -> v12: `socialAdRun` added to dayManagement.
  * v12 -> v13: core `equipment` slots added. Old saves were already-open cafés
  *   with tables, so they migrate to machine 1 / seating 1.
+ * v13 -> v14: `purchasedUpgrades` array added (defaults to []).
  * Older versions may also lack décor slots added after the save was written
  * (clock/lamp/cups).
  */
@@ -567,14 +572,39 @@ export function migrateRawSave(raw: unknown): unknown {
       if (typeof dm.guestsLost !== "number") {
         dm.guestsLost = 0;
       }
+      if (typeof dm.serveStreak !== "number") {
+        dm.serveStreak = 0;
+      }
+      if (typeof dm.bestServeStreak !== "number") {
+        dm.bestServeStreak = 0;
+      }
       obj.dayManagement = dm;
     }
 
     if (obj.daySummary && typeof obj.daySummary === "object" && !Array.isArray(obj.daySummary)) {
       const s = obj.daySummary as Record<string, unknown>;
+      const patchedSummary: Record<string, unknown> = { ...s };
+      let summaryPatched = false;
       if (typeof s.guestsLost !== "number") {
-        obj.daySummary = { ...s, guestsLost: 0 };
+        patchedSummary.guestsLost = 0;
+        summaryPatched = true;
       }
+      if (typeof s.bestServeStreak !== "number") {
+        patchedSummary.bestServeStreak = 0;
+        summaryPatched = true;
+      }
+      if (summaryPatched) {
+        obj.daySummary = patchedSummary;
+      }
+    }
+  }
+
+  if (obj.version === 13) {
+    obj.version = 14;
+    patched = true;
+
+    if (!Array.isArray(obj.purchasedUpgrades)) {
+      obj.purchasedUpgrades = [];
     }
   }
 
@@ -603,6 +633,20 @@ export function migrateRawSave(raw: unknown): unknown {
   if (!Array.isArray(obj.pendingEvents)) {
     obj.pendingEvents = [];
     patched = true;
+  }
+
+  // Stale v13 saves written before the serve-flow streak was introduced are
+  // missing these two fields. Patch them unconditionally so they pass validation.
+  if (obj.dayManagement && typeof obj.dayManagement === "object" && !Array.isArray(obj.dayManagement)) {
+    const dm = obj.dayManagement as Record<string, unknown>;
+    if (typeof dm.serveStreak !== "number" || typeof dm.bestServeStreak !== "number") {
+      obj.dayManagement = {
+        ...dm,
+        ...(typeof dm.serveStreak !== "number" ? { serveStreak: 0 } : {}),
+        ...(typeof dm.bestServeStreak !== "number" ? { bestServeStreak: 0 } : {})
+      };
+      patched = true;
+    }
   }
 
   if (obj.run && typeof obj.run === "object" && !Array.isArray(obj.run)) {

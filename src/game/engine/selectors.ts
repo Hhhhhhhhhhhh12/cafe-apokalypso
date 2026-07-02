@@ -488,28 +488,30 @@ export interface EquipmentShopOption {
 
 /** Equipment shop rows for the setup phase and the day-end review. */
 export function getEquipmentShopOptions(state: GameState): EquipmentShopOption[] {
-  return equipmentSlots.map((slot) => {
-    const currentTier = state.equipment[slot.id];
-    const currentTierDef = getEquipmentTier(slot.id, currentTier);
-    const nextTierDef = getEquipmentTier(slot.id, currentTier + 1);
+  return equipmentSlots
+    .filter((slot) => !(state.dayPhase === "setup" && slot.id === "register"))
+    .map((slot) => {
+      const currentTier = state.equipment[slot.id];
+      const currentTierDef = getEquipmentTier(slot.id, currentTier);
+      const nextTierDef = getEquipmentTier(slot.id, currentTier + 1);
 
-    return {
-      id: slot.id,
-      label: slot.label,
-      currentTierName:
-        currentTier <= 0 ? slot.emptyHint : currentTierDef?.name ?? slot.emptyHint,
-      unowned: currentTier <= 0,
-      next:
-        nextTierDef && currentTier < getMaxEquipmentTier(slot.id)
-          ? {
-              name: nextTierDef.name,
-              cost: nextTierDef.cost,
-              reputationBonus: nextTierDef.reputationBonus,
-              affordable: nextTierDef.cost <= state.resources.money
-            }
-          : null
-    };
-  });
+      return {
+        id: slot.id,
+        label: slot.label,
+        currentTierName:
+          currentTier <= 0 ? slot.emptyHint : currentTierDef?.name ?? slot.emptyHint,
+        unowned: currentTier <= 0,
+        next:
+          nextTierDef && currentTier < getMaxEquipmentTier(slot.id)
+            ? {
+                name: nextTierDef.name,
+                cost: nextTierDef.cost,
+                reputationBonus: nextTierDef.reputationBonus,
+                affordable: nextTierDef.cost <= state.resources.money
+              }
+            : null
+      };
+    });
 }
 
 export function getManagementHudLabels(state: GameState) {

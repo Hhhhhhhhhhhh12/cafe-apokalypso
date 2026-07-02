@@ -30,6 +30,13 @@ export interface EquipmentSlotDefinition {
  * The machine is required to open (no machine, no café). Seating is optional —
  * with seating tier 0 guests order at the counter and stand / take away; tables
  * and seated guests only appear once furniture is owned.
+ *
+ * The register (the till) is the third slot. Unlike machine/seating it is never
+ * unowned: every café opens with the basic till already on the counter (tier 1),
+ * so it costs nothing at setup and never strains the opening budget. Players only
+ * UPGRADE it (card terminal → pro POS) for atmosphere reputation. This is the
+ * physical hardware and is distinct from the KASSANDRA *software* update, a Day-6
+ * narrative beat that layers onto whatever till is present (see weekOneUpgrades).
  */
 export const equipmentSlots = [
   {
@@ -52,6 +59,17 @@ export const equipmentSlots = [
       { tier: 1, name: "Second-hand Tables & Chairs", cost: 14, reputationBonus: 0, dailyRepBonus: 0 },
       { tier: 2, name: "Matched Café Set", cost: 30, reputationBonus: 2, dailyRepBonus: 1 },
       { tier: 3, name: "Cosy Lounge Corner", cost: 52, reputationBonus: 4, dailyRepBonus: 2 }
+    ]
+  },
+  {
+    id: "register",
+    label: "Register",
+    emptyHint: "Just a cash box — slow and easy to miscount.",
+    tiers: [
+      { tier: 0, name: "Cash Box Only", cost: 0, reputationBonus: 0, dailyRepBonus: 0 },
+      { tier: 1, name: "Basic Till", cost: 10, reputationBonus: 0, dailyRepBonus: 0 },
+      { tier: 2, name: "Card Terminal", cost: 26, reputationBonus: 2, dailyRepBonus: 1 },
+      { tier: 3, name: "Pro POS with Customer Display", cost: 46, reputationBonus: 4, dailyRepBonus: 2 }
     ]
   }
 ] as const satisfies readonly EquipmentSlotDefinition[];

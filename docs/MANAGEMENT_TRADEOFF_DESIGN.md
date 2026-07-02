@@ -487,6 +487,12 @@ A light, slice-level hint of the long-term coffee-appreciation system (GitHub #5
   a premium quality-tier product, capped at **4 bonuses per day**
   (`dayManagement.appreciationBonusesGiven`), and shows the delight line.
 - Serving a picky guest something they don't value shows the letdown line — **no penalty**.
+- **Mild waste (over-serving):** serving a **premium** drink (`qualityTier >= 3`) to a guest who
+  neither appreciates it nor reached for it, and whose own `preferredProductId` is a *lower* tier,
+  adds a "wasted craft" flavor line naming the simpler drink they actually wanted. **No reputation
+  penalty** — the cost is the extra supplies and effort — but it makes "give everyone the fanciest
+  cup" a losing strategy, reinforcing the meaningful-decision goal. Same-tier mismatches (e.g. a
+  pour-over to a cappuccino lover) are letdowns, *not* waste.
 - Currently wired for Cappuccino-Christa (cappuccino), Herr Bohn (filterkaffee), and Herr Grau (handfilter).
 - The full coffee-variety / quality-tier system and per-guest taste catalog remain **out of scope** (post-MVP, #56).
 

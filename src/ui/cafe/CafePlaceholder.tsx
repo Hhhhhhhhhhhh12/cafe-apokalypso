@@ -3,7 +3,7 @@ import type { GameState } from "../../game/types/game";
 import type { ProductId } from "../../game/types/content";
 import { getDioramaGuestVisibility, getNextGuestPreview, getNarrativeEventCards } from "../../game/engine/selectors";
 import { kassandraMessages } from "../../game/data/kassandra";
-import stageBaseAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v04-mid.png";
+import stageBaseAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v04-nofurniture-fix.png";
 import coffeeMachineAsset from "../../../assets/sprites/props/placeholder-cafe-coffee-machine.png";
 import kassandraRegisterAsset from "../../../assets/sprites/props/placeholder-kassandra-register.png";
 import bohnGuestAsset from "../../../assets/sprites/guests/placeholder-guest-bohn.png";
@@ -194,7 +194,7 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
   const tablesDirty =
     gameState.resources.cleanliness < 70 && (isOpen || isDayEnd) && customersServed >= 1;
 
-  const showWeirdness = gameState.weirdnessVisible || gameState.day >= 7;
+  const showWeirdness = gameState.weirdnessVisible || gameState.day >= 7 || gameState.hiddenWeirdness >= 3;
   const kassandraAwake = gameState.kassandraInstalled || gameState.day >= 6;
   const isDusty = gameState.day <= 2;
 

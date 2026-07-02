@@ -192,7 +192,9 @@ export function createInitialDayManagement(
     decorBonusesGiven: 0,
     currentGuestPatience: 0,
     currentGuestPatienceMax: 0,
-    guestsLost: 0
+    guestsLost: 0,
+    serveStreak: 0,
+    bestServeStreak: 0
   };
 }
 

@@ -364,7 +364,12 @@ h3 {
   position: absolute;
   inset: 0;
   background: #0a0605;
-  transition: opacity 2s ease-out;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .intro-cinema__veil {
+    transition: opacity 2s ease-out;
+  }
 }
 
 .intro-cinema__subtitle {
@@ -378,8 +383,13 @@ h3 {
   letter-spacing: 0.03em;
   padding: 0 2rem;
   opacity: 0;
-  transition: opacity 0.9s ease;
   pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .intro-cinema__subtitle {
+    transition: opacity 0.9s ease;
+  }
 }
 
 .intro-cinema__subtitle--visible {
@@ -715,10 +725,6 @@ h3 {
   border-color: transparent;
   box-shadow: none;
 }
-.cafe-counter__front,
-.cafe-counter__ledge {
-  display: none;
-}
 .cafe-window,
 .cafe-room-shadow {
   display: none;
@@ -922,8 +928,8 @@ h3 {
 .cafe-coffee-machine {
   position: absolute;
   /* Stands on the painted counter top at the L-junction (left end of the bar). */
-  top: -68%;
-  left: 0%;
+  top: -28%;
+  left: 7%;
   width: 22%;
   height: 52%;
   border: 3px solid transparent;
@@ -987,8 +993,8 @@ h3 {
 .cafe-register {
   position: absolute;
   /* Stands on the right end of the painted counter top. */
-  top: -58%;
-  right: 34%;
+  top: -16%;
+  right: 16%;
   width: 21%;
   height: 48%;
   transform: skewY(2deg);
@@ -1095,12 +1101,24 @@ h3 {
  */
 .cafe-table {
   z-index: 5;
-  width: 20%;
-  height: 25%;
-  transform: skewY(-5deg);
-  /* Hidden: the painted Stage Base already furnishes the room; the faded CSS
-     tables read as ghost boxes over the floor. Kept as fallback structure. */
-  opacity: 0;
+  width: 22%;
+  height: 26%;
+  /* Furniture-free Stage Base (nofurniture-fix) paints no tables, so the bought
+     seating shows the real pixel sprite instead of the old CSS ghost boxes.
+     Sub-shapes (__top / chairs / pseudo legs) are neutralised below. */
+  background-image: url("../../assets/sprites/props/placeholder-table-chair-set.png");
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  background-size: contain;
+  image-rendering: pixelated;
+}
+
+/* CSS-drawn table/chair shapes replaced by the sprite above */
+.cafe-table__top,
+.cafe-chair,
+.cafe-table::after,
+.cafe-table::before {
+  display: none;
 }
 
 .cafe-table--left {
@@ -1375,100 +1393,18 @@ h3 {
     bottom 0.5s ease-in;
 }
 
-/* Standing poses for queue rotation — each guest's single static frame shown
-   while waiting to order. Only Paula has dedicated walk sheets; other guests
-   slide via CSS position transition with their static standing sprite. */
-/* Standing queue sprites — 7-frame idle sheets; Frame 0 shown as static fallback.
-   Staggered negative animation-delay so guests don't blink in unison. */
-.cafe-pilot-asset--cem-standing {
-  width: 88px;
-  height: 88px;
-  background-image: url("../../assets/sprites/guests/placeholder-guest-cem-idle.png");
-  background-repeat: no-repeat;
-  background-position: 0 0;
-  background-size: 616px 88px;
-}
-
-.cafe-pilot-asset--mira-standing {
-  width: 96px;
-  height: 96px;
-  background-image: url("../../assets/sprites/guests/placeholder-guest-mira-idle.png");
-  background-repeat: no-repeat;
-  background-position: 0 0;
-  background-size: 672px 96px;
-}
-
-.cafe-pilot-asset--lukas-standing {
-  width: 96px;
-  height: 96px;
-  background-image: url("../../assets/sprites/guests/placeholder-guest-lukas-idle.png");
-  background-repeat: no-repeat;
-  background-position: 0 0;
-  background-size: 672px 96px;
-}
-
-.cafe-pilot-asset--christa-standing {
-  width: 92px;
-  height: 92px;
-  background-image: url("../../assets/sprites/guests/placeholder-guest-christa-idle.png");
-  background-repeat: no-repeat;
-  background-position: 0 0;
-  background-size: 644px 92px;
-}
-
-.cafe-pilot-asset--kemal-standing {
-  width: 88px;
-  height: 88px;
-  background-image: url("../../assets/sprites/guests/placeholder-guest-kemal-idle.png");
-  background-repeat: no-repeat;
-  background-position: 0 0;
-  background-size: 616px 88px;
-}
-
-.cafe-pilot-asset--fatou-standing {
-  width: 68px;
-  height: 68px;
-  background-image: url("../../assets/sprites/guests/placeholder-guest-fatou.png");
-  background-repeat: no-repeat;
-  background-position: 0 0;
-  background-size: 68px 68px;
-}
-
-.cafe-pilot-asset--bohn-standing {
-  width: 96px;
-  height: 96px;
-  background-image: url("../../assets/sprites/guests/placeholder-guest-bohn-idle.png");
-  background-repeat: no-repeat;
-  background-position: 0 0;
-  background-size: 672px 96px;
-}
-
-.cafe-pilot-asset--grau-standing {
-  width: 88px;
-  height: 88px;
-  background-image: url("../../assets/sprites/guests/placeholder-guest-grau-idle.png");
-  background-repeat: no-repeat;
-  background-position: 0 0;
-  background-size: 616px 88px;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .cafe-pilot-asset--cem-standing     { animation: cafe-cem-idle     2.8s steps(7) infinite; animation-delay: -0.9s; }
-  .cafe-pilot-asset--mira-standing    { animation: cafe-mira-idle    3.6s steps(7) infinite; animation-delay: -1.4s; }
-  .cafe-pilot-asset--lukas-standing   { animation: cafe-lukas-idle   3.2s steps(7) infinite; animation-delay: -2.1s; }
-  .cafe-pilot-asset--christa-standing { animation: cafe-christa-idle 4.0s steps(7) infinite; animation-delay: -0.6s; }
-  .cafe-pilot-asset--kemal-standing   { animation: cafe-kemal-idle   3.0s steps(7) infinite; animation-delay: -0.4s; }
-  .cafe-pilot-asset--bohn-standing    { animation: cafe-bohn-idle    2.4s steps(7) infinite; animation-delay: -1.7s; }
-  .cafe-pilot-asset--grau-standing    { animation: cafe-grau-idle    5.6s steps(7) infinite; animation-delay: -3.2s; }
-}
-
-@keyframes cafe-cem-idle     { to { background-position: -616px 0; } }
-@keyframes cafe-mira-idle    { to { background-position: -672px 0; } }
-@keyframes cafe-lukas-idle   { to { background-position: -672px 0; } }
-@keyframes cafe-christa-idle { to { background-position: -644px 0; } }
-@keyframes cafe-kemal-idle   { to { background-position: -616px 0; } }
-@keyframes cafe-bohn-idle    { to { background-position: -672px 0; } }
-@keyframes cafe-grau-idle    { to { background-position: -616px 0; } }
+/* Standing queue sprites — all guests share one fine-style 68×68 static sprite,
+   rendered at the same scale as the seated guests (see .cafe-pilot-asset--standing
+   base rule below). Idle motion is the shared CSS breathe, so the whole roster
+   reads at one consistent size/proportion/pixel scale. */
+.cafe-pilot-asset--cem-standing     { background-image: url("../../assets/sprites/guests/placeholder-guest-cem.png"); }
+.cafe-pilot-asset--mira-standing    { background-image: url("../../assets/sprites/guests/placeholder-guest-mira.png"); }
+.cafe-pilot-asset--lukas-standing   { background-image: url("../../assets/sprites/guests/placeholder-guest-lukas.png"); }
+.cafe-pilot-asset--christa-standing { background-image: url("../../assets/sprites/guests/placeholder-guest-christa.png"); }
+.cafe-pilot-asset--kemal-standing   { background-image: url("../../assets/sprites/guests/placeholder-guest-kemal.png"); }
+.cafe-pilot-asset--fatou-standing   { background-image: url("../../assets/sprites/guests/placeholder-guest-fatou.png"); }
+.cafe-pilot-asset--bohn-standing    { background-image: url("../../assets/sprites/guests/placeholder-guest-bohn.png"); }
+.cafe-pilot-asset--grau-standing    { background-image: url("../../assets/sprites/guests/placeholder-guest-grau.png"); }
 
 /* Seated guests slide up on first appearance (one-shot on DOM mount). */
 @keyframes guest-seat-in {
@@ -1637,11 +1573,26 @@ h3 {
   display: none;
 }
 
-/* Center standing queue sprites on the placeholder anchor point. */
+/* Center standing queue sprites on the placeholder anchor point. Rendered at the
+   same 108px box / contain scale as the seated guests so queue and seat read at
+   one uniform size. Idle motion = shared CSS breathe (set below). */
 .cafe-pilot-asset--standing {
+  width: 108px;
+  height: 108px;
   bottom: 0;
   left: 50%;
+  z-index: 2;
   transform: translateX(-50%);
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  background-size: contain;
+  image-rendering: pixelated;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cafe-pilot-asset--standing {
+    animation: cafe-guest-breathe 3.4s linear infinite;
+  }
 }
 
 .placeholder-guest-normal-02 {
@@ -1719,10 +1670,11 @@ h3 {
   bottom: 31%;
 }
 
-/* Nele — linkes Fenster, zurückgezogener Arbeitsplatz */
+/* Nele — linke Mitte, zurückgezogener Arbeitsplatz (nach rechts versetzt, damit
+   sie nicht mehr mit der Eck-Pflanze kollidiert) */
 .placeholder-guest-normal-08 {
-  left: 17%;
-  bottom: 50%;
+  left: 33%;
+  bottom: 48%;
 }
 
 /* Meda — Ecke hinten rechts, ab Tag 5 */
@@ -1809,7 +1761,7 @@ h3 {
    ── */
 .cafe-decor-clock {
   position: absolute;
-  left: 74.0%;
+  left: 23.0%;
   top: 30.0%;
   z-index: 8;
   width: 56px;
@@ -1830,22 +1782,22 @@ h3 {
 .cafe-decor-clock.cafe-decor--tier-3 {
   opacity: 1;
   background-image: url("../../assets/sprites/props/placeholder-cafe-clock-t3.png");
-  width: 40px;
-  height: 52px;
+  width: 56px;
+  height: 72px;
 }
 
 /*
- * Floor lamp. Stands in the back-left corner between the door and the left
- * window. Base anchored to the CSS bottom edge (center bottom / contain) so
+ * Floor lamp. Stands between the two back-wall windows (right side).
+ * Base anchored to the CSS bottom edge (center bottom / contain) so
  * the pole base sits on the floor regardless of tier size change.
  */
 .cafe-decor-lamp {
   position: absolute;
-  left: 23.0%;
-  top: 54.0%;
+  left: 65.0%;
+  top: 26.0%;
   z-index: 4;
-  width: 36px;
-  height: 56px;
+  width: 40px;
+  height: 64px;
   background: url("../../assets/sprites/props/placeholder-cafe-lamp.png") center bottom / contain no-repeat;
   image-rendering: pixelated;
 }
@@ -1857,6 +1809,8 @@ h3 {
 .cafe-decor-lamp.cafe-decor--tier-2 {
   opacity: 1;
   background-image: url("../../assets/sprites/props/placeholder-cafe-lamp-t2.png");
+  width: 46px;
+  height: 72px;
 }
 
 .cafe-decor-lamp.cafe-decor--tier-3 {
@@ -1873,8 +1827,8 @@ h3 {
  */
 .cafe-decor-cups {
   position: absolute;
-  left: 68.0%;
-  top: 57.0%;
+  left: 61.0%;
+  top: 72.0%;
   z-index: 6;
   width: 32px;
   height: 27px;
@@ -2063,6 +2017,67 @@ h3 {
   color: #7f2f2c;
   font-size: 1.2rem;
   line-height: 1;
+}
+
+/* Flow meter — the live "rhythm" streak chip shown while a run of matched
+   orders builds. Warm and quiet at first, brighter once it catches fire. */
+.flow-meter {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: -2px 0 2px;
+  padding: 0.32rem 0.6rem;
+  border: 1px solid #d8b27a;
+  border-radius: 999px;
+  background: #fbf0db;
+  color: #6b4a1f;
+  font-size: 0.82rem;
+  font-weight: 700;
+  width: fit-content;
+}
+
+.flow-meter__icon {
+  font-size: 1rem;
+  line-height: 1;
+  color: #c98a2e;
+}
+
+.flow-meter__label {
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+}
+
+.flow-meter__count {
+  font-size: 1rem;
+  color: #b5651d;
+}
+
+.flow-meter--hot {
+  border-color: #e08a2b;
+  background: linear-gradient(100deg, #fde6c2, #fbd49a);
+  color: #7c3a05;
+  box-shadow: 0 0 0 1px rgba(224, 138, 43, 0.25), 0 2px 8px rgba(224, 138, 43, 0.28);
+}
+
+.flow-meter--hot .flow-meter__icon,
+.flow-meter--hot .flow-meter__count {
+  color: #a4470a;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .flow-meter--hot {
+    animation: flow-meter-pulse 1.8s ease-in-out infinite;
+  }
+
+  @keyframes flow-meter-pulse {
+    0%, 100% {
+      box-shadow: 0 0 0 1px rgba(224, 138, 43, 0.25), 0 2px 8px rgba(224, 138, 43, 0.22);
+    }
+    50% {
+      box-shadow: 0 0 0 1px rgba(224, 138, 43, 0.45), 0 3px 12px rgba(224, 138, 43, 0.4);
+    }
+  }
 }
 
 .next-guest {
@@ -2504,6 +2519,13 @@ h3 {
   background: #eef3e7;
   color: #273a2d;
   font-weight: 650;
+}
+
+/* The inner span remounts on each new message (keyed) to replay the slide-in.
+   The outer .status-message stays mounted as a persistent aria-live region so
+   screen readers announce every change. See GitHub #70. */
+.status-message__text {
+  display: inline-block;
   animation: status-slide-in 0.22s ease-out both;
 }
 
@@ -2519,7 +2541,7 @@ h3 {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .status-message {
+  .status-message__text {
     animation: none;
   }
 }
@@ -2878,17 +2900,72 @@ h3 {
   color: #4d3a6b;
 }
 
-/* Progressive hidden weirdness — very subtle diorama shifts before Day 7 reveal */
-.cafe-diorama--weirdness-low .cafe-back-wall {
-  filter: saturate(0.97);
+/* Progressive hidden weirdness — diorama shifts across three buckets.
+   Low (hiddenWeirdness 3–9): barely deniable; deep (10+): noticeable; visible: Day 7 reveal. */
+
+/* --- Low bucket --- */
+.cafe-diorama--weirdness-low .cafe-stage-base {
+  filter: saturate(0.91) brightness(0.985);
 }
 
-.cafe-diorama--weirdness-deep .cafe-back-wall {
-  filter: saturate(0.93) hue-rotate(1deg);
+.cafe-diorama--weirdness-low .cafe-weirdness-hint {
+  opacity: 0.16;
 }
 
-.cafe-diorama--weirdness-deep .cafe-floor {
-  filter: saturate(0.96);
+@media (prefers-reduced-motion: no-preference) {
+  .cafe-diorama--weirdness-low .cafe-clock::before {
+    animation: cafe-clock-reverse-minute 30s linear infinite;
+  }
+  .cafe-diorama--weirdness-low .cafe-clock::after {
+    animation: cafe-clock-reverse-hour 240s linear infinite;
+  }
+}
+
+/* --- Deep bucket --- */
+.cafe-diorama--weirdness-deep .cafe-stage-base {
+  filter: saturate(0.80) hue-rotate(-4deg) brightness(0.97);
+}
+
+.cafe-diorama--weirdness-deep .cafe-weirdness-hint {
+  opacity: 0.36;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cafe-diorama--weirdness-deep .cafe-clock::before {
+    animation: cafe-clock-reverse-minute 8s linear infinite;
+  }
+  .cafe-diorama--weirdness-deep .cafe-clock::after {
+    animation: cafe-clock-reverse-hour 66s linear infinite;
+  }
+  .cafe-diorama--weirdness-deep .cafe-decor-lamp {
+    animation: cafe-lamp-flicker 9s ease-in-out infinite;
+  }
+}
+
+/* --- Visible (Day 7 reveal) --- */
+@media (prefers-reduced-motion: no-preference) {
+  .cafe-diorama--weirdness-visible .cafe-clock::before {
+    animation: cafe-clock-reverse-minute 4s linear infinite;
+  }
+  .cafe-diorama--weirdness-visible .cafe-clock::after {
+    animation: cafe-clock-reverse-hour 32s linear infinite;
+  }
+}
+
+@keyframes cafe-clock-reverse-minute {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(-360deg); }
+}
+
+@keyframes cafe-clock-reverse-hour {
+  from { transform: rotate(74deg); }
+  to   { transform: rotate(-286deg); }
+}
+
+@keyframes cafe-lamp-flicker {
+  0%, 78%, 100% { opacity: 1; }
+  83%           { opacity: 0.58; }
+  91%           { opacity: 0.84; }
 }
 
 .objective-card {
@@ -3885,9 +3962,7 @@ h3 {
 .cafe-storage,
 .cafe-door,
 .cafe-floor__tiles,
-.cafe-room-shadow,
-.cafe-counter__front,
-.cafe-counter__ledge {
+.cafe-room-shadow {
   display: none !important;
 }
 .cafe-floor,
@@ -3897,11 +3972,11 @@ h3 {
   box-shadow: none !important;
 }
 
-
 /* === CSS-Diorama dauerhaft deaktiviert — nur das PNG (.cafe-stage-base) ist Hintergrund ===
    Hard-Override: der gemalte Hintergrund ist die einzige Raumdarstellung. Die
    Struktur-Container (.cafe-floor/.cafe-counter) bleiben als unsichtbare
-   Positionierungs-Boxen erhalten, damit Maschine/Kasse/Props weiter ankern. */
+   Positionierungs-Boxen erhalten, damit Maschine/Kasse/Props weiter ankern.
+   cafe-counter__front/ledge bleiben sichtbar (furniture-free Hintergrund hat keine gemalte Theke). */
 .cafe-stage-base { display: block !important; }
 .cafe-back-wall,
 .cafe-side-wall,
@@ -3911,9 +3986,7 @@ h3 {
 .cafe-storage,
 .cafe-door,
 .cafe-floor__tiles,
-.cafe-room-shadow,
-.cafe-counter__front,
-.cafe-counter__ledge {
+.cafe-room-shadow {
   display: none !important;
 }
 .cafe-floor,
@@ -3986,4 +4059,242 @@ h3 {
 
 @media (prefers-reduced-motion: reduce) {
   .day-result-card { animation: none; }
+}
+
+/* Display & accessibility options menu (scaffold) — GitHub #67 */
+.hero-bar__aside {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.options-menu {
+  position: relative;
+  align-self: flex-end;
+}
+
+.options-menu__button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid #c8a98d;
+  border-radius: 999px;
+  background: #fff8ed;
+  color: #6c5146;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.options-menu__button:hover {
+  border-color: #16606c;
+  color: #16606c;
+}
+
+.options-menu__button:focus-visible {
+  outline: 2px solid #16606c;
+  outline-offset: 2px;
+}
+
+.options-menu__icon {
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.options-menu__panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 30;
+  width: min(280px, 80vw);
+  padding: 0.85rem;
+  border: 2px solid #5c4037;
+  border-radius: 8px;
+  background: #fff8ed;
+  box-shadow: 0 6px 0 #c8a98d, 0 10px 20px rgba(140, 88, 48, 0.18);
+  text-align: left;
+}
+
+.options-menu__lead {
+  margin: 0 0 0.6rem;
+  color: #4a3b34;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.options-menu__list {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.options-menu__item {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.options-menu__item-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.options-menu__item-label {
+  color: #35241e;
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.options-menu__tag {
+  flex: none;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.options-menu__tag--respected {
+  background: #e2efe6;
+  color: #1f6b4a;
+}
+
+.options-menu__tag--coming-soon {
+  background: #efe6d8;
+  color: #8a6d3a;
+}
+
+.options-menu__item-detail {
+  color: #6c5146;
+  font-size: 0.78rem;
+}
+
+/* Toggle for interactive options */
+.options-menu__toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.options-menu__toggle-input {
+  width: 1rem;
+  height: 1rem;
+  cursor: pointer;
+}
+
+.options-menu__toggle-input:focus-visible {
+  outline: 2px solid #16606c;
+  outline-offset: 1px;
+}
+
+.options-menu__toggle-label {
+  color: #35241e;
+  font-size: 0.84rem;
+  font-weight: 700;
+  flex: 1;
+}
+
+/* Colourblind-friendly palette (GitHub #68) */
+/* High contrast, hue-independent (blue-yellow, blue-black focus) */
+html.cafe-colorblind-mode {
+  --color-primary-dark: #000000;
+  --color-primary-mid: #1a1a1a;
+  --color-primary-light: #333333;
+  --color-accent-teal: #0066cc;
+  --color-accent-warm: #ff8800;
+  --color-neutral-light: #ffffff;
+  --color-neutral-mid: #e6e6e6;
+  --color-neutral-dark: #cccccc;
+  --color-text-primary: #000000;
+  --color-text-secondary: #333333;
+  --color-text-tertiary: #666666;
+  --color-border-strong: #000000;
+  --color-border-mid: #333333;
+  --color-background-main: #ffffff;
+  --color-background-alt: #f0f0f0;
+  --color-button-bg: #e6e6e6;
+  --color-button-hover: #cccccc;
+  --color-status-good: #0066cc;
+  --color-status-warning: #ff8800;
+  --color-status-caution: #ff6600;
+}
+
+html.cafe-colorblind-mode h1,
+html.cafe-colorblind-mode h2,
+html.cafe-colorblind-mode h3 {
+  color: #000000;
+}
+
+html.cafe-colorblind-mode .eyebrow {
+  color: #0066cc;
+}
+
+html.cafe-colorblind-mode .hero-bar {
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.1) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.1) 1px, transparent 1px),
+    #ffffff;
+  border-bottom-color: #333333;
+}
+
+html.cafe-colorblind-mode .day-card,
+html.cafe-colorblind-mode .panel {
+  border-color: #000000;
+  background: #ffffff;
+  box-shadow: 0 6px 0 #cccccc, 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+html.cafe-colorblind-mode .day-card__label {
+  color: #333333;
+}
+
+html.cafe-colorblind-mode .day-card strong {
+  color: #000000;
+}
+
+html.cafe-colorblind-mode .options-menu__button {
+  border-color: #333333;
+  background: #ffffff;
+  color: #000000;
+}
+
+html.cafe-colorblind-mode .options-menu__button:hover {
+  border-color: #0066cc;
+  color: #0066cc;
+}
+
+html.cafe-colorblind-mode .options-menu__panel {
+  border-color: #000000;
+  background: #ffffff;
+  box-shadow: 0 6px 0 #cccccc, 0 10px 20px rgba(0, 0, 0, 0.18);
+}
+
+html.cafe-colorblind-mode .options-menu__lead {
+  color: #000000;
+}
+
+html.cafe-colorblind-mode .options-menu__item-label {
+  color: #000000;
+}
+
+html.cafe-colorblind-mode .options-menu__item-detail {
+  color: #333333;
+}
+
+html.cafe-colorblind-mode .options-menu__tag--respected {
+  background: #e6f2ff;
+  color: #003d99;
+}
+
+html.cafe-colorblind-mode .options-menu__tag--coming-soon {
+  background: #fff5e6;
+  color: #664400;
 }

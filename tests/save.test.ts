@@ -250,7 +250,7 @@ describe("save migration", () => {
     expect(migrateRawSave(42)).toBe(42);
   });
 
-  it("migrateRawSave v12 → v13: adds equipment {machine:1, seating:1} to an old open-café save", () => {
+  it("migrateRawSave: adds the full equipment set to an old open-café save with none", () => {
     const raw = { ...createInitialGameState(), version: 12 } as Record<string, unknown>;
     delete (raw as Record<string, unknown>).equipment;
     const migrated = migrateRawSave(raw) as {
@@ -258,16 +258,18 @@ describe("save migration", () => {
       equipment: Record<string, number>;
     };
     expect(migrated.version).toBe(CURRENT_GAME_STATE_VERSION);
-    expect(migrated.equipment).toEqual({ machine: 1, seating: 1 });
+    expect(migrated.equipment).toEqual({ machine: 1, seating: 1, register: 1 });
   });
 
-  it("migrateRawSave v12 → v13: does not overwrite equipment that already exists", () => {
+  it("migrateRawSave: preserves existing tiers but backfills the new register slot", () => {
     const raw = {
       ...createInitialGameState(),
       version: 12,
       equipment: { machine: 2, seating: 0 }
     } as Record<string, unknown>;
     const migrated = migrateRawSave(raw) as { equipment: Record<string, number> };
-    expect(migrated.equipment).toEqual({ machine: 2, seating: 0 });
+    // machine/seating are kept as-is; the register slot (added after these saves
+    // were written) is backfilled to the owned baseline tier 1.
+    expect(migrated.equipment).toEqual({ machine: 2, seating: 0, register: 1 });
   });
 });
