@@ -422,7 +422,8 @@ const GUEST_IDS = [
   "freelancerin-nele",
   "herr-grau",
   "frau-roter-regenschirm",
-  "meda"
+  "meda",
+  "nachbarin-mira"
 ] as const;
 
 function isValidGuestMemory(value: unknown): value is Partial<Record<GuestId, GuestMemoryEntry>> {
