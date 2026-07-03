@@ -4208,8 +4208,8 @@ html.cafe-colorblind-mode {
   --color-primary-dark: #000000;
   --color-primary-mid: #1a1a1a;
   --color-primary-light: #333333;
-  --color-accent-teal: #0066cc;
-  --color-accent-warm: #ff8800;
+  --color-accent-teal: #0052a3;
+  --color-accent-warm: #c94f00;
   --color-neutral-light: #ffffff;
   --color-neutral-mid: #e6e6e6;
   --color-neutral-dark: #cccccc;
@@ -4222,9 +4222,9 @@ html.cafe-colorblind-mode {
   --color-background-alt: #f0f0f0;
   --color-button-bg: #e6e6e6;
   --color-button-hover: #cccccc;
-  --color-status-good: #0066cc;
-  --color-status-warning: #ff8800;
-  --color-status-caution: #ff6600;
+  --color-status-good: #0052a3;
+  --color-status-warning: #c94f00;
+  --color-status-caution: #c94f00;
 }
 
 html.cafe-colorblind-mode h1,
@@ -4234,7 +4234,7 @@ html.cafe-colorblind-mode h3 {
 }
 
 html.cafe-colorblind-mode .eyebrow {
-  color: #0066cc;
+  color: #0052a3;
 }
 
 html.cafe-colorblind-mode .hero-bar {
@@ -4267,8 +4267,8 @@ html.cafe-colorblind-mode .options-menu__button {
 }
 
 html.cafe-colorblind-mode .options-menu__button:hover {
-  border-color: #0066cc;
-  color: #0066cc;
+  border-color: #0052a3;
+  color: #0052a3;
 }
 
 html.cafe-colorblind-mode .options-menu__panel {
