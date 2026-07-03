@@ -21,7 +21,8 @@ export type GuestId =
   | "freelancerin-nele"
   | "herr-grau"
   | "frau-roter-regenschirm"
-  | "meda";
+  | "meda"
+  | "nachbarin-mira";
 
 export type ProductId =
   | "filterkaffee"

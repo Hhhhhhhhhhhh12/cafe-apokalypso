@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Café Apokalypso — Sprite-Review</title>
+<style>
+  :root { --bg:#1d1b22; --card:#27242e; --ink:#ece9f0; --muted:#9b94a8; --accent:#c98a5a; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:system-ui,-apple-system,"Segoe UI",sans-serif; background:var(--bg); color:var(--ink); }
+  header { position:sticky; top:0; z-index:5; background:rgba(29,27,34,.96); backdrop-filter:blur(6px);
+    border-bottom:1px solid #38343f; padding:14px 20px; display:flex; flex-wrap:wrap; gap:16px; align-items:center; }
+  h1 { font-size:18px; margin:0; letter-spacing:.3px; }
+  h1 small { color:var(--muted); font-weight:400; font-size:12px; display:block; margin-top:2px; }
+  .controls { display:flex; flex-wrap:wrap; gap:14px; align-items:center; margin-left:auto; }
+  .controls label { font-size:12px; color:var(--muted); display:flex; align-items:center; gap:6px; }
+  .swatches { display:flex; gap:6px; }
+  .swatch { width:24px; height:24px; border-radius:6px; border:2px solid transparent; cursor:pointer; }
+  .swatch.active { border-color:var(--accent); }
+  button { font:inherit; font-size:13px; background:var(--accent); color:#1a1410; border:0; border-radius:8px;
+    padding:8px 14px; cursor:pointer; font-weight:600; }
+  button.ghost { background:#34303c; color:var(--ink); }
+  input[type=range] { accent-color:var(--accent); }
+  main { padding:22px; display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:18px; }
+  .card { background:var(--card); border:1px solid #36323d; border-radius:14px; overflow:hidden; display:flex; flex-direction:column; }
+  .name { padding:10px 14px 4px; font-weight:600; font-size:14px; display:flex; align-items:center; gap:8px; }
+  .tag { font-size:10px; font-weight:600; padding:2px 7px; border-radius:99px; background:#3a3543; color:var(--muted); }
+  .tag.proto { background:#5a3f6b; color:#f3e6ff; }
+  .stage { display:flex; align-items:flex-end; justify-content:center; min-height:200px; padding:14px;
+    background-image:var(--stage-bg); background-size:cover; background-position:center; }
+  .stage img { image-rendering:pixelated; display:block; }
+  .baseline { position:relative; }
+  textarea { width:100%; border:0; border-top:1px solid #36323d; background:#211e28; color:var(--ink);
+    padding:10px 14px; font:inherit; font-size:13px; resize:vertical; min-height:62px; outline:none; }
+  textarea:focus { background:#262230; }
+  .saved { font-size:10px; color:var(--muted); padding:0 14px 8px; min-height:14px; }
+  #exportbox { margin:0 22px 26px; }
+  pre { background:#16141a; border:1px solid #36323d; border-radius:10px; padding:14px; white-space:pre-wrap;
+    font-size:12px; color:#cfc8da; max-height:280px; overflow:auto; }
+  .hint { color:var(--muted); font-size:12px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Café Apokalypso — Sprite-Review <small id="stand">lädt …</small></h1>
+  <div class="controls">
+    <label>Zoom
+      <input type="range" id="zoom" min="2" max="8" step="1" value="4" />
+      <span id="zoomval">4×</span>
+    </label>
+    <label>Hintergrund
+      <span class="swatches" id="swatches"></span>
+    </label>
+    <button class="ghost" id="reload">↻ Aktualisieren</button>
+    <button id="export">Kommentare exportieren</button>
+  </div>
+</header>
+<main id="grid"></main>
+<div id="exportbox" hidden>
+  <p class="hint">Kopiert in die Zwischenablage — füge es im Chat ein, dann arbeite ich die Anmerkungen ein:</p>
+  <pre id="exporttext"></pre>
+</div>
+
+<script>
+// Alle Gäste-Sprites. Pfade relativ zu tools/ → ../assets/...  (zeigt immer den Live-Dateistand)
+const GUESTS = [
+  ["paula","Paula", true],
+  ["cem","Cem"], ["mira","Mira"], ["lukas","Lukas"], ["christa","Christa"],
+  ["bohn","Herr Bohn"], ["grau","Herr Grau"], ["strange","Strange (=Grau)"], ["kemal","Kemal"],
+  ["fatou","Fatou"], ["meda","Meda"], ["nele","Nele"], ["roter-regenschirm","Frau m. rotem Regenschirm"],
+];
+const BACKGROUNDS = {
+  "Dunkel":   "linear-gradient(#2a2730,#211e28)",
+  "Hell":     "linear-gradient(#efe7da,#e3d8c6)",
+  "Café-Tan": "linear-gradient(#cdb091,#b8966f)",
+  "Karo":     "repeating-conic-gradient(#3a3543 0% 25%, #2c2833 0% 50%) 0/24px 24px",
+};
+const LS = "cafe-sprite-review.comments.v1";
+const bust = Date.now();
+let zoom = 4;
+
+function loadComments(){ try { return JSON.parse(localStorage.getItem(LS)||"{}"); } catch { return {}; } }
+function saveComment(key,val){ const c=loadComments(); c[key]=val; localStorage.setItem(LS, JSON.stringify(c)); }
+
+const grid = document.getElementById("grid");
+const comments = loadComments();
+GUESTS.forEach(([key,label,proto])=>{
+  const card=document.createElement("div"); card.className="card";
+  card.innerHTML = `
+    <div class="name">${label} ${proto?'<span class="tag proto">Protagonistin</span>':'<span class="tag">Gast</span>'}</div>
+    <div class="stage">
+      <img alt="${label}" data-key="${key}"
+           src="../assets/sprites/guests/placeholder-guest-${key}.png?t=${bust}" />
+    </div>
+    <textarea placeholder="Anmerkung zu ${label} …" data-key="${key}">${(comments[key]||"").replace(/</g,"&lt;")}</textarea>
+    <div class="saved" data-saved="${key}"></div>`;
+  grid.appendChild(card);
+});
+
+function applyZoom(){
+  document.querySelectorAll(".stage img").forEach(img=>{
+    img.onload = ()=>{ img.style.width=(img.naturalWidth*zoom)+"px"; img.style.height=(img.naturalHeight*zoom)+"px"; };
+    if(img.complete && img.naturalWidth){ img.style.width=(img.naturalWidth*zoom)+"px"; img.style.height=(img.naturalHeight*zoom)+"px"; }
+  });
+}
+document.getElementById("zoom").addEventListener("input",e=>{ zoom=+e.target.value; document.getElementById("zoomval").textContent=zoom+"×"; applyZoom(); });
+
+// Hintergrund-Swatches
+const sw=document.getElementById("swatches");
+Object.entries(BACKGROUNDS).forEach(([name,css],i)=>{
+  const b=document.createElement("span"); b.className="swatch"+(i===0?" active":""); b.title=name; b.style.background=css;
+  b.onclick=()=>{ document.documentElement.style.setProperty("--stage-bg",css);
+    document.querySelectorAll(".swatch").forEach(s=>s.classList.remove("active")); b.classList.add("active"); };
+  sw.appendChild(b);
+});
+document.documentElement.style.setProperty("--stage-bg",BACKGROUNDS["Dunkel"]);
+
+// Kommentare speichern
+grid.addEventListener("input",e=>{
+  const k=e.target.dataset.key; if(!k||e.target.tagName!=="TEXTAREA") return;
+  saveComment(k,e.target.value);
+  const s=document.querySelector(`[data-saved="${k}"]`); if(s){ s.textContent="gespeichert ✓"; clearTimeout(s._t); s._t=setTimeout(()=>s.textContent="",1200); }
+});
+
+// Export
+document.getElementById("export").addEventListener("click",()=>{
+  const c=loadComments();
+  const lines=["# Sprite-Review — Anmerkungen",""];
+  GUESTS.forEach(([key,label])=>{ if((c[key]||"").trim()) lines.push(`- **${label}** (${key}): ${c[key].trim()}`); });
+  if(lines.length===2) lines.push("_(keine Kommentare)_");
+  const txt=lines.join("\n");
+  const box=document.getElementById("exportbox"); box.hidden=false;
+  document.getElementById("exporttext").textContent=txt;
+  navigator.clipboard && navigator.clipboard.writeText(txt).catch(()=>{});
+  box.scrollIntoView({behavior:"smooth"});
+});
+
+document.getElementById("reload").addEventListener("click",()=>location.reload());
+document.getElementById("stand").textContent = "Live-Dateistand · geladen " + new Date().toLocaleTimeString("de-DE");
+applyZoom();
+</script>
+</body>
+</html>

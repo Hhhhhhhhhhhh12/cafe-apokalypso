@@ -106,7 +106,7 @@ describe("café diorama view", () => {
     const base = createInitialGameState();
     const markup = renderCafe({
       ...base,
-      decor: { plant: 2, shelf: 3, clock: 1, lamp: 2, cups: 3 }
+      decor: { plant: 2, plant2: 1, shelf: 3, clock: 1, lamp: 2, cups: 3 }
     });
 
     expect(markup).toMatch(/cafe-decor-plant[^"]*cafe-decor--tier-2/);

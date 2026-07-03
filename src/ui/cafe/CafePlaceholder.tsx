@@ -9,6 +9,7 @@ import kassandraRegisterAsset from "../../../assets/sprites/props/placeholder-ka
 import bohnGuestAsset from "../../../assets/sprites/guests/placeholder-guest-bohn.png";
 import strangeGuestAsset from "../../../assets/sprites/guests/placeholder-guest-strange.png";
 import cemGuestAsset from "../../../assets/sprites/guests/placeholder-guest-cem.png";
+import cemSeatedAsset from "../../../assets/sprites/guests/placeholder-guest-cem-seated.png";
 import miraGuestAsset from "../../../assets/sprites/guests/placeholder-guest-mira.png";
 import lukasGuestAsset from "../../../assets/sprites/guests/placeholder-guest-lukas.png";
 import christaGuestAsset from "../../../assets/sprites/guests/placeholder-guest-christa.png";
@@ -435,7 +436,7 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
               >
                 <img
                   className="cafe-pilot-asset cafe-pilot-asset--guest cafe-pilot-asset--cem"
-                  src={cemGuestAsset}
+                  src={cemSeatedAsset}
                   aria-hidden="true"
                   alt=""
                 />

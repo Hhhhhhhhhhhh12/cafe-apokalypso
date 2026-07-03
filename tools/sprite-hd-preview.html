@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sprite HD-Vergleich</title>
+<style>
+  :root { --bg:#1d1b22; --card:#27242e; --ink:#ece9f0; --muted:#9b94a8; --accent:#c98a5a; }
+  *{box-sizing:border-box;} body{margin:0;font-family:system-ui,sans-serif;background:var(--bg);color:var(--ink);}
+  header{position:sticky;top:0;background:rgba(29,27,34,.96);border-bottom:1px solid #38343f;padding:14px 20px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;}
+  h1{font-size:18px;margin:0;} h1 small{display:block;color:var(--muted);font-size:12px;font-weight:400;margin-top:2px;}
+  .controls{margin-left:auto;display:flex;gap:14px;align-items:center;flex-wrap:wrap;}
+  .controls label{font-size:12px;color:var(--muted);display:flex;gap:6px;align-items:center;}
+  .swatches{display:flex;gap:6px;} .swatch{width:24px;height:24px;border-radius:6px;border:2px solid transparent;cursor:pointer;}
+  .swatch.active{border-color:var(--accent);}
+  main{padding:24px;display:flex;flex-direction:column;gap:26px;}
+  .row{background:var(--card);border:1px solid #36323d;border-radius:14px;padding:16px 20px;}
+  .row h2{margin:0 0 14px;font-size:15px;}
+  .pair{display:flex;gap:30px;flex-wrap:wrap;}
+  .col{flex:1;min-width:240px;text-align:center;}
+  .col .tag{font-size:12px;color:var(--muted);margin-bottom:8px;}
+  .col .tag b{color:var(--ink);}
+  .stage{min-height:340px;display:flex;align-items:flex-end;justify-content:center;padding:16px;border-radius:10px;background:var(--stage-bg);}
+  .stage img{image-rendering:pixelated;}
+</style>
+</head>
+<body>
+<header>
+  <h1>Café Apokalypso — HD-Vergleich <small>Aktuell (68px / size 48) vs. Neu (v3 / size 64, high detail, hell)</small></h1>
+  <div class="controls">
+    <label>Zoom <input type="range" id="zoom" min="3" max="9" step="1" value="6"><span id="zv">6×</span></label>
+    <label>Hintergrund <span class="swatches" id="sw"></span></label>
+  </div>
+</header>
+<main id="main"></main>
+<script>
+const bust=Date.now();
+const ROWS=[
+  {name:"Cem", cur:`../assets/sprites/guests/placeholder-guest-cem.png?t=${bust}`, hd:`hd-samples/cem.png?t=${bust}`},
+  {name:"Christa", cur:`../assets/sprites/guests/placeholder-guest-christa.png?t=${bust}`, hd:`hd-samples/christa.png?t=${bust}`},
+];
+const BG={"Dunkel":"linear-gradient(#2a2730,#211e28)","Hell":"linear-gradient(#efe7da,#e3d8c6)","Café-Tan":"linear-gradient(#cdb091,#b8966f)","Karo":"repeating-conic-gradient(#3a3543 0 25%,#2c2833 0 50%) 0/24px 24px"};
+let zoom=6;
+const main=document.getElementById("main");
+ROWS.forEach(r=>{
+  const el=document.createElement("div");el.className="row";
+  el.innerHTML=`<h2>${r.name}</h2><div class="pair">
+    <div class="col"><div class="tag">AKTUELL · <b>68px</b></div><div class="stage"><img data-fit src="${r.cur}"></div></div>
+    <div class="col"><div class="tag">NEU HD · <b>v3 / size 64</b></div><div class="stage"><img data-fit src="${r.hd}"></div></div>
+  </div>`;
+  main.appendChild(el);
+});
+function fit(){document.querySelectorAll("img[data-fit]").forEach(i=>{const a=()=>{i.style.width=(i.naturalWidth*zoom)+"px";i.style.height=(i.naturalHeight*zoom)+"px";};i.complete&&i.naturalWidth?a():i.onload=a;});}
+document.getElementById("zoom").oninput=e=>{zoom=+e.target.value;document.getElementById("zv").textContent=zoom+"×";fit();};
+const sw=document.getElementById("sw");
+Object.entries(BG).forEach(([n,c],i)=>{const b=document.createElement("span");b.className="swatch"+(i===0?" active":"");b.title=n;b.style.background=c;b.onclick=()=>{document.documentElement.style.setProperty("--stage-bg",c);document.querySelectorAll(".swatch").forEach(s=>s.classList.remove("active"));b.classList.add("active");};sw.appendChild(b);});
+document.documentElement.style.setProperty("--stage-bg",BG["Dunkel"]);
+fit();
+</script>
+</body>
+</html>
