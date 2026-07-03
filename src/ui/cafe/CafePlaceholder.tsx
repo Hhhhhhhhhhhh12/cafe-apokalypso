@@ -8,7 +8,6 @@ import coffeeMachineAsset from "../../../assets/sprites/props/placeholder-cafe-c
 import kassandraRegisterAsset from "../../../assets/sprites/props/placeholder-kassandra-register.png";
 import bohnGuestAsset from "../../../assets/sprites/guests/placeholder-guest-bohn.png";
 import strangeGuestAsset from "../../../assets/sprites/guests/placeholder-guest-strange.png";
-import cemGuestAsset from "../../../assets/sprites/guests/placeholder-guest-cem.png";
 import cemSeatedAsset from "../../../assets/sprites/guests/placeholder-guest-cem-seated.png";
 import miraGuestAsset from "../../../assets/sprites/guests/placeholder-guest-mira.png";
 import lukasGuestAsset from "../../../assets/sprites/guests/placeholder-guest-lukas.png";
