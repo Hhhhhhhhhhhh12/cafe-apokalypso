@@ -10,6 +10,16 @@ const envPort = (globalThis as { process?: { env?: Record<string, string | undef
 export default defineConfig({
   base: "/cafe-apokalypso/",
   plugins: [react()],
+  build: {
+    rollupOptions: {
+      input: {
+        // Main game shell plus the standalone Lookbook reference page.
+        // Paths are resolved relative to the Vite project root.
+        main: "index.html",
+        lookbook: "lookbook.html"
+      }
+    }
+  },
   server: envPort ? { port: Number(envPort), strictPort: true } : undefined,
   test: {
     environment: "node",
