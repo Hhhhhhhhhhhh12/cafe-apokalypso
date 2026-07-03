@@ -41,6 +41,15 @@ export const decorSlots = [
     ]
   },
   {
+    id: "plant2",
+    label: "Counter Plant",
+    tiers: [
+      { tier: 1, name: "Sprig in a Jar", cost: 0, reputationBonus: 0, dailyCleanBonus: 0, dailyRepBonus: 0 },
+      { tier: 2, name: "Potted Herb", cost: 10, reputationBonus: 1, dailyCleanBonus: 1, dailyRepBonus: 0 },
+      { tier: 3, name: "Blooming Succulent", cost: 20, reputationBonus: 2, dailyCleanBonus: 1, dailyRepBonus: 1 }
+    ]
+  },
+  {
     id: "shelf",
     label: "Shelf",
     tiers: [

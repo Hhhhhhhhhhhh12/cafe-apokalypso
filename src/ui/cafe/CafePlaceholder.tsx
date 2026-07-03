@@ -249,6 +249,7 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
           <div className={`cafe-decor-lamp cafe-decor--tier-${gameState.decor?.lamp ?? 1}`} aria-hidden="true" />
           <div className={`cafe-decor-cups cafe-decor--tier-${gameState.decor?.cups ?? 1}`} aria-hidden="true" />
           <div className={`cafe-plant cafe-decor-plant cafe-decor--tier-${gameState.decor?.plant ?? 1}`} aria-hidden="true" />
+          <div className={`cafe-decor-plant2 cafe-decor--tier-${gameState.decor?.plant2 ?? 1}`} aria-hidden="true" />
 
           {/* CSS back wall — window, menu board, storage shelf */}
           <div className="cafe-back-wall" aria-hidden="true">
@@ -327,14 +328,14 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
             {/* Tables — only visible once furniture is owned (seating tier >= 1) */}
             {gameState.equipment.seating >= 1 && (
               <>
-                <div className="cafe-table cafe-table--left" aria-hidden="true">
+                <div className={`cafe-table cafe-table--left cafe-table--tier-${gameState.equipment.seating}`} aria-hidden="true">
                   <span className="cafe-table__top" />
                   <span className="cafe-chair cafe-chair--front" />
                   <span className="cafe-chair cafe-chair--side" />
                   {tablesDirty && <span className="cafe-cup cafe-cup--dirty" />}
                 </div>
 
-                <div className="cafe-table cafe-table--right" aria-hidden="true">
+                <div className={`cafe-table cafe-table--right cafe-table--tier-${gameState.equipment.seating}`} aria-hidden="true">
                   <span className="cafe-table__top" />
                   <span className="cafe-chair cafe-chair--front" />
                   <span className="cafe-chair cafe-chair--side" />

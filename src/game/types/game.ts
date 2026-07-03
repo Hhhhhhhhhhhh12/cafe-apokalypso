@@ -9,7 +9,7 @@ import type {
 } from "./content";
 import type { DayNumber } from "./content";
 
-export type GameStateVersion = 14;
+export type GameStateVersion = 15;
 
 export type ContentCatalogVersion = "week-one-v1";
 
@@ -19,7 +19,7 @@ export type CleanlinessStateLabel = "Clean" | "Tidy" | "Messy" | "Chaotic";
 export type StressStateLabel = "Calm" | "Busy" | "Tense" | "Overloaded";
 export type DayPhase = "setup" | "day_start" | "open" | "day_end";
 export type ClosureReason = "money" | "reputation";
-export type DecorSlotId = "plant" | "shelf" | "clock" | "lamp" | "cups";
+export type DecorSlotId = "plant" | "plant2" | "shelf" | "clock" | "lamp" | "cups";
 export type EquipmentSlotId = "machine" | "seating" | "register";
 export type HelperTaskId = "cleaning" | "service" | "barista" | "counter" | "marketing";
 export type EmployeeLevel = 1 | 2 | 3;

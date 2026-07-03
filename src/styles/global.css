@@ -1121,6 +1121,33 @@ h3 {
   display: none;
 }
 
+/*
+ * Seating tiers (equipment.seating 1..3) — one sprite, tinted per tier so the
+ * shop purchase reads as a visible upgrade without new art:
+ *   1 Second-hand → worn: desaturated, cooler, softer
+ *   2 Matched Set → crisp, full colour
+ *   3 Cosy Lounge → warm & lush, with a soft glow accent
+ */
+.cafe-table--tier-1 {
+  filter: saturate(0.68) brightness(0.95) sepia(0.06) contrast(0.96);
+}
+.cafe-table--tier-2 {
+  filter: saturate(1.06) brightness(1.01);
+}
+.cafe-table--tier-3 {
+  filter: saturate(1.16) brightness(1.04) drop-shadow(0 0 6px rgba(214, 150, 74, 0.35));
+}
+/* Cosy Lounge (tier 3) adds a warm floor glow under the set */
+.cafe-table--tier-3::after {
+  display: block;
+  content: "";
+  position: absolute;
+  inset: 62% 14% 6%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(198, 122, 66, 0.4) 0%, rgba(198, 122, 66, 0) 70%);
+  z-index: -1;
+}
+
 .cafe-table--left {
   left: 15%;
   bottom: 19%;
@@ -1748,6 +1775,33 @@ h3 {
   background-image: url("../../assets/sprites/props/placeholder-cafe-plant-t3.png");
   width: 60px;
   height: 80px;
+}
+
+/* Counter pot plant (plant2) — small herb/succulent sitting on the counter surface. */
+.cafe-decor-plant2 {
+  position: absolute;
+  left: 78%;
+  top: 55%;
+  z-index: 5;
+  width: 32px;
+  height: 40px;
+  background: url("../../assets/sprites/props/placeholder-cafe-plant.png") center bottom / contain no-repeat;
+  image-rendering: pixelated;
+}
+
+.cafe-decor-plant2.cafe-decor--tier-1 {
+  opacity: 0.80;
+  filter: grayscale(0.3) saturate(0.7);
+}
+
+.cafe-decor-plant2.cafe-decor--tier-2 {
+  opacity: 1;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-plant-t2.png");
+}
+
+.cafe-decor-plant2.cafe-decor--tier-3 {
+  opacity: 1;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-plant-t3.png");
 }
 
 /*
