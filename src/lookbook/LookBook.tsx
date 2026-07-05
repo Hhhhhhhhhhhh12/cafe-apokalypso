@@ -77,7 +77,7 @@ const scenes: DioramaScene[] = [
       ...baseState(),
       day: 1,
       resources: { ...baseState().resources, cleanliness: 90, stress: 5, mood: "calm" },
-      decor: { plant: 1, shelf: 1, clock: 1, lamp: 1, cups: 1 }
+      decor: { plant: 1, plant2: 1, shelf: 1, clock: 1, lamp: 1, cups: 1 }
     }
   },
   {
@@ -88,7 +88,7 @@ const scenes: DioramaScene[] = [
       ...baseState(),
       day: 4,
       resources: { ...baseState().resources, cleanliness: 55, stress: 45, mood: "busy" },
-      decor: { plant: 2, shelf: 2, clock: 2, lamp: 2, cups: 2 },
+      decor: { plant: 2, plant2: 2, shelf: 2, clock: 2, lamp: 2, cups: 2 },
       hiddenWeirdness: 6
     }
   },
@@ -100,7 +100,7 @@ const scenes: DioramaScene[] = [
       ...baseState(),
       day: 7,
       resources: { ...baseState().resources, cleanliness: 35, stress: 75, mood: "strained" },
-      decor: { plant: 3, shelf: 3, clock: 3, lamp: 3, cups: 3 },
+      decor: { plant: 3, plant2: 3, shelf: 3, clock: 3, lamp: 3, cups: 3 },
       kassandraInstalled: true,
       unlocks: { ...baseState().unlocks, kassandra: true },
       hiddenWeirdness: 14,

@@ -1884,7 +1884,7 @@ function formatMissingSupply(ingredients: readonly IngredientKey[]): string {
 function setNextGuestPatience(state: GameState): GameState {
   const queuePos = state.dayManagement.customersServed + state.dayManagement.guestsLost;
   const guest = getGuestForCustomer(state, queuePos);
-  const baseMax = guest ? getGuestPatienceMax(guest) : 0;
+  const baseMax = guest ? getGuestPatienceMax() : 0;
   // Messy café (cleanliness < 50) costs every arriving guest one patience tick —
   // they're already irritated before they even order.
   const messyPenalty = baseMax > 0 && state.resources.cleanliness < 50 ? PATIENCE_TICK : 0;

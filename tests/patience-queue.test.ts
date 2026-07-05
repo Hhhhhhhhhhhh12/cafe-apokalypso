@@ -36,13 +36,13 @@ describe("patience helpers", () => {
     expect(getGuestPatienceTicks(cem)).toBe(2);
     // Uniform 4-pip window: every guest tolerates the same number of
     // non-serve actions so the patience bar reads consistently.
-    expect(getGuestPatienceMax(cem)).toBe(4 * PATIENCE_TICK);
+    expect(getGuestPatienceMax()).toBe(4 * PATIENCE_TICK);
   });
 
   it("patient guest gets 4 ticks", () => {
     const bohn = weekOneGuests.find((g) => g.id === "herr-bohn")!;
     expect(getGuestPatienceTicks(bohn)).toBe(4);
-    expect(getGuestPatienceMax(bohn)).toBe(4 * PATIENCE_TICK);
+    expect(getGuestPatienceMax()).toBe(4 * PATIENCE_TICK);
   });
 
   it("normal guest gets 3 ticks", () => {

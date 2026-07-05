@@ -142,7 +142,7 @@ export function getGuestPatienceTicks(guest: GuestDefinition): number {
  * the 4-pip bar reads cleanly: each pip = one non-serve action of tolerance.
  * The messy-café penalty still deducts one tick on arrival (see setNextGuestPatience).
  */
-export function getGuestPatienceMax(_guest: GuestDefinition): number {
+export function getGuestPatienceMax(): number {
   return PATIENCE_TICKS_MAX * PATIENCE_TICK;
 }
 
