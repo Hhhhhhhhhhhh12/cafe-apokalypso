@@ -343,6 +343,15 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
                     <span className="cafe-cup cafe-cup--dirty" />
                   )}
                 </div>
+
+                <div className={`cafe-table cafe-table--back cafe-table--tier-${gameState.equipment.seating}`} aria-hidden="true">
+                  <span className="cafe-table__top" />
+                  <span className="cafe-chair cafe-chair--front" />
+                  <span className="cafe-chair cafe-chair--side" />
+                  {tablesDirty && visibleGuests.fatou && (
+                    <span className="cafe-cup cafe-cup--dirty" />
+                  )}
+                </div>
               </>
             )}
 
