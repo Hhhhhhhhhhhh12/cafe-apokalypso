@@ -22,15 +22,12 @@ export default tseslint.config(
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
-      // react-hooks v7's recommended preset promotes this to an error; the
-      // codebase has several pre-existing, intentional setState-in-effect
-      // syncs (timers, localStorage-derived UI state) that predate the rule.
-      // Downgrade to warn rather than rewrite them under CI pressure.
+      // react-hooks v7's recommended preset promotes these two compiler-powered
+      // rules to errors; the codebase has pre-existing, intentional
+      // setState-in-effect syncs and "latest value ref" idioms that predate
+      // them. Downgraded to warn rather than rewritten under CI pressure —
+      // proper adoption is tracked in #140.
       "react-hooks/set-state-in-effect": "warn",
-      // Same reasoning: v7 promotes this to an error, but the codebase uses
-      // the standard "latest value ref" idiom (mutate ref.current during
-      // render so effects/callbacks read a fresh value without becoming a
-      // dependency) in a few places. Downgrade rather than rewrite.
       "react-hooks/refs": "warn",
       "react-refresh/only-export-components": [
         "warn",
