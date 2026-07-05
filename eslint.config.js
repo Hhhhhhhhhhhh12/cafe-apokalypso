@@ -22,6 +22,11 @@ export default tseslint.config(
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
+      // New compiler-powered rules in eslint-plugin-react-hooks v7 flag six
+      // pre-existing effect patterns; adopting them is tracked separately so
+      // the eslint-10 peer fix stays mechanical.
+      "react-hooks/set-state-in-effect": "off",
+      "react-hooks/refs": "off",
       "react-refresh/only-export-components": [
         "warn",
         { allowConstantExport: true }
