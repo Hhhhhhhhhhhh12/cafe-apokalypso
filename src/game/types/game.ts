@@ -9,7 +9,7 @@ import type {
 } from "./content";
 import type { DayNumber } from "./content";
 
-export type GameStateVersion = 15;
+export type GameStateVersion = 16;
 
 export type ContentCatalogVersion = "week-one-v1";
 
@@ -88,6 +88,13 @@ export interface DayManagementState {
   serveStreak: number;
   /** Highest flow streak reached today. Surfaced in the day-end recap. */
   bestServeStreak: number;
+  /**
+   * Number of open-day actions taken since the last serve (or since opening).
+   * Drives the 4-state patience label: 0 = Relaxed, 1 = Waiting, 2 = Restless,
+   * 3 = Leaving. At 4 the guest walks out. Resets to 0 on every successful serve
+   * and whenever a new guest steps up to the counter.
+   */
+  actionsWithoutServing: number;
 }
 
 export interface GuestMemoryEntry {

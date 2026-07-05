@@ -11,21 +11,32 @@ import {
 } from "../src/game/engine/management";
 import { weekOneGuests } from "../src/game/data";
 
-/** Helper: open a day-N game (skips equipment/setup phase if present). */
+/** Helper: open a day-N game (skips equipment/setup phase if present).
+ *  Tops up action points so patience tests can burn a full 4-tick window
+ *  regardless of the day's real AP budget. */
 function openDayN(day: number): ReturnType<typeof createInitialGameState> {
   let state = { ...createInitialGameState(), day: day as 1 } as ReturnType<
     typeof createInitialGameState
   >;
   // Ensure we're in day_start regardless of setup phase
   state = { ...state, dayPhase: "day_start" };
-  return gameReducer(state, { type: "open_day" });
+  const opened = gameReducer(state, { type: "open_day" });
+  return {
+    ...opened,
+    dayManagement: {
+      ...opened.dayManagement,
+      actionPointsRemaining: Math.max(opened.dayManagement.actionPointsRemaining, 8)
+    }
+  };
 }
 
 describe("patience helpers", () => {
-  it("impatient guest gets 2 ticks", () => {
+  it("flavor ticks still differ by guest, but patience max is uniform (4 ticks)", () => {
     const cem = weekOneGuests.find((g) => g.id === "lieferfahrer-cem")!;
     expect(getGuestPatienceTicks(cem)).toBe(2);
-    expect(getGuestPatienceMax(cem)).toBe(2 * PATIENCE_TICK);
+    // Uniform 4-pip window: every guest tolerates the same number of
+    // non-serve actions so the patience bar reads consistently.
+    expect(getGuestPatienceMax(cem)).toBe(4 * PATIENCE_TICK);
   });
 
   it("patient guest gets 4 ticks", () => {

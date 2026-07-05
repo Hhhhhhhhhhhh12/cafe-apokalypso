@@ -90,25 +90,37 @@ export const ACTION_BUDGET_BY_DAY: Record<GameState["day"], number> = {
 };
 
 /**
- * Guest patience & queue (#PATIENCE). The guest at the counter loses one tick of
- * patience for every open-day action the player spends on something *other* than
- * serving them. When it reaches zero the guest leaves unserved (a walkout).
+ * Guest patience & queue (#PATIENCE). The guest at the counter advances through
+ * four states as the player spends action points on things other than serving:
+ *   actionsWithoutServing 0 → Relaxed
+ *   actionsWithoutServing 1 → Waiting
+ *   actionsWithoutServing 2 → Restless
+ *   actionsWithoutServing 3 → Leaving   (danger zone — serve next or they walk)
+ *   actionsWithoutServing 4 → Walkout   (guest leaves unserved)
  *
- * Patience is stored 0..max where max = ticks · PATIENCE_TICK, so `max / TICK`
- * equals the number of non-serve actions the guest tolerates before walking out.
- * Everything is derived from behaviorTags — fully deterministic, no randomness.
+ * The pip bar uses currentGuestPatience / currentGuestPatienceMax, which are
+ * kept in sync with actionsWithoutServing (4 fixed pips, one drains per action).
  */
 export const PATIENCE_TICK = 25;
+
+/** Total pip slots in the patience bar — always 4, one per state. */
+export const PATIENCE_TICKS_MAX = 4;
 
 /** Walkouts only bite from Day 4 on; Days 1–3 keep the cozy onboarding window —
  *  the patience bar still ticks down (teaching the mechanic) but nobody leaves. */
 export const WALKOUT_FROM_DAY = 4;
 
-/** Stress added and reputation removed when a guest gives up and walks out. */
-export const WALKOUT_STRESS = 4;
+/** actionsWithoutServing threshold at which a guest walks out. */
+export const WALKOUT_THRESHOLD = 4;
+
+/** Stress added when a guest gives up and walks out. */
+export const WALKOUT_STRESS = 8;
 export const WALKOUT_REPUTATION_PENALTY = 1;
 
-/** Number of non-serve actions a guest tolerates, from their behavior tags. */
+/**
+ * Flavor tag helper — kept for guest characterisation (orderLine choices, etc.)
+ * but no longer controls walkout timing (all guests share the same 4-tick window).
+ */
 export function getGuestPatienceTicks(guest: GuestDefinition): number {
   const tags = guest.behaviorTags;
   if (tags.some((tag) => tag === "impatient" || tag === "quick-service")) {
@@ -124,9 +136,14 @@ export function getGuestPatienceTicks(guest: GuestDefinition): number {
   return 3;
 }
 
-/** Full patience value (0..max) for a guest at the moment they reach the counter. */
-export function getGuestPatienceMax(guest: GuestDefinition): number {
-  return getGuestPatienceTicks(guest) * PATIENCE_TICK;
+/**
+ * Full patience value (0..max) for a guest at the moment they reach the counter.
+ * Always PATIENCE_TICKS_MAX * PATIENCE_TICK (100) — uniform across all guests so
+ * the 4-pip bar reads cleanly: each pip = one non-serve action of tolerance.
+ * The messy-café penalty still deducts one tick on arrival (see setNextGuestPatience).
+ */
+export function getGuestPatienceMax(_guest: GuestDefinition): number {
+  return PATIENCE_TICKS_MAX * PATIENCE_TICK;
 }
 
 export function guestsCanWalkOut(day: GameState["day"]): boolean {
@@ -135,6 +152,12 @@ export function guestsCanWalkOut(day: GameState["day"]): boolean {
 
 export type GuestPatienceLabel = "Relaxed" | "Waiting" | "Restless" | "Leaving";
 
+/**
+ * Derives the patience label from actionsWithoutServing.
+ * The old percentage-based overload is kept for backward compat with the pip bar
+ * — callers that already have (value, max) from currentGuestPatience can still use
+ * it, but the canonical path goes through actionsWithoutServing.
+ */
 export function getGuestPatienceLabel(value: number, max: number): GuestPatienceLabel {
   if (max <= 0 || value >= max * 0.66) {
     return "Relaxed";
@@ -145,6 +168,17 @@ export function getGuestPatienceLabel(value: number, max: number): GuestPatience
   if (value > 0) {
     return "Restless";
   }
+  return "Leaving";
+}
+
+/**
+ * Derives the patience label directly from the actionsWithoutServing counter.
+ * This is the canonical source used by the reducer and selectors.
+ */
+export function getPatienceLabelFromCounter(actionsWithoutServing: number): GuestPatienceLabel {
+  if (actionsWithoutServing <= 0) return "Relaxed";
+  if (actionsWithoutServing === 1) return "Waiting";
+  if (actionsWithoutServing === 2) return "Restless";
   return "Leaving";
 }
 
@@ -194,7 +228,8 @@ export function createInitialDayManagement(
     currentGuestPatienceMax: 0,
     guestsLost: 0,
     serveStreak: 0,
-    bestServeStreak: 0
+    bestServeStreak: 0,
+    actionsWithoutServing: 0
   };
 }
 

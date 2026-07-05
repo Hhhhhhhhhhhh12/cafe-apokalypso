@@ -18,7 +18,7 @@ import type {
 } from "../types/game";
 import { createInitialDayManagement, STARTING_REPUTATION, SUPPLY_CAPS } from "./management";
 
-export const CURRENT_GAME_STATE_VERSION = 15;
+export const CURRENT_GAME_STATE_VERSION = 16;
 export const CURRENT_CONTENT_CATALOG_VERSION = "week-one-v1";
 
 const initialResources: ResourceState = {
@@ -617,6 +617,18 @@ export function migrateRawSave(raw: unknown): unknown {
       const dm = obj.decor as Record<string, unknown>;
       if (typeof dm.plant2 !== "number") {
         obj.decor = { ...dm, plant2: 1 };
+      }
+    }
+  }
+
+  if (obj.version === 15) {
+    obj.version = 16;
+    patched = true;
+
+    if (obj.dayManagement && typeof obj.dayManagement === "object" && !Array.isArray(obj.dayManagement)) {
+      const dm = obj.dayManagement as Record<string, unknown>;
+      if (typeof dm.actionsWithoutServing !== "number") {
+        obj.dayManagement = { ...dm, actionsWithoutServing: 0 };
       }
     }
   }

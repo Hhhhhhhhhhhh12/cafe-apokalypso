@@ -1628,15 +1628,16 @@ h3 {
   opacity: 0;
 }
 
+/* Seated at the LEFT table (back chair) — clustered to the real table sprite */
 .placeholder-guest-normal-03 {
-  left: 20%;
-  bottom: 30%;
+  left: 22%;
+  bottom: 26%;
 }
 
-/* Second seated guest — different table position */
+/* Seated at the RIGHT table (back chair) */
 .placeholder-guest-normal-04 {
-  right: 24%;
-  bottom: 22%;
+  right: 30%;
+  bottom: 24%;
   background: #4a6e8a;
 }
 
@@ -1644,22 +1645,22 @@ h3 {
   background: #d9a47d;
 }
 
-/* Third seated guest — Lukas, left side near window */
+/* Lukas — seated at the LEFT table (front/side chair) */
 .placeholder-guest-normal-05 {
-  left: 10%;
-  bottom: 35%;
+  left: 17%;
+  bottom: 21%;
 }
 
-/* Christa — right side, near second table (day 2+) */
+/* Christa — seated at the RIGHT table (front/side chair, day 2+) */
 .placeholder-guest-normal-06 {
-  right: 14%;
-  bottom: 30%;
+  right: 24%;
+  bottom: 19%;
 }
 
-/* Herr Bohn — mid-back, near storage shelf (day 3+) */
+/* Herr Bohn — standing mid-back near the storage shelf (no table; day 3+) */
 .placeholder-guest-normal-07 {
-  left: 43%;
-  bottom: 45%;
+  left: 40%;
+  bottom: 40%;
 }
 
 .placeholder-guest-strange-01,
@@ -1697,11 +1698,10 @@ h3 {
   bottom: 31%;
 }
 
-/* Nele — linke Mitte, zurückgezogener Arbeitsplatz (nach rechts versetzt, damit
-   sie nicht mehr mit der Eck-Pflanze kollidiert) */
+/* Nele — third seat at the LEFT table (front-right chair) */
 .placeholder-guest-normal-08 {
-  left: 33%;
-  bottom: 48%;
+  left: 29%;
+  bottom: 23%;
 }
 
 /* Meda — Ecke hinten rechts, ab Tag 5 */
@@ -1716,10 +1716,10 @@ h3 {
   bottom: 52%;
 }
 
-/* Fatou — Mitte rechts, ruhiger Stammplatz ab Tag 2 */
+/* Fatou — third seat at the RIGHT table (front-left chair, day 2+) */
 .placeholder-guest-normal-09 {
-  left: 54%;
-  bottom: 28%;
+  right: 38%;
+  bottom: 21%;
 }
 
 /*
