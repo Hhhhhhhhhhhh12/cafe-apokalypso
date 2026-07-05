@@ -2211,14 +2211,49 @@ h3 {
   border-color: #3f7a56;
 }
 
+/* 4-state patience escalation: Relaxed (default green) → Waiting (amber)
+   → Restless (orange) → Leaving (red + pulse). Driven by the label class
+   from ActionPanel; --critical below stays as a legacy alias. */
+.next-guest__patience--waiting .next-guest__patience-label {
+  color: #8a6a20;
+}
+
+.next-guest__patience--waiting .next-guest__patience-pip--filled {
+  background: #c89430;
+  border-color: #a0761f;
+}
+
+.next-guest__patience--restless .next-guest__patience-label {
+  color: #a04818;
+  font-weight: 600;
+}
+
+.next-guest__patience--restless .next-guest__patience-pip--filled {
+  background: #d06020;
+  border-color: #a84714;
+}
+
+.next-guest__patience--leaving .next-guest__patience-label,
 .next-guest__patience--critical .next-guest__patience-label {
   color: #a83228;
   font-weight: 600;
 }
 
+.next-guest__patience--leaving .next-guest__patience-pip--filled,
 .next-guest__patience--critical .next-guest__patience-pip--filled {
   background: #d04030;
   border-color: #a82820;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .next-guest__patience--leaving .next-guest__patience-bar {
+    animation: patience-leaving-pulse 0.9s ease-in-out infinite;
+  }
+}
+
+@keyframes patience-leaving-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
 }
 
 /* Counter menu — product serve buttons overlaid in the diorama above the counter */
