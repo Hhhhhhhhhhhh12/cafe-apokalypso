@@ -3,20 +3,29 @@ import { useEffect, useId, useRef, useState } from "react";
 /**
  * Display & Accessibility options menu.
  *
- * Active toggles: Colourblind-friendly palette (#68).
+ * Active toggles: Colourblind-friendly palette (#68), Larger text (#128).
  * Passive status: Reduced motion (already honoured by prefers-reduced-motion).
- * Future toggles: Text size, contrast, …
  */
 const OPTIONS_STORAGE_KEY = "cafe-apokalypso.options.v1";
 
 interface StoredOptions {
   colourblindMode?: boolean;
+  largeText?: boolean;
 }
+
+type ToggleKey = keyof StoredOptions;
+
+/** Root classes are how the palettes/scales reach CSS — one per toggle. */
+const TOGGLE_ROOT_CLASS: Record<ToggleKey, string> = {
+  colourblindMode: "cafe-colorblind-mode",
+  largeText: "cafe-text-large"
+};
 
 interface Option {
   label: string;
   detail: string;
-  status: "interactive" | "respected" | "coming-soon";
+  status: "interactive" | "respected";
+  key?: ToggleKey;
 }
 
 const OPTIONS: readonly Option[] = [
@@ -28,11 +37,13 @@ const OPTIONS: readonly Option[] = [
   {
     label: "Colourblind-friendly palette",
     status: "interactive",
+    key: "colourblindMode",
     detail: "A higher-contrast, hue-independent mode."
   },
   {
-    label: "Text size",
-    status: "coming-soon",
+    label: "Larger text",
+    status: "interactive",
+    key: "largeText",
     detail: "Scale the interface text up for easier reading."
   }
 ];
@@ -56,30 +67,31 @@ function saveOptions(opts: StoredOptions): void {
 
 export function OptionsMenu({ defaultOpen = false }: { defaultOpen?: boolean }) {
   const [open, setOpen] = useState(defaultOpen);
-  const [colourblindMode, setColourblindMode] = useState(false);
+  const [settings, setSettings] = useState<StoredOptions>({});
+  const [loaded, setLoaded] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const panelId = useId();
-  const colourblindCheckboxId = useId();
+  const idPrefix = useId();
 
   // Load persisted options on mount.
   useEffect(() => {
-    const stored = loadOptions();
-    if (stored.colourblindMode) {
-      setColourblindMode(true);
-      document.documentElement.classList.add("cafe-colorblind-mode");
-    }
+    setSettings(loadOptions());
+    setLoaded(true);
   }, []);
 
-  // Apply/remove colourblind mode on the document root.
+  // Sync root classes with the settings, persist changes.
   useEffect(() => {
-    if (colourblindMode) {
-      document.documentElement.classList.add("cafe-colorblind-mode");
-    } else {
-      document.documentElement.classList.remove("cafe-colorblind-mode");
+    if (!loaded) {
+      return;
     }
-    // Persist to localStorage.
-    saveOptions({ colourblindMode });
-  }, [colourblindMode]);
+    for (const [key, className] of Object.entries(TOGGLE_ROOT_CLASS)) {
+      document.documentElement.classList.toggle(
+        className,
+        Boolean(settings[key as ToggleKey])
+      );
+    }
+    saveOptions(settings);
+  }, [settings, loaded]);
 
   // Esc closes the panel and returns focus to the trigger.
   useEffect(() => {
@@ -119,15 +131,19 @@ export function OptionsMenu({ defaultOpen = false }: { defaultOpen?: boolean }) 
         >
           <ul className="options-menu__list">
             {OPTIONS.map((option) => {
-              if (option.status === "interactive") {
+              if (option.status === "interactive" && option.key) {
+                const key = option.key;
+                const checkboxId = `${idPrefix}-${key}`;
                 return (
                   <li key={option.label} className="options-menu__item">
-                    <label htmlFor={colourblindCheckboxId} className="options-menu__toggle">
+                    <label htmlFor={checkboxId} className="options-menu__toggle">
                       <input
-                        id={colourblindCheckboxId}
+                        id={checkboxId}
                         type="checkbox"
-                        checked={colourblindMode}
-                        onChange={() => setColourblindMode((v) => !v)}
+                        checked={Boolean(settings[key])}
+                        onChange={() =>
+                          setSettings((prev) => ({ ...prev, [key]: !prev[key] }))
+                        }
                         className="options-menu__toggle-input"
                       />
                       <span className="options-menu__toggle-label">{option.label}</span>
@@ -140,8 +156,8 @@ export function OptionsMenu({ defaultOpen = false }: { defaultOpen?: boolean }) 
                 <li key={option.label} className="options-menu__item">
                   <span className="options-menu__item-head">
                     <span className="options-menu__item-label">{option.label}</span>
-                    <span className={`options-menu__tag options-menu__tag--${option.status}`}>
-                      {option.status === "respected" ? "Respected" : "Coming soon"}
+                    <span className="options-menu__tag options-menu__tag--respected">
+                      Respected
                     </span>
                   </span>
                   <span className="options-menu__item-detail">{option.detail}</span>

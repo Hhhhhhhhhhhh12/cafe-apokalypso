@@ -8,6 +8,13 @@ html {
   overflow-x: clip;
 }
 
+/* Larger text (GitHub #128) — all interface text is rem-based, so bumping the
+   root size scales panels/buttons/labels uniformly. Diorama sprites are sized
+   in px and keep their pixel-art dimensions. */
+html.cafe-text-large {
+  font-size: 118.75%; /* 19px base */
+}
+
 :root {
   color: #211814;
   background: #f4eadf;
