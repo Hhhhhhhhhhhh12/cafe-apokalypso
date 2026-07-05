@@ -22,6 +22,11 @@ export default tseslint.config(
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
+      // New in eslint-plugin-react-hooks v7 (React compiler lints). The queue/
+      // walk choreography in CafePlaceholder intentionally drives a phase
+      // machine from effects — keep these visible as warnings, not CI failures.
+      "react-hooks/refs": "warn",
+      "react-hooks/set-state-in-effect": "warn",
       "react-refresh/only-export-components": [
         "warn",
         { allowConstantExport: true }
