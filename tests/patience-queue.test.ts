@@ -215,18 +215,17 @@ describe("getGuestPatienceState labels", () => {
     expect(ps.critical).toBe(false);
   });
 
-  it("returns Restless when patience is low on Day 4+", () => {
+  it("escalates through Waiting/Restless to Leaving on Day 4+", () => {
     let state = openDayN(4);
-    const maxTicks = state.dayManagement.currentGuestPatienceMax / PATIENCE_TICK;
-    // Drain to last tick
-    for (let i = 0; i < maxTicks - 1; i++) {
-      if (state.dayManagement.actionPointsRemaining > 0) {
-        state = gameReducer(state, { type: "clean_tables" });
-      }
-    }
+    // 1 non-serve action → Waiting, 2 → Restless, 3 → Leaving (critical)
+    state = gameReducer(state, { type: "clean_tables" });
+    expect(getGuestPatienceState(state)?.label).toBe("Waiting");
+    state = gameReducer(state, { type: "clean_tables" });
+    expect(getGuestPatienceState(state)?.label).toBe("Restless");
+    state = gameReducer(state, { type: "clean_tables" });
     const ps = getGuestPatienceState(state);
     if (ps) {
-      expect(["Waiting", "Restless"]).toContain(ps.label);
+      expect(ps.label).toBe("Leaving");
       expect(ps.critical).toBe(true);
     }
   });
