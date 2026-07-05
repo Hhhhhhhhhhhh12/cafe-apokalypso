@@ -1884,7 +1884,7 @@ function formatMissingSupply(ingredients: readonly IngredientKey[]): string {
 function setNextGuestPatience(state: GameState): GameState {
   const queuePos = state.dayManagement.customersServed + state.dayManagement.guestsLost;
   const guest = getGuestForCustomer(state, queuePos);
-  const baseMax = guest ? getGuestPatienceMax(guest) : 0;
+  const baseMax = guest ? getGuestPatienceMax() : 0;
   // Messy café (cleanliness < 50) costs every arriving guest one patience tick —
   // they're already irritated before they even order.
   const messyPenalty = baseMax > 0 && state.resources.cleanliness < 50 ? PATIENCE_TICK : 0;
@@ -1894,7 +1894,8 @@ function setNextGuestPatience(state: GameState): GameState {
     dayManagement: {
       ...state.dayManagement,
       currentGuestPatience: max,
-      currentGuestPatienceMax: max
+      currentGuestPatienceMax: max,
+      actionsWithoutServing: 0
     }
   };
 }
@@ -1911,10 +1912,18 @@ function applyPatienceTick(state: GameState): { state: GameState; walkoutLine: s
   }
 
   const newPatience = Math.max(0, management.currentGuestPatience - PATIENCE_TICK);
+  const newActionsWithoutServing = management.actionsWithoutServing + 1;
 
   if (newPatience > 0 || !guestsCanWalkOut(state.day)) {
     return {
-      state: { ...state, dayManagement: { ...management, currentGuestPatience: newPatience } },
+      state: {
+        ...state,
+        dayManagement: {
+          ...management,
+          currentGuestPatience: newPatience,
+          actionsWithoutServing: newActionsWithoutServing
+        }
+      },
       walkoutLine: ""
     };
   }
@@ -1934,6 +1943,7 @@ function applyPatienceTick(state: GameState): { state: GameState; walkoutLine: s
     dayManagement: {
       ...management,
       currentGuestPatience: 0,
+      actionsWithoutServing: newActionsWithoutServing,
       guestsLost: management.guestsLost + 1,
       serveStreak: 0
     }

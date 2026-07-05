@@ -163,7 +163,7 @@ describe("save migration", () => {
     // Should have kept day 3, not reset to day 1 fresh game
     expect(state.day).toBe(3);
     expect(state.version).toBe(CURRENT_GAME_STATE_VERSION);
-    expect(state.decor).toEqual({ plant: 1, shelf: 1, clock: 1, lamp: 1, cups: 1 });
+    expect(state.decor).toEqual({ plant: 1, plant2: 1, shelf: 1, clock: 1, lamp: 1, cups: 1 });
   });
 
   it("loadGameState keeps a v8 day-end save lacking dailyOverhead", () => {

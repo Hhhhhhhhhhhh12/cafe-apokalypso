@@ -9,7 +9,7 @@ import type {
 } from "./content";
 import type { DayNumber } from "./content";
 
-export type GameStateVersion = 14;
+export type GameStateVersion = 16;
 
 export type ContentCatalogVersion = "week-one-v1";
 
@@ -19,7 +19,7 @@ export type CleanlinessStateLabel = "Clean" | "Tidy" | "Messy" | "Chaotic";
 export type StressStateLabel = "Calm" | "Busy" | "Tense" | "Overloaded";
 export type DayPhase = "setup" | "day_start" | "open" | "day_end";
 export type ClosureReason = "money" | "reputation";
-export type DecorSlotId = "plant" | "shelf" | "clock" | "lamp" | "cups";
+export type DecorSlotId = "plant" | "plant2" | "shelf" | "clock" | "lamp" | "cups";
 export type EquipmentSlotId = "machine" | "seating" | "register";
 export type HelperTaskId = "cleaning" | "service" | "barista" | "counter" | "marketing";
 export type EmployeeLevel = 1 | 2 | 3;
@@ -88,6 +88,13 @@ export interface DayManagementState {
   serveStreak: number;
   /** Highest flow streak reached today. Surfaced in the day-end recap. */
   bestServeStreak: number;
+  /**
+   * Number of open-day actions taken since the last serve (or since opening).
+   * Drives the 4-state patience label: 0 = Relaxed, 1 = Waiting, 2 = Restless,
+   * 3 = Leaving. At 4 the guest walks out. Resets to 0 on every successful serve
+   * and whenever a new guest steps up to the counter.
+   */
+  actionsWithoutServing: number;
 }
 
 export interface GuestMemoryEntry {

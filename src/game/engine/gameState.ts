@@ -18,7 +18,7 @@ import type {
 } from "../types/game";
 import { createInitialDayManagement, STARTING_REPUTATION, SUPPLY_CAPS } from "./management";
 
-export const CURRENT_GAME_STATE_VERSION = 14;
+export const CURRENT_GAME_STATE_VERSION = 16;
 export const CURRENT_CONTENT_CATALOG_VERSION = "week-one-v1";
 
 const initialResources: ResourceState = {
@@ -78,7 +78,7 @@ export function createInitialGameState(): GameState {
     cafeClosed: false,
     closureReason: null,
     reputationZeroStreak: 0,
-    decor: { plant: 1, shelf: 1, clock: 1, lamp: 1, cups: 1 },
+    decor: { plant: 1, plant2: 1, shelf: 1, clock: 1, lamp: 1, cups: 1 },
     equipment: { machine: 1, seating: 1, register: 1 },
     run: { ...initialRun, modifierIds: [...initialRun.modifierIds], memoryFragments: [] },
     guestMemory: {},
@@ -359,7 +359,7 @@ function isValidUnlocks(value: unknown): value is UnlockState {
 }
 
 /** All décor slot keys that must exist in a valid save. */
-const DECOR_SLOT_KEYS = ["plant", "shelf", "clock", "lamp", "cups"] as const;
+const DECOR_SLOT_KEYS = ["plant", "plant2", "shelf", "clock", "lamp", "cups"] as const;
 
 function isValidDecor(value: unknown): value is Record<typeof DECOR_SLOT_KEYS[number], number> {
   if (!value || typeof value !== "object") {
@@ -422,7 +422,8 @@ const GUEST_IDS = [
   "freelancerin-nele",
   "herr-grau",
   "frau-roter-regenschirm",
-  "meda"
+  "meda",
+  "nachbarin-mira"
 ] as const;
 
 function isValidGuestMemory(value: unknown): value is Partial<Record<GuestId, GuestMemoryEntry>> {
@@ -605,6 +606,30 @@ export function migrateRawSave(raw: unknown): unknown {
 
     if (!Array.isArray(obj.purchasedUpgrades)) {
       obj.purchasedUpgrades = [];
+    }
+  }
+
+  if (obj.version === 14) {
+    obj.version = 15;
+    patched = true;
+
+    if (obj.decor && typeof obj.decor === "object" && !Array.isArray(obj.decor)) {
+      const dm = obj.decor as Record<string, unknown>;
+      if (typeof dm.plant2 !== "number") {
+        obj.decor = { ...dm, plant2: 1 };
+      }
+    }
+  }
+
+  if (obj.version === 15) {
+    obj.version = 16;
+    patched = true;
+
+    if (obj.dayManagement && typeof obj.dayManagement === "object" && !Array.isArray(obj.dayManagement)) {
+      const dm = obj.dayManagement as Record<string, unknown>;
+      if (typeof dm.actionsWithoutServing !== "number") {
+        obj.dayManagement = { ...dm, actionsWithoutServing: 0 };
+      }
     }
   }
 

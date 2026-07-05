@@ -33,6 +33,23 @@ export const weekOneGuests = [
     missedPreferenceLine: "She accepts it without complaint, which somehow makes it harder to forget."
   },
   {
+    id: "nachbarin-mira",
+    name: "Nachbarin Mira",
+    category: "normal",
+    firstDay: 2,
+    behaviorTags: ["calm", "local", "regular"],
+    summary: "Neighbour from the building upstairs who turns up when the kitchen feels too quiet.",
+    sampleLines: ["Filter coffee, please."],
+    orderLine: "Filter coffee, please. I only came down because the kitchen was too quiet.",
+    learningCue: "She does not look for a table. She already knows which one she wants.",
+    preferredProductId: "filterkaffee",
+    serveLine: "She takes the cup and finds her corner without asking if it is free.",
+    matchedPreferenceLine: "Filter coffee. She nods once, already moving toward her table.",
+    missedPreferenceLine: "She accepts it politely. She will remember the correct order anyway.",
+    decorAtmosphereBonus: { minAvgTier: 2 },
+    decorAtmosphereLine: "She sets down the cup and looks around. \"It feels more settled in here than it used to.\" Rep +1."
+  },
+  {
     id: "laptop-lukas",
     name: "Laptop-Lukas",
     category: "normal",

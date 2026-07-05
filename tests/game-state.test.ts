@@ -14,8 +14,8 @@ describe("initial game state", () => {
   it("starts as a serializable day-one café state", () => {
     const state = createInitialGameState();
 
-    expect(state.version).toBe(14);
-    expect(state.decor).toEqual({ plant: 1, shelf: 1, clock: 1, lamp: 1, cups: 1 });
+    expect(state.version).toBe(16);
+    expect(state.decor).toEqual({ plant: 1, plant2: 1, shelf: 1, clock: 1, lamp: 1, cups: 1 });
     expect(state.run.runNumber).toBe(1);
     expect(state.run.modifierIds).toHaveLength(7);
     expect(getCurrentDayModifier(state).id).toBe("soft-opening");

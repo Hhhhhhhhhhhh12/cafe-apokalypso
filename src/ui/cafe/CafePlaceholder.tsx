@@ -8,9 +8,9 @@ import coffeeMachineAsset from "../../../assets/sprites/props/placeholder-cafe-c
 import kassandraRegisterAsset from "../../../assets/sprites/props/placeholder-kassandra-register.png";
 import bohnGuestAsset from "../../../assets/sprites/guests/placeholder-guest-bohn.png";
 import strangeGuestAsset from "../../../assets/sprites/guests/placeholder-guest-strange.png";
-import cemGuestAsset from "../../../assets/sprites/guests/placeholder-guest-cem.png";
-import miraGuestAsset from "../../../assets/sprites/guests/placeholder-guest-mira.png";
-import lukasGuestAsset from "../../../assets/sprites/guests/placeholder-guest-lukas.png";
+import cemSeatedAsset from "../../../assets/sprites/guests/placeholder-guest-cem-seated.png";
+import miraSeatedAsset from "../../../assets/sprites/guests/placeholder-guest-mira-seated.png";
+import lukasSeatedAsset from "../../../assets/sprites/guests/placeholder-guest-lukas-seated.png";
 import christaGuestAsset from "../../../assets/sprites/guests/placeholder-guest-christa.png";
 import neleGuestAsset from "../../../assets/sprites/guests/placeholder-guest-nele.png";
 import medaGuestAsset from "../../../assets/sprites/guests/placeholder-guest-meda.png";
@@ -249,6 +249,7 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
           <div className={`cafe-decor-lamp cafe-decor--tier-${gameState.decor?.lamp ?? 1}`} aria-hidden="true" />
           <div className={`cafe-decor-cups cafe-decor--tier-${gameState.decor?.cups ?? 1}`} aria-hidden="true" />
           <div className={`cafe-plant cafe-decor-plant cafe-decor--tier-${gameState.decor?.plant ?? 1}`} aria-hidden="true" />
+          <div className={`cafe-decor-plant2 cafe-decor--tier-${gameState.decor?.plant2 ?? 1}`} aria-hidden="true" />
 
           {/* CSS back wall — window, menu board, storage shelf */}
           <div className="cafe-back-wall" aria-hidden="true">
@@ -327,14 +328,14 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
             {/* Tables — only visible once furniture is owned (seating tier >= 1) */}
             {gameState.equipment.seating >= 1 && (
               <>
-                <div className="cafe-table cafe-table--left" aria-hidden="true">
+                <div className={`cafe-table cafe-table--left cafe-table--tier-${gameState.equipment.seating}`} aria-hidden="true">
                   <span className="cafe-table__top" />
                   <span className="cafe-chair cafe-chair--front" />
                   <span className="cafe-chair cafe-chair--side" />
                   {tablesDirty && <span className="cafe-cup cafe-cup--dirty" />}
                 </div>
 
-                <div className="cafe-table cafe-table--right" aria-hidden="true">
+                <div className={`cafe-table cafe-table--right cafe-table--tier-${gameState.equipment.seating}`} aria-hidden="true">
                   <span className="cafe-table__top" />
                   <span className="cafe-chair cafe-chair--front" />
                   <span className="cafe-chair cafe-chair--side" />
@@ -434,7 +435,7 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
               >
                 <img
                   className="cafe-pilot-asset cafe-pilot-asset--guest cafe-pilot-asset--cem"
-                  src={cemGuestAsset}
+                  src={cemSeatedAsset}
                   aria-hidden="true"
                   alt=""
                 />
@@ -449,7 +450,7 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
               >
                 <img
                   className="cafe-pilot-asset cafe-pilot-asset--guest cafe-pilot-asset--mira"
-                  src={miraGuestAsset}
+                  src={miraSeatedAsset}
                   aria-hidden="true"
                   alt=""
                 />
@@ -464,7 +465,7 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
               >
                 <img
                   className="cafe-pilot-asset cafe-pilot-asset--guest cafe-pilot-asset--lukas"
-                  src={lukasGuestAsset}
+                  src={lukasSeatedAsset}
                   aria-hidden="true"
                   alt=""
                 />

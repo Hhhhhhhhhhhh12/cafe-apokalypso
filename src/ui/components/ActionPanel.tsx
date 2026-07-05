@@ -270,7 +270,7 @@ function OpenDayControls({
           </div>
           {patienceState ? (
             <span
-              className={`next-guest__patience${patienceState.critical ? " next-guest__patience--critical" : ""}`}
+              className={`next-guest__patience next-guest__patience--${patienceState.label.toLowerCase()}${patienceState.critical ? " next-guest__patience--critical" : ""}`}
               aria-label={`Guest patience: ${patienceState.label}`}
             >
               <span className="next-guest__patience-label">{patienceState.label}</span>

@@ -1121,6 +1121,33 @@ h3 {
   display: none;
 }
 
+/*
+ * Seating tiers (equipment.seating 1..3) — one sprite, tinted per tier so the
+ * shop purchase reads as a visible upgrade without new art:
+ *   1 Second-hand → worn: desaturated, cooler, softer
+ *   2 Matched Set → crisp, full colour
+ *   3 Cosy Lounge → warm & lush, with a soft glow accent
+ */
+.cafe-table--tier-1 {
+  filter: saturate(0.68) brightness(0.95) sepia(0.06) contrast(0.96);
+}
+.cafe-table--tier-2 {
+  filter: saturate(1.06) brightness(1.01);
+}
+.cafe-table--tier-3 {
+  filter: saturate(1.16) brightness(1.04) drop-shadow(0 0 6px rgba(214, 150, 74, 0.35));
+}
+/* Cosy Lounge (tier 3) adds a warm floor glow under the set */
+.cafe-table--tier-3::after {
+  display: block;
+  content: "";
+  position: absolute;
+  inset: 62% 14% 6%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(198, 122, 66, 0.4) 0%, rgba(198, 122, 66, 0) 70%);
+  z-index: -1;
+}
+
 .cafe-table--left {
   left: 15%;
   bottom: 19%;
@@ -1601,15 +1628,16 @@ h3 {
   opacity: 0;
 }
 
+/* Seated at the LEFT table (back chair) — clustered to the real table sprite */
 .placeholder-guest-normal-03 {
-  left: 20%;
-  bottom: 30%;
+  left: 22%;
+  bottom: 26%;
 }
 
-/* Second seated guest — different table position */
+/* Seated at the RIGHT table (back chair) */
 .placeholder-guest-normal-04 {
-  right: 24%;
-  bottom: 22%;
+  right: 30%;
+  bottom: 24%;
   background: #4a6e8a;
 }
 
@@ -1617,22 +1645,22 @@ h3 {
   background: #d9a47d;
 }
 
-/* Third seated guest — Lukas, left side near window */
+/* Lukas — seated at the LEFT table (front/side chair) */
 .placeholder-guest-normal-05 {
-  left: 10%;
-  bottom: 35%;
+  left: 17%;
+  bottom: 21%;
 }
 
-/* Christa — right side, near second table (day 2+) */
+/* Christa — seated at the RIGHT table (front/side chair, day 2+) */
 .placeholder-guest-normal-06 {
-  right: 14%;
-  bottom: 30%;
+  right: 24%;
+  bottom: 19%;
 }
 
-/* Herr Bohn — mid-back, near storage shelf (day 3+) */
+/* Herr Bohn — standing mid-back near the storage shelf (no table; day 3+) */
 .placeholder-guest-normal-07 {
-  left: 43%;
-  bottom: 45%;
+  left: 40%;
+  bottom: 40%;
 }
 
 .placeholder-guest-strange-01,
@@ -1670,11 +1698,10 @@ h3 {
   bottom: 31%;
 }
 
-/* Nele — linke Mitte, zurückgezogener Arbeitsplatz (nach rechts versetzt, damit
-   sie nicht mehr mit der Eck-Pflanze kollidiert) */
+/* Nele — third seat at the LEFT table (front-right chair) */
 .placeholder-guest-normal-08 {
-  left: 33%;
-  bottom: 48%;
+  left: 29%;
+  bottom: 23%;
 }
 
 /* Meda — Ecke hinten rechts, ab Tag 5 */
@@ -1689,10 +1716,10 @@ h3 {
   bottom: 52%;
 }
 
-/* Fatou — Mitte rechts, ruhiger Stammplatz ab Tag 2 */
+/* Fatou — third seat at the RIGHT table (front-left chair, day 2+) */
 .placeholder-guest-normal-09 {
-  left: 54%;
-  bottom: 28%;
+  right: 38%;
+  bottom: 21%;
 }
 
 /*
@@ -1748,6 +1775,33 @@ h3 {
   background-image: url("../../assets/sprites/props/placeholder-cafe-plant-t3.png");
   width: 60px;
   height: 80px;
+}
+
+/* Counter pot plant (plant2) — small herb/succulent sitting on the counter surface. */
+.cafe-decor-plant2 {
+  position: absolute;
+  left: 78%;
+  top: 55%;
+  z-index: 5;
+  width: 32px;
+  height: 40px;
+  background: url("../../assets/sprites/props/placeholder-cafe-plant.png") center bottom / contain no-repeat;
+  image-rendering: pixelated;
+}
+
+.cafe-decor-plant2.cafe-decor--tier-1 {
+  opacity: 0.80;
+  filter: grayscale(0.3) saturate(0.7);
+}
+
+.cafe-decor-plant2.cafe-decor--tier-2 {
+  opacity: 1;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-plant-t2.png");
+}
+
+.cafe-decor-plant2.cafe-decor--tier-3 {
+  opacity: 1;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-plant-t3.png");
 }
 
 /*
@@ -2157,14 +2211,49 @@ h3 {
   border-color: #3f7a56;
 }
 
+/* 4-state patience escalation: Relaxed (default green) → Waiting (amber)
+   → Restless (orange) → Leaving (red + pulse). Driven by the label class
+   from ActionPanel; --critical below stays as a legacy alias. */
+.next-guest__patience--waiting .next-guest__patience-label {
+  color: #8a6a20;
+}
+
+.next-guest__patience--waiting .next-guest__patience-pip--filled {
+  background: #c89430;
+  border-color: #a0761f;
+}
+
+.next-guest__patience--restless .next-guest__patience-label {
+  color: #a04818;
+  font-weight: 600;
+}
+
+.next-guest__patience--restless .next-guest__patience-pip--filled {
+  background: #d06020;
+  border-color: #a84714;
+}
+
+.next-guest__patience--leaving .next-guest__patience-label,
 .next-guest__patience--critical .next-guest__patience-label {
   color: #a83228;
   font-weight: 600;
 }
 
+.next-guest__patience--leaving .next-guest__patience-pip--filled,
 .next-guest__patience--critical .next-guest__patience-pip--filled {
   background: #d04030;
   border-color: #a82820;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .next-guest__patience--leaving .next-guest__patience-bar {
+    animation: patience-leaving-pulse 0.9s ease-in-out infinite;
+  }
+}
+
+@keyframes patience-leaving-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
 }
 
 /* Counter menu — product serve buttons overlaid in the diorama above the counter */
