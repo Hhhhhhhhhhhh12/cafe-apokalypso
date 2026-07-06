@@ -1165,6 +1165,17 @@ h3 {
   bottom: 15%;
 }
 
+/* Back table — sits in the gap between Bohn and the counter/machine, further
+   back in the isometric floor so it reads a touch smaller/higher than the
+   two front tables. Hosts Nele + Fatou instead of crowding a third chair
+   onto the front tables (whose sprite only draws two chairs). */
+.cafe-table--back {
+  left: 45%;
+  bottom: 47%;
+  width: 18%;
+  height: 16%;
+}
+
 .cafe-table__top {
   position: absolute;
   inset: 11% 12% 33%;
@@ -1664,10 +1675,11 @@ h3 {
   bottom: 19%;
 }
 
-/* Herr Bohn — standing mid-back near the storage shelf (no table; day 3+) */
+/* Herr Bohn — standing, coffee in hand, left of the back table (no table
+   of his own; nudged clear of the back table's guests; day 3+) */
 .placeholder-guest-normal-07 {
-  left: 40%;
-  bottom: 40%;
+  left: 34%;
+  bottom: 38%;
 }
 
 .placeholder-guest-strange-01,
@@ -1705,10 +1717,10 @@ h3 {
   bottom: 31%;
 }
 
-/* Nele — third seat at the LEFT table (front-right chair) */
+/* Nele — seated at the BACK table (left chair) */
 .placeholder-guest-normal-08 {
-  left: 29%;
-  bottom: 23%;
+  left: 50%;
+  bottom: 52%;
 }
 
 /* Meda — Ecke hinten rechts, ab Tag 5 */
@@ -1723,10 +1735,10 @@ h3 {
   bottom: 52%;
 }
 
-/* Fatou — third seat at the RIGHT table (front-left chair, day 2+) */
+/* Fatou — seated at the BACK table (right chair, day 2+) */
 .placeholder-guest-normal-09 {
-  right: 38%;
-  bottom: 21%;
+  left: 46%;
+  bottom: 48%;
 }
 
 /*
