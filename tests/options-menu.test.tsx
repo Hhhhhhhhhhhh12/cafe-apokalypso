@@ -1,8 +1,8 @@
 /**
- * Display & Accessibility options menu (#67 scaffold, #68 colourblind toggle).
+ * Display & Accessibility options menu (#67 scaffold, #68 colourblind, #128 text size).
  *
- * Tests: disclosure button in header, panel structure, colourblind checkbox present
- * and properly labelled. localStorage persistence is hand-tested (renderToStaticMarkup
+ * Tests: disclosure button in header, panel structure, both toggles present and
+ * properly labelled. localStorage persistence is hand-tested (renderToStaticMarkup
  * doesn't support effects/storage).
  */
 import { renderToStaticMarkup } from "react-dom/server";
@@ -11,7 +11,7 @@ import { describe, expect, it } from "vitest";
 import { App } from "../src/app/App";
 import { OptionsMenu } from "../src/ui/components/OptionsMenu";
 
-describe("options menu (#67, #68)", () => {
+describe("options menu (#67, #68, #128)", () => {
   it("renders a collapsed, labelled disclosure button in the app header", () => {
     const markup = renderToStaticMarkup(<App />);
     expect(markup).toContain("options-menu__button");
@@ -46,9 +46,12 @@ describe("options menu (#67, #68)", () => {
     expect(markup).toContain("Respected");
   });
 
-  it("previews future options as coming soon", () => {
+  it("renders larger text as an interactive checkbox (#128)", () => {
     const markup = renderToStaticMarkup(<OptionsMenu defaultOpen />);
-    expect(markup).toContain("Text size");
-    expect(markup).toContain("Coming soon");
+    expect(markup).toContain("Larger text");
+    // Both toggles render as real checkboxes now — nothing left "coming soon".
+    const checkboxCount = (markup.match(/type="checkbox"/g) ?? []).length;
+    expect(checkboxCount).toBe(2);
+    expect(markup).not.toContain("Coming soon");
   });
 });
