@@ -23,9 +23,11 @@ type QueueGuest = (typeof QUEUE_ROTATION)[number];
 interface CafePlaceholderProps {
   gameState: GameState;
   onServeProduct?: (productId: ProductId) => void;
+  /** Fired when the player clicks a dirty table in the diorama (issue #130). */
+  onCleanTables?: () => void;
 }
 
-export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
+export function CafePlaceholder({ gameState, onCleanTables }: CafePlaceholderProps) {
   // --- Visual state classes ---
   const cleanlinessClass =
     gameState.resources.cleanliness >= 70
@@ -325,33 +327,43 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
               <div className="cafe-service-mat" />
             </div>
 
-            {/* Tables — only visible once furniture is owned (seating tier >= 1) */}
+            {/* Tables — only visible once furniture is owned (seating tier >= 1).
+                Dirty tables become clickable and fire the clean-tables action (#130). */}
             {gameState.equipment.seating >= 1 && (
               <>
-                <div className={`cafe-table cafe-table--left cafe-table--tier-${gameState.equipment.seating}`} aria-hidden="true">
-                  <span className="cafe-table__top" />
-                  <span className="cafe-chair cafe-chair--front" />
-                  <span className="cafe-chair cafe-chair--side" />
-                  {tablesDirty && <span className="cafe-cup cafe-cup--dirty" />}
-                </div>
-
-                <div className={`cafe-table cafe-table--right cafe-table--tier-${gameState.equipment.seating}`} aria-hidden="true">
-                  <span className="cafe-table__top" />
-                  <span className="cafe-chair cafe-chair--front" />
-                  <span className="cafe-chair cafe-chair--side" />
-                  {tablesDirty && visibleGuests.mira && (
-                    <span className="cafe-cup cafe-cup--dirty" />
-                  )}
-                </div>
-
-                <div className={`cafe-table cafe-table--back cafe-table--tier-${gameState.equipment.seating}`} aria-hidden="true">
-                  <span className="cafe-table__top" />
-                  <span className="cafe-chair cafe-chair--front" />
-                  <span className="cafe-chair cafe-chair--side" />
-                  {tablesDirty && visibleGuests.fatou && (
-                    <span className="cafe-cup cafe-cup--dirty" />
-                  )}
-                </div>
+                {([
+                  { pos: "left", dirty: tablesDirty },
+                  { pos: "right", dirty: tablesDirty && visibleGuests.mira },
+                  { pos: "back", dirty: tablesDirty && visibleGuests.fatou }
+                ] as const).map(({ pos, dirty }) => {
+                  const className = `cafe-table cafe-table--${pos} cafe-table--tier-${gameState.equipment.seating}`;
+                  const inner = (
+                    <>
+                      <span className="cafe-table__top" />
+                      <span className="cafe-chair cafe-chair--front" />
+                      <span className="cafe-chair cafe-chair--side" />
+                      {dirty && <span className="cafe-cup cafe-cup--dirty" />}
+                    </>
+                  );
+                  const clickable =
+                    dirty && isOpen && gameState.dayManagement.actionPointsRemaining > 0 && !!onCleanTables;
+                  return clickable ? (
+                    <button
+                      key={pos}
+                      type="button"
+                      className={`${className} cafe-table--clickable`}
+                      onClick={onCleanTables}
+                      aria-label="Dirty table — wipe it down (1 action)"
+                      title="Wipe the tables (1 action)"
+                    >
+                      {inner}
+                    </button>
+                  ) : (
+                    <div key={pos} className={className} aria-hidden="true">
+                      {inner}
+                    </div>
+                  );
+                })}
               </>
             )}
 

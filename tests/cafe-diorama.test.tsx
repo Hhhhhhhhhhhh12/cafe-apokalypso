@@ -8,8 +8,11 @@ import { CafePlaceholder } from "../src/ui/cafe/CafePlaceholder";
 import type { DayNumber } from "../src/game/types/content";
 import type { GameState } from "../src/game/types/game";
 
-function renderCafe(state: GameState = createInitialGameState()) {
-  return renderToStaticMarkup(<CafePlaceholder gameState={state} />);
+function renderCafe(
+  state: GameState = createInitialGameState(),
+  onCleanTables?: () => void
+) {
+  return renderToStaticMarkup(<CafePlaceholder gameState={state} onCleanTables={onCleanTables} />);
 }
 
 function visibleText(markup: string) {
@@ -100,6 +103,38 @@ describe("café diorama view", () => {
     expect(one).toContain("placeholder-guest-normal-03");
     expect(one).not.toContain("placeholder-guest-normal-04");
     expect(two).toContain("placeholder-guest-normal-04");
+  });
+
+  it("renders dirty tables as clickable clean-table buttons (#130)", () => {
+    const base = createInitialGameState();
+    const dirtyOpen: GameState = {
+      ...base,
+      dayPhase: "open",
+      resources: { ...base.resources, cleanliness: 40 },
+      equipment: { ...base.equipment, seating: 1 },
+      dayManagement: { ...base.dayManagement, customersServed: 2, actionPointsRemaining: 2 }
+    };
+
+    const clickable = renderCafe(dirtyOpen, () => {});
+    expect(clickable).toContain("cafe-table--clickable");
+    expect(clickable).toContain("Dirty table — wipe it down (1 action)");
+
+    // Without a handler the tables stay decorative
+    expect(renderCafe(dirtyOpen)).not.toContain("cafe-table--clickable");
+
+    // Clean café → nothing to wipe, no button
+    const cleanOpen: GameState = {
+      ...dirtyOpen,
+      resources: { ...dirtyOpen.resources, cleanliness: 90 }
+    };
+    expect(renderCafe(cleanOpen, () => {})).not.toContain("cafe-table--clickable");
+
+    // No action points left → not clickable either
+    const noAp: GameState = {
+      ...dirtyOpen,
+      dayManagement: { ...dirtyOpen.dayManagement, actionPointsRemaining: 0 }
+    };
+    expect(renderCafe(noAp, () => {})).not.toContain("cafe-table--clickable");
   });
 
   it("emits décor tier classes for every prop slot", () => {

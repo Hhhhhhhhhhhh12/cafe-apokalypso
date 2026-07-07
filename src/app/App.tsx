@@ -186,6 +186,7 @@ export function App() {
         <ResourceHud gameState={gameState} />
         <CafePlaceholder
           gameState={gameState}
+          onCleanTables={() => dispatch({ type: "clean_tables" })}
         />
         <ActionPanel
           gameState={gameState}
