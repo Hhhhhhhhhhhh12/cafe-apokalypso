@@ -1,0 +1,258 @@
+/* Art Review Board chrome — scoped to .artreview so it never leaks into the
+   game shell. This is an internal workflow tool, not a game surface. */
+
+.artreview {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 24px 80px;
+  color: #3d2a23;
+  font-family: system-ui, sans-serif;
+}
+
+.artreview__hero {
+  margin-bottom: 32px;
+}
+
+.artreview__eyebrow {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.75rem;
+  color: #8f342f;
+}
+
+.artreview__hero h1 {
+  margin: 4px 0 10px;
+  font-size: 2.2rem;
+}
+
+.artreview__lede {
+  margin: 0 0 16px;
+  max-width: 60ch;
+  line-height: 1.5;
+  color: #5a463c;
+}
+
+.artreview__export-row {
+  display: flex;
+  gap: 8px;
+}
+
+.artreview button {
+  font: inherit;
+  cursor: pointer;
+}
+
+.artreview__export-row button {
+  border: 2px solid #b98e6a;
+  background: #fff6ea;
+  color: #5a463c;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.artreview__export-row button:hover {
+  transform: translateY(-1px);
+}
+
+.artreview__layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.artreview__sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.artreview__add-form,
+.artreview__editor {
+  background: #fff6ea;
+  border: 2px solid #e0c4a2;
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.artreview__add-form h2,
+.artreview__editor-header h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.artreview label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #6b554a;
+}
+
+.artreview input[type="text"],
+.artreview select,
+.artreview textarea {
+  font: inherit;
+  font-weight: 400;
+  color: #3d2a23;
+  border: 1px solid #cdab86;
+  border-radius: 6px;
+  padding: 8px 10px;
+  background: #fffdf8;
+}
+
+.artreview textarea {
+  resize: vertical;
+}
+
+.artreview__submit {
+  border: none;
+  border-radius: 6px;
+  padding: 10px 16px;
+  background: #8f342f;
+  color: #fff3e2;
+  font-weight: 700;
+}
+
+.artreview__submit:disabled {
+  background: #cdab86;
+  color: #fff6ea;
+  cursor: not-allowed;
+}
+
+.artreview__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.artreview__empty {
+  color: #8a6f5e;
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+.artreview__list-item {
+  width: 100%;
+  text-align: left;
+  border: 1px solid #e0c4a2;
+  border-radius: 8px;
+  background: #fffdf8;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.artreview__list-item--active {
+  border-color: #8f342f;
+  background: #fbe9e2;
+}
+
+.artreview__list-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.artreview__badge {
+  font-size: 0.72rem;
+  color: #6b554a;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.artreview__editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.artreview__delete {
+  border: 1px solid #b95a4f;
+  background: transparent;
+  color: #8f342f;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.artreview__status-group {
+  border: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+
+.artreview__status-group legend {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #6b554a;
+  padding: 0;
+}
+
+.artreview__status-btn {
+  border: 1px solid #cdab86;
+  background: #fffdf8;
+  color: #5a463c;
+  padding: 8px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.artreview__status-btn--active {
+  border-color: #8f342f;
+  color: #fff3e2;
+}
+
+.artreview__status-btn--active.artreview__status-btn--keep {
+  background: #4a7c4e;
+  border-color: #4a7c4e;
+}
+
+.artreview__status-btn--active.artreview__status-btn--refine {
+  background: #b98e30;
+  border-color: #b98e30;
+}
+
+.artreview__status-btn--active.artreview__status-btn--reject {
+  background: #a03c34;
+  border-color: #a03c34;
+}
+
+.artreview__status-btn--active.artreview__status-btn--later {
+  background: #6b554a;
+  border-color: #6b554a;
+}
+
+.artreview__priority-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.artreview__priority-row input[type="range"] {
+  flex: 1;
+}
+
+.artreview__priority-value {
+  font-weight: 700;
+  min-width: 32px;
+}
+
+.artreview__hint {
+  color: #6b554a;
+  font-style: italic;
+}

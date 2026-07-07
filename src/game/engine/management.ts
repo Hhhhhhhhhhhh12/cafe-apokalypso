@@ -12,6 +12,7 @@ import type {
   EmployeeLevel,
   GameState,
   HelperAssignment,
+  HelperAutonomyLevel,
   HelperTaskId,
   IngredientKey,
   StressStateLabel,
@@ -174,12 +175,22 @@ export function getGuestPatienceLabel(value: number, max: number): GuestPatience
 /**
  * Derives the patience label directly from the actionsWithoutServing counter.
  * This is the canonical source used by the reducer and selectors.
+ *
+ * totalTicks is the guest's actual tick budget (PATIENCE_TICKS_MAX, or one
+ * less on a messy-café day — see setNextGuestPatience). Labelling off ticks
+ * *remaining* rather than a fixed actionsWithoutServing threshold keeps
+ * "Leaving" anchored to "one more non-serve action walks them out" even when
+ * the messy penalty shrinks the budget to 3 ticks instead of 4.
  */
-export function getPatienceLabelFromCounter(actionsWithoutServing: number): GuestPatienceLabel {
+export function getPatienceLabelFromCounter(
+  actionsWithoutServing: number,
+  totalTicks: number = PATIENCE_TICKS_MAX
+): GuestPatienceLabel {
   if (actionsWithoutServing <= 0) return "Relaxed";
-  if (actionsWithoutServing === 1) return "Waiting";
-  if (actionsWithoutServing === 2) return "Restless";
-  return "Leaving";
+  const remaining = totalTicks - actionsWithoutServing;
+  if (remaining <= 1) return "Leaving";
+  if (remaining === 2) return "Restless";
+  return "Waiting";
 }
 
 /**
@@ -229,8 +240,25 @@ export function createInitialDayManagement(
     guestsLost: 0,
     serveStreak: 0,
     bestServeStreak: 0,
-    actionsWithoutServing: 0
+    actionsWithoutServing: 0,
+    helperAutonomousActions: 0
   };
+}
+
+/**
+ * Helper autonomy schedule (issue #73/#132): helpers only exist from Day 3
+ * onward (see selectHelper's day-3 gate in reducer.ts), so "micromanagement"
+ * covers Days 1-2 as a vacuous default — Day 3 is the helper's first, closely
+ * directed day ("learning"), Day 4+ is fully autonomous.
+ */
+export function getHelperAutonomyLevel(day: GameState["day"]): HelperAutonomyLevel {
+  if (day < 3) {
+    return "micromanagement";
+  }
+  if (day === 3) {
+    return "learning";
+  }
+  return "autonomous";
 }
 
 export function getCleanlinessLabel(value: number): CleanlinessStateLabel {
@@ -386,7 +414,8 @@ export function getIngredientRequirement(
 
 export function createHelperAssignment(
   helperId: StaffOptionId,
-  taskId: HelperTaskId
+  taskId: HelperTaskId,
+  day: GameState["day"]
 ): HelperAssignment | null {
   const staffOption = weekOneStaffOptions.find((candidate) => candidate.id === helperId);
 
@@ -399,7 +428,8 @@ export function createHelperAssignment(
     taskId,
     locked: false,
     dailyCost: staffOption.dailyCost,
-    flavorLine: getHelperFlavorLine(helperId, taskId)
+    flavorLine: getHelperFlavorLine(helperId, taskId),
+    autonomyLevel: getHelperAutonomyLevel(day)
   };
 }
 

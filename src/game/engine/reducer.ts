@@ -890,7 +890,7 @@ function selectHelper(
     };
   }
 
-  const assignment = createHelperAssignment(helperId, taskId);
+  const assignment = createHelperAssignment(helperId, taskId, state.day);
 
   if (!assignment) {
     return {
@@ -1901,6 +1901,36 @@ function setNextGuestPatience(state: GameState): GameState {
 }
 
 /**
+ * Applies one autonomous helper action (ambient tidying) if the current
+ * helper's autonomyLevel allows it: "micromanagement" never acts,
+ * "learning" acts on every other idle action, "autonomous" acts on every one.
+ * Tracked in dayManagement.helperAutonomousActions for the day-end recap (#131).
+ */
+function applyHelperAutonomy(state: GameState, actionsWithoutServing: number): GameState {
+  const level = state.helperAssignment?.autonomyLevel;
+
+  if (!level || level === "micromanagement") {
+    return state;
+  }
+
+  if (level === "learning" && actionsWithoutServing % 2 !== 0) {
+    return state;
+  }
+
+  return {
+    ...state,
+    resources: {
+      ...state.resources,
+      cleanliness: clampMeter(state.resources.cleanliness + 1)
+    },
+    dayManagement: {
+      ...state.dayManagement,
+      helperAutonomousActions: state.dayManagement.helperAutonomousActions + 1
+    }
+  };
+}
+
+/**
  * Decrement patience by one tick for a non-serve action.
  * Returns the updated state and an optional walkout narrative line.
  * On Day 1–3 patience still drains (teaching the mechanic) but no one leaves.
@@ -1915,15 +1945,17 @@ function applyPatienceTick(state: GameState): { state: GameState; walkoutLine: s
   const newActionsWithoutServing = management.actionsWithoutServing + 1;
 
   if (newPatience > 0 || !guestsCanWalkOut(state.day)) {
+    const tickedState: GameState = {
+      ...state,
+      dayManagement: {
+        ...management,
+        currentGuestPatience: newPatience,
+        actionsWithoutServing: newActionsWithoutServing
+      }
+    };
+
     return {
-      state: {
-        ...state,
-        dayManagement: {
-          ...management,
-          currentGuestPatience: newPatience,
-          actionsWithoutServing: newActionsWithoutServing
-        }
-      },
+      state: applyHelperAutonomy(tickedState, newActionsWithoutServing),
       walkoutLine: ""
     };
   }

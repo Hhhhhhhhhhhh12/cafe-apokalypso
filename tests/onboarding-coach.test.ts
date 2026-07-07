@@ -45,7 +45,8 @@ describe("first-week onboarding coach (#PHASE3)", () => {
         taskId: "cleaning",
         dailyCost: 0,
         flavorLine: "",
-        locked: true
+        locked: true,
+        autonomyLevel: "learning"
       },
       dayManagement: {
         ...createInitialGameState().dayManagement,
