@@ -264,6 +264,28 @@ describe("messy café patience penalty", () => {
     }
   });
 
+  it("messy café still shows Leaving/critical one action before walkout (Day 4+)", () => {
+    // Regression: with the messy penalty, the guest only has 3 ticks instead
+    // of 4, so they used to walk out on the 3rd non-serve action without the
+    // label/critical flag ever reaching "Leaving".
+    let state = openDayN(4);
+    state = { ...state, resources: { ...state.resources, cleanliness: 30 } };
+    state = gameReducer(state, { type: "serve_product", productId: "filterkaffee" });
+    expect(getGuestPatienceState(state)?.messyPenalty).toBe(true);
+
+    state = gameReducer(state, { type: "clean_tables" });
+    const afterOne = getGuestPatienceState(state);
+    expect(afterOne?.label).toBe("Restless");
+    expect(afterOne?.critical).toBe(false);
+
+    state = gameReducer(state, { type: "clean_tables" });
+    const afterTwo = getGuestPatienceState(state);
+    if (afterTwo) {
+      expect(afterTwo.label).toBe("Leaving");
+      expect(afterTwo.critical).toBe(true);
+    }
+  });
+
   it("cleaning above threshold removes messyPenalty for next guest", () => {
     let state = openDayN(1);
     // Start messy

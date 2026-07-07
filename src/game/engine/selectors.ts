@@ -16,6 +16,7 @@ import {
   getProductById,
   getStressLabel,
   guestsCanWalkOut,
+  PATIENCE_TICK,
   SUPPLY_CAPS,
   SUPPLY_UNIT_COSTS
 } from "./management";
@@ -594,10 +595,11 @@ export function getGuestPatienceState(state: GameState): GuestPatienceState | nu
     return null;
   }
   const { currentGuestPatience: patience, currentGuestPatienceMax: max, actionsWithoutServing } = state.dayManagement;
-  // Canonical label path: the actionsWithoutServing counter (0 Relaxed, 1 Waiting,
-  // 2 Restless, 3 Leaving) — walkout fires at 4 once walkouts are active.
-  const label = getPatienceLabelFromCounter(actionsWithoutServing);
-  const critical = guestsCanWalkOut(state.day) && actionsWithoutServing >= 3;
+  // Canonical label path: ticks remaining out of this guest's actual budget
+  // (4 normally, 3 on a messy-café day — see getPatienceLabelFromCounter).
+  const totalTicks = max > 0 ? Math.round(max / PATIENCE_TICK) : 0;
+  const label = getPatienceLabelFromCounter(actionsWithoutServing, totalTicks);
+  const critical = guestsCanWalkOut(state.day) && label === "Leaving";
   const messyPenalty = state.resources.cleanliness < 50;
   return { patience, max, label, critical, messyPenalty };
 }

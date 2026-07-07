@@ -175,12 +175,22 @@ export function getGuestPatienceLabel(value: number, max: number): GuestPatience
 /**
  * Derives the patience label directly from the actionsWithoutServing counter.
  * This is the canonical source used by the reducer and selectors.
+ *
+ * totalTicks is the guest's actual tick budget (PATIENCE_TICKS_MAX, or one
+ * less on a messy-café day — see setNextGuestPatience). Labelling off ticks
+ * *remaining* rather than a fixed actionsWithoutServing threshold keeps
+ * "Leaving" anchored to "one more non-serve action walks them out" even when
+ * the messy penalty shrinks the budget to 3 ticks instead of 4.
  */
-export function getPatienceLabelFromCounter(actionsWithoutServing: number): GuestPatienceLabel {
+export function getPatienceLabelFromCounter(
+  actionsWithoutServing: number,
+  totalTicks: number = PATIENCE_TICKS_MAX
+): GuestPatienceLabel {
   if (actionsWithoutServing <= 0) return "Relaxed";
-  if (actionsWithoutServing === 1) return "Waiting";
-  if (actionsWithoutServing === 2) return "Restless";
-  return "Leaving";
+  const remaining = totalTicks - actionsWithoutServing;
+  if (remaining <= 1) return "Leaving";
+  if (remaining === 2) return "Restless";
+  return "Waiting";
 }
 
 /**
