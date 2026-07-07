@@ -79,21 +79,17 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
 
   const [queueGuest, setQueueGuest] = useState<QueueGuest>("kemal");
 
-  // Stable ref so the entrance effect can read the latest value without it being a dep
-  const customersServedForQueueRef = useRef(customersServed);
-  customersServedForQueueRef.current = customersServed;
-
   useEffect(() => {
     if (!showQueueGuest) {
-      setPaulaPhase("at-door");
+      queueMicrotask(() => setPaulaPhase("at-door"));
       return;
     }
-    setQueueGuest(QUEUE_ROTATION[customersServedForQueueRef.current % QUEUE_ROTATION.length]);
+    queueMicrotask(() => setQueueGuest(QUEUE_ROTATION[customersServed % QUEUE_ROTATION.length]));
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setPaulaPhase("idle");
+      queueMicrotask(() => setPaulaPhase("idle"));
       return;
     }
-    setPaulaPhase("at-door");
+    queueMicrotask(() => setPaulaPhase("at-door"));
     let raf2 = 0;
     const raf1 = requestAnimationFrame(() => {
       raf2 = requestAnimationFrame(() => setPaulaPhase("walking"));
@@ -102,13 +98,14 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
       cancelAnimationFrame(raf1);
       cancelAnimationFrame(raf2);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- customersServed intentionally not a dep; only the transition into the queue should retrigger this
   }, [showQueueGuest]);
 
   const prevServedRef = useRef(customersServed);
   useEffect(() => {
     if (customersServed > prevServedRef.current) {
       if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        setPaulaPhase(prev => (prev === "idle" ? "walking-to-counter" : prev));
+        queueMicrotask(() => setPaulaPhase(prev => (prev === "idle" ? "walking-to-counter" : prev)));
       }
     }
     prevServedRef.current = customersServed;
@@ -133,7 +130,7 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
       const firstSentence = gameState.statusMessage?.split(/\.\s+/)[0]?.trim() ?? null;
       if (firstSentence) {
         if (serveReactionTimerRef.current) clearTimeout(serveReactionTimerRef.current);
-        setServeReaction(prev => ({ text: firstSentence, key: (prev?.key ?? 0) + 1 }));
+        queueMicrotask(() => setServeReaction(prev => ({ text: firstSentence, key: (prev?.key ?? 0) + 1 })));
         serveReactionTimerRef.current = setTimeout(() => setServeReaction(null), 2500);
       }
       // B2 — every 3rd serve
@@ -141,7 +138,7 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
         const idx = (Math.floor(customersServed / 3) - 1 + kassandraMessages.length) % kassandraMessages.length;
         const text = kassandraMessages[idx].text;
         if (kassandraAsideTimerRef.current) clearTimeout(kassandraAsideTimerRef.current);
-        setKassandraAside(prev => ({ text, key: (prev?.key ?? 0) + 1 }));
+        queueMicrotask(() => setKassandraAside(prev => ({ text, key: (prev?.key ?? 0) + 1 })));
         kassandraAsideTimerRef.current = setTimeout(() => setKassandraAside(null), 4000);
       }
       // B1 — every 2nd serve, pick a floor event
@@ -153,7 +150,7 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
           const evt = floorEvents[Math.floor(customersServed / 2) % floorEvents.length];
           const text = evt.flavorLines?.[0] ?? evt.text;
           if (ambientEventTimerRef.current) clearTimeout(ambientEventTimerRef.current);
-          setAmbientEvent(prev => ({ text, key: (prev?.key ?? 0) + 1 }));
+          queueMicrotask(() => setAmbientEvent(prev => ({ text, key: (prev?.key ?? 0) + 1 })));
           ambientEventTimerRef.current = setTimeout(() => setAmbientEvent(null), 3500);
         }
       }
@@ -182,7 +179,7 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
     const moneyDelta = gameState.dayManagement.moneyEarned - prevMoneyEarnedRef.current;
     const repDelta = gameState.resources.reputation - prevRepRef.current;
     if (moneyDelta > 0) {
-      setCoinTick(prev => ({ money: moneyDelta, rep: repDelta, key: (prev?.key ?? 0) + 1 }));
+      queueMicrotask(() => setCoinTick(prev => ({ money: moneyDelta, rep: repDelta, key: (prev?.key ?? 0) + 1 })));
     }
     prevMoneyEarnedRef.current = gameState.dayManagement.moneyEarned;
     prevRepRef.current = gameState.resources.reputation;

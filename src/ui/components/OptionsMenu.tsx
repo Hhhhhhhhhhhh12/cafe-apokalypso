@@ -67,23 +67,13 @@ function saveOptions(opts: StoredOptions): void {
 
 export function OptionsMenu({ defaultOpen = false }: { defaultOpen?: boolean }) {
   const [open, setOpen] = useState(defaultOpen);
-  const [settings, setSettings] = useState<StoredOptions>({});
-  const [loaded, setLoaded] = useState(false);
+  const [settings, setSettings] = useState<StoredOptions>(() => loadOptions());
   const buttonRef = useRef<HTMLButtonElement>(null);
   const panelId = useId();
   const idPrefix = useId();
 
-  // Load persisted options on mount.
-  useEffect(() => {
-    setSettings(loadOptions());
-    setLoaded(true);
-  }, []);
-
   // Sync root classes with the settings, persist changes.
   useEffect(() => {
-    if (!loaded) {
-      return;
-    }
     for (const [key, className] of Object.entries(TOGGLE_ROOT_CLASS)) {
       document.documentElement.classList.toggle(
         className,
@@ -91,7 +81,7 @@ export function OptionsMenu({ defaultOpen = false }: { defaultOpen?: boolean }) 
       );
     }
     saveOptions(settings);
-  }, [settings, loaded]);
+  }, [settings]);
 
   // Esc closes the panel and returns focus to the trigger.
   useEffect(() => {

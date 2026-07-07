@@ -12,17 +12,19 @@ export function AchievementToast({ queue, onDequeue }: AchievementToastProps) {
 
   useEffect(() => {
     if (!current) {
-      setVisible(false);
       return;
     }
-    setVisible(true);
+    const showFrame = requestAnimationFrame(() => setVisible(true));
     const timer = setTimeout(() => {
       setVisible(false);
       // Small delay so the exit animation plays before the next item pops in
       const dequeueTimer = setTimeout(onDequeue, 300);
       return () => clearTimeout(dequeueTimer);
     }, 4000);
-    return () => clearTimeout(timer);
+    return () => {
+      cancelAnimationFrame(showFrame);
+      clearTimeout(timer);
+    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [current?.id]);
 
