@@ -9,7 +9,7 @@ import type {
 } from "./content";
 import type { DayNumber } from "./content";
 
-export type GameStateVersion = 16;
+export type GameStateVersion = 17;
 
 export type ContentCatalogVersion = "week-one-v1";
 
@@ -18,6 +18,7 @@ export type IngredientKey = "coffee" | "milk" | "pastries";
 export type CleanlinessStateLabel = "Clean" | "Tidy" | "Messy" | "Chaotic";
 export type StressStateLabel = "Calm" | "Busy" | "Tense" | "Overloaded";
 export type DayPhase = "setup" | "day_start" | "open" | "day_end";
+export type HelperAutonomyLevel = "micromanagement" | "learning" | "autonomous";
 export type ClosureReason = "money" | "reputation";
 export type DecorSlotId = "plant" | "plant2" | "shelf" | "clock" | "lamp" | "cups";
 export type EquipmentSlotId = "machine" | "seating" | "register";
@@ -49,6 +50,8 @@ export interface HelperAssignment {
   locked: boolean;
   dailyCost: number;
   flavorLine: string;
+  /** How independently the helper acts, derived from the current day. See getHelperAutonomyLevel. */
+  autonomyLevel: HelperAutonomyLevel;
 }
 
 export type SupplyPurchaseState = SupplyState;
@@ -95,6 +98,8 @@ export interface DayManagementState {
    * and whenever a new guest steps up to the counter.
    */
   actionsWithoutServing: number;
+  /** Count of autonomous helper actions today (learning/autonomous autonomyLevel only). Surfaced in the day-end recap. */
+  helperAutonomousActions: number;
 }
 
 export interface GuestMemoryEntry {

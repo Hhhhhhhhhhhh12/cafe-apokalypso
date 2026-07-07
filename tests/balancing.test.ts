@@ -380,20 +380,20 @@ describe("balancing: staff helpers differ from no-helper baseline", () => {
 
   it("createHelperAssignment returns null for invalid task combos", () => {
     // Jana cannot do barista
-    expect(createHelperAssignment("jana", "barista")).toBeNull();
+    expect(createHelperAssignment("jana", "barista", 3)).toBeNull();
     // Nino cannot do cleaning
-    expect(createHelperAssignment("nino", "cleaning")).toBeNull();
+    expect(createHelperAssignment("nino", "cleaning", 3)).toBeNull();
     // Nele cannot do service
-    expect(createHelperAssignment("nele", "service")).toBeNull();
+    expect(createHelperAssignment("nele", "service", 3)).toBeNull();
   });
 
   it("createHelperAssignment returns valid assignments for documented combos", () => {
-    expect(createHelperAssignment("jana", "cleaning")).not.toBeNull();
-    expect(createHelperAssignment("jana", "service")).not.toBeNull();
-    expect(createHelperAssignment("nino", "barista")).not.toBeNull();
-    expect(createHelperAssignment("nino", "counter")).not.toBeNull();
-    expect(createHelperAssignment("nele", "marketing")).not.toBeNull();
-    expect(createHelperAssignment("nele", "counter")).not.toBeNull();
+    expect(createHelperAssignment("jana", "cleaning", 3)).not.toBeNull();
+    expect(createHelperAssignment("jana", "service", 3)).not.toBeNull();
+    expect(createHelperAssignment("nino", "barista", 3)).not.toBeNull();
+    expect(createHelperAssignment("nino", "counter", 3)).not.toBeNull();
+    expect(createHelperAssignment("nele", "marketing", 3)).not.toBeNull();
+    expect(createHelperAssignment("nele", "counter", 3)).not.toBeNull();
   });
 
   it("Nino (barista) gives reputation bonus for espresso (baristaReputationBonus increments)", () => {

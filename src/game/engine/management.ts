@@ -12,6 +12,7 @@ import type {
   EmployeeLevel,
   GameState,
   HelperAssignment,
+  HelperAutonomyLevel,
   HelperTaskId,
   IngredientKey,
   StressStateLabel,
@@ -229,8 +230,25 @@ export function createInitialDayManagement(
     guestsLost: 0,
     serveStreak: 0,
     bestServeStreak: 0,
-    actionsWithoutServing: 0
+    actionsWithoutServing: 0,
+    helperAutonomousActions: 0
   };
+}
+
+/**
+ * Helper autonomy schedule (issue #73/#132): helpers only exist from Day 3
+ * onward (see selectHelper's day-3 gate in reducer.ts), so "micromanagement"
+ * covers Days 1-2 as a vacuous default — Day 3 is the helper's first, closely
+ * directed day ("learning"), Day 4+ is fully autonomous.
+ */
+export function getHelperAutonomyLevel(day: GameState["day"]): HelperAutonomyLevel {
+  if (day < 3) {
+    return "micromanagement";
+  }
+  if (day === 3) {
+    return "learning";
+  }
+  return "autonomous";
 }
 
 export function getCleanlinessLabel(value: number): CleanlinessStateLabel {
@@ -386,7 +404,8 @@ export function getIngredientRequirement(
 
 export function createHelperAssignment(
   helperId: StaffOptionId,
-  taskId: HelperTaskId
+  taskId: HelperTaskId,
+  day: GameState["day"]
 ): HelperAssignment | null {
   const staffOption = weekOneStaffOptions.find((candidate) => candidate.id === helperId);
 
@@ -399,7 +418,8 @@ export function createHelperAssignment(
     taskId,
     locked: false,
     dailyCost: staffOption.dailyCost,
-    flavorLine: getHelperFlavorLine(helperId, taskId)
+    flavorLine: getHelperFlavorLine(helperId, taskId),
+    autonomyLevel: getHelperAutonomyLevel(day)
   };
 }
 

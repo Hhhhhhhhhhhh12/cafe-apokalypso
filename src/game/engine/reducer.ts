@@ -890,7 +890,7 @@ function selectHelper(
     };
   }
 
-  const assignment = createHelperAssignment(helperId, taskId);
+  const assignment = createHelperAssignment(helperId, taskId, state.day);
 
   if (!assignment) {
     return {
