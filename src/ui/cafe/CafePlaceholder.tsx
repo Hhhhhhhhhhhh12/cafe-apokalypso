@@ -20,6 +20,14 @@ import fatouGuestAsset from "../../../assets/sprites/guests/placeholder-guest-fa
 const QUEUE_ROTATION = ["kemal", "cem", "mira", "lukas", "christa", "fatou"] as const;
 type QueueGuest = (typeof QUEUE_ROTATION)[number];
 
+/** Window-safe reduced-motion check, callable during render. */
+function prefersReducedMotion(): boolean {
+  return (
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+}
+
 interface CafePlaceholderProps {
   gameState: GameState;
   onServeProduct?: (productId: ProductId) => void;
@@ -77,23 +85,32 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
     "at-door" | "walking" | "idle" | "walking-to-counter" | "exiting-east"
   >("at-door");
 
-  const [queueGuest, setQueueGuest] = useState<QueueGuest>("kemal");
+  const [queueGuest, setQueueGuest] = useState<QueueGuest>(
+    () => QUEUE_ROTATION[customersServed % QUEUE_ROTATION.length]
+  );
 
-  // Stable ref so the entrance effect can read the latest value without it being a dep
-  const customersServedForQueueRef = useRef(customersServed);
-  customersServedForQueueRef.current = customersServed;
-
-  useEffect(() => {
-    if (!showQueueGuest) {
+  // Adjust-during-render: when the queue toggles, snapshot the guest for this
+  // opening and place Paula — reading customersServed directly instead of
+  // smuggling it past the effect deps via a ref. With reduced motion she goes
+  // straight to idle here; rAF timing can't be relied on (hidden tabs), and
+  // there is no walk to stage anyway.
+  const [prevShowQueueGuest, setPrevShowQueueGuest] = useState(showQueueGuest);
+  if (prevShowQueueGuest !== showQueueGuest) {
+    setPrevShowQueueGuest(showQueueGuest);
+    if (showQueueGuest) {
+      setQueueGuest(QUEUE_ROTATION[customersServed % QUEUE_ROTATION.length]);
+      setPaulaPhase(prefersReducedMotion() ? "idle" : "at-door");
+    } else {
       setPaulaPhase("at-door");
+    }
+  }
+
+  // The walk itself stays in an effect: it needs a painted "at-door" frame
+  // before flipping to "walking", so the set happens inside rAF callbacks.
+  useEffect(() => {
+    if (!showQueueGuest || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       return;
     }
-    setQueueGuest(QUEUE_ROTATION[customersServedForQueueRef.current % QUEUE_ROTATION.length]);
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setPaulaPhase("idle");
-      return;
-    }
-    setPaulaPhase("at-door");
     let raf2 = 0;
     const raf1 = requestAnimationFrame(() => {
       raf2 = requestAnimationFrame(() => setPaulaPhase("walking"));
@@ -104,45 +121,39 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
     };
   }, [showQueueGuest]);
 
-  const prevServedRef = useRef(customersServed);
-  useEffect(() => {
-    if (customersServed > prevServedRef.current) {
-      if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        setPaulaPhase(prev => (prev === "idle" ? "walking-to-counter" : prev));
-      }
+  // Adjust-during-render: a completed serve sends idle Paula to the counter.
+  const [prevServed, setPrevServed] = useState(customersServed);
+  if (prevServed !== customersServed) {
+    setPrevServed(customersServed);
+    if (customersServed > prevServed && paulaPhase === "idle" && !prefersReducedMotion()) {
+      setPaulaPhase("walking-to-counter");
     }
-    prevServedRef.current = customersServed;
-  }, [customersServed]);
+  }
 
   // A2: Serve reaction bubble — first sentence of statusMessage, shown 2.5 s
   const [serveReaction, setServeReaction] = useState<{ text: string; key: number } | null>(null);
-  const serveReactionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // B2: Kassandra passive aside — every 3rd serve, shown 4 s
   const [kassandraAside, setKassandraAside] = useState<{ text: string; key: number } | null>(null);
-  const kassandraAsideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // B1: Ambient event overlay — "On the floor" events shown every 2nd serve, 3 s
   const [ambientEvent, setAmbientEvent] = useState<{ text: string; key: number } | null>(null);
-  const ambientEventTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const prevServedForFeedbackRef = useRef(customersServed);
-  useEffect(() => {
-    if (customersServed > prevServedForFeedbackRef.current) {
+  // Adjust-during-render: a serve increment spawns the feedback bubbles, reading
+  // statusMessage and the narrative selectors straight from this render's props.
+  const [prevServedForFeedback, setPrevServedForFeedback] = useState(customersServed);
+  if (prevServedForFeedback !== customersServed) {
+    setPrevServedForFeedback(customersServed);
+    if (customersServed > prevServedForFeedback) {
       // A2: serve reaction
       const firstSentence = gameState.statusMessage?.split(/\.\s+/)[0]?.trim() ?? null;
       if (firstSentence) {
-        if (serveReactionTimerRef.current) clearTimeout(serveReactionTimerRef.current);
         setServeReaction(prev => ({ text: firstSentence, key: (prev?.key ?? 0) + 1 }));
-        serveReactionTimerRef.current = setTimeout(() => setServeReaction(null), 2500);
       }
       // B2 — every 3rd serve
       if (customersServed % 3 === 0) {
         const idx = (Math.floor(customersServed / 3) - 1 + kassandraMessages.length) % kassandraMessages.length;
-        const text = kassandraMessages[idx].text;
-        if (kassandraAsideTimerRef.current) clearTimeout(kassandraAsideTimerRef.current);
-        setKassandraAside(prev => ({ text, key: (prev?.key ?? 0) + 1 }));
-        kassandraAsideTimerRef.current = setTimeout(() => setKassandraAside(null), 4000);
+        setKassandraAside(prev => ({ text: kassandraMessages[idx].text, key: (prev?.key ?? 0) + 1 }));
       }
       // B1 — every 2nd serve, pick a floor event
       if (customersServed % 2 === 0) {
@@ -152,15 +163,31 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
         if (floorEvents.length > 0) {
           const evt = floorEvents[Math.floor(customersServed / 2) % floorEvents.length];
           const text = evt.flavorLines?.[0] ?? evt.text;
-          if (ambientEventTimerRef.current) clearTimeout(ambientEventTimerRef.current);
           setAmbientEvent(prev => ({ text, key: (prev?.key ?? 0) + 1 }));
-          ambientEventTimerRef.current = setTimeout(() => setAmbientEvent(null), 3500);
         }
       }
     }
-    prevServedForFeedbackRef.current = customersServed;
-  // statusMessage changes with every serve — including it ensures we read the fresh value
-  }, [customersServed, gameState.statusMessage]); // eslint-disable-line react-hooks/exhaustive-deps
+  }
+
+  // Expiry timers — one effect per bubble, keyed on the payload object, so a
+  // fresh serve restarts the clock exactly like the old manual timer refs.
+  useEffect(() => {
+    if (!serveReaction) return;
+    const timer = setTimeout(() => setServeReaction(null), 2500);
+    return () => clearTimeout(timer);
+  }, [serveReaction]);
+
+  useEffect(() => {
+    if (!kassandraAside) return;
+    const timer = setTimeout(() => setKassandraAside(null), 4000);
+    return () => clearTimeout(timer);
+  }, [kassandraAside]);
+
+  useEffect(() => {
+    if (!ambientEvent) return;
+    const timer = setTimeout(() => setAmbientEvent(null), 3500);
+    return () => clearTimeout(timer);
+  }, [ambientEvent]);
 
   // Coin tick: track money + rep deltas on each serve
   const prevMoneyEarnedRef = useRef(gameState.dayManagement.moneyEarned);
