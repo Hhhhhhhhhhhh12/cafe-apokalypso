@@ -9,7 +9,7 @@ import type {
 } from "./content";
 import type { DayNumber } from "./content";
 
-export type GameStateVersion = 16;
+export type GameStateVersion = 17;
 
 export type ContentCatalogVersion = "week-one-v1";
 
@@ -22,6 +22,13 @@ export type ClosureReason = "money" | "reputation";
 export type DecorSlotId = "plant" | "plant2" | "shelf" | "clock" | "lamp" | "cups";
 export type EquipmentSlotId = "machine" | "seating" | "register";
 export type HelperTaskId = "cleaning" | "service" | "barista" | "counter" | "marketing";
+
+/**
+ * Helper autonomy across the 7-day slice (#132): the helper starts as pure
+ * decoration, shows first initiative on Day 3, and works alongside the player
+ * from Day 4. Advanced automatically by day when a new day begins.
+ */
+export type HelperAutonomyLevel = "micromanagement" | "learning" | "autonomous";
 export type EmployeeLevel = 1 | 2 | 3;
 
 export type DayActionId =
@@ -95,6 +102,12 @@ export interface DayManagementState {
    * and whenever a new guest steps up to the counter.
    */
   actionsWithoutServing: number;
+  /** Helper autonomy stage for this day (#132). Derived from the day number. */
+  autonomyLevel: HelperAutonomyLevel;
+  /** Cups the assigned helper cleared on their own today (learning+). */
+  helperCupsCleared: number;
+  /** Guests the assigned helper served unprompted today (autonomous, max 1). */
+  helperAutonomousServes: number;
 }
 
 export interface GuestMemoryEntry {

@@ -505,7 +505,44 @@ function applySuccessfulServe(
     betterBeansLine = "The beans speak for themselves. Rep +1.";
   }
 
-  const statusParts = [serveLine, appreciationLine, decorAtmosphereLine, betterBeansLine, wasteLine, ...flavorLines].filter(
+  // Helper autonomy (#132): from Day 3 (learning) an assigned helper clears the
+  // empty cup after each serve on their own; from Day 4 (autonomous) they clear
+  // faster and additionally serve one regular per day unprompted. Deterministic:
+  // the autonomous serve fires once the player has served twice.
+  let helperAutonomyLine = "";
+  if (workingState.helperAssignment && management.autonomyLevel !== "micromanagement") {
+    const helperName =
+      workingState.helperAssignment.helperId.charAt(0).toUpperCase() +
+      workingState.helperAssignment.helperId.slice(1);
+    const clearBonus = management.autonomyLevel === "autonomous" ? 2 : 1;
+    resources = { ...resources, cleanliness: clampMeter(resources.cleanliness + clearBonus) };
+    management = { ...management, helperCupsCleared: management.helperCupsCleared + 1 };
+    if (management.helperCupsCleared === 1 && management.autonomyLevel === "learning") {
+      helperAutonomyLine = `${helperName}: "I noticed the cup was empty and cleared it."`;
+    }
+
+    if (
+      management.autonomyLevel === "autonomous" &&
+      management.helperAutonomousServes === 0 &&
+      management.customersServed >= 2 &&
+      supplies.coffee >= 1
+    ) {
+      const filterCoffee = getProductById("filterkaffee");
+      const helperEarned = getEarnedPrice(filterCoffee.basePrice, resources.reputation);
+      supplies = { ...supplies, coffee: supplies.coffee - 1 };
+      resources = { ...resources, money: clampResource(resources.money + helperEarned) };
+      management = {
+        ...management,
+        customersServed: management.customersServed + 1,
+        moneyEarned: clampResource(management.moneyEarned + helperEarned),
+        suppliesUsed: addSupplies(management.suppliesUsed, { coffee: 1, milk: 0, pastries: 0 }),
+        helperAutonomousServes: management.helperAutonomousServes + 1
+      };
+      helperAutonomyLine = `${helperName} hands a filter coffee across the counter before you can ask. +€${helperEarned.toFixed(2)}.`;
+    }
+  }
+
+  const statusParts = [serveLine, appreciationLine, decorAtmosphereLine, betterBeansLine, helperAutonomyLine, wasteLine, ...flavorLines].filter(
     (part) => part.length > 0
   );
 

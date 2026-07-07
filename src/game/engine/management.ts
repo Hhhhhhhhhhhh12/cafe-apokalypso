@@ -6,6 +6,7 @@ import type {
   StaffOptionId
 } from "../types/content";
 import type {
+  HelperAutonomyLevel,
   CleanlinessStateLabel,
   DayManagementState,
   DayShiftRating,
@@ -197,6 +198,20 @@ export const MUNDANE_STRESS_EVENT_LINES = [
   "The register froze for eleven seconds, then carried on as if it hadn’t. It did not offer an explanation, and you did not ask."
 ] as const;
 
+/**
+ * Autonomy schedule (#132): Days 1-2 the helper is decoration, Day 3 they show
+ * first initiative, Days 4-7 they work alongside the player. Deterministic by day.
+ */
+export function getHelperAutonomyLevel(day: GameState["day"]): HelperAutonomyLevel {
+  if (day <= 2) {
+    return "micromanagement";
+  }
+  if (day === 3) {
+    return "learning";
+  }
+  return "autonomous";
+}
+
 export function createInitialDayManagement(
   reputationAtStart: number,
   day: GameState["day"] = 1
@@ -226,6 +241,9 @@ export function createInitialDayManagement(
     decorBonusesGiven: 0,
     currentGuestPatience: 0,
     currentGuestPatienceMax: 0,
+    autonomyLevel: getHelperAutonomyLevel(day),
+    helperCupsCleared: 0,
+    helperAutonomousServes: 0,
     guestsLost: 0,
     serveStreak: 0,
     bestServeStreak: 0,

@@ -601,3 +601,24 @@ export function getGuestPatienceState(state: GameState): GuestPatienceState | nu
   const messyPenalty = state.resources.cleanliness < 50;
   return { patience, max, label, critical, messyPenalty };
 }
+
+
+export interface HelperAutonomyInfo {
+  level: import("../types/game").HelperAutonomyLevel;
+  /** True while a helper is actually assigned for the day. */
+  helperAssigned: boolean;
+  cupsCleared: number;
+  autonomousServes: number;
+}
+
+/**
+ * Helper autonomy snapshot (#132) — feeds the Day-End Helper Recap UI (#131).
+ */
+export function getHelperAutonomyInfo(state: GameState): HelperAutonomyInfo {
+  return {
+    level: state.dayManagement.autonomyLevel,
+    helperAssigned: state.helperAssignment !== null,
+    cupsCleared: state.dayManagement.helperCupsCleared,
+    autonomousServes: state.dayManagement.helperAutonomousServes
+  };
+}

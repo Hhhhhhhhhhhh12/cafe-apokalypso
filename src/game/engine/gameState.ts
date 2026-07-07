@@ -16,9 +16,9 @@ import type {
   SupplyState,
   UnlockState
 } from "../types/game";
-import { createInitialDayManagement, STARTING_REPUTATION, SUPPLY_CAPS } from "./management";
+import { createInitialDayManagement, getHelperAutonomyLevel, STARTING_REPUTATION, SUPPLY_CAPS } from "./management";
 
-export const CURRENT_GAME_STATE_VERSION = 16;
+export const CURRENT_GAME_STATE_VERSION = 17;
 export const CURRENT_CONTENT_CATALOG_VERSION = "week-one-v1";
 
 const initialResources: ResourceState = {
@@ -630,6 +630,24 @@ export function migrateRawSave(raw: unknown): unknown {
       if (typeof dm.actionsWithoutServing !== "number") {
         obj.dayManagement = { ...dm, actionsWithoutServing: 0 };
       }
+    }
+  }
+
+  if (obj.version === 16) {
+    obj.version = 17;
+    patched = true;
+
+    if (obj.dayManagement && typeof obj.dayManagement === "object" && !Array.isArray(obj.dayManagement)) {
+      const dm = obj.dayManagement as Record<string, unknown>;
+      const day = typeof obj.day === "number" && obj.day >= 1 && obj.day <= 7 ? obj.day : 1;
+      obj.dayManagement = {
+        ...dm,
+        ...(typeof dm.autonomyLevel !== "string"
+          ? { autonomyLevel: getHelperAutonomyLevel(day as GameState["day"]) }
+          : {}),
+        ...(typeof dm.helperCupsCleared !== "number" ? { helperCupsCleared: 0 } : {}),
+        ...(typeof dm.helperAutonomousServes !== "number" ? { helperAutonomousServes: 0 } : {})
+      };
     }
   }
 
