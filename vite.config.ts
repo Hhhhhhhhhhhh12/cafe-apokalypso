@@ -13,10 +13,11 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        // Main game shell plus the standalone Lookbook reference page.
+        // Main game shell plus standalone reference/tooling pages.
         // Paths are resolved relative to the Vite project root.
         main: "index.html",
-        lookbook: "lookbook.html"
+        lookbook: "lookbook.html",
+        artreview: "artreview.html"
       }
     }
   },
