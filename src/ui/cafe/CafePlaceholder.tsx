@@ -11,11 +11,11 @@ import strangeGuestAsset from "../../../assets/sprites/guests/placeholder-guest-
 import cemSeatedAsset from "../../../assets/sprites/guests/placeholder-guest-cem-seated.png";
 import miraSeatedAsset from "../../../assets/sprites/guests/placeholder-guest-mira-seated.png";
 import lukasSeatedAsset from "../../../assets/sprites/guests/placeholder-guest-lukas-seated.png";
-import christaGuestAsset from "../../../assets/sprites/guests/placeholder-guest-christa.png";
-import neleGuestAsset from "../../../assets/sprites/guests/placeholder-guest-nele.png";
+import christaSeatedAsset from "../../../assets/sprites/guests/placeholder-guest-christa-seated.png";
+import neleSeatedAsset from "../../../assets/sprites/guests/placeholder-guest-nele-seated.png";
 import medaGuestAsset from "../../../assets/sprites/guests/placeholder-guest-meda.png";
 import roterRegenschirmGuestAsset from "../../../assets/sprites/guests/placeholder-guest-roter-regenschirm.png";
-import fatouGuestAsset from "../../../assets/sprites/guests/placeholder-guest-fatou.png";
+import fatouSeatedAsset from "../../../assets/sprites/guests/placeholder-guest-fatou-seated.png";
 
 const QUEUE_ROTATION = ["kemal", "cem", "mira", "lukas", "christa", "fatou"] as const;
 type QueueGuest = (typeof QUEUE_ROTATION)[number];
@@ -528,7 +528,7 @@ export function CafePlaceholder({ gameState, onCleanTables }: CafePlaceholderPro
               >
                 <img
                   className="cafe-pilot-asset cafe-pilot-asset--guest cafe-pilot-asset--christa"
-                  src={christaGuestAsset}
+                  src={christaSeatedAsset}
                   aria-hidden="true"
                   alt=""
                 />
@@ -573,7 +573,7 @@ export function CafePlaceholder({ gameState, onCleanTables }: CafePlaceholderPro
               >
                 <img
                   className="cafe-pilot-asset cafe-pilot-asset--guest cafe-pilot-asset--nele"
-                  src={neleGuestAsset}
+                  src={neleSeatedAsset}
                   alt=""
                   aria-hidden="true"
                 />
@@ -618,7 +618,7 @@ export function CafePlaceholder({ gameState, onCleanTables }: CafePlaceholderPro
               >
                 <img
                   className="cafe-pilot-asset cafe-pilot-asset--guest cafe-pilot-asset--fatou"
-                  src={fatouGuestAsset}
+                  src={fatouSeatedAsset}
                   alt=""
                   aria-hidden="true"
                 />
