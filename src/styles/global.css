@@ -1135,6 +1135,30 @@ h3 {
  *   2 Matched Set → crisp, full colour
  *   3 Cosy Lounge → warm & lush, with a soft glow accent
  */
+/* Clickable dirty table (#130): the table itself is a button while there is
+   something to wipe. Button chrome is stripped so the sprite stays identical;
+   hover/focus add a warm lift so the affordance reads without breaking the scene. */
+button.cafe-table {
+  border: none;
+  padding: 0;
+  background-color: transparent;
+  font: inherit;
+}
+
+.cafe-table--clickable {
+  cursor: pointer;
+}
+
+.cafe-table--clickable:hover,
+.cafe-table--clickable:focus-visible {
+  filter: brightness(1.14) drop-shadow(0 0 6px rgba(214, 158, 62, 0.55));
+}
+
+.cafe-table--clickable:focus-visible {
+  outline: 2px solid #b8762a;
+  outline-offset: 2px;
+}
+
 .cafe-table--tier-1 {
   filter: saturate(0.68) brightness(0.95) sepia(0.06) contrast(0.96);
 }
