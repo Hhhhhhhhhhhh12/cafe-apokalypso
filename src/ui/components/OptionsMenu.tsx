@@ -67,7 +67,9 @@ function saveOptions(opts: StoredOptions): void {
 
 export function OptionsMenu({ defaultOpen = false }: { defaultOpen?: boolean }) {
   const [open, setOpen] = useState(defaultOpen);
-  const [settings, setSettings] = useState<StoredOptions>(() => loadOptions());
+  // Lazy initializer: loadOptions() is try/catch-safe even where localStorage
+  // is unavailable (static server render), so no load-on-mount effect needed.
+  const [settings, setSettings] = useState<StoredOptions>(loadOptions);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const panelId = useId();
   const idPrefix = useId();

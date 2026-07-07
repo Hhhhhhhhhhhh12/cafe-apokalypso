@@ -10,20 +10,28 @@ export function AchievementToast({ queue, onDequeue }: AchievementToastProps) {
   const [visible, setVisible] = useState(false);
   const current = queue[0] ?? null;
 
+  // Adjust-during-render: reset the enter animation whenever the toast slot
+  // empties, so the next item starts hidden and animates in again.
+  if (!current && visible) {
+    setVisible(false);
+  }
+
   useEffect(() => {
     if (!current) {
       return;
     }
-    const showFrame = requestAnimationFrame(() => setVisible(true));
+    // One frame hidden, then visible — lets the enter transition play.
+    const raf = requestAnimationFrame(() => setVisible(true));
+    let dequeueTimer: ReturnType<typeof setTimeout> | undefined;
     const timer = setTimeout(() => {
       setVisible(false);
       // Small delay so the exit animation plays before the next item pops in
-      const dequeueTimer = setTimeout(onDequeue, 300);
-      return () => clearTimeout(dequeueTimer);
+      dequeueTimer = setTimeout(onDequeue, 300);
     }, 4000);
     return () => {
-      cancelAnimationFrame(showFrame);
+      cancelAnimationFrame(raf);
       clearTimeout(timer);
+      if (dequeueTimer) clearTimeout(dequeueTimer);
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [current?.id]);

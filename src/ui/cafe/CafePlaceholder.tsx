@@ -3,7 +3,7 @@ import type { GameState } from "../../game/types/game";
 import type { ProductId } from "../../game/types/content";
 import { getDioramaGuestVisibility, getNextGuestPreview, getNarrativeEventCards } from "../../game/engine/selectors";
 import { kassandraMessages } from "../../game/data/kassandra";
-import stageBaseAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v04-mid.png";
+import stageBaseAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v04-nofurniture-fix.png";
 import coffeeMachineAsset from "../../../assets/sprites/props/placeholder-cafe-coffee-machine.png";
 import kassandraRegisterAsset from "../../../assets/sprites/props/placeholder-kassandra-register.png";
 import bohnGuestAsset from "../../../assets/sprites/guests/placeholder-guest-bohn.png";
@@ -20,12 +20,22 @@ import fatouGuestAsset from "../../../assets/sprites/guests/placeholder-guest-fa
 const QUEUE_ROTATION = ["kemal", "cem", "mira", "lukas", "christa", "fatou"] as const;
 type QueueGuest = (typeof QUEUE_ROTATION)[number];
 
+/** Window-safe reduced-motion check, callable during render. */
+function prefersReducedMotion(): boolean {
+  return (
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+}
+
 interface CafePlaceholderProps {
   gameState: GameState;
   onServeProduct?: (productId: ProductId) => void;
+  /** Fired when the player clicks a dirty table in the diorama (issue #130). */
+  onCleanTables?: () => void;
 }
 
-export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
+export function CafePlaceholder({ gameState, onCleanTables }: CafePlaceholderProps) {
   // --- Visual state classes ---
   const cleanlinessClass =
     gameState.resources.cleanliness >= 70
@@ -77,19 +87,32 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
     "at-door" | "walking" | "idle" | "walking-to-counter" | "exiting-east"
   >("at-door");
 
-  const [queueGuest, setQueueGuest] = useState<QueueGuest>("kemal");
+  const [queueGuest, setQueueGuest] = useState<QueueGuest>(
+    () => QUEUE_ROTATION[customersServed % QUEUE_ROTATION.length]
+  );
 
+  // Adjust-during-render: when the queue toggles, snapshot the guest for this
+  // opening and place Paula — reading customersServed directly instead of
+  // smuggling it past the effect deps via a ref. With reduced motion she goes
+  // straight to idle here; rAF timing can't be relied on (hidden tabs), and
+  // there is no walk to stage anyway.
+  const [prevShowQueueGuest, setPrevShowQueueGuest] = useState(showQueueGuest);
+  if (prevShowQueueGuest !== showQueueGuest) {
+    setPrevShowQueueGuest(showQueueGuest);
+    if (showQueueGuest) {
+      setQueueGuest(QUEUE_ROTATION[customersServed % QUEUE_ROTATION.length]);
+      setPaulaPhase(prefersReducedMotion() ? "idle" : "at-door");
+    } else {
+      setPaulaPhase("at-door");
+    }
+  }
+
+  // The walk itself stays in an effect: it needs a painted "at-door" frame
+  // before flipping to "walking", so the set happens inside rAF callbacks.
   useEffect(() => {
-    if (!showQueueGuest) {
-      queueMicrotask(() => setPaulaPhase("at-door"));
+    if (!showQueueGuest || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       return;
     }
-    queueMicrotask(() => setQueueGuest(QUEUE_ROTATION[customersServed % QUEUE_ROTATION.length]));
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      queueMicrotask(() => setPaulaPhase("idle"));
-      return;
-    }
-    queueMicrotask(() => setPaulaPhase("at-door"));
     let raf2 = 0;
     const raf1 = requestAnimationFrame(() => {
       raf2 = requestAnimationFrame(() => setPaulaPhase("walking"));
@@ -98,48 +121,41 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
       cancelAnimationFrame(raf1);
       cancelAnimationFrame(raf2);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- customersServed intentionally not a dep; only the transition into the queue should retrigger this
   }, [showQueueGuest]);
 
-  const prevServedRef = useRef(customersServed);
-  useEffect(() => {
-    if (customersServed > prevServedRef.current) {
-      if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        queueMicrotask(() => setPaulaPhase(prev => (prev === "idle" ? "walking-to-counter" : prev)));
-      }
+  // Adjust-during-render: a completed serve sends idle Paula to the counter.
+  const [prevServed, setPrevServed] = useState(customersServed);
+  if (prevServed !== customersServed) {
+    setPrevServed(customersServed);
+    if (customersServed > prevServed && paulaPhase === "idle" && !prefersReducedMotion()) {
+      setPaulaPhase("walking-to-counter");
     }
-    prevServedRef.current = customersServed;
-  }, [customersServed]);
+  }
 
   // A2: Serve reaction bubble — first sentence of statusMessage, shown 2.5 s
   const [serveReaction, setServeReaction] = useState<{ text: string; key: number } | null>(null);
-  const serveReactionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // B2: Kassandra passive aside — every 3rd serve, shown 4 s
   const [kassandraAside, setKassandraAside] = useState<{ text: string; key: number } | null>(null);
-  const kassandraAsideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // B1: Ambient event overlay — "On the floor" events shown every 2nd serve, 3 s
   const [ambientEvent, setAmbientEvent] = useState<{ text: string; key: number } | null>(null);
-  const ambientEventTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const prevServedForFeedbackRef = useRef(customersServed);
-  useEffect(() => {
-    if (customersServed > prevServedForFeedbackRef.current) {
+  // Adjust-during-render: a serve increment spawns the feedback bubbles, reading
+  // statusMessage and the narrative selectors straight from this render's props.
+  const [prevServedForFeedback, setPrevServedForFeedback] = useState(customersServed);
+  if (prevServedForFeedback !== customersServed) {
+    setPrevServedForFeedback(customersServed);
+    if (customersServed > prevServedForFeedback) {
       // A2: serve reaction
       const firstSentence = gameState.statusMessage?.split(/\.\s+/)[0]?.trim() ?? null;
       if (firstSentence) {
-        if (serveReactionTimerRef.current) clearTimeout(serveReactionTimerRef.current);
-        queueMicrotask(() => setServeReaction(prev => ({ text: firstSentence, key: (prev?.key ?? 0) + 1 })));
-        serveReactionTimerRef.current = setTimeout(() => setServeReaction(null), 2500);
+        setServeReaction(prev => ({ text: firstSentence, key: (prev?.key ?? 0) + 1 }));
       }
       // B2 — every 3rd serve
       if (customersServed % 3 === 0) {
         const idx = (Math.floor(customersServed / 3) - 1 + kassandraMessages.length) % kassandraMessages.length;
-        const text = kassandraMessages[idx].text;
-        if (kassandraAsideTimerRef.current) clearTimeout(kassandraAsideTimerRef.current);
-        queueMicrotask(() => setKassandraAside(prev => ({ text, key: (prev?.key ?? 0) + 1 })));
-        kassandraAsideTimerRef.current = setTimeout(() => setKassandraAside(null), 4000);
+        setKassandraAside(prev => ({ text: kassandraMessages[idx].text, key: (prev?.key ?? 0) + 1 }));
       }
       // B1 — every 2nd serve, pick a floor event
       if (customersServed % 2 === 0) {
@@ -149,15 +165,31 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
         if (floorEvents.length > 0) {
           const evt = floorEvents[Math.floor(customersServed / 2) % floorEvents.length];
           const text = evt.flavorLines?.[0] ?? evt.text;
-          if (ambientEventTimerRef.current) clearTimeout(ambientEventTimerRef.current);
-          queueMicrotask(() => setAmbientEvent(prev => ({ text, key: (prev?.key ?? 0) + 1 })));
-          ambientEventTimerRef.current = setTimeout(() => setAmbientEvent(null), 3500);
+          setAmbientEvent(prev => ({ text, key: (prev?.key ?? 0) + 1 }));
         }
       }
     }
-    prevServedForFeedbackRef.current = customersServed;
-  // statusMessage changes with every serve — including it ensures we read the fresh value
-  }, [customersServed, gameState.statusMessage]); // eslint-disable-line react-hooks/exhaustive-deps
+  }
+
+  // Expiry timers — one effect per bubble, keyed on the payload object, so a
+  // fresh serve restarts the clock exactly like the old manual timer refs.
+  useEffect(() => {
+    if (!serveReaction) return;
+    const timer = setTimeout(() => setServeReaction(null), 2500);
+    return () => clearTimeout(timer);
+  }, [serveReaction]);
+
+  useEffect(() => {
+    if (!kassandraAside) return;
+    const timer = setTimeout(() => setKassandraAside(null), 4000);
+    return () => clearTimeout(timer);
+  }, [kassandraAside]);
+
+  useEffect(() => {
+    if (!ambientEvent) return;
+    const timer = setTimeout(() => setAmbientEvent(null), 3500);
+    return () => clearTimeout(timer);
+  }, [ambientEvent]);
 
   // Coin tick: track money + rep deltas on each serve
   const prevMoneyEarnedRef = useRef(gameState.dayManagement.moneyEarned);
@@ -179,7 +211,7 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
     const moneyDelta = gameState.dayManagement.moneyEarned - prevMoneyEarnedRef.current;
     const repDelta = gameState.resources.reputation - prevRepRef.current;
     if (moneyDelta > 0) {
-      queueMicrotask(() => setCoinTick(prev => ({ money: moneyDelta, rep: repDelta, key: (prev?.key ?? 0) + 1 })));
+      setCoinTick(prev => ({ money: moneyDelta, rep: repDelta, key: (prev?.key ?? 0) + 1 }));
     }
     prevMoneyEarnedRef.current = gameState.dayManagement.moneyEarned;
     prevRepRef.current = gameState.resources.reputation;
@@ -322,24 +354,43 @@ export function CafePlaceholder({ gameState }: CafePlaceholderProps) {
               <div className="cafe-service-mat" />
             </div>
 
-            {/* Tables — only visible once furniture is owned (seating tier >= 1) */}
+            {/* Tables — only visible once furniture is owned (seating tier >= 1).
+                Dirty tables become clickable and fire the clean-tables action (#130). */}
             {gameState.equipment.seating >= 1 && (
               <>
-                <div className={`cafe-table cafe-table--left cafe-table--tier-${gameState.equipment.seating}`} aria-hidden="true">
-                  <span className="cafe-table__top" />
-                  <span className="cafe-chair cafe-chair--front" />
-                  <span className="cafe-chair cafe-chair--side" />
-                  {tablesDirty && <span className="cafe-cup cafe-cup--dirty" />}
-                </div>
-
-                <div className={`cafe-table cafe-table--right cafe-table--tier-${gameState.equipment.seating}`} aria-hidden="true">
-                  <span className="cafe-table__top" />
-                  <span className="cafe-chair cafe-chair--front" />
-                  <span className="cafe-chair cafe-chair--side" />
-                  {tablesDirty && visibleGuests.mira && (
-                    <span className="cafe-cup cafe-cup--dirty" />
-                  )}
-                </div>
+                {([
+                  { pos: "left", dirty: tablesDirty },
+                  { pos: "right", dirty: tablesDirty && visibleGuests.mira },
+                  { pos: "back", dirty: tablesDirty && visibleGuests.fatou }
+                ] as const).map(({ pos, dirty }) => {
+                  const className = `cafe-table cafe-table--${pos} cafe-table--tier-${gameState.equipment.seating}`;
+                  const inner = (
+                    <>
+                      <span className="cafe-table__top" />
+                      <span className="cafe-chair cafe-chair--front" />
+                      <span className="cafe-chair cafe-chair--side" />
+                      {dirty && <span className="cafe-cup cafe-cup--dirty" />}
+                    </>
+                  );
+                  const clickable =
+                    dirty && isOpen && gameState.dayManagement.actionPointsRemaining > 0 && !!onCleanTables;
+                  return clickable ? (
+                    <button
+                      key={pos}
+                      type="button"
+                      className={`${className} cafe-table--clickable`}
+                      onClick={onCleanTables}
+                      aria-label="Dirty table — wipe it down (1 action)"
+                      title="Wipe the tables (1 action)"
+                    >
+                      {inner}
+                    </button>
+                  ) : (
+                    <div key={pos} className={className} aria-hidden="true">
+                      {inner}
+                    </div>
+                  );
+                })}
               </>
             )}
 
