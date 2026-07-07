@@ -18,6 +18,7 @@ import {
   SUPPLY_UNIT_COSTS,
   createHelperAssignment,
   getEarnedPrice,
+  getHelperAutonomyLevel,
   getReputationIncomeFactor
 } from "../src/game/engine/management";
 import { weekOneProducts } from "../src/game/data";
@@ -394,6 +395,67 @@ describe("balancing: staff helpers differ from no-helper baseline", () => {
     expect(createHelperAssignment("nino", "counter", 3)).not.toBeNull();
     expect(createHelperAssignment("nele", "marketing", 3)).not.toBeNull();
     expect(createHelperAssignment("nele", "counter", 3)).not.toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Helper autonomy state machine (#132)
+// ---------------------------------------------------------------------------
+describe("helper autonomy state machine", () => {
+  it("getHelperAutonomyLevel follows the Day 1-7 schedule (micromanagement -> learning -> autonomous)", () => {
+    expect(getHelperAutonomyLevel(1)).toBe("micromanagement");
+    expect(getHelperAutonomyLevel(2)).toBe("micromanagement");
+    expect(getHelperAutonomyLevel(3)).toBe("learning");
+    expect(getHelperAutonomyLevel(4)).toBe("autonomous");
+    expect(getHelperAutonomyLevel(5)).toBe("autonomous");
+    expect(getHelperAutonomyLevel(6)).toBe("autonomous");
+    expect(getHelperAutonomyLevel(7)).toBe("autonomous");
+  });
+
+  it("createHelperAssignment stamps the assignment with the day's autonomy level", () => {
+    expect(createHelperAssignment("jana", "cleaning", 3)?.autonomyLevel).toBe("learning");
+    expect(createHelperAssignment("jana", "cleaning", 5)?.autonomyLevel).toBe("autonomous");
+  });
+
+  it("micromanagement-level helper never produces autonomous actions across a full idle day", () => {
+    let state = createDayStartState(3);
+    state = gameReducer(state, { type: "select_helper", helperId: "jana", taskId: "cleaning" });
+    state = { ...state, helperAssignment: { ...state.helperAssignment!, autonomyLevel: "micromanagement" } };
+    state = gameReducer(state, { type: "open_day" });
+
+    for (let i = 0; i < 6; i++) {
+      state = gameReducer(state, { type: "clean_tables" });
+    }
+
+    expect(state.dayManagement.helperAutonomousActions).toBe(0);
+  });
+
+  it("learning/autonomous-level helper accrues autonomous actions on idle (non-serve) actions", () => {
+    let learningState = createDayStartState(3);
+    learningState = gameReducer(learningState, {
+      type: "select_helper",
+      helperId: "jana",
+      taskId: "cleaning"
+    });
+    learningState = gameReducer(learningState, { type: "open_day" });
+    expect(learningState.helperAssignment?.autonomyLevel).toBe("learning");
+
+    for (let i = 0; i < 4; i++) {
+      learningState = gameReducer(learningState, { type: "check_supplies" });
+    }
+    expect(learningState.dayManagement.helperAutonomousActions).toBeGreaterThan(0);
+
+    let autonomousState = createDayStartState(5);
+    autonomousState = gameReducer(autonomousState, {
+      type: "select_helper",
+      helperId: "jana",
+      taskId: "cleaning"
+    });
+    autonomousState = gameReducer(autonomousState, { type: "open_day" });
+    expect(autonomousState.helperAssignment?.autonomyLevel).toBe("autonomous");
+
+    autonomousState = gameReducer(autonomousState, { type: "check_supplies" });
+    expect(autonomousState.dayManagement.helperAutonomousActions).toBe(1);
   });
 
   it("Nino (barista) gives reputation bonus for espresso (baristaReputationBonus increments)", () => {

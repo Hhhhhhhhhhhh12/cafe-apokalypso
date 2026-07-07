@@ -18,7 +18,7 @@ import type {
 } from "../types/game";
 import { createInitialDayManagement, STARTING_REPUTATION, SUPPLY_CAPS } from "./management";
 
-export const CURRENT_GAME_STATE_VERSION = 16;
+export const CURRENT_GAME_STATE_VERSION = 17;
 export const CURRENT_CONTENT_CATALOG_VERSION = "week-one-v1";
 
 const initialResources: ResourceState = {
@@ -476,6 +476,8 @@ function isValidGuestMemory(value: unknown): value is Partial<Record<GuestId, Gu
  * v12 -> v13: core `equipment` slots added. Old saves were already-open cafés
  *   with tables, so they migrate to machine 1 / seating 1.
  * v13 -> v14: `purchasedUpgrades` array added (defaults to []).
+ * v16 -> v17: `helperAssignment.autonomyLevel` and `dayManagement.helperAutonomousActions`
+ *   added (helper autonomy state machine, #132). Default to "micromanagement" / 0.
  * Older versions may also lack décor slots added after the save was written
  * (clock/lamp/cups).
  */
@@ -629,6 +631,26 @@ export function migrateRawSave(raw: unknown): unknown {
       const dm = obj.dayManagement as Record<string, unknown>;
       if (typeof dm.actionsWithoutServing !== "number") {
         obj.dayManagement = { ...dm, actionsWithoutServing: 0 };
+      }
+    }
+  }
+
+  if (obj.version === 16) {
+    obj.version = 17;
+    patched = true;
+
+    if (obj.dayManagement && typeof obj.dayManagement === "object" && !Array.isArray(obj.dayManagement)) {
+      const dm = obj.dayManagement as Record<string, unknown>;
+      if (typeof dm.helperAutonomousActions !== "number") {
+        obj.dayManagement = { ...dm, helperAutonomousActions: 0 };
+      }
+    }
+
+    const assignment = obj.helperAssignment;
+    if (assignment && typeof assignment === "object" && !Array.isArray(assignment)) {
+      const a = assignment as Record<string, unknown>;
+      if (typeof a.autonomyLevel !== "string") {
+        obj.helperAssignment = { ...a, autonomyLevel: "micromanagement" };
       }
     }
   }

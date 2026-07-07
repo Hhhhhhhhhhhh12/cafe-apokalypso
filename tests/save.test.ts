@@ -244,6 +244,32 @@ describe("save migration", () => {
     expect(migrated.staffXp).toEqual({});
   });
 
+  it("migrateRawSave (v16 -> v17): backfills helperAutonomousActions and helperAssignment.autonomyLevel", () => {
+    const raw = {
+      ...createInitialGameState(),
+      version: 16,
+      helperAssignment: {
+        helperId: "jana",
+        taskId: "cleaning",
+        locked: true,
+        dailyCost: 10,
+        flavorLine: "Hilft aus."
+      }
+    } as Record<string, unknown>;
+    const dayManagement = raw.dayManagement as Record<string, unknown>;
+    delete dayManagement.helperAutonomousActions;
+
+    const migrated = migrateRawSave(raw) as {
+      version: number;
+      dayManagement: { helperAutonomousActions: unknown };
+      helperAssignment: { autonomyLevel: unknown };
+    };
+
+    expect(migrated.version).toBe(CURRENT_GAME_STATE_VERSION);
+    expect(migrated.dayManagement.helperAutonomousActions).toBe(0);
+    expect(migrated.helperAssignment.autonomyLevel).toBe("micromanagement");
+  });
+
   it("migrateRawSave is a no-op for non-objects", () => {
     expect(migrateRawSave(null)).toBeNull();
     expect(migrateRawSave("string")).toBe("string");
