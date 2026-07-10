@@ -137,6 +137,11 @@ export interface DaySummary {
   objectiveTitle: string;
   objectiveCompleted: boolean;
   helperRecap: string | null;
+  /**
+   * Narrative one-liner describing what the helper did on their own today
+   * (#131). Optional: absent on summaries written before this field existed.
+   */
+  helperAutonomyRecap?: string | null;
   stressEvent: string | null;
   flavorLines: string[];
 }

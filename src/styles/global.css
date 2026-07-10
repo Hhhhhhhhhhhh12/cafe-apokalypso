@@ -3136,6 +3136,17 @@ button.cafe-table {
   line-height: 1.45;
 }
 
+/* Helper autonomy recap (#131) — one warm line about what the helper did unasked */
+.helper-recap-line {
+  margin: 0.35rem 0 0;
+  padding-left: 0.6rem;
+  border-left: 3px solid #c89430;
+  color: #6a554b;
+  font-size: 0.9rem;
+  font-style: italic;
+  line-height: 1.45;
+}
+
 .day-flavor-lines {
   margin: 0.9rem 0 0;
   padding: 0.6rem 0.75rem;
