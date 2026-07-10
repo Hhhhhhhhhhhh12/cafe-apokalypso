@@ -1858,8 +1858,12 @@ button.cafe-table {
    ── */
 .cafe-decor-clock {
   position: absolute;
-  left: 23.0%;
-  top: 30.0%;
+  /* Wall strip between the windows — glass spans 24.7–33.6 % / 65.4–74.4 %
+     of the v04 stage image, so 23 % hung the clock inside the left window.
+     translateX centers the px-sized sprite on the anchor at every viewport. */
+  left: 49.5%;
+  top: 19.0%;
+  transform: translateX(-50%);
   z-index: 8;
   width: 56px;
   height: 56px;
@@ -1887,11 +1891,15 @@ button.cafe-table {
  * Floor lamp. Stands between the two back-wall windows (right side).
  * Base anchored to the CSS bottom edge (center bottom / contain) so
  * the pole base sits on the floor regardless of tier size change.
+ * 65 % + top floated it inside the right window (glass starts at 65.4 %);
+ * now the sprite centers on 59.5 % via translateX and its base is pinned
+ * to the v04 wall/floor line (~63 % height) via bottom, at every viewport.
  */
 .cafe-decor-lamp {
   position: absolute;
-  left: 65.0%;
-  top: 26.0%;
+  left: 59.5%;
+  bottom: 37.0%;
+  transform: translateX(-50%);
   z-index: 4;
   width: 40px;
   height: 64px;

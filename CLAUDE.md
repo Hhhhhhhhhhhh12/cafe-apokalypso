@@ -19,7 +19,7 @@ KRITISCHE Regel: Immer auf gescheite Diversität der Figuren achten (Hauttöne, 
 
 ## Diorama-Geometrie (nicht neu herleiten!)
 
-**Aktueller Raum: Stage-PNG-Diorama** — gemaltes PNG als Hintergrund. `.cafe-stage-base { display: block }`. Décor-Sprites (clock/lamp/cups/shelf/plant) sind aktiv als CSS-Overlays. Lamp: `top: 18%` in `.cafe-decor-lamp`.
+**Aktueller Raum: Stage-PNG-Diorama** — gemaltes PNG als Hintergrund. `.cafe-stage-base { display: block }`. Décor-Sprites (clock/lamp/cups/shelf/plant) sind aktiv als CSS-Overlays. Clock/Lamp sind center-verankert (`left` + `translateX(-50%)`); Lamp steht per `bottom: 37%` auf der Boden-Linie (v04-Fensterglas: 24,7–33,6 % und 65,4–74,4 % Bildbreite, Wand/Boden-Linie ≈ 63 % Höhe).
 
 **WICHTIG: NIEMALS `.cafe-back-wall` oder `.cafe-side-wall` sichtbar machen oder `.cafe-stage-base` auf `display:none` setzen** — das bricht das Diorama-Layout komplett. Diese sind Positionierungs-Container, nicht visuelle Layer.
 
