@@ -165,6 +165,9 @@ export function DayProgressPanel({ gameState }: DayProgressPanelProps) {
             </div>
           </div>
           <p className="day-recap-line">{getDayEndRecapLine(gameState)}</p>
+          {gameState.daySummary.helperAutonomyRecap ? (
+            <p className="helper-recap-line">{gameState.daySummary.helperAutonomyRecap}</p>
+          ) : null}
           <dl className="summary-list">
             {[
               { label: "Objective", value: `${gameState.daySummary.objectiveCompleted ? "Completed" : "Missed"} · ${gameState.daySummary.objectiveTitle}` },

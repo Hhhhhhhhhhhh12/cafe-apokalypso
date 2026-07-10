@@ -21,6 +21,7 @@ import {
 } from "./selectors";
 import { getObjectiveStatus } from "./objectives";
 import {
+  getHelperAutonomyRecapLine,
   applyProductConsumption,
   clampMeter,
   clampResource,
@@ -1267,6 +1268,10 @@ function applyDayEndConsequences(state: GameState): GameState {
       objectiveTitle: getObjectiveStatus(state).objective.title,
       objectiveCompleted: false,
       helperRecap: state.helperAssignment ? getHelperLabel(state.helperAssignment) : null,
+      helperAutonomyRecap: getHelperAutonomyRecapLine(
+        state.helperAssignment,
+        management.helperAutonomousActions
+      ),
       stressEvent,
       flavorLines
     },

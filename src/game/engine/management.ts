@@ -433,6 +433,44 @@ export function createHelperAssignment(
   };
 }
 
+/**
+ * Day-end helper recap (#131): a narrative line reinforcing the autonomy ramp.
+ * Days 1-2 the player did everything; Day 3 the helper shows first initiative;
+ * Days 4-7 the numbers climb. Uses dayManagement.helperAutonomousActions.
+ */
+export function getHelperAutonomyRecapLine(
+  assignment: HelperAssignment | null,
+  autonomousActions: number
+): string {
+  if (!assignment) {
+    return "You handled everything today.";
+  }
+
+  const name =
+    weekOneStaffOptions.find((candidate) => candidate.id === assignment.helperId)?.name ??
+    assignment.helperId;
+
+  if (assignment.autonomyLevel === "micromanagement") {
+    return `You handled everything today. ${name} watched closely — and took notes.`;
+  }
+
+  if (assignment.autonomyLevel === "learning") {
+    if (autonomousActions === 0) {
+      return `${name} waited for instructions today. Tomorrow, maybe more.`;
+    }
+    return `${name}: "I noticed the cup was empty and cleared it." (${autonomousActions} small ${
+      autonomousActions === 1 ? "thing" : "things"
+    } done unasked)`;
+  }
+
+  if (autonomousActions === 0) {
+    return `${name} was ready to take over, but the day never gave them the chance.`;
+  }
+  return `${name} cleared ${autonomousActions} ${
+    autonomousActions === 1 ? "table" : "tables"
+  } without being asked.${autonomousActions >= 4 ? " The café is starting to run itself." : ""}`;
+}
+
 export function getHelperLabel(assignment: HelperAssignment | null): string {
   if (!assignment) {
     return "No helper assigned";
