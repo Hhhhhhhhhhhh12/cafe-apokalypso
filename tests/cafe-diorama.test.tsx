@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { App } from "../src/app/App";
 import { createInitialGameState } from "../src/game/engine/gameState";
 import { getDioramaGuestVisibility } from "../src/game/engine/selectors";
-import { CafePlaceholder } from "../src/ui/cafe/CafePlaceholder";
+import { CafeScene } from "../src/ui/cafe/CafeScene";
 import type { DayNumber } from "../src/game/types/content";
 import type { GameState } from "../src/game/types/game";
 
@@ -12,7 +12,7 @@ function renderCafe(
   state: GameState = createInitialGameState(),
   onCleanTables?: () => void
 ) {
-  return renderToStaticMarkup(<CafePlaceholder gameState={state} onCleanTables={onCleanTables} />);
+  return renderToStaticMarkup(<CafeScene gameState={state} onCleanTables={onCleanTables} />);
 }
 
 function visibleText(markup: string) {
@@ -40,16 +40,16 @@ describe("café diorama view", () => {
 
     expect(markup).toContain("cafe-stage");
     expect(markup).toContain("cafe-diorama");
-    expect(markup).toContain("cafe-floor");
     expect(markup).toContain("cafe-counter");
     expect(markup).toContain("cafe-coffee-machine");
     expect(markup).toContain("cafe-register");
     expect(markup).toContain("cafe-table");
-    expect(markup).toContain("cafe-door");
-    expect(markup).toContain("cafe-window");
     expect(markup).toContain("cafe-storage");
-    expect(markup).toContain("cafe-menu-board");
     expect(markup).toContain("cafe-plant");
+    // Tür/Fenster/Menütafel liefert das Stage-PNG — die alten unsichtbaren
+    // CSS-Zonen-Container existieren in der datengetriebenen Szene nicht mehr.
+    expect(markup).not.toContain("cafe-floor");
+    expect(markup).not.toContain("cafe-back-wall");
     // Weirdness hint is conditionally rendered — absent on Day 1
     expect(markup).not.toContain("cafe-weirdness-hint");
   });
