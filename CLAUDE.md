@@ -6,7 +6,7 @@ KRITISCHE Regel: Immer auf gescheite Diversität der Figuren achten (Hauttöne, 
 ## Befehle
 
 - Dev-Server: `preview_start` mit Name `cafe-apokalypso` (Port 5173, definiert in `.claude/launch.json`)
-- Tests: `npx vitest run` (219 Tests, müssen grün bleiben)
+- Tests: `npx vitest run` (322 Tests, müssen grün bleiben)
 - Für Preview-/Kalibrier-Arbeit: Skill `.claude/skills/cafe-preview/SKILL.md` lesen und befolgen
 
 ## Token-Arbeitsregeln
@@ -19,7 +19,7 @@ KRITISCHE Regel: Immer auf gescheite Diversität der Figuren achten (Hauttöne, 
 
 ## Diorama-Geometrie (nicht neu herleiten!)
 
-**Aktueller Raum: Stage-PNG-Diorama** — gemaltes PNG als Hintergrund. `.cafe-stage-base { display: block }`. Décor-Sprites (clock/lamp/cups/shelf/plant) sind aktiv als CSS-Overlays. Clock/Lamp sind center-verankert (`left` + `translateX(-50%)`); Lamp steht per `bottom: 37%` auf der Boden-Linie (v04-Fensterglas: 24,7–33,6 % und 65,4–74,4 % Bildbreite, Wand/Boden-Linie ≈ 63 % Höhe).
+**Aktueller Raum: Stage-PNG-Diorama** — Hintergrund ist `assets/backgrounds/placeholder-cafe-stage-base-v05-pixellab.png`: echte Pixel-Art aus Pixellab (`create_map_object`, 400×316 roh, 2× nearest-neighbour auf 800×632, Flood-Fill-Freistellung von den Rändern; ersetzt seit PR #150 das gemalte/gepatchte v04). `.cafe-stage-base { display: block; image-rendering: pixelated }`. Décor-Sprites (clock/lamp/cups/shelf/plant) sind aktiv als CSS-Overlays. Clock/Lamp sind center-verankert (`left` + `translateX(-50%)`); Lamp steht per `bottom: 37%` auf der Boden-Linie. Décor-Positionen sind auf v05 verifiziert; die alten v04-Messwerte (Fensterglas 24,7–33,6 % und 65,4–74,4 % Bildbreite, Wand/Boden-Linie ≈ 63 % Höhe) sind nur noch Richtwerte — bei Neu-Kalibrierung am v05-PNG messen.
 
 **WICHTIG: NIEMALS `.cafe-back-wall` oder `.cafe-side-wall` sichtbar machen oder `.cafe-stage-base` auf `display:none` setzen** — das bricht das Diorama-Layout komplett. Diese sind Positionierungs-Container, nicht visuelle Layer.
 
