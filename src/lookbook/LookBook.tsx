@@ -1,12 +1,12 @@
 import { useMemo, useState } from "react";
-import { CafePlaceholder } from "../ui/cafe/CafePlaceholder";
+import { CafeScene } from "../ui/cafe/CafeScene";
 import { createInitialGameState } from "../game/engine/gameState";
 import type { GameState } from "../game/types/game";
 
 /**
  * Lookbook — a single page that always shows the *current* look of the game:
  * the live diorama at a few representative states, plus every furniture and
- * character sprite straight from /assets. It reuses the real <CafePlaceholder>
+ * character sprite straight from /assets. It reuses the real <CafeScene>
  * component and the real global.css, so whatever changes in the game shows up
  * here on the next reload. Reference surface only — no game logic, no save.
  */
@@ -150,7 +150,7 @@ export function LookBook() {
         <p className="lookbook__scene-note">{scene.note}</p>
         <div className="lookbook__diorama-frame">
           {/* key forces a fresh mount per scene so entrance choreography re-runs */}
-          <CafePlaceholder key={scene.id} gameState={scene.state} />
+          <CafeScene key={scene.id} gameState={scene.state} />
         </div>
       </section>
 
