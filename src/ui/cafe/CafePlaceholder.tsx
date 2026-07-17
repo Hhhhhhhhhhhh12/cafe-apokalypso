@@ -3,7 +3,7 @@ import type { GameState, TableId } from "../../game/types/game";
 import type { ProductId } from "../../game/types/content";
 import { getDioramaGuestVisibility, getNextGuestPreview, getNarrativeEventCards } from "../../game/engine/selectors";
 import { kassandraMessages } from "../../game/data/kassandra";
-import stageBaseAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v05-pixellab.png";
+import stageBaseAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-growth-v01.png";
 import coffeeMachineAsset from "../../../assets/sprites/props/placeholder-cafe-coffee-machine.png";
 import kassandraRegisterAsset from "../../../assets/sprites/props/placeholder-kassandra-register.png";
 import bohnGuestAsset from "../../../assets/sprites/guests/placeholder-guest-bohn.png";
@@ -55,6 +55,7 @@ export function CafePlaceholder({ gameState, onCleanTable }: CafePlaceholderProp
       : gameState.day >= 4
         ? "cafe-diorama--day-four"
         : "cafe-diorama--day-one";
+  const growthDayClass = `cafe-diorama--growth-day-${Math.min(7, Math.max(1, gameState.day))}`;
   const kassandraClass =
     gameState.kassandraInstalled || gameState.unlocks.kassandra || gameState.day >= 6
       ? "cafe-diorama--kassandra-awake"
@@ -242,6 +243,7 @@ export function CafePlaceholder({ gameState, onCleanTable }: CafePlaceholderProp
           cleanlinessClass,
           stressClass,
           dayClass,
+          growthDayClass,
           kassandraClass,
           weirdnessClass,
         ].join(" ")}
@@ -278,6 +280,7 @@ export function CafePlaceholder({ gameState, onCleanTable }: CafePlaceholderProp
           <div className={`cafe-decor-cups cafe-decor--tier-${gameState.decor?.cups ?? 1}`} aria-hidden="true" />
           <div className={`cafe-plant cafe-decor-plant cafe-decor--tier-${gameState.decor?.plant ?? 1}`} aria-hidden="true" />
           <div className={`cafe-decor-plant2 cafe-decor--tier-${gameState.decor?.plant2 ?? 1}`} aria-hidden="true" />
+          <div className={`cafe-furniture-shelf cafe-decor--tier-${gameState.decor?.shelf ?? 1}`} aria-hidden="true" />
 
           {/* CSS back wall — window, menu board, storage shelf */}
           <div className="cafe-back-wall" aria-hidden="true">

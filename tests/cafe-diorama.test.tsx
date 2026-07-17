@@ -211,6 +211,17 @@ describe("café diorama view", () => {
     expect(markup).toContain("cafe-diorama--strained");
     expect(markup).toContain("cafe-diorama--kassandra-awake");
   });
+
+  it("emits an exact growth step for every café day", () => {
+    for (let day = 1; day <= 7; day += 1) {
+      const markup = renderCafe({
+        ...createInitialGameState(),
+        day: day as DayNumber
+      });
+
+      expect(markup).toContain(`cafe-diorama--growth-day-${day}`);
+    }
+  });
 });
 
 function cafeStateFor(day: DayNumber, customersServed: number): GameState {

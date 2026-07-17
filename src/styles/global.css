@@ -641,11 +641,13 @@ h3 {
   --cream: #fff2d8;
   --teal: #16606c;
   --shadow: rgba(43, 32, 27, 0.28);
-  /* Zoom and pan — change via JS style attribute for room expansion */
-  --cafe-zoom: 1.35;
+  /* The room expands by tiny fixed steps while furniture keeps its own scale. */
+  --cafe-zoom: 1;
   --cafe-pan-x: 0%;
+  --cafe-room-growth: 0.84;
   position: relative;
-  min-height: 625px;
+  min-height: 0;
+  aspect-ratio: 16 / 9;
   overflow: hidden;
   border: 3px solid #3d2a23;
   border-radius: 8px;
@@ -710,8 +712,23 @@ h3 {
   width: 100%;
   height: 100%;
   object-fit: fill;
-  /* v05 is native pixel art; keep its geometry crisp at responsive sizes. */
+  transform: scale(var(--cafe-room-growth));
+  transform-origin: 50% 92%;
+  transition: transform 3.6s cubic-bezier(0.4, 0, 0.2, 1);
+  /* High-resolution pixel art stays crisp at responsive sizes. */
   image-rendering: pixelated;
+}
+
+.cafe-diorama--growth-day-1 { --cafe-room-growth: 0.84; }
+.cafe-diorama--growth-day-2 { --cafe-room-growth: 0.867; }
+.cafe-diorama--growth-day-3 { --cafe-room-growth: 0.893; }
+.cafe-diorama--growth-day-4 { --cafe-room-growth: 0.92; }
+.cafe-diorama--growth-day-5 { --cafe-room-growth: 0.947; }
+.cafe-diorama--growth-day-6 { --cafe-room-growth: 0.973; }
+.cafe-diorama--growth-day-7 { --cafe-room-growth: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cafe-stage-base { transition: none; }
 }
 
 .cafe-back-wall,
@@ -1114,7 +1131,7 @@ h3 {
   /* Furniture-free Stage Base (nofurniture-fix) paints no tables, so the bought
      seating shows the real pixel sprite instead of the old CSS ghost boxes.
      Sub-shapes (__top / chairs / pseudo legs) are neutralised below. */
-  background-image: url("../../assets/sprites/props/placeholder-table-chair-set.png");
+  background-image: url("../../assets/sprites/props/placeholder-table-chair-set-v2.png");
   background-repeat: no-repeat;
   background-position: center bottom;
   background-size: contain;
@@ -1846,6 +1863,21 @@ button.cafe-table {
 .cafe-decor-plant2.cafe-decor--tier-3 {
   opacity: 1;
   background-image: url("../../assets/sprites/props/placeholder-cafe-plant-t3.png");
+}
+
+.cafe-furniture-shelf {
+  position: absolute;
+  top: 31%;
+  left: 31%;
+  z-index: 5;
+  width: 18%;
+  height: 13%;
+  background: url("../../assets/sprites/props/placeholder-cafe-shelf-v2.png") center / contain no-repeat;
+  image-rendering: pixelated;
+}
+
+.cafe-furniture-shelf.cafe-decor--tier-1 {
+  opacity: 1;
 }
 
 /*
@@ -3255,7 +3287,7 @@ button.cafe-table {
   }
 
   .cafe-diorama {
-    min-height: 570px;
+    min-height: 0;
   }
 }
 
@@ -4138,6 +4170,15 @@ button.cafe-table {
   background: transparent !important;
   border-color: transparent !important;
   box-shadow: none !important;
+}
+
+/* Furniture is independent from the growing room shell. */
+.cafe-counter {
+  background: url("../../assets/sprites/props/placeholder-cafe-counter-v2.png") center / contain no-repeat !important;
+}
+.cafe-counter__front,
+.cafe-counter__ledge {
+  display: none;
 }
 
 /* ── B1: Ambient event overlay — floor events shown during service ─────────── */
