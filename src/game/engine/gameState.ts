@@ -9,6 +9,7 @@ import type {
   GameState,
   GuestMemoryEntry,
   HelperAssignment,
+  HelperTaskId,
   IngredientKey,
   ResourceState,
   RunState,
@@ -251,14 +252,30 @@ function isValidHelperAssignment(value: unknown): value is HelperAssignment | nu
 
   return (
     typeof assignment.helperId === "string" &&
-    ["jana", "nino", "nele"].includes(assignment.helperId) &&
     typeof assignment.taskId === "string" &&
-    ["cleaning", "service", "barista", "counter", "marketing"].includes(
-      assignment.taskId
-    ) &&
+    isValidHelperTaskPair(assignment.helperId, assignment.taskId) &&
     typeof assignment.locked === "boolean" &&
     typeof assignment.dailyCost === "number" &&
-    typeof assignment.flavorLine === "string"
+    typeof assignment.flavorLine === "string" &&
+    typeof assignment.autonomyLevel === "string" &&
+    ["micromanagement", "learning", "autonomous"].includes(assignment.autonomyLevel)
+  );
+}
+
+function isValidHelperTaskPair(helperId: unknown, taskId: unknown): boolean {
+  if (typeof helperId !== "string" || typeof taskId !== "string") {
+    return false;
+  }
+
+  const validTasks: Record<HelperAssignment["helperId"], readonly HelperTaskId[]> = {
+    jana: ["cleaning", "service"],
+    nino: ["barista", "counter"],
+    nele: ["marketing", "counter"]
+  };
+
+  return (
+    helperId in validTasks &&
+    validTasks[helperId as HelperAssignment["helperId"]].includes(taskId as HelperTaskId)
   );
 }
 
@@ -504,7 +521,11 @@ export function migrateRawSave(raw: unknown): unknown {
     if (assignment && typeof assignment === "object" && !Array.isArray(assignment)) {
       const a = assignment as Record<string, unknown>;
       if (a.helperId === "mira") {
-        obj.helperAssignment = { ...a, helperId: "nele" };
+        obj.helperAssignment = {
+          ...a,
+          helperId: "nele",
+          taskId: isValidHelperTaskPair("nele", a.taskId) ? a.taskId : "counter"
+        };
       }
     }
   }

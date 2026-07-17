@@ -195,7 +195,7 @@ describe("save migration", () => {
     expect(state.daySummary?.dailyOverhead).toBe(0);
   });
 
-  it("loadGameState renames the v8 helper 'mira' to 'nele'", () => {
+  it("loadGameState renames the v8 helper 'mira' to a valid 'nele' assignment", () => {
     const helperAssignment = {
       helperId: "mira",
       taskId: "service",
@@ -208,6 +208,7 @@ describe("save migration", () => {
 
     expect(state.day).toBe(4);
     expect(state.helperAssignment?.helperId).toBe("nele");
+    expect(state.helperAssignment?.taskId).toBe("counter");
   });
 
   it("migrateRawSave adds staffXp: {} to a v9 save", () => {

@@ -103,6 +103,45 @@ describe("save-regression: malformed JSON", () => {
   });
 });
 
+describe("save-regression: helper assignment integrity", () => {
+  it("rejects a helper/task combination that the management rules cannot create", () => {
+    const invalidSave = {
+      ...createInitialGameState(),
+      helperAssignment: {
+        helperId: "nele",
+        taskId: "service",
+        locked: false,
+        dailyCost: 20,
+        flavorLine: "Invalid legacy assignment.",
+        autonomyLevel: "micromanagement"
+      }
+    };
+
+    expect(isValidGameState(invalidSave)).toBe(false);
+    expect(
+      loadGameState(
+        createMemoryStorage({ [SAVE_KEY]: JSON.stringify(invalidSave) })
+      )
+    ).toEqual(createFreshRunState());
+  });
+
+  it("rejects a helper assignment with an unknown autonomy level", () => {
+    const invalidSave = {
+      ...createInitialGameState(),
+      helperAssignment: {
+        helperId: "nele",
+        taskId: "counter",
+        locked: false,
+        dailyCost: 20,
+        flavorLine: "Invalid autonomy state.",
+        autonomyLevel: "independent"
+      }
+    };
+
+    expect(isValidGameState(invalidSave)).toBe(false);
+  });
+});
+
 // ---------------------------------------------------------------------------
 // Version mismatch (wrong tag / legacy key)
 // ---------------------------------------------------------------------------
