@@ -220,6 +220,7 @@ export function createInitialDayManagement(
     moneySpent: 0,
     suppliesUsed: { coffee: 0, milk: 0, pastries: 0 },
     cleaningActions: 0,
+    dirtyTableIds: [],
     offerReviewed: false,
     advertisingRun: false,
     socialAdRun: false,

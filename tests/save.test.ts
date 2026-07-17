@@ -156,6 +156,22 @@ describe("save migration", () => {
     expect(migrated.version).toBe(CURRENT_GAME_STATE_VERSION);
   });
 
+  it("migrates v17 saves with no table-level cleaning state", () => {
+    const v17 = {
+      ...createInitialGameState(),
+      version: 17,
+      dayManagement: { ...createInitialGameState().dayManagement }
+    };
+    delete (v17.dayManagement as Partial<typeof v17.dayManagement>).dirtyTableIds;
+
+    const migrated = migrateRawSave(v17) as {
+      version: number;
+      dayManagement: { dirtyTableIds: string[] };
+    };
+    expect(migrated.version).toBe(CURRENT_GAME_STATE_VERSION);
+    expect(migrated.dayManagement.dirtyTableIds).toEqual([]);
+  });
+
   it("loadGameState migrates a real v8 save instead of resetting to a new game", () => {
     const storage = createMemoryStorage(makeRealV8Save(3));
     const state = loadGameState(storage);

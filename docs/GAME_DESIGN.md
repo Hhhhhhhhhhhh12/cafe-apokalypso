@@ -22,7 +22,7 @@ Day 7 acts as a small operational stress test and ends with the first explicit a
 
 Café Apokalypso is a cozy-absurd café management soft-roguelite for the web.
 
-The player starts with a seemingly normal small café. Early gameplay focuses on direct micromanagement: taking orders, preparing simple products, accepting payment, cleaning tables, managing basic ingredients, setting prices, and choosing small advertising actions.
+The player starts with a seemingly normal small café. Early gameplay focuses on direct micromanagement: taking orders, preparing simple products, accepting payment, cleaning tables, managing basic ingredients, setting prices, and choosing small advertising actions. In week 1, table cleaning is deliberately table-by-table: a served guest can leave a specific table dirty, and the player chooses that table directly in the diorama to spend an action cleaning it.
 
 The long-term structure is built around repeated café weeks. A week functions as a soft run: the player manages several in-game days, responds to guests and events, and reaches an end-of-week pressure point. If the week collapses or becomes unstable, reality may partially reset, while KASSANDRA preserves fragments of memory, guest knowledge, unlocks, forecasts, or start bonuses.
 

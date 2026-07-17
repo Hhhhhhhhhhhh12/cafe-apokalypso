@@ -10,9 +10,9 @@ import type { GameState } from "../src/game/types/game";
 
 function renderCafe(
   state: GameState = createInitialGameState(),
-  onCleanTables?: () => void
+  onCleanTable?: (tableId: "left" | "right" | "back") => void
 ) {
-  return renderToStaticMarkup(<CafePlaceholder gameState={state} onCleanTables={onCleanTables} />);
+  return renderToStaticMarkup(<CafePlaceholder gameState={state} onCleanTable={onCleanTable} />);
 }
 
 function visibleText(markup: string) {
@@ -105,19 +105,25 @@ describe("café diorama view", () => {
     expect(two).toContain("placeholder-guest-normal-04");
   });
 
-  it("renders dirty tables as clickable clean-table buttons (#130)", () => {
+  it("renders individual dirty tables as clickable clean-table buttons (#73)", () => {
     const base = createInitialGameState();
     const dirtyOpen: GameState = {
       ...base,
       dayPhase: "open",
       resources: { ...base.resources, cleanliness: 40 },
       equipment: { ...base.equipment, seating: 1 },
-      dayManagement: { ...base.dayManagement, customersServed: 2, actionPointsRemaining: 2 }
+      dayManagement: {
+        ...base.dayManagement,
+        customersServed: 2,
+        actionPointsRemaining: 2,
+        dirtyTableIds: ["left", "right"]
+      }
     };
 
     const clickable = renderCafe(dirtyOpen, () => {});
     expect(clickable).toContain("cafe-table--clickable");
-    expect(clickable).toContain("Dirty table — wipe it down (1 action)");
+    expect(clickable).toContain("Dirty left table — wipe it down (1 action)");
+    expect(clickable).toContain("Dirty right table — wipe it down (1 action)");
 
     // Without a handler the tables stay decorative
     expect(renderCafe(dirtyOpen)).not.toContain("cafe-table--clickable");
@@ -125,7 +131,8 @@ describe("café diorama view", () => {
     // Clean café → nothing to wipe, no button
     const cleanOpen: GameState = {
       ...dirtyOpen,
-      resources: { ...dirtyOpen.resources, cleanliness: 90 }
+      resources: { ...dirtyOpen.resources, cleanliness: 90 },
+      dayManagement: { ...dirtyOpen.dayManagement, dirtyTableIds: [] }
     };
     expect(renderCafe(cleanOpen, () => {})).not.toContain("cafe-table--clickable");
 

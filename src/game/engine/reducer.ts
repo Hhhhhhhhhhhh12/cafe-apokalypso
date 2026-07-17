@@ -71,7 +71,8 @@ import type {
   HelperTaskId,
   IngredientKey,
   ResourceState,
-  SupplyState
+  SupplyState,
+  TableId
 } from "../types/game";
 
 const FLYER_COST = 2;
@@ -174,6 +175,9 @@ function applyAction(state: GameState, action: GameAction): GameState {
 
     case "clean_tables":
       return cleanTables(state);
+
+    case "clean_table":
+      return cleanTable(state, action.tableId);
 
     case "adjust_offer":
       return adjustOffer(state);
@@ -347,6 +351,14 @@ function applySuccessfulServe(
       moneyEarned: clampResource(management.moneyEarned + earned),
       suppliesUsed: addSupplies(management.suppliesUsed, suppliesUsed)
     };
+
+    const tableToClear = getTableForServedCustomer(workingState, management.customersServed);
+    if (tableToClear && !management.dirtyTableIds.includes(tableToClear)) {
+      management = {
+        ...management,
+        dirtyTableIds: [...management.dirtyTableIds, tableToClear]
+      };
+    }
 
     if (resources.cleanliness < 40 && !management.cleanlinessStressApplied) {
       resources = { ...resources, stress: clampMeter(resources.stress + 5) };
@@ -611,10 +623,21 @@ function rememberServedGuest(
 }
 
 function cleanTables(state: GameState): GameState {
+  return cleanTable(state, state.dayManagement.dirtyTableIds[0]);
+}
+
+function cleanTable(state: GameState, tableId: TableId | undefined): GameState {
   if (state.dayPhase !== "open") {
     return {
       ...state,
       statusMessage: "Cleaning belongs to the open café day."
+    };
+  }
+
+  if (tableId && !state.dayManagement.dirtyTableIds.includes(tableId)) {
+    return {
+      ...state,
+      statusMessage: `The ${tableId} table is already tidy.`
     };
   }
 
@@ -633,8 +656,8 @@ function cleanTables(state: GameState): GameState {
 
   const cleanMessage =
     slowWindowReduction > 0
-      ? "Tables cleaned during a quiet window. Cleanliness rises and stress drops slightly."
-      : "Tables cleaned. Cleanliness rises.";
+      ? `The ${tableId ?? "next"} table is cleaned during a quiet window. Cleanliness rises and stress drops slightly.`
+      : `The ${tableId ?? "next"} table is cleaned. Cleanliness rises.`;
 
   return {
     ...tickedState,
@@ -648,11 +671,23 @@ function cleanTables(state: GameState): GameState {
     dayManagement: {
       ...tickedState.dayManagement,
       cleaningActions: tickedState.dayManagement.cleaningActions + 1,
+      dirtyTableIds: tableId
+        ? tickedState.dayManagement.dirtyTableIds.filter((dirtyTableId) => dirtyTableId !== tableId)
+        : tickedState.dayManagement.dirtyTableIds,
       slowCleaningStressReductionUsed:
         tickedState.dayManagement.slowCleaningStressReductionUsed || slowWindowReduction > 0
     },
     statusMessage: [cleanMessage, walkoutLine].filter(Boolean).join(" ")
   };
+}
+
+function getTableForServedCustomer(state: GameState, customersServed: number): TableId | null {
+  if (state.equipment.seating < 1) {
+    return null;
+  }
+
+  const tables: readonly TableId[] = ["left", "right", "back"];
+  return tables[(customersServed - 1) % tables.length];
 }
 
 function checkSupplies(state: GameState): GameState {

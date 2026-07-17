@@ -15,11 +15,12 @@ import type {
   RunState,
   SupplyPurchaseState,
   SupplyState,
+  TableId,
   UnlockState
 } from "../types/game";
 import { createInitialDayManagement, STARTING_REPUTATION, SUPPLY_CAPS } from "./management";
 
-export const CURRENT_GAME_STATE_VERSION = 17;
+export const CURRENT_GAME_STATE_VERSION = 18;
 export const CURRENT_CONTENT_CATALOG_VERSION = "week-one-v1";
 
 const initialResources: ResourceState = {
@@ -216,6 +217,7 @@ function isValidDayManagement(value: unknown): value is DayManagementState {
     typeof management.moneySpent === "number" &&
     isValidSupplies(management.suppliesUsed) &&
     typeof management.cleaningActions === "number" &&
+    isValidTableIdArray(management.dirtyTableIds) &&
     typeof management.offerReviewed === "boolean" &&
     typeof management.advertisingRun === "boolean" &&
     typeof management.socialAdRun === "boolean" &&
@@ -236,6 +238,14 @@ function isValidDayManagement(value: unknown): value is DayManagementState {
     typeof management.guestsLost === "number" &&
     typeof management.serveStreak === "number" &&
     typeof management.bestServeStreak === "number"
+  );
+}
+
+function isValidTableIdArray(value: unknown): value is TableId[] {
+  return (
+    Array.isArray(value) &&
+    value.every((tableId) => typeof tableId === "string" && ["left", "right", "back"].includes(tableId)) &&
+    new Set(value).size === value.length
   );
 }
 
@@ -672,6 +682,18 @@ export function migrateRawSave(raw: unknown): unknown {
       const a = assignment as Record<string, unknown>;
       if (typeof a.autonomyLevel !== "string") {
         obj.helperAssignment = { ...a, autonomyLevel: "micromanagement" };
+      }
+    }
+  }
+
+  if (obj.version === 17) {
+    obj.version = 18;
+    patched = true;
+
+    if (obj.dayManagement && typeof obj.dayManagement === "object" && !Array.isArray(obj.dayManagement)) {
+      const dm = obj.dayManagement as Record<string, unknown>;
+      if (!Array.isArray(dm.dirtyTableIds)) {
+        obj.dayManagement = { ...dm, dirtyTableIds: [] };
       }
     }
   }

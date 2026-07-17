@@ -9,7 +9,7 @@ import type {
 } from "./content";
 import type { DayNumber } from "./content";
 
-export type GameStateVersion = 17;
+export type GameStateVersion = 18;
 
 export type ContentCatalogVersion = "week-one-v1";
 
@@ -24,6 +24,8 @@ export type DecorSlotId = "plant" | "plant2" | "shelf" | "clock" | "lamp" | "cup
 export type EquipmentSlotId = "machine" | "seating" | "register";
 export type HelperTaskId = "cleaning" | "service" | "barista" | "counter" | "marketing";
 export type EmployeeLevel = 1 | 2 | 3;
+/** Tables in the café that can be directly selected for cleaning. */
+export type TableId = "left" | "right" | "back";
 
 export type DayActionId =
   | "take_order"
@@ -64,6 +66,8 @@ export interface DayManagementState {
   moneySpent: number;
   suppliesUsed: SupplyState;
   cleaningActions: number;
+  /** Tables currently needing attention. A player can select one directly in the diorama. */
+  dirtyTableIds: TableId[];
   offerReviewed: boolean;
   advertisingRun: boolean;
   socialAdRun: boolean;
@@ -222,6 +226,7 @@ export type GameAction =
   | { type: "prepare_counter" }
   | { type: "check_supplies" }
   | { type: "clean_tables" }
+  | { type: "clean_table"; tableId: TableId }
   | { type: "adjust_offer" }
   | { type: "run_advertising"; adType?: "flyer" | "social" }
   | { type: "consult_kassandra" }

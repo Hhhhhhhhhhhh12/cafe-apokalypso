@@ -144,6 +144,24 @@ describe("management tradeoff system", () => {
     expect(cleanedState.resources.cleanliness).toBe(90);
   });
 
+  it("tracks and cleans individual tables", () => {
+    let state = createInitialGameState();
+    state = gameReducer(state, { type: "serve_product", productId: "filterkaffee" });
+    state = gameReducer(state, { type: "serve_product", productId: "filterkaffee" });
+
+    expect(state.dayManagement.dirtyTableIds).toEqual(["left", "right"]);
+
+    const cleanedRight = gameReducer(state, { type: "clean_table", tableId: "right" });
+    expect(cleanedRight.dayManagement.dirtyTableIds).toEqual(["left"]);
+    expect(cleanedRight.resources.cleanliness).toBe(state.resources.cleanliness + 12);
+
+    const alreadyTidy = gameReducer(cleanedRight, { type: "clean_table", tableId: "back" });
+    expect(alreadyTidy).toEqual({
+      ...cleanedRight,
+      statusMessage: "The back table is already tidy."
+    });
+  });
+
   it("applies cleanliness reputation effects at day end", () => {
     const messyState = completePreparedDay({
       ...createInitialGameState(),

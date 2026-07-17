@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import type { GameState } from "../../game/types/game";
+import type { GameState, TableId } from "../../game/types/game";
 import type { ProductId } from "../../game/types/content";
 import { getDioramaGuestVisibility, getNextGuestPreview, getNarrativeEventCards } from "../../game/engine/selectors";
 import { kassandraMessages } from "../../game/data/kassandra";
@@ -31,11 +31,11 @@ function prefersReducedMotion(): boolean {
 interface CafePlaceholderProps {
   gameState: GameState;
   onServeProduct?: (productId: ProductId) => void;
-  /** Fired when the player clicks a dirty table in the diorama (issue #130). */
-  onCleanTables?: () => void;
+  /** Fired when the player selects a specific dirty table in the diorama (issue #73). */
+  onCleanTable?: (tableId: TableId) => void;
 }
 
-export function CafePlaceholder({ gameState, onCleanTables }: CafePlaceholderProps) {
+export function CafePlaceholder({ gameState, onCleanTable }: CafePlaceholderProps) {
   // --- Visual state classes ---
   const cleanlinessClass =
     gameState.resources.cleanliness >= 70
@@ -220,8 +220,7 @@ export function CafePlaceholder({ gameState, onCleanTables }: CafePlaceholderPro
   const visibleGuests = getDioramaGuestVisibility(gameState);
   const nextGuest = getNextGuestPreview(gameState);
 
-  const tablesDirty =
-    gameState.resources.cleanliness < 70 && (isOpen || isDayEnd) && customersServed >= 1;
+  const dirtyTableIds = new Set(gameState.dayManagement.dirtyTableIds);
 
   const showWeirdness = gameState.weirdnessVisible || gameState.day >= 7 || gameState.hiddenWeirdness >= 3;
   const kassandraAwake = gameState.kassandraInstalled || gameState.day >= 6;
@@ -354,15 +353,15 @@ export function CafePlaceholder({ gameState, onCleanTables }: CafePlaceholderPro
               <div className="cafe-service-mat" />
             </div>
 
-            {/* Tables — only visible once furniture is owned (seating tier >= 1).
-                Dirty tables become clickable and fire the clean-tables action (#130). */}
+            {/* Tables — direct, table-by-table cleaning makes early floor work tangible (#73). */}
             {gameState.equipment.seating >= 1 && (
               <>
                 {([
-                  { pos: "left", dirty: tablesDirty },
-                  { pos: "right", dirty: tablesDirty && visibleGuests.mira },
-                  { pos: "back", dirty: tablesDirty && visibleGuests.fatou }
-                ] as const).map(({ pos, dirty }) => {
+                  { pos: "left" },
+                  { pos: "right" },
+                  { pos: "back" }
+                ] as const).map(({ pos }) => {
+                  const dirty = dirtyTableIds.has(pos);
                   const className = `cafe-table cafe-table--${pos} cafe-table--tier-${gameState.equipment.seating}`;
                   const inner = (
                     <>
@@ -373,15 +372,15 @@ export function CafePlaceholder({ gameState, onCleanTables }: CafePlaceholderPro
                     </>
                   );
                   const clickable =
-                    dirty && isOpen && gameState.dayManagement.actionPointsRemaining > 0 && !!onCleanTables;
+                    dirty && isOpen && gameState.dayManagement.actionPointsRemaining > 0 && !!onCleanTable;
                   return clickable ? (
                     <button
                       key={pos}
                       type="button"
                       className={`${className} cafe-table--clickable`}
-                      onClick={onCleanTables}
-                      aria-label="Dirty table — wipe it down (1 action)"
-                      title="Wipe the tables (1 action)"
+                      onClick={() => onCleanTable(pos)}
+                      aria-label={`Dirty ${pos} table — wipe it down (1 action)`}
+                      title={`Wipe the ${pos} table (1 action)`}
                     >
                       {inner}
                     </button>
