@@ -710,7 +710,8 @@ h3 {
   width: 100%;
   height: 100%;
   object-fit: fill;
-  image-rendering: auto;
+  /* v05 is native pixel art; keep its geometry crisp at responsive sizes. */
+  image-rendering: pixelated;
 }
 
 .cafe-back-wall,
