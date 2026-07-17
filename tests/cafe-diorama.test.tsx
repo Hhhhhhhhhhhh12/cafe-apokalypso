@@ -145,6 +145,7 @@ describe("café diorama view", () => {
     });
 
     expect(markup).toMatch(/cafe-decor-plant[^"]*cafe-decor--tier-2/);
+    expect(markup).toMatch(/cafe-decor-plant2[^"]*cafe-decor--tier-1/);
     expect(markup).toMatch(/cafe-storage[^"]*cafe-decor--tier-3/);
     expect(markup).toMatch(/cafe-decor-clock[^"]*cafe-decor--tier-1/);
     expect(markup).toMatch(/cafe-decor-lamp[^"]*cafe-decor--tier-2/);

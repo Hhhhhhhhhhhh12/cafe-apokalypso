@@ -831,6 +831,12 @@ describe("fail-state and reputation-scaled income", () => {
     expect(upgraded.resources.money).toBe(30);
     expect(upgraded.resources.reputation).toBe(26);
 
+    // The second plant is its own purchasable counter slot, with its own price.
+    const counterPlant = gameReducer(dayEnd, { type: "upgrade_decor", slot: "plant2" });
+    expect(counterPlant.decor.plant2).toBe(2);
+    expect(counterPlant.resources.money).toBe(32);
+    expect(counterPlant.resources.reputation).toBe(26);
+
     // Not enough money is blocked.
     const broke: GameState = {
       ...dayEnd,
