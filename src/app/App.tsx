@@ -12,7 +12,7 @@ import { weekOneAchievements } from "../game/data/achievements";
 import type { AchievementDefinition } from "../game/types/content";
 import { AchievementToast } from "../ui/components/AchievementToast";
 import { ActionPanel } from "../ui/components/ActionPanel";
-import { CafePlaceholder } from "../ui/cafe/CafePlaceholder";
+import { CafeScene } from "../ui/cafe/CafeScene";
 import { IntroSequence } from "../ui/components/IntroSequence";
 import { OptionsMenu } from "../ui/components/OptionsMenu";
 import { DayProgressPanel } from "../ui/panels/DayProgressPanel";
@@ -184,7 +184,7 @@ export function App() {
 
       <section className="workspace-grid" aria-label="Game shell workspace">
         <ResourceHud gameState={gameState} />
-        <CafePlaceholder
+        <CafeScene
           gameState={gameState}
           onCleanTables={() => dispatch({ type: "clean_tables" })}
         />

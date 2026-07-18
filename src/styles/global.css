@@ -685,23 +685,6 @@ h3 {
   box-shadow: inset 0 -30px 60px rgba(61, 42, 35, 0.18);
 }
 
-.cafe-back-wall,
-.cafe-side-wall,
-.cafe-floor,
-.cafe-counter,
-.cafe-table,
-.cafe-room-shadow,
-.cafe-plant,
-.placeholder-guest,
-.cafe-weirdness-hint {
-  position: absolute;
-}
-
-.cafe-back-wall,
-.cafe-side-wall {
-  display: none;
-}
-
 .cafe-stage-base {
   display: block;
   position: absolute;
@@ -714,91 +697,12 @@ h3 {
   image-rendering: pixelated;
 }
 
-.cafe-back-wall,
-.cafe-side-wall {
-  display: none;
-}
-
-/* Stage-base PNG supplies walls, floor, counter visually — containers kept for positioning */
-.cafe-floor {
-  background: transparent;
-  border-color: transparent;
-  box-shadow: none;
-}
-.cafe-floor__tiles {
-  display: none;
-}
-.cafe-counter {
-  background: transparent;
-  border-color: transparent;
-  box-shadow: none;
-}
-.cafe-window,
-.cafe-room-shadow {
-  display: none;
-}
-
-.cafe-window {
-  position: absolute;
-  top: 12%;
-  left: 9%;
-  width: 24%;
-  height: 34%;
-  border: 4px solid #5a392d;
-  background:
-    linear-gradient(90deg, transparent 47%, rgba(90, 57, 45, 0.9) 47% 53%, transparent 53%),
-    linear-gradient(180deg, #f7d88f 0 52%, #8fb7bd 52% 100%);
-  box-shadow: inset 0 -7px 0 rgba(80, 48, 38, 0.2), 5px 7px 0 rgba(66, 39, 31, 0.14);
-}
-
-.cafe-window__light {
-  position: absolute;
-  right: -34%;
-  bottom: -78%;
-  width: 160%;
-  height: 86%;
-  transform: skewX(-24deg);
-  background: rgba(255, 232, 158, 0.24);
-}
-
-.cafe-menu-board {
-  position: absolute;
-  top: 13%;
-  left: 43%;
-  display: grid;
-  gap: 7px;
-  width: 24%;
-  height: 28%;
-  border: 4px solid #3d2a23;
-  border-radius: 6px;
-  padding: 10px 14px;
-  background: #243a35;
-  box-shadow: 5px 7px 0 rgba(66, 39, 31, 0.14);
-}
-
-.cafe-menu-board span {
-  display: block;
-  height: 5px;
-  border-radius: 999px;
-  background: #f2d68a;
-}
-
-.cafe-menu-board span:nth-child(2) {
-  width: 72%;
-  background: #f5efe4;
-}
-
-.cafe-menu-board span:nth-child(3) {
-  width: 48%;
-  background: #d79a74;
-}
+/* Stage-PNG liefert Wände/Boden/Theke visuell — alle Szenen-Positionen
+   kommen als Daten aus src/ui/cafe/scene.ts (Inline-Styles der CafeScene).
+   Die alten Zonen-Container (back-wall/side-wall/floor/queue) und ihre
+   CSS-gemalten Relikte (Fenster, Tür, Menütafel) sind entfernt. */
 
 .cafe-storage {
-  position: absolute;
-  top: 37%;
-  right: 2%;
-  width: 18%;
-  height: 45%;
   border: 3px solid #4d3026;
   border-radius: 5px;
   background:
@@ -832,99 +736,11 @@ h3 {
   background: #cdb487;
 }
 
-.cafe-door {
-  position: absolute;
-  right: 13%;
-  bottom: 0;
-  width: 50%;
-  height: 58%;
-  border: 4px solid #4d3026;
-  border-bottom: 0;
-  border-radius: 7px 7px 0 0;
-  background:
-    linear-gradient(90deg, rgba(255, 250, 222, 0.24), transparent 54%),
-    #704333;
-  box-shadow: inset 7px 0 0 rgba(255, 248, 237, 0.12);
-}
-
-.cafe-door span {
-  position: absolute;
-  top: 47%;
-  right: 18%;
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: #f2c26d;
-}
-
-.cafe-floor {
-  right: 6%;
-  bottom: 4%;
-  left: 5%;
-  z-index: 2;
-  height: 65%;
-  clip-path: polygon(9% 1%, 100% 15%, 88% 100%, 0 84%);
-  overflow: hidden;
-  border: 3px solid transparent;
-  background: transparent;
-  box-shadow: none;
-}
-
-.cafe-floor__tiles {
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(35deg, transparent 47%, var(--floor-line) 48% 52%, transparent 53%),
-    linear-gradient(129deg, transparent 47%, var(--floor-line) 48% 52%, transparent 53%);
-  background-size: 52px 48px;
-  opacity: 0.42;
-}
-
-.cafe-room-shadow {
-  right: 5%;
-  bottom: 7%;
-  left: 7%;
-  z-index: 0;
-  height: 78%;
-  clip-path: polygon(10% 6%, 95% 18%, 85% 95%, 0 80%);
-  background:
-    radial-gradient(ellipse at 34% 32%, rgba(52, 31, 24, 0.2), transparent 36%),
-    radial-gradient(ellipse at 72% 66%, rgba(52, 31, 24, 0.18), transparent 33%);
-  filter: blur(3px);
-  opacity: 0.55;
-}
-
 .cafe-counter {
-  top: 53.8%;
-  left: 59.6%;
-  z-index: 4;
-  width: 43.8%;
-  height: 33.8%;
   border: none;
   border-radius: 7px;
   background: transparent;
   box-shadow: none;
-}
-
-.cafe-counter__front {
-  position: absolute;
-  inset: 48% 0 0;
-  border-top: 3px solid rgba(53, 36, 30, 0.75);
-  background:
-    linear-gradient(90deg, transparent 22%, rgba(255, 248, 237, 0.12) 22% 25%, transparent 25% 54%, rgba(255, 248, 237, 0.12) 54% 57%, transparent 57%);
-  opacity: 1;
-}
-
-.cafe-counter__ledge {
-  position: absolute;
-  top: 39%;
-  right: 3%;
-  left: 3%;
-  height: 13%;
-  border-top: 3px solid rgba(53, 36, 30, 0.55);
-  border-bottom: 3px solid rgba(53, 36, 30, 0.3);
-  background: rgba(255, 248, 237, 0.12);
-  opacity: 1;
 }
 
 /*
@@ -1108,9 +924,6 @@ h3 {
  * faded so it reads as a soft placeholder hint. Classes retained as fallback.
  */
 .cafe-table {
-  z-index: 5;
-  width: 22%;
-  height: 26%;
   /* Furniture-free Stage Base (nofurniture-fix) paints no tables, so the bought
      seating shows the real pixel sprite instead of the old CSS ghost boxes.
      Sub-shapes (__top / chairs / pseudo legs) are neutralised below. */
@@ -1178,27 +991,6 @@ button.cafe-table {
   border-radius: 50%;
   background: radial-gradient(ellipse at center, rgba(198, 122, 66, 0.4) 0%, rgba(198, 122, 66, 0) 70%);
   z-index: -1;
-}
-
-.cafe-table--left {
-  left: 15%;
-  bottom: 19%;
-}
-
-.cafe-table--right {
-  right: 22%;
-  bottom: 15%;
-}
-
-/* Back table — sits in the gap between Bohn and the counter/machine, further
-   back in the isometric floor so it reads a touch smaller/higher than the
-   two front tables. Hosts Nele + Fatou instead of crowding a third chair
-   onto the front tables (whose sprite only draws two chairs). */
-.cafe-table--back {
-  left: 45%;
-  bottom: 47%;
-  width: 18%;
-  height: 16%;
 }
 
 .cafe-table__top {
@@ -1272,18 +1064,8 @@ button.cafe-table {
   box-shadow: 0 0 6px rgba(22, 160, 180, 0.5);
 }
 
-.cafe-queue {
-  position: absolute;
-  /* Moved from the cramped bottom-right corner into the open painted floor so
-     the waiting guest stands in the room rather than against the wall. */
-  left: 34%;
-  bottom: 9%;
-  z-index: 6;
-  width: 16%;
-  height: 41%;
-}
-
 .placeholder-guest {
+  position: absolute;
   /* Scaled up from 22×34 so CSS guest blobs and sprite containers are legible
      at game scale against the Stage Base background. */
   width: 32px;
@@ -1327,35 +1109,15 @@ button.cafe-table {
   border-radius: 50%;
 }
 
-.placeholder-guest-normal-01 {
-  left: 50%;
-  bottom: 8%;
-  transform: translateX(-50%);
-}
-
 /* Paula's entrance: start at the painted door, walk to the queue spot.
-   The transition runs when .placeholder-guest--at-door is removed. */
+   Wegpunkte liegen in scene.ts (PAULA_PATH); die Transition läuft, sobald
+   die Inline-Position von at-door auf den Queue-Punkt wechselt. */
 @media (prefers-reduced-motion: no-preference) {
   .placeholder-guest-normal-01 {
     transition:
       left 2.6s linear,
       bottom 2.6s linear;
   }
-}
-
-/* Calibrated against the painted door: sprite center dio x 8.4%, feet
-   y 56.6%. Percentages are relative to .cafe-queue, hence the overshoot. */
-.placeholder-guest-normal-01.placeholder-guest--at-door {
-  left: -195%;
-  bottom: 130%;
-  transition: none;
-}
-
-/* Paula's exit: walks toward the counter (north in the painted room).
-   Target overshoots the queue box upward so she disappears into the counter area. */
-.placeholder-guest-normal-01.placeholder-guest--walking-to-counter {
-  left: 60%;
-  bottom: 185%;
 }
 
 .cafe-pilot-asset--paula,
@@ -1456,8 +1218,6 @@ button.cafe-table {
 /* Paula's east exit: slides off-screen right after reaching the counter.
    Uses a faster transition (1.4s) so the exit feels snappy. */
 .placeholder-guest-normal-01.placeholder-guest--exiting-east {
-  left: 420%;
-  bottom: 8%;
   transition:
     left 1.4s linear,
     bottom 0.5s ease-in;
@@ -1665,22 +1425,13 @@ button.cafe-table {
   }
 }
 
+/* Sitzplätze/Positionen aller Gäste: scene.ts (GUEST_SPOTS). Hier bleiben
+   nur noch Farb-/Sichtbarkeits-Stile der Klassen. */
 .placeholder-guest-normal-02 {
-  right: 2%;
-  bottom: 6%;
   opacity: 0;
 }
 
-/* Seated at the LEFT table (back chair) — clustered to the real table sprite */
-.placeholder-guest-normal-03 {
-  left: 22%;
-  bottom: 26%;
-}
-
-/* Seated at the RIGHT table (back chair) */
 .placeholder-guest-normal-04 {
-  right: 30%;
-  bottom: 24%;
   background: #4a6e8a;
 }
 
@@ -1688,34 +1439,9 @@ button.cafe-table {
   background: #d9a47d;
 }
 
-/* Lukas — seated at the LEFT table (front/side chair) */
-.placeholder-guest-normal-05 {
-  left: 17%;
-  bottom: 21%;
-}
-
-/* Christa — seated at the RIGHT table (front/side chair, day 2+) */
-.placeholder-guest-normal-06 {
-  right: 24%;
-  bottom: 19%;
-}
-
-/* Herr Bohn — standing, coffee in hand, left of the back table (no table
-   of his own; nudged clear of the back table's guests; day 3+) */
-.placeholder-guest-normal-07 {
-  left: 34%;
-  bottom: 38%;
-}
-
 .placeholder-guest-strange-01,
 .placeholder-guest-strange-02 {
   background: #5d3b78;
-}
-
-/* Strange guest — positioned when conditionally rendered */
-.placeholder-guest-strange-01 {
-  left: 60%;
-  bottom: 43%;
 }
 
 .placeholder-guest-strange-01::before {
@@ -1737,33 +1463,10 @@ button.cafe-table {
   filter: saturate(0.12) sepia(0.24) brightness(0.87) contrast(1.05);
 }
 
-.placeholder-guest-strange-02 {
-  right: 28%;
-  bottom: 31%;
-}
-
-/* Nele — seated at the BACK table (left chair) */
-.placeholder-guest-normal-08 {
-  left: 50%;
-  bottom: 52%;
-}
-
 /* Meda — Ecke hinten rechts, ab Tag 5 */
 .placeholder-guest-strange-02 .cafe-pilot-asset--meda,
 .placeholder-guest-strange-02 .cafe-pilot-asset--guest {
   filter: saturate(0.8) brightness(0.92);
-}
-
-/* Frau mit rotem Regenschirm — linke Mitte, Tag 7 */
-.placeholder-guest-strange-03 {
-  left: 30%;
-  bottom: 52%;
-}
-
-/* Fatou — seated at the BACK table (right chair, day 2+) */
-.placeholder-guest-normal-09 {
-  left: 46%;
-  bottom: 48%;
 }
 
 /*
@@ -1771,19 +1474,9 @@ button.cafe-table {
  * diorama image, not .cafe-floor, so save-injected tier changes stay anchored to
  * the painted empty floor corner.
  */
-/* Décor sprite overlays — positioned absolute within .cafe-world */
-.cafe-decor-plant,
-.cafe-decor-clock,
-.cafe-decor-lamp,
-.cafe-decor-cups {
-  display: block;
-  position: absolute;
-}
-
+/* Décor-Sprites — Slot-Positionen in scene.ts (DECOR_SPOTS), hier nur noch
+   Sprite, Größe und Tier-Varianten. */
 .cafe-decor-plant {
-  left: 17.4%;
-  top: 55.4%;
-  z-index: 5;
   width: 68px;
   height: 80px;
   background: url("../../assets/sprites/props/placeholder-cafe-plant.png") center bottom / contain no-repeat;
@@ -1823,10 +1516,6 @@ button.cafe-table {
 
 /* Counter pot plant (plant2) — small herb/succulent sitting on the counter surface. */
 .cafe-decor-plant2 {
-  position: absolute;
-  left: 78%;
-  top: 55%;
-  z-index: 5;
   width: 32px;
   height: 40px;
   background: url("../../assets/sprites/props/placeholder-cafe-plant.png") center bottom / contain no-repeat;
@@ -1853,19 +1542,7 @@ button.cafe-table {
  * window and menu board. The weirdness-hint .cafe-clock CSS below is separate
  * and untouched — that's the overlay omen; this is the real décor prop.
  */
-/* ── Décor props: children of .cafe-world (zoom 1.35× around center/58%) ─
-   CSS % = .cafe-world box (873×625). Visual position after zoom differs from
-   CSS position — use inverse: css = (vis_px − ox)/1.35 + ox, ox=(W/2,0.58H).
-   ── */
 .cafe-decor-clock {
-  position: absolute;
-  /* Wall strip between the windows — glass spans 24.7–33.6 % / 65.4–74.4 %
-     of the v04 stage image, so 23 % hung the clock inside the left window.
-     translateX centers the px-sized sprite on the anchor at every viewport. */
-  left: 49.5%;
-  top: 19.0%;
-  transform: translateX(-50%);
-  z-index: 8;
   width: 56px;
   height: 56px;
   background: url("../../assets/sprites/props/placeholder-cafe-clock.png") center / contain no-repeat;
@@ -1897,11 +1574,6 @@ button.cafe-table {
  * to the v04 wall/floor line (~63 % height) via bottom, at every viewport.
  */
 .cafe-decor-lamp {
-  position: absolute;
-  left: 59.5%;
-  bottom: 37.0%;
-  transform: translateX(-50%);
-  z-index: 4;
   width: 40px;
   height: 64px;
   background: url("../../assets/sprites/props/placeholder-cafe-lamp.png") center bottom / contain no-repeat;
@@ -1932,10 +1604,6 @@ button.cafe-table {
  * surface (was 62%/40%, which floated them over the right window).
  */
 .cafe-decor-cups {
-  position: absolute;
-  left: 61.0%;
-  top: 72.0%;
-  z-index: 6;
   width: 32px;
   height: 27px;
   background: url("../../assets/sprites/props/placeholder-cafe-cups.png") center / contain no-repeat;
@@ -1977,11 +1645,6 @@ button.cafe-table {
 }
 
 .cafe-weirdness-hint {
-  top: 18%;
-  right: 13%;
-  z-index: 7;
-  width: 20%;
-  height: 32%;
   opacity: 0.24;
 }
 
@@ -2071,20 +1734,10 @@ button.cafe-table {
   transform: translate(10px, 6px) rotate(18deg);
 }
 
-.cafe-diorama--messy .cafe-chair--front {
-  transform: rotate(12deg);
-}
-
 .cafe-diorama--strained {
   background:
     radial-gradient(circle at 20% 18%, rgba(255, 237, 192, 0.48), transparent 29%),
     linear-gradient(135deg, #dfad7f 0 52%, #b98072 52% 100%);
-}
-
-.cafe-diorama--day-seven .cafe-window {
-  background:
-    linear-gradient(90deg, transparent 47%, rgba(90, 57, 45, 0.9) 47% 53%, transparent 53%),
-    linear-gradient(180deg, #e7a85f 0 52%, #6c939d 52% 100%);
 }
 
 .action-panel {
@@ -4106,46 +3759,13 @@ button.cafe-table {
 @media (prefers-reduced-motion: reduce) {
   .cafe-kassandra-aside { animation: none; }
 }
-.cafe-back-wall,
-.cafe-side-wall,
-.cafe-window,
-.cafe-window__light,
-.cafe-menu-board,
-.cafe-storage,
-.cafe-door,
-.cafe-floor__tiles,
-.cafe-room-shadow {
-  display: none !important;
-}
-.cafe-floor,
-.cafe-counter {
-  background: transparent !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
-}
-
-/* === CSS-Diorama dauerhaft deaktiviert — nur das PNG (.cafe-stage-base) ist Hintergrund ===
-   Hard-Override: der gemalte Hintergrund ist die einzige Raumdarstellung. Die
-   Struktur-Container (.cafe-floor/.cafe-counter) bleiben als unsichtbare
-   Positionierungs-Boxen erhalten, damit Maschine/Kasse/Props weiter ankern.
-   cafe-counter__front/ledge bleiben sichtbar (furniture-free Hintergrund hat keine gemalte Theke). */
+/* Das Stage-PNG ist die einzige Raumdarstellung — nie ausblenden. */
 .cafe-stage-base { display: block !important; }
-.cafe-back-wall,
-.cafe-side-wall,
-.cafe-window,
-.cafe-window__light,
-.cafe-menu-board,
-.cafe-storage,
-.cafe-door,
-.cafe-floor__tiles,
-.cafe-room-shadow {
+
+/* Regal-Slot: noch kein echtes Décor-Sprite; das Stage-PNG malt bereits
+   Regale. Der DOM-Knoten bleibt (Tier-Klassen/Tests), bis ein Sprite kommt. */
+.cafe-storage {
   display: none !important;
-}
-.cafe-floor,
-.cafe-counter {
-  background: transparent !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
 }
 
 /* ── B1: Ambient event overlay — floor events shown during service ─────────── */
