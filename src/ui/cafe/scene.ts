@@ -129,15 +129,30 @@ export const COUNTER_FRAME: StageSpot = {
   z: 4,
 };
 
-/* ── Décor-Slots (wandmontiert, px-Größen liegen in den Tier-Klassen) ── */
+/* ── Décor-Slots (wandmontiert, px-Größen liegen in den Tier-Klassen) ──
+   Auf die v06-Stage kalibriert (2026-07-18): Uhr im Wandstreifen zwischen
+   den Fenstern, Lampe auf der Boden-Linie zwischen Tür und linkem Fenster,
+   Tassen auf der Tresen-Vorderkante, Pflanze auf dem Boden vorne links. */
 export const DECOR_SPOTS = {
-  clock: { left: 49.5, top: 19.0, z: 8, centered: true },
-  lamp: { left: 59.5, bottom: 37.0, z: 4, centered: true },
-  cups: { left: 61.0, top: 72.0, z: 6 },
-  plant: { left: 17.4, top: 55.4, z: 5 },
+  clock: { left: 47.3, top: 23.0, z: 8, centered: true },
+  lamp: { left: 27.5, bottom: 31.5, z: 4, centered: true },
+  cups: { left: 65.5, top: 59.4, z: 6 },
+  plant: { left: 14.0, top: 71.0, z: 5 },
   plant2: { left: 78.0, top: 55.0, z: 5 },
   /** Regal rechts — sichtbarer Décor-Slot. */
   shelf: { right: 2, top: 37, w: 18, h: 45, z: 3 },
+} satisfies Record<string, StageSpot>;
+
+/* ── Detail-Kompositions-Schicht ───────────────────────────────────────
+   Der Raum-PNG ist bei 400 Art-px Breite gecappt (~2,9 Screen-px/Pixel).
+   Fokale Wandelemente (Fenster, Tür) liegen daher als eigene, kleiner
+   rendernde Sprites darüber (~1 Screen-px/Pixel, sichtbar feiner) und
+   überdecken die im PNG gemalten Pendants vollständig. Gegen die
+   gemessenen v06-Fenster/Tür-Boxen kalibriert. */
+export const STAGE_DETAIL_SPOTS = {
+  windowL: { left: 29.9, top: 12.4, w: 14.6, h: 43, z: 3 },
+  windowR: { left: 49.4, top: 12.4, w: 14.6, h: 43, z: 3 },
+  door: { left: 10.3, top: 29.5, w: 14.3, h: 43, z: 3 },
 } satisfies Record<string, StageSpot>;
 
 export const WEIRDNESS_SPOT: StageSpot = { right: 13, top: 18, w: 20, h: 32, z: 7 };

@@ -693,8 +693,27 @@ h3 {
   width: 100%;
   height: 100%;
   object-fit: fill;
-  /* v05 stage base is genuine pixel art (Pixellab) — keep pixels crisp */
+  /* v06 stage base is genuine pixel art (Pixellab) — keep pixels crisp */
   image-rendering: pixelated;
+}
+
+/* Detail-Kompositions-Schicht: hochdichte Fenster-/Tür-Sprites über dem
+   400-px-Shell. Position/Größe kommen aus scene.ts (STAGE_DETAIL_SPOTS);
+   hier nur das Aussehen. background-size 100% 100% deckt den im PNG
+   gemalten Rahmen vollständig ab (leichte Streckung bewusst erlaubt). */
+.cafe-stage-detail {
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+  image-rendering: pixelated;
+  pointer-events: none;
+}
+.cafe-stage-detail--window-l,
+.cafe-stage-detail--window-r {
+  background-image: url("../../assets/sprites/props/placeholder-cafe-window-arched.png");
+}
+.cafe-stage-detail--door {
+  background-image: url("../../assets/sprites/props/placeholder-cafe-door.png");
 }
 
 /* Stage-PNG liefert Wände/Boden/Theke visuell — alle Szenen-Positionen
@@ -751,9 +770,9 @@ h3 {
  */
 .cafe-coffee-machine {
   position: absolute;
-  /* Stands on the painted counter top at the L-junction (left end of the bar). */
-  top: -28%;
-  left: 7%;
+  /* Stands on the v06 painted counter top (top face y 54-63), left end of the bar. */
+  top: -69.5%;
+  left: 16.6%;
   width: 22%;
   height: 52%;
   border: 3px solid transparent;
@@ -816,9 +835,10 @@ h3 {
  */
 .cafe-register {
   position: absolute;
-  /* Stands on the right end of the painted counter top. */
-  top: -16%;
-  right: 16%;
+  /* Stands on the right end of the v06 painted counter top; stays inside the
+     zoom-crop window (visible img x <= 87). */
+  top: -57%;
+  right: 30.3%;
   width: 21%;
   height: 48%;
   transform: skewY(2deg);
