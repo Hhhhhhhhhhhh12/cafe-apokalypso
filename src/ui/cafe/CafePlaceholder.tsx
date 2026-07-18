@@ -252,22 +252,22 @@ export function CafePlaceholder({ gameState, onCleanTable }: CafePlaceholderProp
         aria-label={`3/4 café room on Day ${gameState.day}: counter, coffee machine, register, queue, ${gameState.equipment.seating >= 1 ? "two tables, " : "standing room only, "}door, window, storage shelf, and menu board.`}
       >
         {coinTick && (
-          <span key={coinTick.key} className="cafe-coin-tick" aria-hidden="true">
+          <span key={`coin-${coinTick.key}`} className="cafe-coin-tick" aria-hidden="true">
             +€{coinTick.money.toFixed(2)}{coinTick.rep > 0 ? " ★" : ""}
           </span>
         )}
         {serveReaction && (
-          <span key={serveReaction.key} className="cafe-serve-reaction" aria-hidden="true">
+          <span key={`serve-${serveReaction.key}`} className="cafe-serve-reaction" aria-hidden="true">
             {serveReaction.text}
           </span>
         )}
         {ambientEvent && (
-          <span key={ambientEvent.key} className="cafe-ambient-event" aria-hidden="true">
+          <span key={`ambient-${ambientEvent.key}`} className="cafe-ambient-event" aria-hidden="true">
             {ambientEvent.text}
           </span>
         )}
         {kassandraAside && (
-          <span key={kassandraAside.key} className="cafe-kassandra-aside" aria-hidden="true">
+          <span key={`kassandra-${kassandraAside.key}`} className="cafe-kassandra-aside" aria-hidden="true">
             {kassandraAside.text}
           </span>
         )}

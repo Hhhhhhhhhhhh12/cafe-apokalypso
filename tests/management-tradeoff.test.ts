@@ -469,7 +469,9 @@ describe("management tradeoff system", () => {
       taskId: "counter"
     });
 
-    expect(openedState.resources.money).toBe(24);
+    expect(openedState.resources.money).toBe(
+      dayFiveState.resources.money - selectedState.helperAssignment!.dailyCost
+    );
     expect(openedState.helperAssignment?.locked).toBe(true);
     expect(changedState.helperAssignment?.helperId).toBe("jana");
   });
