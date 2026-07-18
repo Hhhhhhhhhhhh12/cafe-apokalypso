@@ -284,6 +284,11 @@ export function CafePlaceholder({ gameState, onCleanTable }: CafePlaceholderProp
           <div className={`cafe-decor-plant2 cafe-decor--tier-${gameState.decor?.plant2 ?? 1}`} aria-hidden="true" />
           <div className={`cafe-furniture-shelf cafe-decor--tier-${gameState.decor?.shelf ?? 1}`} aria-hidden="true" />
 
+          {/* Fantasy pets — cozy décor with a faint twist (#73 world-building) */}
+          <div className="cafe-pet cafe-pet-cat" aria-hidden="true" />
+          <div className="cafe-pet cafe-pet-dragon" aria-hidden="true" />
+          <div className="cafe-pet cafe-pet-fluff" aria-hidden="true" />
+
           {/* CSS back wall — window, menu board, storage shelf */}
           <div className="cafe-back-wall" aria-hidden="true">
             <div className="cafe-window">

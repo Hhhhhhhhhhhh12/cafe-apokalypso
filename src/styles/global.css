@@ -1906,6 +1906,45 @@ button.cafe-table {
 }
 
 /*
+ * Fantasy pets (#73 world-building). Cozy set-dressing with a faint twist —
+ * absolutely positioned in .cafe-world like the décor props. Static poses;
+ * idle animation can layer on later via the *-idle-sheet.png assets.
+ */
+.cafe-pet {
+  position: absolute;
+  z-index: 6;
+  image-rendering: pixelated;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+/* Box sizes mirror each sprite's own aspect ratio and are scaled against a
+   standing guest (108px ≈ an adult), so a cat reads at roughly knee height. */
+.cafe-pet-cat {
+  left: 31%;
+  top: 67%;
+  width: 16px;
+  height: 28px;
+  background-image: url("../../assets/sprites/guests/placeholder-pet-cat.png");
+}
+/* Curled on the counter ledge (top edge sits at 65.9%) like a stray croissant. */
+.cafe-pet-dragon {
+  left: 68%;
+  top: 62.5%;
+  width: 14px;
+  height: 26px;
+  background-image: url("../../assets/sprites/guests/placeholder-pet-dragon.png");
+}
+/* Beside plant2 (78–81.7%), clear of the counter box (starts at 58%/65.9%). */
+.cafe-pet-fluff {
+  left: 74%;
+  top: 58%;
+  width: 16px;
+  height: 20px;
+  background-image: url("../../assets/sprites/guests/placeholder-pet-fluff.png");
+}
+
+/*
  * Wall clock (Pixellab shabby tier-1). Hangs on the back wall between the
  * window and menu board. The weirdness-hint .cafe-clock CSS below is separate
  * and untouched — that's the overlay omen; this is the real décor prop.
