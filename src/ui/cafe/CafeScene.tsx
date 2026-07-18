@@ -8,11 +8,12 @@ import {
   DECOR_SPOTS,
   GUEST_SPOTS,
   PAULA_PATH,
+  STAGE_DETAIL_SPOTS,
   TABLE_SPOTS,
   WEIRDNESS_SPOT,
   spotStyle,
 } from "./scene";
-import stageBaseAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v05-pixellab.png";
+import stageBaseAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v06-pixellab.png";
 import coffeeMachineAsset from "../../../assets/sprites/props/placeholder-cafe-coffee-machine.png";
 import kassandraRegisterAsset from "../../../assets/sprites/props/placeholder-kassandra-register.png";
 import bohnGuestAsset from "../../../assets/sprites/guests/placeholder-guest-bohn.png";
@@ -310,6 +311,10 @@ export function CafeScene({ gameState, onCleanTables }: CafeSceneProps) {
         )}
         <div className="cafe-world" ref={worldRef} onClick={logStageSpot}>
           <img className="cafe-stage-base" src={stageBaseAsset} alt="" aria-hidden="true" />
+          {/* Hochdichte Detail-Sprites über dem 400-px-Shell (Fenster/Tür) */}
+          <div style={spotStyle(STAGE_DETAIL_SPOTS.windowL)} className="cafe-stage-detail cafe-stage-detail--window-l" aria-hidden="true" />
+          <div style={spotStyle(STAGE_DETAIL_SPOTS.windowR)} className="cafe-stage-detail cafe-stage-detail--window-r" aria-hidden="true" />
+          <div style={spotStyle(STAGE_DETAIL_SPOTS.door)} className="cafe-stage-detail cafe-stage-detail--door" aria-hidden="true" />
           {isDusty && <div className="cafe-dust" aria-hidden="true" />}
 
           {/* Décor props — Position aus scene.ts, Tier-Sprite aus der Klasse */}
