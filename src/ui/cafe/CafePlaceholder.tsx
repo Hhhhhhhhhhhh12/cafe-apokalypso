@@ -3,7 +3,8 @@ import type { GameState, TableId } from "../../game/types/game";
 import type { ProductId } from "../../game/types/content";
 import { getDioramaGuestVisibility, getNextGuestPreview, getNarrativeEventCards } from "../../game/engine/selectors";
 import { kassandraMessages } from "../../game/data/kassandra";
-import stageBaseAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-growth-v01.png";
+import floorGrowthAsset from "../../../assets/backgrounds/placeholder-cafe-floor-growth-v01.png";
+import stageShellAsset from "../../../assets/backgrounds/placeholder-cafe-stage-shell-v01.png";
 import coffeeMachineAsset from "../../../assets/sprites/props/placeholder-cafe-coffee-machine.png";
 import kassandraRegisterAsset from "../../../assets/sprites/props/placeholder-kassandra-register.png";
 import bohnGuestAsset from "../../../assets/sprites/guests/placeholder-guest-bohn.png";
@@ -271,7 +272,9 @@ export function CafePlaceholder({ gameState, onCleanTable }: CafePlaceholderProp
           </span>
         )}
         <div className="cafe-world">
-          <img className="cafe-stage-base" src={stageBaseAsset} alt="" aria-hidden="true" />
+          <img className="cafe-floor-base" src={floorGrowthAsset} alt="" aria-hidden="true" />
+          <img className="cafe-floor-growth" src={floorGrowthAsset} alt="" aria-hidden="true" />
+          <img className="cafe-stage-base" src={stageShellAsset} alt="" aria-hidden="true" />
           {isDusty && <div className="cafe-dust" aria-hidden="true" />}
 
           {/* Décor props — positioned absolute via CSS, tier drives sprite */}
