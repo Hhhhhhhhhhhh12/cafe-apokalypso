@@ -6,12 +6,12 @@ KRITISCHE Regel: Immer auf gescheite Diversität der Figuren achten (Hauttöne, 
 ## Befehle
 
 - Dev-Server: `preview_start` mit Name `cafe-apokalypso` (Port 5173, definiert in `.claude/launch.json`)
-- Tests: `npx vitest run` (219 Tests, müssen grün bleiben)
+- Tests: `npx vitest run` (322 Tests, müssen grün bleiben)
 - Für Preview-/Kalibrier-Arbeit: Skill `.claude/skills/cafe-preview/SKILL.md` lesen und befolgen
 
 ## Token-Arbeitsregeln
 
-- `src/styles/global.css` (~2000 Zeilen) NIE komplett lesen → `grep -n` + Read mit offset/limit
+- `src/styles/global.css` (~4000 Zeilen) NIE komplett lesen → `grep -n` + Read mit offset/limit
 - Positionen messen mit `preview_eval` + getBoundingClientRect (Diorama-relativ), NICHT per Screenshot-Iteration
 - Max. 1 Beweis-Screenshot pro Verifikation
 - Breite Codesuchen an den Explore-Subagent geben
@@ -19,17 +19,17 @@ KRITISCHE Regel: Immer auf gescheite Diversität der Figuren achten (Hauttöne, 
 
 ## Diorama-Geometrie (nicht neu herleiten!)
 
-**Aktueller Raum: Stage-PNG-Diorama** — gemaltes PNG als Hintergrund. `.cafe-stage-base { display: block }`. Décor-Sprites (clock/lamp/cups/shelf/plant) sind aktiv als CSS-Overlays. Clock/Lamp sind center-verankert (`left` + `translateX(-50%)`); Lamp steht per `bottom: 37%` auf der Boden-Linie (v04-Fensterglas: 24,7–33,6 % und 65,4–74,4 % Bildbreite, Wand/Boden-Linie ≈ 63 % Höhe).
+**Positionen sind DATEN, kein Magic-Number-CSS mehr.** Seit dem Render-Neustart liegen alle Szenen-Anker in [`src/ui/cafe/scene.ts`](src/ui/cafe/scene.ts) — EIN Koordinatensystem („Stage-%": Prozent der `.cafe-world`-Box, x von links, y von unten). Die Render-Komponente ist [`src/ui/cafe/CafeScene.tsx`](src/ui/cafe/CafeScene.tsx) (flache Sprite-Liste, Positionen inline aus `scene.ts`). `CafePlaceholder.tsx` und das alte Floor-/Queue-/Wall-Container-System sind gelöscht.
 
-**WICHTIG: NIEMALS `.cafe-back-wall` oder `.cafe-side-wall` sichtbar machen oder `.cafe-stage-base` auf `display:none` setzen** — das bricht das Diorama-Layout komplett. Diese sind Positionierungs-Container, nicht visuelle Layer.
+- **Kalibrieren = Zahl in `scene.ts` ändern.** Kein CSS-Positionsblock mehr suchen. Im Dev-Modus loggt ein Klick in die Szene die Stage-%-Koordinate (`[scene] left: …%, bottom: …%`) → direkt übernehmen.
+- **CSS macht nur noch Aussehen**, nicht Ort: Sprite-Größen, Tier-Varianten, Personality-Animationen (breathe/fidget/lean), Filter/Opacity bleiben in `global.css` (Klassen `cafe-decor-*`, `placeholder-guest-normal-NN`, `cafe-table--tier-N`).
 
-- `.cafe-back-wall` = Positionierungs-Container, `display: none` (visuell durch Stage-PNG geliefert). Enthält: `.cafe-window` (display:none), `.cafe-menu-board` (display:none), `.cafe-storage` (rechts, sichtbar als Décor-Slot).
-- `.cafe-side-wall` = Positionierungs-Container, `display: none` (visuell durch Stage-PNG geliefert).
-- `.cafe-floor` = Positionierungs-Container für Gäste: left 5 % / right 6 % / bottom 4 % / height 65 % des Dioramas, `clip-path: polygon(9% 1%, 100% 15%, 88% 100%, 0 84%)`, `background: transparent`. Umrechnung Diorama-% → Floor-%: `floorX = (dioX − 5) / 89 · 100`, `floorY = (dioY − 31) / 65 · 100`.
-- `.cafe-counter` = Positionierungs-Container, `background: transparent` (visuell durch Stage-PNG geliefert). Kaffeemaschine + KASSANDRA-Kasse sind seine Kinder (Sprites).
-- Décor-Tier-Klassen (`cafe-decor--tier-N`) existieren im DOM und sind per CSS sichtbar (Sprites aktiv seit feat/pixel-props-pixellab).
-- Serve-Menü (Produktliste) ist aus dem Diorama heraus in die ActionPanel-Sidebar verlagert (`.serve-menu`). Kein floating UI über dem Spielbereich mehr.
-- Paula-Walk-Choreografie: Phasen-Maschine in CafePlaceholder.tsx (`at-door` → `walking` → `idle`), Tür-Startposition ist relativ zu `.cafe-queue` (left −195 % / bottom 130 %).
+**Hintergrund:** `assets/backgrounds/placeholder-cafe-stage-base-v05-pixellab.png` — echte Pixel-Art aus Pixellab (`create_map_object`, 400×316 roh, 2× nearest-neighbour auf 800×632, Flood-Fill-Freistellung; ersetzt seit PR #150 das gemalte/gepatchte v04). `.cafe-stage-base { display: block; image-rendering: pixelated }` — **nie auf `display:none` setzen**, das PNG ist die einzige Raumdarstellung. Alte v04-Messwerte (Fensterglas 24,7–33,6 % / 65,4–74,4 % Breite, Wand/Boden-Linie ≈ 63 %) sind nur noch Richtwerte; bei Neu-Kalibrierung am v05-PNG messen.
+
+- `.cafe-counter` = Rahmen für Kaffeemaschine + KASSANDRA-Kasse (deren Offsets liegen weiter in CSS-Klassen); Position via `COUNTER_FRAME` in `scene.ts`.
+- `.cafe-storage` = Regal-Slot, aktuell `display:none` (Stage-PNG malt Regale); DOM-Knoten bleibt für Tier-Klassen/Tests, bis ein echtes Sprite kommt.
+- Serve-Menü (Produktliste) liegt in der ActionPanel-Sidebar (`.serve-menu`), nicht im Diorama.
+- Paula-Walk-Choreografie: Phasen-Maschine in `CafeScene.tsx` (`at-door` → `walking` → `idle` → `walking-to-counter` → `exiting-east`), Wegpunkte als `PAULA_PATH` in `scene.ts`.
 
 ## Sprite-Pipeline
 
@@ -53,4 +53,4 @@ KRITISCHE Regel: Immer auf gescheite Diversität der Figuren achten (Hauttöne, 
 - Paula-Objekt: `4f722dd8-810d-488c-b398-9ef6f439d38f` (8 Richtungen, 68×68, aus exaktem Referenz-Sprite). Animationen: paula-idle (Süd, 5 Frames), paula-walk (Ost + Südost, je 7 Frames).
 - Sprite-Sheets bauen: `python3 tools/assemble_sprite_sheet.py out.png frame1.png …` (cleant + bottom-center). Rendern als `background-image` + `steps(N)`-Loop über `background-position` in px (Frame = 108 px), hinter `prefers-reduced-motion: no-preference`; Frame 0 = Original-Sprite als statischer Fallback. Beispiele: `cafe-paula-idle`, `cafe-paula-walk` in global.css.
 - Sitzende Gäste atmen per CSS (`cafe-guest-breathe`, diskreter 1px-Bob, gestaffelte negative delays) — bewusst kein Pixellab (Kosten/Identität).
-- Paula-Walk-Choreografie: Phasen-Maschine in CafePlaceholder.tsx (`at-door` → `walking` → `idle`), Tür-Startposition ist relativ zu `.cafe-queue` (left −195 % / bottom 130 %).
+- Paula-Walk-Choreografie: Phasen-Maschine in `CafeScene.tsx`, Wegpunkte als `PAULA_PATH` in `scene.ts`.
