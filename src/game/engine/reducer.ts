@@ -1941,19 +1941,36 @@ function setNextGuestPatience(state: GameState): GameState {
 }
 
 /**
- * Applies one autonomous helper action (ambient tidying) if the current
- * helper's autonomyLevel allows it: "micromanagement" never acts,
- * "learning" acts on every other idle action, "autonomous" acts on every one.
- * Tracked in dayManagement.helperAutonomousActions for the day-end recap (#131).
+ * Applies one autonomous helper action when the assigned task can actually
+ * perform one. In the current slice, only Jana on cleaning has an ambient
+ * floor task: she clears one specific dirty table. Service, barista, counter,
+ * and marketing keep their explicit serve/open-day effects instead of being
+ * misreported as table cleaning.
+ *
+ * "micromanagement" never acts, "learning" acts on every other idle action,
+ * and "autonomous" acts on every one. The counter only tracks work that was
+ * actually completed, so the day-end recap stays truthful.
  */
 function applyHelperAutonomy(state: GameState, actionsWithoutServing: number): GameState {
-  const level = state.helperAssignment?.autonomyLevel;
+  const assignment = state.helperAssignment;
+  const level = assignment?.autonomyLevel;
 
-  if (!level || level === "micromanagement") {
+  if (
+    !assignment ||
+    assignment.helperId !== "jana" ||
+    assignment.taskId !== "cleaning" ||
+    !level ||
+    level === "micromanagement"
+  ) {
     return state;
   }
 
   if (level === "learning" && actionsWithoutServing % 2 !== 0) {
+    return state;
+  }
+
+  const [tableId, ...remainingDirtyTableIds] = state.dayManagement.dirtyTableIds;
+  if (!tableId) {
     return state;
   }
 
@@ -1965,6 +1982,7 @@ function applyHelperAutonomy(state: GameState, actionsWithoutServing: number): G
     },
     dayManagement: {
       ...state.dayManagement,
+      dirtyTableIds: remainingDirtyTableIds,
       helperAutonomousActions: state.dayManagement.helperAutonomousActions + 1
     }
   };

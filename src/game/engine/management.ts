@@ -455,6 +455,16 @@ export function getHelperAutonomyRecapLine(
     return `You handled everything today. ${name} watched closely — and took notes.`;
   }
 
+  if (assignment.taskId !== "cleaning") {
+    const taskRecaps: Record<Exclude<HelperTaskId, "cleaning">, string> = {
+      service: `${name} kept service moving through the shift.`,
+      barista: `${name} stayed on the coffee machine and watched the quality.`,
+      counter: `${name} kept the counter steady from opening.`,
+      marketing: `${name}'s promotion was ready when you needed it.`
+    };
+    return taskRecaps[assignment.taskId];
+  }
+
   if (assignment.autonomyLevel === "learning") {
     if (autonomousActions === 0) {
       return `${name} waited for instructions today. Tomorrow, maybe more.`;
@@ -500,7 +510,7 @@ export function getHelperTaskLabel(taskId: HelperTaskId): string {
 
 export function getHelperTaskHint(taskId: HelperTaskId): string {
   const hints: Record<HelperTaskId, string> = {
-    cleaning: "Keeps the tables tidy — cleanliness stays above 45 without spending an action. Each serve still drops cleanliness by 2; Jana resets it quietly.",
+    cleaning: "Keeps the floor tidy — Jana can clear a specific marked table without spending your action. Each serve still drops cleanliness by 2; she also keeps it above 45.",
     service: "Serves a second guest on each order — doubles income per action point while the extra-orders pool lasts.",
     barista: "Espresso and cappuccino earn +1 Rep each (up to 3 times today). Nino also uses slightly less milk on milk drinks.",
     counter: "Steady hands at the till reduce opening stress — Nino saves 8 Stress on arrival, Nele saves 5.",
@@ -516,7 +526,7 @@ export function getHelperFlavorLine(
 ): string {
   // Jana — service/cleaning
   if (helperId === "jana" && taskId === "cleaning") {
-    return "Jana cleaned everything. You are not sure when. Cleanliness held above 45 all shift.";
+    return "Jana kept an eye on the floor. When a marked table needed it, she took it without waiting. Cleanliness held above 45 all shift.";
   }
   if (helperId === "jana" && taskId === "service") {
     return "Jana took orders alongside you. Each action served an extra guest — income roughly doubled per round. She remained calm about the menu gaps.";

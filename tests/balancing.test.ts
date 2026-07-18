@@ -430,7 +430,7 @@ describe("helper autonomy state machine", () => {
     expect(state.dayManagement.helperAutonomousActions).toBe(0);
   });
 
-  it("learning/autonomous-level helper accrues autonomous actions on idle (non-serve) actions", () => {
+  it("learning/autonomous-level Jana clears a dirty table on eligible idle actions", () => {
     let learningState = createDayStartState(3);
     learningState = gameReducer(learningState, {
       type: "select_helper",
@@ -440,10 +440,13 @@ describe("helper autonomy state machine", () => {
     learningState = gameReducer(learningState, { type: "open_day" });
     expect(learningState.helperAssignment?.autonomyLevel).toBe("learning");
 
+    learningState = gameReducer(learningState, { type: "serve_product", productId: "filterkaffee" });
+    expect(learningState.dayManagement.dirtyTableIds).toEqual(["left"]);
     for (let i = 0; i < 4; i++) {
       learningState = gameReducer(learningState, { type: "check_supplies" });
     }
     expect(learningState.dayManagement.helperAutonomousActions).toBeGreaterThan(0);
+    expect(learningState.dayManagement.dirtyTableIds).toEqual([]);
 
     let autonomousState = createDayStartState(5);
     autonomousState = gameReducer(autonomousState, {
@@ -454,8 +457,30 @@ describe("helper autonomy state machine", () => {
     autonomousState = gameReducer(autonomousState, { type: "open_day" });
     expect(autonomousState.helperAssignment?.autonomyLevel).toBe("autonomous");
 
+    autonomousState = gameReducer(autonomousState, { type: "serve_product", productId: "filterkaffee" });
+    expect(autonomousState.dayManagement.dirtyTableIds).toEqual(["left"]);
     autonomousState = gameReducer(autonomousState, { type: "check_supplies" });
     expect(autonomousState.dayManagement.helperAutonomousActions).toBe(1);
+    expect(autonomousState.dayManagement.dirtyTableIds).toEqual([]);
+  });
+
+  it.each([
+    ["Jana on service", "jana", "service"],
+    ["Nino on barista", "nino", "barista"],
+    ["Nino on counter", "nino", "counter"],
+    ["Nele on marketing", "nele", "marketing"],
+    ["Nele on counter", "nele", "counter"]
+  ] as const)("does not turn %s into an unassigned cleaning action", (_label, helperId, taskId) => {
+    let state = createDayStartState(5);
+    state = gameReducer(state, { type: "select_helper", helperId, taskId });
+    state = gameReducer(state, { type: "open_day" });
+    state = gameReducer(state, { type: "serve_product", productId: "filterkaffee" });
+    const dirtyTableIds = state.dayManagement.dirtyTableIds;
+
+    state = gameReducer(state, { type: "check_supplies" });
+
+    expect(state.dayManagement.dirtyTableIds).toEqual(dirtyTableIds);
+    expect(state.dayManagement.helperAutonomousActions).toBe(0);
   });
 
   it("Nino (barista) gives reputation bonus for espresso (baristaReputationBonus increments)", () => {

@@ -18,6 +18,17 @@ function assignment(level: HelperAssignment["autonomyLevel"]): HelperAssignment 
   };
 }
 
+function assignmentForTask(
+  helperId: HelperAssignment["helperId"],
+  taskId: HelperAssignment["taskId"]
+): HelperAssignment {
+  return {
+    ...assignment("autonomous"),
+    helperId,
+    taskId
+  };
+}
+
 describe("getHelperAutonomyRecapLine (#131)", () => {
   it("credits the player when no helper was assigned", () => {
     expect(getHelperAutonomyRecapLine(null, 0)).toBe("You handled everything today.");
@@ -48,6 +59,13 @@ describe("getHelperAutonomyRecapLine (#131)", () => {
     expect(getHelperAutonomyRecapLine(assignment("autonomous"), 5)).toContain(
       "The café is starting to run itself."
     );
+  });
+
+  it("keeps non-cleaning helper recaps task-specific", () => {
+    const line = getHelperAutonomyRecapLine(assignmentForTask("nino", "barista"), 3);
+    expect(line).toContain("Nino");
+    expect(line).toContain("coffee machine");
+    expect(line).not.toContain("cleared");
   });
 });
 
@@ -82,14 +100,15 @@ describe("day-end summary integration", () => {
     };
     state = gameReducer(state, { type: "select_helper", helperId: "jana", taskId: "cleaning" });
     state = gameReducer(state, { type: "open_day" });
-    // Non-serve actions trigger ambient autonomous tidying at "autonomous" level
-    state = gameReducer(state, { type: "clean_tables" });
+    state = gameReducer(state, { type: "serve_product", productId: "filterkaffee" });
+    expect(state.dayManagement.dirtyTableIds).toEqual(["left"]);
+
+    // An autonomous cleaner picks up the specific marked table during a non-serve action.
     state = gameReducer(state, { type: "check_supplies" });
     const actions = state.dayManagement.helperAutonomousActions;
     expect(actions).toBeGreaterThan(0);
+    expect(state.dayManagement.dirtyTableIds).toEqual([]);
 
-    // complete_day requires at least one served customer
-    state = gameReducer(state, { type: "serve_product", productId: "filterkaffee" });
     state = gameReducer(state, { type: "complete_day" });
     expect(state.daySummary?.helperAutonomyRecap).toContain("without being asked");
     expect(state.daySummary?.helperAutonomyRecap).toContain(String(actions));
