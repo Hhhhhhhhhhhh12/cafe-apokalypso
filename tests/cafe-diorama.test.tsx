@@ -226,7 +226,6 @@ describe("café diorama view", () => {
   it("keeps a fixed room shell behind the growing usable floor", () => {
     const markup = renderCafe(createInitialGameState());
 
-    expect(markup).toContain("cafe-floor-base");
     expect(markup).toContain("cafe-floor-growth");
     expect(markup).toContain("cafe-stage-base");
   });

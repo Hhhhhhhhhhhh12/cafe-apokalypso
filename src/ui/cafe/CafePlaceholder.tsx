@@ -272,7 +272,6 @@ export function CafePlaceholder({ gameState, onCleanTable }: CafePlaceholderProp
           </span>
         )}
         <div className="cafe-world">
-          <img className="cafe-floor-base" src={floorGrowthAsset} alt="" aria-hidden="true" />
           <img className="cafe-floor-growth" src={floorGrowthAsset} alt="" aria-hidden="true" />
           <img className="cafe-stage-base" src={stageShellAsset} alt="" aria-hidden="true" />
           {isDusty && <div className="cafe-dust" aria-hidden="true" />}

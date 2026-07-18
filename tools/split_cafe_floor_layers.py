@@ -11,9 +11,16 @@ SOURCE = ROOT / "assets/backgrounds/placeholder-cafe-stage-base-growth-v01.png"
 SHELL = ROOT / "assets/backgrounds/placeholder-cafe-stage-shell-v01.png"
 FLOOR = ROOT / "assets/backgrounds/placeholder-cafe-floor-growth-v01.png"
 
-# The four painted floor corners in the 1672 x 941 source.  The wall-panel seam
-# stays on the floor layer, so the floor and the shell meet cleanly at day seven.
-FLOOR_POLYGON = [(76, 596), (758, 345), (1594, 645), (796, 905)]
+# The five painted floor corners in the 1672 x 941 source. The short flat front
+# edge is intentional; omitting its right corner leaves a detached floor wedge
+# in the otherwise transparent wall shell.
+FLOOR_POLYGON = [
+    (76, 596),
+    (758, 345),
+    (1594, 645),
+    (995, 905),
+    (790, 905),
+]
 
 
 def main() -> None:

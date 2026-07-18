@@ -641,10 +641,10 @@ h3 {
   --cream: #fff2d8;
   --teal: #16606c;
   --shadow: rgba(43, 32, 27, 0.28);
-  /* Only the floor expands; walls, counter and furniture keep their scale. */
+  /* Only the front floor edge expands; walls and furniture stay fixed. */
   --cafe-zoom: 1;
   --cafe-pan-x: 0%;
-  --cafe-floor-growth: 0.84;
+  --cafe-floor-tip: 82%;
   position: relative;
   min-height: 0;
   aspect-ratio: 16 / 9;
@@ -699,7 +699,6 @@ h3 {
   position: absolute;
 }
 
-.cafe-floor-base,
 .cafe-floor-growth {
   display: block;
   position: absolute;
@@ -711,17 +710,17 @@ h3 {
   pointer-events: none;
 }
 
-.cafe-floor-base {
-  z-index: 1;
-  filter: brightness(0.54) saturate(0.58) sepia(0.1);
-}
-
 .cafe-floor-growth {
-  z-index: 2;
-  transform: scale(var(--cafe-floor-growth));
-  /* The usable floor unfolds from the counter instead of pulling it away. */
-  transform-origin: 75% 70%;
-  transition: transform 3.6s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1;
+  clip-path: polygon(
+    4.55% 63.34%,
+    45.33% 36.66%,
+    95.34% 68.54%,
+    59.51% var(--cafe-floor-tip),
+    47.25% var(--cafe-floor-tip)
+  );
+  transition: clip-path 3.6s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: clip-path;
 }
 
 .cafe-back-wall,
@@ -733,7 +732,7 @@ h3 {
   display: block;
   position: absolute;
   inset: 0;
-  z-index: 3;
+  z-index: 2;
   width: 100%;
   height: 100%;
   object-fit: fill;
@@ -741,13 +740,13 @@ h3 {
   image-rendering: pixelated;
 }
 
-.cafe-diorama--growth-day-1 { --cafe-floor-growth: 0.84; }
-.cafe-diorama--growth-day-2 { --cafe-floor-growth: 0.867; }
-.cafe-diorama--growth-day-3 { --cafe-floor-growth: 0.893; }
-.cafe-diorama--growth-day-4 { --cafe-floor-growth: 0.92; }
-.cafe-diorama--growth-day-5 { --cafe-floor-growth: 0.947; }
-.cafe-diorama--growth-day-6 { --cafe-floor-growth: 0.973; }
-.cafe-diorama--growth-day-7 { --cafe-floor-growth: 1; }
+.cafe-diorama--growth-day-1 { --cafe-floor-tip: 82%; }
+.cafe-diorama--growth-day-2 { --cafe-floor-tip: 84.37%; }
+.cafe-diorama--growth-day-3 { --cafe-floor-tip: 86.73%; }
+.cafe-diorama--growth-day-4 { --cafe-floor-tip: 89.1%; }
+.cafe-diorama--growth-day-5 { --cafe-floor-tip: 91.47%; }
+.cafe-diorama--growth-day-6 { --cafe-floor-tip: 93.83%; }
+.cafe-diorama--growth-day-7 { --cafe-floor-tip: 96.2%; }
 
 @media (prefers-reduced-motion: reduce) {
   .cafe-floor-growth { transition: none; }
@@ -900,10 +899,10 @@ h3 {
   right: 6%;
   bottom: 4%;
   left: 5%;
-  z-index: 2;
+  z-index: 4;
   height: 65%;
-  clip-path: polygon(9% 1%, 100% 15%, 88% 100%, 0 84%);
-  overflow: hidden;
+  clip-path: none;
+  overflow: visible;
   border: 3px solid transparent;
   background: transparent;
   box-shadow: none;
@@ -934,12 +933,13 @@ h3 {
 }
 
 .cafe-counter {
-  /* Fixed on the day-one floor; it does not move as the room opens up. */
-  top: 45%;
-  left: 53%;
+  /* Fixed furniture overlay; independent from the growing floor mask. */
+  top: 29%;
+  left: 62%;
   z-index: 4;
-  width: 43.8%;
-  height: 33.8%;
+  width: 31.5%;
+  height: auto;
+  aspect-ratio: 384 / 224;
   border: none;
   border-radius: 7px;
   background: transparent;
@@ -976,8 +976,8 @@ h3 {
 .cafe-coffee-machine {
   position: absolute;
   /* Stands on the painted counter top at the L-junction (left end of the bar). */
-  top: -28%;
-  left: 7%;
+  top: -8%;
+  left: 13%;
   width: 22%;
   height: 52%;
   border: 3px solid transparent;
@@ -1041,8 +1041,8 @@ h3 {
 .cafe-register {
   position: absolute;
   /* Stands on the right end of the painted counter top. */
-  top: -16%;
-  right: 16%;
+  top: -3%;
+  right: 8%;
   width: 21%;
   height: 48%;
   transform: skewY(2deg);
@@ -1149,8 +1149,9 @@ h3 {
  */
 .cafe-table {
   z-index: 5;
-  width: 22%;
-  height: 26%;
+  width: 14%;
+  height: auto;
+  aspect-ratio: 1;
   /* Furniture-free Stage Base (nofurniture-fix) paints no tables, so the bought
      seating shows the real pixel sprite instead of the old CSS ghost boxes.
      Sub-shapes (__top / chairs / pseudo legs) are neutralised below. */
@@ -1221,13 +1222,13 @@ button.cafe-table {
 }
 
 .cafe-table--left {
-  left: 23%;
-  bottom: 32%;
+  top: 40%;
+  left: 25%;
 }
 
 .cafe-table--right {
-  right: 31%;
-  bottom: 30%;
+  top: 42%;
+  left: 43%;
 }
 
 /* Back table — sits in the gap between Bohn and the counter/machine, further
@@ -1235,10 +1236,11 @@ button.cafe-table {
    two front tables. Hosts Nele + Fatou instead of crowding a third chair
    onto the front tables (whose sprite only draws two chairs). */
 .cafe-table--back {
-  left: 45%;
-  bottom: 47%;
-  width: 18%;
-  height: 16%;
+  top: 25%;
+  left: 35%;
+  width: 12%;
+  height: auto;
+  aspect-ratio: 1;
 }
 
 .cafe-table__top {
@@ -4171,11 +4173,9 @@ button.cafe-table {
   box-shadow: none !important;
 }
 
-/* === CSS-Diorama dauerhaft deaktiviert — nur das PNG (.cafe-stage-base) ist Hintergrund ===
-   Hard-Override: der gemalte Hintergrund ist die einzige Raumdarstellung. Die
-   Struktur-Container (.cafe-floor/.cafe-counter) bleiben als unsichtbare
-   Positionierungs-Boxen erhalten, damit Maschine/Kasse/Props weiter ankern.
-   cafe-counter__front/ledge bleiben sichtbar (furniture-free Hintergrund hat keine gemalte Theke). */
+/* === CSS-Diorama dauerhaft deaktiviert — Floor- und Shell-PNG bilden den Raum ===
+   Die Struktur-Container bleiben als ungeclippte Möbel-Ebene erhalten, damit
+   Maschine, Kasse, Tische und Gäste unabhängig vom Boden-Reveal ankern. */
 .cafe-stage-base { display: block !important; }
 .cafe-back-wall,
 .cafe-side-wall,
