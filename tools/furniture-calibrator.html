@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Café Apokalypso – Möbel anordnen</title>
+  <style>
+    :root{--paper:#f4eadf;--cream:#fff8ed;--ink:#3d2a23;--wine:#92332f;--teal:#16606c;--amber:#b8762a;--line:#bfa994}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.4 ui-rounded,"Avenir Next",system-ui,sans-serif}
+    header{display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:14px 18px;border-bottom:2px solid var(--ink);background:var(--cream)}
+    h1{margin:0;font-size:20px}.sub{color:#765e51;font-size:13px}.days{display:flex;gap:4px;margin-left:auto}
+    button,input{font:inherit}.day,.ghost,.primary{border:2px solid var(--ink);border-radius:8px;padding:7px 11px;cursor:pointer;background:var(--cream);color:var(--ink)}
+    .day.on{background:var(--teal);color:white}.primary{background:var(--wine);color:white;font-weight:700}.ghost:hover,.day:hover{background:#eadccd}
+    main{display:grid;grid-template-columns:minmax(560px,1fr) 320px;gap:16px;padding:16px;align-items:start}
+    .stage-card,.panel{border:2px solid var(--ink);border-radius:12px;background:var(--cream);box-shadow:4px 5px 0 rgba(61,42,35,.16)}
+    .stage-card{padding:10px}.stage{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;background:#d4bfa0;border-radius:7px;touch-action:none;user-select:none}
+    .layer{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;pointer-events:none;image-rendering:pixelated}
+    .floor{z-index:1;clip-path:polygon(4.55% 63.34%,45.33% 36.66%,95.34% 68.54%,59.51% var(--tip),47.25% var(--tip))}.shell{z-index:2}
+    .grid{display:none;position:absolute;inset:0;z-index:20;pointer-events:none;background-image:linear-gradient(rgba(22,96,108,.18) 1px,transparent 1px),linear-gradient(90deg,rgba(22,96,108,.18) 1px,transparent 1px);background-size:5% 5%}.stage.show-grid .grid{display:block}
+    .safe{position:absolute;inset:0;z-index:19;width:100%;height:100%;pointer-events:none}.safe polygon{fill:rgba(22,96,108,.035);stroke:rgba(22,96,108,.7);stroke-width:.35;stroke-dasharray:1.2 1}
+    .item{position:absolute;z-index:7;cursor:grab;touch-action:none}.item:active{cursor:grabbing}.item img{display:block;width:100%;height:auto;image-rendering:pixelated;pointer-events:none}
+    .item.sel::after{content:attr(data-label);position:absolute;left:50%;bottom:100%;transform:translate(-50%,-4px);padding:2px 6px;border-radius:5px;background:var(--teal);color:white;font-size:11px;white-space:nowrap}
+    .item.sel{filter:drop-shadow(0 0 2px white) drop-shadow(0 0 2px var(--teal))}.stage.show-box .item{outline:1px dashed var(--amber)}
+    .item.unsafe{filter:drop-shadow(0 0 3px #d02f2f)}.item.unsafe.sel::after{background:#a52b2b}
+    .panel{padding:14px;position:sticky;top:12px}.panel h2{font-size:16px;margin:0 0 10px}.objects{display:grid;gap:7px}
+    .object{display:flex;align-items:center;justify-content:space-between;width:100%;padding:9px 10px;border:2px solid #ccb8a5;border-radius:8px;background:#fffaf2;cursor:pointer;text-align:left}.object.on{border-color:var(--teal);background:#e8f2ef}.badge{font-size:11px;padding:2px 6px;border-radius:99px;background:#dcebe6;color:#245b50}.badge.bad{background:#f6d8cc;color:#8f2c22}
+    .status{margin:10px 0;padding:9px;border-left:4px solid var(--teal);background:#e8f2ef;border-radius:5px}.status.bad{border-color:#b33a2c;background:#f8ddd4}
+    label{display:block;font-weight:700;margin-top:12px}.range-row{display:grid;grid-template-columns:34px 1fr 34px 50px;gap:6px;align-items:center;margin-top:6px}.range-row button{height:34px;border:1px solid var(--line);border-radius:6px;background:white;cursor:pointer}.range-row output{text-align:right;font-variant-numeric:tabular-nums}
+    .checks{display:flex;gap:12px;flex-wrap:wrap;margin:13px 0}.checks label{margin:0;font-weight:500}.actions{display:flex;gap:7px;flex-wrap:wrap}.css{white-space:pre-wrap;max-height:230px;overflow:auto;margin:12px 0 0;padding:9px;border:1px solid #d1bdab;border-radius:7px;background:#2f2927;color:#f8ead8;font:11px/1.4 ui-monospace,SFMono-Regular,monospace}
+    .help{font-size:12px;color:#765e51;margin:10px 0 0}.sr{position:absolute;clip:rect(0,0,0,0)}
+    @media(max-width:980px){main{grid-template-columns:1fr}.panel{position:static}.days{margin-left:0}}
+  </style>
+</head>
+<body>
+  <header>
+    <div><h1>☕ Möbel anordnen</h1><div class="sub">Ziehen, Größe einstellen, Tag-1-Boden prüfen</div></div>
+    <div class="days" id="days" aria-label="Café-Tag"></div>
+  </header>
+  <main>
+    <section class="stage-card">
+      <div class="stage" id="stage" style="--tip:82%">
+        <img class="layer floor" src="../assets/backgrounds/placeholder-cafe-floor-growth-v01.png" alt="">
+        <img class="layer shell" src="../assets/backgrounds/placeholder-cafe-stage-shell-v01.png" alt="">
+        <svg class="safe" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polygon id="safe-poly"></polygon></svg>
+        <div class="grid"></div>
+      </div>
+    </section>
+    <aside class="panel">
+      <h2>Was möchtest du bewegen?</h2>
+      <div class="objects" id="objects"></div>
+      <div class="status" id="status">Tag 1 sicher</div>
+      <label for="size">Größe</label>
+      <div class="range-row"><button id="minus" title="Kleiner">−</button><input id="size" type="range" min="60" max="140" value="100"><button id="plus" title="Größer">+</button><output id="size-out">100 %</output></div>
+      <div class="checks">
+        <label><input id="grid" type="checkbox"> Raster</label>
+        <label><input id="box" type="checkbox"> Bildrand prüfen</label>
+      </div>
+      <div class="actions"><button class="primary" id="copy">Positionen kopieren</button><button class="ghost" id="reset">Objekt zurücksetzen</button><button class="ghost" id="reset-all">Alle zurücksetzen</button></div>
+      <pre class="css" id="css"></pre>
+      <p class="help">Ziehen = bewegen · Pfeiltasten = 1 px · Shift + Pfeil = 8 px. Rot bedeutet: Die Standfläche liegt an Tag 1 außerhalb des Bodens.</p>
+    </aside>
+  </main>
+  <script>
+    const FLOOR={left:5,top:31,width:89,height:65};
+    const TIPS=[82,84.37,86.73,89.1,91.47,93.83,96.2];
+    const DAY1=[[4.55,63.34],[45.33,36.66],[95.34,68.54],[59.51,82],[47.25,82]];
+    const defaults=[
+      {id:'left',label:'Tisch links',selector:'.cafe-table--left',kind:'table',x:27.58,y:57.04,w:12.28,ratio:1,src:'../assets/sprites/props/placeholder-table-chair-set-v2.png'},
+      {id:'right',label:'Tisch rechts',selector:'.cafe-table--right',kind:'table',x:43.36,y:58.30,w:12.28,ratio:1,src:'../assets/sprites/props/placeholder-table-chair-set-v2.png'},
+      {id:'back',label:'Tisch hinten',selector:'.cafe-table--back',kind:'table',x:36.35,y:47.59,w:10.52,ratio:1,src:'../assets/sprites/props/placeholder-table-chair-set-v2.png'},
+      {id:'plant',label:'Pflanze',selector:'.cafe-decor-plant',kind:'plant',x:17.4,y:55.4,w:7.79,ratio:68/80,src:'../assets/sprites/props/placeholder-cafe-plant.png'}
+    ];
+    const storeKey='cafe-apokalypso.furniture-calibrator.v1';
+    let saved={};try{saved=JSON.parse(localStorage.getItem(storeKey)||'{}')}catch{}
+    let items=defaults.map(d=>({...d,...saved[d.id]}));let selected='left',day=1,drag=null;
+    const stage=document.querySelector('#stage'),objects=document.querySelector('#objects'),size=document.querySelector('#size'),sizeOut=document.querySelector('#size-out'),status=document.querySelector('#status'),cssOut=document.querySelector('#css');
+    document.querySelector('#safe-poly').setAttribute('points',DAY1.map(p=>p.join(',')).join(' '));
+    const pointInPoly=(p,poly)=>{let inside=false;for(let i=0,j=poly.length-1;i<poly.length;j=i++){const [xi,yi]=poly[i],[xj,yj]=poly[j];if(((yi>p[1])!==(yj>p[1]))&&(p[0]<(xj-xi)*(p[1]-yi)/(yj-yi)+xi))inside=!inside}return inside};
+    const heightPct=p=>p.w*(16/9)/p.ratio;
+    const safe=p=>{const h=heightPct(p),foot=p.kind==='plant'?[[p.x+p.w*.38,p.y+h*.94],[p.x+p.w*.62,p.y+h*.94]]:[[p.x+p.w*.17,p.y+h*.88],[p.x+p.w*.83,p.y+h*.88]];return foot.every(pt=>pointInPoly(pt,DAY1))};
+    const persist=()=>{const out={};items.forEach(p=>out[p.id]={x:p.x,y:p.y,w:p.w});localStorage.setItem(storeKey,JSON.stringify(out))};
+    function cssText(){return items.map(p=>{if(p.kind==='table'){const left=(p.x-FLOOR.left)/FLOOR.width*100,top=(p.y-FLOOR.top)/FLOOR.height*100,width=p.w/FLOOR.width*100;return `${p.selector} {\n  left: ${left.toFixed(2)}%;\n  top: ${top.toFixed(2)}%;\n  width: ${width.toFixed(2)}%;\n  height: auto;\n  aspect-ratio: 1;\n}`}const scale=p.w/defaults.find(d=>d.id===p.id).w;return `${p.selector} {\n  left: ${p.x.toFixed(2)}%;\n  top: ${p.y.toFixed(2)}%;\n  width: ${Math.round(68*scale)}px;\n  height: ${Math.round(80*scale)}px;\n}`}).join('\n\n')}
+    function render(){
+      stage.style.setProperty('--tip',TIPS[day-1]+'%');stage.querySelectorAll('.item').forEach(n=>n.remove());
+      items.forEach(p=>{const el=document.createElement('div');el.className='item'+(p.id===selected?' sel':'')+(safe(p)?'':' unsafe');el.dataset.id=p.id;el.dataset.label=p.label;el.style.left=p.x+'%';el.style.top=p.y+'%';el.style.width=p.w+'%';el.innerHTML=`<img src="${p.src}" alt="${p.label}">`;el.addEventListener('pointerdown',down);stage.appendChild(el)});
+      objects.innerHTML='';items.forEach(p=>{const b=document.createElement('button');b.className='object'+(p.id===selected?' on':'');b.innerHTML=`<span>${p.label}</span><span class="badge ${safe(p)?'':'bad'}">${safe(p)?'Tag 1 sicher':'außerhalb'}</span>`;b.onclick=()=>{selected=p.id;render()};objects.appendChild(b)});
+      const current=items.find(p=>p.id===selected),base=defaults.find(p=>p.id===selected);const pct=Math.round(current.w/base.w*100);size.value=pct;sizeOut.textContent=pct+' %';const okay=safe(current);status.className='status'+(okay?'':' bad');status.textContent=okay?'Tag 1 sicher':'Steht an Tag 1 außerhalb des Bodens';cssOut.textContent=cssText();persist();
+      document.querySelectorAll('.day').forEach((b,i)=>b.classList.toggle('on',i===day-1));
+    }
+    function down(e){selected=e.currentTarget.dataset.id;const p=items.find(x=>x.id===selected),r=stage.getBoundingClientRect();drag={p,sx:e.clientX,sy:e.clientY,x:p.x,y:p.y,w:r.width,h:r.height};e.currentTarget.setPointerCapture(e.pointerId);render();e.preventDefault()}
+    addEventListener('pointermove',e=>{if(!drag)return;drag.p.x=+(drag.x+(e.clientX-drag.sx)/drag.w*100).toFixed(2);drag.p.y=+(drag.y+(e.clientY-drag.sy)/drag.h*100).toFixed(2);render()});addEventListener('pointerup',()=>drag=null);
+    function resizeSelected(value){const p=items.find(x=>x.id===selected),base=defaults.find(x=>x.id===selected),h0=heightPct(p),cx=p.x+p.w/2,feet=p.y+h0;p.w=+(base.w*value/100).toFixed(2);const h=heightPct(p);p.x=+(cx-p.w/2).toFixed(2);p.y=+(feet-h).toFixed(2);render()}
+    size.oninput=()=>resizeSelected(+size.value);document.querySelector('#minus').onclick=()=>resizeSelected(Math.max(60,+size.value-1));document.querySelector('#plus').onclick=()=>resizeSelected(Math.min(140,+size.value+1));
+    document.querySelector('#grid').onchange=e=>stage.classList.toggle('show-grid',e.target.checked);document.querySelector('#box').onchange=e=>stage.classList.toggle('show-box',e.target.checked);
+    document.querySelector('#copy').onclick=async e=>{try{await navigator.clipboard.writeText(cssText());e.currentTarget.textContent='Kopiert ✓';setTimeout(()=>e.currentTarget.textContent='Positionen kopieren',1500)}catch{cssOut.focus();alert('Bitte den CSS-Block unten manuell kopieren.')}};
+    document.querySelector('#reset').onclick=()=>{const i=items.findIndex(p=>p.id===selected),d=defaults[i];items[i]={...d};render()};document.querySelector('#reset-all').onclick=()=>{items=defaults.map(d=>({...d}));render()};
+    addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))return;const p=items.find(x=>x.id===selected),r=stage.getBoundingClientRect(),step=e.shiftKey?8:1;p.x+=({ArrowLeft:-step,ArrowRight:step}[e.key]||0)/r.width*100;p.y+=({ArrowUp:-step,ArrowDown:step}[e.key]||0)/r.height*100;render();e.preventDefault()});
+    const days=document.querySelector('#days');TIPS.forEach((_,i)=>{const b=document.createElement('button');b.className='day';b.textContent='Tag '+(i+1);b.onclick=()=>{day=i+1;render()};days.appendChild(b)});render();
+  </script>
+</body>
+</html>

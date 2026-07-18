@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "calibrate:furniture": "vite --host 127.0.0.1 --open /cafe-apokalypso/tools/furniture-calibrator.html",
     "build": "vite build",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
