@@ -34,7 +34,7 @@
 </head>
 <body>
   <header>
-    <div><h1>☕ Möbel anordnen</h1><div class="sub">Ziehen, Größe einstellen, Tag-1-Boden prüfen</div></div>
+    <div><h1>☕ Möbel anordnen</h1><div class="sub">Alle losen Möbel ziehen, Größe einstellen, Tag-1-Boden prüfen</div></div>
     <div class="days" id="days" aria-label="Café-Tag"></div>
   </header>
   <main>
@@ -58,7 +58,7 @@
       </div>
       <div class="actions"><button class="primary" id="copy">Positionen kopieren</button><button class="ghost" id="reset">Objekt zurücksetzen</button><button class="ghost" id="reset-all">Alle zurücksetzen</button></div>
       <pre class="css" id="css"></pre>
-      <p class="help">Ziehen = bewegen · Pfeiltasten = 1 px · Shift + Pfeil = 8 px. Rot bedeutet: Die Standfläche liegt an Tag 1 außerhalb des Bodens.</p>
+      <p class="help">Ziehen = bewegen · Pfeiltasten = 1 px · Shift + Pfeil = 8 px. Rot bedeutet bei Tischen: Die Standfläche liegt an Tag 1 außerhalb des Bodens. Maschine und Kasse bleiben beim Export relativ zur Theke.</p>
     </aside>
   </main>
   <script>
@@ -66,26 +66,30 @@
     const TIPS=[82,84.37,86.73,89.1,91.47,93.83,96.2];
     const DAY1=[[4.55,63.34],[45.33,36.66],[95.34,68.54],[59.51,82],[47.25,82]];
     const defaults=[
-      {id:'left',label:'Tisch links',selector:'.cafe-table--left',kind:'table',x:27.58,y:57.04,w:12.28,ratio:1,src:'../assets/sprites/props/placeholder-table-chair-set-v2.png'},
-      {id:'right',label:'Tisch rechts',selector:'.cafe-table--right',kind:'table',x:43.36,y:58.30,w:12.28,ratio:1,src:'../assets/sprites/props/placeholder-table-chair-set-v2.png'},
-      {id:'back',label:'Tisch hinten',selector:'.cafe-table--back',kind:'table',x:36.35,y:47.59,w:10.52,ratio:1,src:'../assets/sprites/props/placeholder-table-chair-set-v2.png'},
-      {id:'plant',label:'Pflanze',selector:'.cafe-decor-plant',kind:'plant',x:17.4,y:55.4,w:7.79,ratio:68/80,src:'../assets/sprites/props/placeholder-cafe-plant.png'}
+      {id:'left',label:'Tisch links',selector:'.cafe-table--left',space:'floor',kind:'table',x:29.68,y:48.03,w:12.28,ratio:1,z:7,src:'../assets/sprites/props/placeholder-table-chair-set-v2.png'},
+      {id:'right',label:'Tisch rechts',selector:'.cafe-table--right',space:'floor',kind:'table',x:51.54,y:48.15,w:12.28,ratio:1,z:7,src:'../assets/sprites/props/placeholder-table-chair-set-v2.png'},
+      {id:'back',label:'Tisch hinten',selector:'.cafe-table--back',space:'floor',kind:'table',x:40.76,y:39.68,w:10.52,ratio:1,z:7,src:'../assets/sprites/props/placeholder-table-chair-set-v2.png'},
+      {id:'plant',label:'Pflanze',selector:'.cafe-decor-plant',space:'world-px',kind:'plant',x:14.92,y:49.60,w:5.04,ratio:44/52,pixelWidth:44,pixelHeight:52,z:6,src:'../assets/sprites/props/placeholder-cafe-plant.png'},
+      {id:'shelf',label:'Regal',selector:'.cafe-furniture-shelf',space:'world',kind:'wall',x:31,y:31,w:18,ratio:224/144,z:5,src:'../assets/sprites/props/placeholder-cafe-shelf-v2.png'},
+      {id:'counter',label:'Theke',selector:'.cafe-counter',space:'floor',kind:'fixed',x:60.18,y:49.85,w:28.04,ratio:384/224,z:4,src:'../assets/sprites/props/placeholder-cafe-counter-v2.png'},
+      {id:'machine',label:'Maschine',selector:'.cafe-coffee-machine',space:'counter',kind:'fixed',x:63.27,y:47.03,w:7.28,ratio:64/48,z:8,src:'../assets/sprites/props/placeholder-cafe-coffee-machine.png'},
+      {id:'register',label:'Kasse',selector:'.cafe-register',space:'counter',kind:'fixed',x:78.32,y:43.68,w:9.42,ratio:48/32,z:8,src:'../assets/sprites/props/placeholder-kassandra-register.png'}
     ];
-    const storeKey='cafe-apokalypso.furniture-calibrator.v1';
+    const storeKey='cafe-apokalypso.furniture-calibrator.v2';
     let saved={};try{saved=JSON.parse(localStorage.getItem(storeKey)||'{}')}catch{}
     let items=defaults.map(d=>({...d,...saved[d.id]}));let selected='left',day=1,drag=null;
     const stage=document.querySelector('#stage'),objects=document.querySelector('#objects'),size=document.querySelector('#size'),sizeOut=document.querySelector('#size-out'),status=document.querySelector('#status'),cssOut=document.querySelector('#css');
     document.querySelector('#safe-poly').setAttribute('points',DAY1.map(p=>p.join(',')).join(' '));
     const pointInPoly=(p,poly)=>{let inside=false;for(let i=0,j=poly.length-1;i<poly.length;j=i++){const [xi,yi]=poly[i],[xj,yj]=poly[j];if(((yi>p[1])!==(yj>p[1]))&&(p[0]<(xj-xi)*(p[1]-yi)/(yj-yi)+xi))inside=!inside}return inside};
     const heightPct=p=>p.w*(16/9)/p.ratio;
-    const safe=p=>{const h=heightPct(p),foot=p.kind==='plant'?[[p.x+p.w*.38,p.y+h*.94],[p.x+p.w*.62,p.y+h*.94]]:[[p.x+p.w*.17,p.y+h*.88],[p.x+p.w*.83,p.y+h*.88]];return foot.every(pt=>pointInPoly(pt,DAY1))};
+    const safe=p=>{if(p.kind!=='table')return true;const h=heightPct(p),foot=[[p.x+p.w*.17,p.y+h*.88],[p.x+p.w*.83,p.y+h*.88]];return foot.every(pt=>pointInPoly(pt,DAY1))};
     const persist=()=>{const out={};items.forEach(p=>out[p.id]={x:p.x,y:p.y,w:p.w});localStorage.setItem(storeKey,JSON.stringify(out))};
-    function cssText(){return items.map(p=>{if(p.kind==='table'){const left=(p.x-FLOOR.left)/FLOOR.width*100,top=(p.y-FLOOR.top)/FLOOR.height*100,width=p.w/FLOOR.width*100;return `${p.selector} {\n  left: ${left.toFixed(2)}%;\n  top: ${top.toFixed(2)}%;\n  width: ${width.toFixed(2)}%;\n  height: auto;\n  aspect-ratio: 1;\n}`}const scale=p.w/defaults.find(d=>d.id===p.id).w;return `${p.selector} {\n  left: ${p.x.toFixed(2)}%;\n  top: ${p.y.toFixed(2)}%;\n  width: ${Math.round(68*scale)}px;\n  height: ${Math.round(80*scale)}px;\n}`}).join('\n\n')}
+    function cssText(){return items.map(p=>{const base=defaults.find(d=>d.id===p.id);if(p.space==='floor'){const left=(p.x-FLOOR.left)/FLOOR.width*100,top=(p.y-FLOOR.top)/FLOOR.height*100,width=p.w/FLOOR.width*100;return `${p.selector} {\n  left: ${left.toFixed(2)}%;\n  top: ${top.toFixed(2)}%;\n  width: ${width.toFixed(2)}%;\n  height: auto;\n  aspect-ratio: ${p.kind==='table'?'1':p.ratio.toFixed(3)};\n}`}if(p.space==='counter'){const counter=items.find(x=>x.id==='counter'),counterH=heightPct(counter),left=(p.x-counter.x)/counter.w*100,top=(p.y-counter.y)/counterH*100,width=p.w/counter.w*100;return `${p.selector} {\n  left: ${left.toFixed(2)}%;\n  ${p.id==='register'?'right: auto;\n  ':''}top: ${top.toFixed(2)}%;\n  width: ${width.toFixed(2)}%;\n  height: auto;\n  aspect-ratio: ${p.ratio.toFixed(3)};\n}`}if(p.space==='world-px'){const scale=p.w/base.w;return `${p.selector} {\n  left: ${p.x.toFixed(2)}%;\n  top: ${p.y.toFixed(2)}%;\n  width: ${Math.round(p.pixelWidth*scale)}px;\n  height: ${Math.round(p.pixelHeight*scale)}px;\n}`}return `${p.selector} {\n  left: ${p.x.toFixed(2)}%;\n  top: ${p.y.toFixed(2)}%;\n  width: ${p.w.toFixed(2)}%;\n  height: auto;\n  aspect-ratio: ${p.ratio.toFixed(3)};\n}`}).join('\n\n')}
     function render(){
       stage.style.setProperty('--tip',TIPS[day-1]+'%');stage.querySelectorAll('.item').forEach(n=>n.remove());
-      items.forEach(p=>{const el=document.createElement('div');el.className='item'+(p.id===selected?' sel':'')+(safe(p)?'':' unsafe');el.dataset.id=p.id;el.dataset.label=p.label;el.style.left=p.x+'%';el.style.top=p.y+'%';el.style.width=p.w+'%';el.innerHTML=`<img src="${p.src}" alt="${p.label}">`;el.addEventListener('pointerdown',down);stage.appendChild(el)});
-      objects.innerHTML='';items.forEach(p=>{const b=document.createElement('button');b.className='object'+(p.id===selected?' on':'');b.innerHTML=`<span>${p.label}</span><span class="badge ${safe(p)?'':'bad'}">${safe(p)?'Tag 1 sicher':'außerhalb'}</span>`;b.onclick=()=>{selected=p.id;render()};objects.appendChild(b)});
-      const current=items.find(p=>p.id===selected),base=defaults.find(p=>p.id===selected);const pct=Math.round(current.w/base.w*100);size.value=pct;sizeOut.textContent=pct+' %';const okay=safe(current);status.className='status'+(okay?'':' bad');status.textContent=okay?'Tag 1 sicher':'Steht an Tag 1 außerhalb des Bodens';cssOut.textContent=cssText();persist();
+      items.forEach(p=>{const el=document.createElement('div');el.className='item'+(p.id===selected?' sel':'')+(safe(p)?'':' unsafe');el.dataset.id=p.id;el.dataset.label=p.label;el.style.left=p.x+'%';el.style.top=p.y+'%';el.style.width=p.w+'%';el.style.zIndex=p.z;el.innerHTML=`<img src="${p.src}" alt="${p.label}">`;el.addEventListener('pointerdown',down);stage.appendChild(el)});
+      objects.innerHTML='';items.forEach(p=>{const floorCheck=p.kind==='table',okay=safe(p),badge=floorCheck?(okay?'Tag 1 sicher':'außerhalb'):'verschiebbar';const b=document.createElement('button');b.className='object'+(p.id===selected?' on':'');b.innerHTML=`<span>${p.label}</span><span class="badge ${okay?'':'bad'}">${badge}</span>`;b.onclick=()=>{selected=p.id;render()};objects.appendChild(b)});
+      const current=items.find(p=>p.id===selected),base=defaults.find(p=>p.id===selected);const pct=Math.round(current.w/base.w*100);size.value=pct;sizeOut.textContent=pct+' %';const okay=safe(current),floorCheck=current.kind==='table';status.className='status'+(okay?'':' bad');status.textContent=floorCheck?(okay?'Tag 1 sicher':'Steht an Tag 1 außerhalb des Bodens'):'Frei verschiebbar';cssOut.textContent=cssText();persist();
       document.querySelectorAll('.day').forEach((b,i)=>b.classList.toggle('on',i===day-1));
     }
     function down(e){selected=e.currentTarget.dataset.id;const p=items.find(x=>x.id===selected),r=stage.getBoundingClientRect();drag={p,sx:e.clientX,sy:e.clientY,x:p.x,y:p.y,w:r.width,h:r.height};e.currentTarget.setPointerCapture(e.pointerId);render();e.preventDefault()}

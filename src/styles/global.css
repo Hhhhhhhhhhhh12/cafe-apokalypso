@@ -1222,13 +1222,19 @@ button.cafe-table {
 }
 
 .cafe-table--left {
-  top: 40%;
-  left: 25%;
+  top: 26.20%;
+  left: 27.73%;
+  width: 13.80%;
+  height: auto;
+  aspect-ratio: 1;
 }
 
 .cafe-table--right {
-  top: 42%;
-  left: 43%;
+  top: 26.38%;
+  left: 52.29%;
+  width: 13.80%;
+  height: auto;
+  aspect-ratio: 1;
 }
 
 /* Back table — sits in the gap between Bohn and the counter/machine, further
@@ -1236,9 +1242,9 @@ button.cafe-table {
    two front tables. Hosts Nele + Fatou instead of crowding a third chair
    onto the front tables (whose sprite only draws two chairs). */
 .cafe-table--back {
-  top: 25%;
-  left: 35%;
-  width: 12%;
+  top: 13.35%;
+  left: 40.18%;
+  width: 11.82%;
   height: auto;
   aspect-ratio: 1;
 }
@@ -1823,11 +1829,11 @@ button.cafe-table {
 }
 
 .cafe-decor-plant {
-  left: 17.4%;
-  top: 55.4%;
+  left: 14.92%;
+  top: 49.60%;
   z-index: 5;
-  width: 68px;
-  height: 80px;
+  width: 44px;
+  height: 52px;
   background: url("../../assets/sprites/props/placeholder-cafe-plant.png") center bottom / contain no-repeat;
   image-rendering: pixelated;
 }
@@ -1859,8 +1865,6 @@ button.cafe-table {
 .cafe-decor-plant.cafe-decor--tier-3 {
   opacity: 1;
   background-image: url("../../assets/sprites/props/placeholder-cafe-plant-t3.png");
-  width: 60px;
-  height: 80px;
 }
 
 /* Counter pot plant (plant2) — small herb/succulent sitting on the counter surface. */
