@@ -50,13 +50,19 @@ Details: Abschnitt „Diorama-Geometrie" in `AGENTS.md`/`CLAUDE.md`.
 
 ## Nächste Schritte
 
-Offene, umrissene Arbeit steht als GitHub-Issues mit Labels **`codex-ready`**
-bzw. **`claude-ready`**. Einstieg: Issues nach diesen Labels filtern. Größere
-Schwerpunkte zum Zeitpunkt der Übergabe:
+Offene, umrissene Arbeit steht als GitHub-Issues; für Agenten vorbereitete
+Tickets tragen das Label **`codex-ready`** bzw. **`claude-ready`**. Konkret zum
+Zeitpunkt der Übergabe:
 
-1. Gäste-/Tisch-/Theken-Spots in `scene.ts` auf die v06-Stage nach-kalibrieren.
-2. Sprite-Qualität einzelner Gäste (zu dunkel / zu niedrig aufgelöst).
-3. Repo-Hygiene: alte Stashes und verwaiste Branches auflösen.
+1. **#169** — Gäste-/Tisch-/Theken-Spots in `scene.ts` auf die v06-Stage
+   nach-kalibrieren (`codex-ready`; klar umrissen, guter Einstieg).
+2. **#170** — Sprite-Qualität: Cem zu dunkel, vier Gäste-Sprites zu niedrig
+   aufgelöst.
+3. **#171** — Repo-Hygiene: Stashes triagieren, verwaiste Alt-Branches auflösen.
+
+Längerfristige Richtung: [`docs/ROADMAP.md`](docs/ROADMAP.md) und
+[`docs/MVP_SCOPE.md`](docs/MVP_SCOPE.md); offene Design-Entscheidungen tragen
+das Label `needs-decision`.
 
 ## Arbeitsweise / Konventionen
 
