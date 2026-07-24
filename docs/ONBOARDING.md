@@ -151,7 +151,44 @@ UI-Logik.
 
 ---
 
-## 7. Wo du weiterliest (nach Bedarf, nicht alles auf einmal)
+## 7. ClickUp — der Projektüberblick (optional)
+
+ClickUp ist die **menschenlesbare Überblicks-Ebene** für Roadmap, Prioritäten
+und Status. Wichtig zum Einordnen:
+
+> **ClickUp ist nicht kanonisch.** Verbindliche Design-/Tech-/Scope-Entscheidungen
+> gelten erst, wenn sie in den Repo-Markdown-Dateien stehen (v. a.
+> [`docs/DECISIONS.md`](DECISIONS.md)). Ein Handoff „zählt" erst, wenn er eine
+> Spur in der Git-Historie hinterlässt (Branch/Commit/PR). ClickUp ist Cockpit,
+> **kein Gate** — GitHub + Markdown bleiben die Source of Truth.
+
+Wofür ClickUp genutzt wird: lesbarer Projektüberblick, Roadmap & Prioritäten,
+Task-/Review-Status, Ideen-Parkplatz, Tool-Zuweisung, Pitch-/Bewerbungs-Tasks.
+
+**Wo das Projekt liegt:** Space **Team-Space** → Ordner **Café Apokalypso**, mit
+diesen Listen:
+
+| Liste | Wofür |
+|-------|-------|
+| **MVP Smoke Demo** | Die spielbare 7-Tage-Slice — konkrete Umsetzungs-Tasks |
+| **Game Design & Content** | Gameplay-Systeme, Gäste, Events, Story-Beats |
+| **Art / Sound / Mood** | Sprites, Hintergründe, Stimmung, Art-Review |
+| **Tech / Repo / Deploy** | Architektur, Build, Hosting, Repo-Aufgaben |
+| **Backlog & Later** | Alles, was bewusst noch nicht dran ist |
+| **Oneliner / Figurenstimmen** | Dialog-Schnipsel & Ton-Experimente je Figur |
+
+**So arbeiten Git & ClickUp zusammen:** Ein Task in ClickUp → als GitHub-Issue mit
+Akzeptanzkriterien ausformuliert → Umsetzung im PR → bei bindender Entscheidung
+die passende `docs/`-Datei aktualisieren. ClickUp-Status darf man mitpflegen, aber
+er ersetzt keinen dieser Schritte.
+
+> **Zugang:** Falls du (Scharon) noch keinen ClickUp-Zugang zum *Team-Space* hast,
+> frag im Team nach einer Einladung — die Repo-Arbeit selbst geht auch komplett
+> ohne ClickUp, es ist reiner Überblick.
+
+---
+
+## 8. Wo du weiterliest (nach Bedarf, nicht alles auf einmal)
 
 `docs/` ist ein Referenz-Index (~5000 Zeilen) — gezielt einzelne Dateien lesen.
 
