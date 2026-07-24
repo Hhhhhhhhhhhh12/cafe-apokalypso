@@ -8,14 +8,6 @@
       "port": 5173,
       "autoPort": true,
       "url": "http://localhost:5173/cafe-apokalypso/"
-    },
-    {
-      "name": "cafe-apokalypso-hooks",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev", "--prefix", "/Users/Heineken/Code/cafe-apokalypso-hooks"],
-      "port": 5173,
-      "autoPort": true,
-      "url": "http://localhost:5173/cafe-apokalypso/"
     }
   ]
 }
