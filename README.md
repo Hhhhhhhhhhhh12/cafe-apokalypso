@@ -114,8 +114,11 @@ The current app is an early placeholder shell. It includes a day-one state, reso
 
 ## Documentation
 
+New here? Start with [`docs/ONBOARDING.md`](docs/ONBOARDING.md) — a 15-minute overview to get playing and developing.
+
 Detailed project docs live in `docs/`:
 
+- `ONBOARDING.md` — **new-contributor overview**: what the game is, how to run it, where to read next
 - `PROJECT_CANON.md` — **first source of truth**: all agents and contributors read this first
 - `DECISIONS.md` — binding design and technical decisions
 - `GAME_DESIGN.md` — gameplay systems and player experience
