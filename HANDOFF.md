@@ -10,6 +10,9 @@ TypeScript, kein Backend, lokaler Save). Ziel ist ein portfoliofähiger
 7-Tage-Vertical-Slice. Vollständige Vision: [`README.md`](README.md) und
 [`docs/GAME_DESIGN.md`](docs/GAME_DESIGN.md).
 
+**Wie es aussieht:** [`docs/screenshots/`](docs/screenshots/) — volle Spiel-UI
+und das Diorama über die Woche (Tag 1 / 4 / 7), ohne selbst starten zu müssen.
+
 ## Erste 10 Minuten
 
 ```bash
