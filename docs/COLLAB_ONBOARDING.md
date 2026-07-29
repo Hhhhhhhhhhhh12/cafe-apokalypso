@@ -5,6 +5,10 @@ bündelt Arbeitswissen, das bisher nur in lokalen Agent-Notizen lag, damit alle 
 selben Stand ausgehen. Für die harten Geometrie-/Pipeline-Regeln siehe
 `CLAUDE.md` bzw. die Spiegelung `AGENTS.md` — hier steht der Prozess-Kontext.
 
+> **Ganz neu hier?** Fang mit [`ONBOARDING.md`](ONBOARDING.md) an — Spielkonzept,
+> 7-Tage-Bogen, Figuren und erster lokaler Start. Dieses Dokument setzt darauf auf
+> und geht in die Prozess-/Architektur-/Handoff-Tiefe.
+
 Stand dieses Dokuments: 2026-07-18.
 
 ## 1. Schnelleinstieg
@@ -12,7 +16,7 @@ Stand dieses Dokuments: 2026-07-18.
 ```bash
 npm install
 npm run dev            # Port 5173, öffnet /cafe-apokalypso/
-npx vitest run         # Testsuite, muss grün bleiben (aktuell 335 Tests)
+npx vitest run         # Testsuite, muss grün bleiben (aktuell 322 Tests)
 ```
 
 - Stack: React + Vite + TypeScript. Cozy-Management-Spiel über 7 Tage, langsam

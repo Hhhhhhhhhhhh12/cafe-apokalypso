@@ -195,6 +195,8 @@ er ersetzt keinen dieser Schritte.
 | Wenn du … willst | lies |
 |---|---|
 | **Den Kanon verstehen** (zuerst!) | [`docs/PROJECT_CANON.md`](PROJECT_CANON.md) |
+| **Prozess/Architektur-Tiefe** (Render-Schicht, Branch-/Merge-Workflow, Pipeline) | [`docs/COLLAB_ONBOARDING.md`](COLLAB_ONBOARDING.md) |
+| **Kick-off-Entscheidungen** Team (Rollen, Review-Kultur, Lizenz) | [`docs/COLLAB_AGENDA.md`](COLLAB_AGENDA.md) |
 | Bindende Design-/Tech-Entscheidungen | [`docs/DECISIONS.md`](DECISIONS.md) |
 | Gameplay-Systeme & Spielerfahrung | [`docs/GAME_DESIGN.md`](GAME_DESIGN.md) |
 | Den Management-Loop von Woche 1 | [`docs/MANAGEMENT_TRADEOFF_DESIGN.md`](MANAGEMENT_TRADEOFF_DESIGN.md) |
