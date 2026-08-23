@@ -19,14 +19,15 @@ KRITISCHE Regel: Immer auf gescheite Diversität der Figuren achten (Hauttöne, 
 
 ## Diorama-Geometrie (nicht neu herleiten!)
 
-**Aktueller Raum: Stage-PNG-Diorama** — gemaltes PNG als Hintergrund. `.cafe-stage-base { display: block }`. Décor-Sprites (clock/lamp/cups/shelf/plant) sind aktiv als CSS-Overlays. Lamp: `top: 18%` in `.cafe-decor-lamp`.
+**Aktueller Raum: warmes v04-HD-Diorama** — der leere Raum ist in `placeholder-cafe-shell-v04-clean-hd.png` und `placeholder-cafe-floor-v04-clean-hd.png` getrennt. `.cafe-stage-base { display: block }`; nur der Boden wächst über sieben Tage. Theke, Regal, Maschine, Kasse und weiteres Décor sind separate transparente Sprites. Lamp: `top: 18%` in `.cafe-decor-lamp`.
 
 **WICHTIG: NIEMALS `.cafe-back-wall` oder `.cafe-side-wall` sichtbar machen oder `.cafe-stage-base` auf `display:none` setzen** — das bricht das Diorama-Layout komplett. Diese sind Positionierungs-Container, nicht visuelle Layer.
 
 - `.cafe-back-wall` = Positionierungs-Container, `display: none` (visuell durch Stage-PNG geliefert). Enthält: `.cafe-window` (display:none), `.cafe-menu-board` (display:none), `.cafe-storage` (rechts, sichtbar als Décor-Slot).
 - `.cafe-side-wall` = Positionierungs-Container, `display: none` (visuell durch Stage-PNG geliefert).
+- `.cafe-floor-growth` = sichtbarer v04-Boden; Day-1-Polygon in Diorama-%: `[(5.92,71.84),(50,52.39),(94.08,72.58),(55.5,82),(44.5,82)]`. Die vordere Spitze wächst von 82 % an Tag 1 auf 99.5 % an Tag 7.
 - `.cafe-floor` = Positionierungs-Container für Gäste: left 5 % / right 6 % / bottom 4 % / height 65 % des Dioramas, `clip-path: polygon(9% 1%, 100% 15%, 88% 100%, 0 84%)`, `background: transparent`. Umrechnung Diorama-% → Floor-%: `floorX = (dioX − 5) / 89 · 100`, `floorY = (dioY − 31) / 65 · 100`.
-- `.cafe-counter` = Positionierungs-Container, `background: transparent` (visuell durch Stage-PNG geliefert). Kaffeemaschine + KASSANDRA-Kasse sind seine Kinder (Sprites).
+- `.cafe-counter` = Positionierungs-Container mit separatem `placeholder-cafe-counter-v04-hd.png`. Kaffeemaschine + KASSANDRA-Kasse sind seine Kinder und nutzen ebenfalls separate v04-HD-Sprites.
 - Décor-Tier-Klassen (`cafe-decor--tier-N`) existieren im DOM und sind per CSS sichtbar (Sprites aktiv seit feat/pixel-props-pixellab).
 - Serve-Menü (Produktliste) ist aus dem Diorama heraus in die ActionPanel-Sidebar verlagert (`.serve-menu`). Kein floating UI über dem Spielbereich mehr.
 - Paula-Walk-Choreografie: Phasen-Maschine in CafePlaceholder.tsx (`at-door` → `walking` → `idle`), Tür-Startposition ist relativ zu `.cafe-queue` (left −195 % / bottom 130 %).
