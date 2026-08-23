@@ -57,8 +57,8 @@ describe("café diorama view", () => {
   it("renders provisional pilot assets while preserving CSS fallbacks", () => {
     const markup = renderCafe();
 
-    expect(markup).toContain("placeholder-cafe-coffee-machine.png");
-    expect(markup).toContain("placeholder-kassandra-register.png");
+    expect(markup).toContain("placeholder-cafe-coffee-machine-v04-hd.png");
+    expect(markup).toContain("placeholder-kassandra-register-v04-hd.png");
     // Paula renders via CSS sprite-sheet background, identified by class
     expect(markup).toContain("cafe-pilot-asset--kemal-standing");
     expect(markup).toContain("cafe-coffee-machine");
