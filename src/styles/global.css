@@ -1225,7 +1225,7 @@ button.cafe-table {
   width: 12.92%;
   height: auto;
   aspect-ratio: 1;
-  background-image: url("../../assets/sprites/props/placeholder-cafe-table-left-v04-hd.png");
+  background-image: url("../../assets/sprites/props/placeholder-cafe-table-left-v05-simple.png");
 }
 
 .cafe-table--right {
@@ -1234,7 +1234,7 @@ button.cafe-table {
   width: 12.92%;
   height: auto;
   aspect-ratio: 1;
-  background-image: url("../../assets/sprites/props/placeholder-cafe-table-round-v04-hd.png");
+  background-image: url("../../assets/sprites/props/placeholder-cafe-table-round-v05-simple.png");
 }
 
 /* Legacy "back" table slot — moved to the front tip in the accepted layout.
@@ -1246,7 +1246,7 @@ button.cafe-table {
   width: 10.67%;
   height: auto;
   aspect-ratio: 1;
-  background-image: url("../../assets/sprites/props/placeholder-cafe-table-front-v04-hd.png");
+  background-image: url("../../assets/sprites/props/placeholder-cafe-table-front-v05-simple.png");
 }
 
 .cafe-table__top {
@@ -1835,7 +1835,7 @@ button.cafe-table {
   width: 6%;
   height: auto;
   aspect-ratio: 995 / 1024;
-  background: url("../../assets/sprites/props/placeholder-cafe-plant-v04-hd.png") center bottom / contain no-repeat;
+  background: url("../../assets/sprites/props/placeholder-cafe-plant-v05-simple.png") center bottom / contain no-repeat;
   image-rendering: auto;
 }
 
@@ -1898,7 +1898,7 @@ button.cafe-table {
   width: 16%;
   height: auto;
   aspect-ratio: 1024 / 683;
-  background: url("../../assets/sprites/props/placeholder-cafe-shelf-v05-stocked-hd.png") center / contain no-repeat;
+  background: url("../../assets/sprites/props/placeholder-cafe-shelf-v06-simple.png") center / contain no-repeat;
   image-rendering: auto;
 }
 
@@ -1970,7 +1970,7 @@ button.cafe-table {
   width: 9%;
   height: auto;
   aspect-ratio: 1024 / 683;
-  background: url("../../assets/sprites/props/placeholder-cafe-clock-v04-hd.png") center / contain no-repeat;
+  background: url("../../assets/sprites/props/placeholder-cafe-clock-v05-simple.png") center / contain no-repeat;
   image-rendering: auto;
 }
 
@@ -1980,7 +1980,7 @@ button.cafe-table {
 
 .cafe-decor-clock.cafe-decor--tier-2 {
   opacity: 1;
-  background-image: url("../../assets/sprites/props/placeholder-cafe-clock-v04-hd.png");
+  background-image: url("../../assets/sprites/props/placeholder-cafe-clock-v05-simple.png");
   filter: saturate(1.05) brightness(1.03);
 }
 
@@ -2005,7 +2005,7 @@ button.cafe-table {
   width: 7%;
   height: auto;
   aspect-ratio: 2 / 3;
-  background: url("../../assets/sprites/props/placeholder-cafe-lamp-v04-hd.png") center bottom / contain no-repeat;
+  background: url("../../assets/sprites/props/placeholder-cafe-lamp-v05-simple.png") center bottom / contain no-repeat;
   image-rendering: auto;
 }
 
@@ -2042,7 +2042,7 @@ button.cafe-table {
   width: 7%;
   height: auto;
   aspect-ratio: 1024 / 683;
-  background: url("../../assets/sprites/props/placeholder-cafe-cups-v04-hd.png") center / contain no-repeat;
+  background: url("../../assets/sprites/props/placeholder-cafe-cups-v05-simple.png") center / contain no-repeat;
   image-rendering: auto;
 }
 
