@@ -16,7 +16,7 @@
     .stage-card,.panel{border:2px solid var(--ink);border-radius:12px;background:var(--cream);box-shadow:4px 5px 0 rgba(61,42,35,.16)}
     .stage-card{padding:10px}.stage{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;background:#d4bfa0;border-radius:7px;touch-action:none;user-select:none}
     .layer{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;pointer-events:none;image-rendering:auto}
-    .floor{z-index:1;clip-path:polygon(4.55% 63.34%,45.33% 36.66%,95.34% 68.54%,59.51% var(--tip),47.25% var(--tip))}.shell{z-index:2}
+    .floor{z-index:1;clip-path:polygon(5.92% 71.84%,50% 52.39%,94.08% 72.58%,55.5% var(--tip),44.5% var(--tip))}.shell{z-index:2}
     .grid{display:none;position:absolute;inset:0;z-index:20;pointer-events:none;background-image:linear-gradient(rgba(22,96,108,.18) 1px,transparent 1px),linear-gradient(90deg,rgba(22,96,108,.18) 1px,transparent 1px);background-size:5% 5%}.stage.show-grid .grid{display:block}
     .safe{position:absolute;inset:0;z-index:19;width:100%;height:100%;pointer-events:none}.safe polygon{fill:rgba(22,96,108,.035);stroke:rgba(22,96,108,.7);stroke-width:.35;stroke-dasharray:1.2 1}
     .item{position:absolute;z-index:7;cursor:grab;touch-action:none}.item:active{cursor:grabbing}.item img{display:block;width:100%;height:100%;object-fit:contain;image-rendering:auto;pointer-events:none}
@@ -58,7 +58,7 @@
       </div>
       <div class="actions"><button class="primary" id="copy">Positionen kopieren</button><button class="ghost" id="reset">Objekt zurücksetzen</button><button class="ghost" id="reset-all">Alle zurücksetzen</button></div>
       <pre class="css" id="css"></pre>
-      <p class="help">Ziehen = bewegen · Pfeiltasten = 1 px · Shift + Pfeil = 8 px. Rot bedeutet bei Tischen: Die Standfläche liegt an Tag 1 außerhalb des Bodens. Maschine und Kasse bleiben beim Export relativ zur Theke.</p>
+      <p class="help">Ziehen = bewegen · Pfeiltasten = 1 px · Shift + Pfeil = 8 px. Rot bedeutet bei Tischen oder Theke: Die Standfläche liegt an Tag 1 außerhalb des Bodens. Maschine und Kasse bewegen sich mit der Theke und bleiben beim Export relativ zu ihr.</p>
     </aside>
   </main>
   <script>
@@ -66,40 +66,41 @@
     const TIPS=[82,85,88,91,94,97,99.5];
     const DAY1=[[5.92,71.84],[50,52.39],[94.08,72.58],[55.5,82],[44.5,82]];
     const defaults=[
-      {id:'left',label:'Tisch links',selector:'.cafe-table--left',space:'floor',kind:'table',x:29.29,y:53.24,w:12.28,ratio:1,z:7,src:'../assets/sprites/props/placeholder-table-chair-set-v2.png'},
-      {id:'right',label:'Tisch rechts',selector:'.cafe-table--right',space:'floor',kind:'table',x:51.54,y:48.15,w:12.28,ratio:1,z:7,src:'../assets/sprites/props/placeholder-table-chair-set-v2.png'},
-      {id:'back',label:'Tisch hinten',selector:'.cafe-table--back',space:'floor',kind:'table',x:45.40,y:64.00,w:10.52,ratio:1,z:7,src:'../assets/sprites/props/placeholder-table-chair-set-v2.png'},
-      {id:'plant',label:'Pflanze',selector:'.cafe-decor-plant',space:'world-px',kind:'plant',x:21.83,y:57.87,w:5.04,ratio:44/52,pixelWidth:44,pixelHeight:52,z:6,src:'../assets/sprites/props/placeholder-cafe-plant.png'},
-      {id:'shelf',label:'Regal',selector:'.cafe-furniture-shelf',space:'world',kind:'wall',x:46.37,y:25.73,w:18,ratio:2.37,z:5,src:'../assets/sprites/props/placeholder-cafe-shelf-v04-hd.png'},
-      {id:'counter',label:'Theke',selector:'.cafe-counter',space:'floor',kind:'fixed',x:61.00,y:43.50,w:28.00,ratio:1024/651,z:4,src:'../assets/sprites/props/placeholder-cafe-counter-v05-rotated-hd.png'},
-      {id:'machine',label:'Maschine',selector:'.cafe-coffee-machine',space:'counter',kind:'fixed',x:67.00,y:44.50,w:6.50,ratio:.725,z:8,src:'../assets/sprites/props/placeholder-cafe-coffee-machine-v04-hd.png'},
-      {id:'register',label:'Kasse',selector:'.cafe-register',space:'counter',kind:'fixed',x:81.50,y:47.00,w:5.80,ratio:.75,z:8,src:'../assets/sprites/props/placeholder-kassandra-register-v04-hd.png'}
+      {id:'left',label:'Tisch links',selector:'.cafe-table--left',space:'floor',kind:'table',x:29.50,y:55.50,w:11.50,ratio:1,z:7,src:'../assets/sprites/props/placeholder-table-chair-set-v3-hd.png'},
+      {id:'right',label:'Tisch Mitte',selector:'.cafe-table--right',space:'floor',kind:'table',x:45.00,y:51.50,w:11.50,ratio:1,z:7,src:'../assets/sprites/props/placeholder-table-chair-set-v3-hd.png'},
+      {id:'back',label:'Tisch vorne',selector:'.cafe-table--back',space:'floor',kind:'table',x:40.80,y:65.00,w:9.50,ratio:1,z:7,src:'../assets/sprites/props/placeholder-table-chair-set-v3-hd.png'},
+      {id:'plant',label:'Pflanze',selector:'.cafe-decor-plant',space:'world',kind:'plant',x:24.50,y:59.50,w:4.40,ratio:44/52,z:6,src:'../assets/sprites/props/placeholder-cafe-plant.png'},
+      {id:'shelf',label:'Regal',selector:'.cafe-furniture-shelf',space:'world',kind:'wall',x:44.00,y:27.00,w:12.50,ratio:1024/756,z:5,src:'../assets/sprites/props/placeholder-cafe-shelf-v04-hd.png'},
+      {id:'counter',label:'Theke',selector:'.cafe-counter',space:'floor',kind:'counter',x:59.00,y:49.00,w:25.50,ratio:1024/651,z:4,src:'../assets/sprites/props/placeholder-cafe-counter-v05-rotated-hd.png'},
+      {id:'machine',label:'Maschine',selector:'.cafe-coffee-machine',space:'counter',kind:'fixed',x:63.59,y:49.58,w:5.48,ratio:.725,z:8,src:'../assets/sprites/props/placeholder-cafe-coffee-machine-v04-hd.png'},
+      {id:'register',label:'Kasse',selector:'.cafe-register',space:'counter',kind:'fixed',x:77.36,y:51.59,w:4.85,ratio:.75,z:8,src:'../assets/sprites/props/placeholder-kassandra-register-v04-hd.png'}
     ];
-    const storeKey='cafe-apokalypso.furniture-calibrator.v3';
+    const storeKey='cafe-apokalypso.furniture-calibrator.v4';
     let saved={};try{saved=JSON.parse(localStorage.getItem(storeKey)||'{}')}catch{}
     let items=defaults.map(d=>({...d,...saved[d.id]}));let selected='left',day=1,drag=null;
     const stage=document.querySelector('#stage'),objects=document.querySelector('#objects'),size=document.querySelector('#size'),sizeOut=document.querySelector('#size-out'),status=document.querySelector('#status'),cssOut=document.querySelector('#css');
     document.querySelector('#safe-poly').setAttribute('points',DAY1.map(p=>p.join(',')).join(' '));
     const pointInPoly=(p,poly)=>{let inside=false;for(let i=0,j=poly.length-1;i<poly.length;j=i++){const [xi,yi]=poly[i],[xj,yj]=poly[j];if(((yi>p[1])!==(yj>p[1]))&&(p[0]<(xj-xi)*(p[1]-yi)/(yj-yi)+xi))inside=!inside}return inside};
     const heightPct=p=>p.w*(16/9)/p.ratio;
-    const safe=p=>{if(p.kind!=='table')return true;const h=heightPct(p),foot=[[p.x+p.w*.17,p.y+h*.88],[p.x+p.w*.83,p.y+h*.88]];return foot.every(pt=>pointInPoly(pt,DAY1))};
+    const footprint=p=>{const h=heightPct(p);if(p.kind==='table')return [[p.x+p.w*.17,p.y+h*.88],[p.x+p.w*.83,p.y+h*.88]];if(p.kind==='counter')return [[p.x+p.w*.04,p.y+h*.43],[p.x+p.w*.70,p.y+h*.95],[p.x+p.w*.96,p.y+h*.68]];return []};
+    const safe=p=>{const points=footprint(p);return !points.length||points.every(pt=>pointInPoly(pt,DAY1))};
     const persist=()=>{const out={};items.forEach(p=>out[p.id]={x:p.x,y:p.y,w:p.w});localStorage.setItem(storeKey,JSON.stringify(out))};
     function cssText(){return items.map(p=>{const base=defaults.find(d=>d.id===p.id);if(p.space==='floor'){const left=(p.x-FLOOR.left)/FLOOR.width*100,top=(p.y-FLOOR.top)/FLOOR.height*100,width=p.w/FLOOR.width*100;return `${p.selector} {\n  left: ${left.toFixed(2)}%;\n  top: ${top.toFixed(2)}%;\n  width: ${width.toFixed(2)}%;\n  height: auto;\n  aspect-ratio: ${p.kind==='table'?'1':p.ratio.toFixed(3)};\n}`}if(p.space==='counter'){const counter=items.find(x=>x.id==='counter'),counterH=heightPct(counter),left=(p.x-counter.x)/counter.w*100,top=(p.y-counter.y)/counterH*100,width=p.w/counter.w*100;return `${p.selector} {\n  left: ${left.toFixed(2)}%;\n  ${p.id==='register'?'right: auto;\n  ':''}top: ${top.toFixed(2)}%;\n  width: ${width.toFixed(2)}%;\n  height: auto;\n  aspect-ratio: ${p.ratio.toFixed(3)};\n}`}if(p.space==='world-px'){const scale=p.w/base.w;return `${p.selector} {\n  left: ${p.x.toFixed(2)}%;\n  top: ${p.y.toFixed(2)}%;\n  width: ${Math.round(p.pixelWidth*scale)}px;\n  height: ${Math.round(p.pixelHeight*scale)}px;\n}`}return `${p.selector} {\n  left: ${p.x.toFixed(2)}%;\n  top: ${p.y.toFixed(2)}%;\n  width: ${p.w.toFixed(2)}%;\n  height: auto;\n  aspect-ratio: ${p.ratio.toFixed(3)};\n}`}).join('\n\n')}
     function render(){
       stage.style.setProperty('--tip',TIPS[day-1]+'%');stage.querySelectorAll('.item').forEach(n=>n.remove());
       items.forEach(p=>{const el=document.createElement('div');el.className='item'+(p.id===selected?' sel':'')+(safe(p)?'':' unsafe');el.dataset.id=p.id;el.dataset.label=p.label;el.style.left=p.x+'%';el.style.top=p.y+'%';el.style.width=p.w+'%';el.style.aspectRatio=p.ratio;el.style.zIndex=p.z;el.innerHTML=`<img src="${p.src}" alt="${p.label}">`;el.addEventListener('pointerdown',down);stage.appendChild(el)});
-      objects.innerHTML='';items.forEach(p=>{const floorCheck=p.kind==='table',okay=safe(p),badge=floorCheck?(okay?'Tag 1 sicher':'außerhalb'):'verschiebbar';const b=document.createElement('button');b.className='object'+(p.id===selected?' on':'');b.innerHTML=`<span>${p.label}</span><span class="badge ${okay?'':'bad'}">${badge}</span>`;b.onclick=()=>{selected=p.id;render()};objects.appendChild(b)});
-      const current=items.find(p=>p.id===selected),base=defaults.find(p=>p.id===selected);const pct=Math.round(current.w/base.w*100);size.value=pct;sizeOut.textContent=pct+' %';const okay=safe(current),floorCheck=current.kind==='table';status.className='status'+(okay?'':' bad');status.textContent=floorCheck?(okay?'Tag 1 sicher':'Steht an Tag 1 außerhalb des Bodens'):'Frei verschiebbar';cssOut.textContent=cssText();persist();
+      objects.innerHTML='';items.forEach(p=>{const floorCheck=p.kind==='table'||p.kind==='counter',okay=safe(p),badge=floorCheck?(okay?'Tag 1 sicher':'außerhalb'):'verschiebbar';const b=document.createElement('button');b.className='object'+(p.id===selected?' on':'');b.innerHTML=`<span>${p.label}</span><span class="badge ${okay?'':'bad'}">${badge}</span>`;b.onclick=()=>{selected=p.id;render()};objects.appendChild(b)});
+      const current=items.find(p=>p.id===selected),base=defaults.find(p=>p.id===selected);const pct=Math.round(current.w/base.w*100);size.value=pct;sizeOut.textContent=pct+' %';const okay=safe(current),floorCheck=current.kind==='table'||current.kind==='counter';status.className='status'+(okay?'':' bad');status.textContent=floorCheck?(okay?'Tag 1 sicher':'Steht an Tag 1 außerhalb des Bodens'):'Frei verschiebbar';cssOut.textContent=cssText();persist();
       document.querySelectorAll('.day').forEach((b,i)=>b.classList.toggle('on',i===day-1));
     }
-    function down(e){selected=e.currentTarget.dataset.id;const p=items.find(x=>x.id===selected),r=stage.getBoundingClientRect();drag={p,sx:e.clientX,sy:e.clientY,x:p.x,y:p.y,w:r.width,h:r.height};e.currentTarget.setPointerCapture(e.pointerId);render();e.preventDefault()}
-    addEventListener('pointermove',e=>{if(!drag)return;drag.p.x=+(drag.x+(e.clientX-drag.sx)/drag.w*100).toFixed(2);drag.p.y=+(drag.y+(e.clientY-drag.sy)/drag.h*100).toFixed(2);render()});addEventListener('pointerup',()=>drag=null);
-    function resizeSelected(value){const p=items.find(x=>x.id===selected),base=defaults.find(x=>x.id===selected),h0=heightPct(p),cx=p.x+p.w/2,feet=p.y+h0;p.w=+(base.w*value/100).toFixed(2);const h=heightPct(p);p.x=+(cx-p.w/2).toFixed(2);p.y=+(feet-h).toFixed(2);render()}
+    function down(e){selected=e.currentTarget.dataset.id;const p=items.find(x=>x.id===selected),r=stage.getBoundingClientRect(),followers=p.id==='counter'?items.filter(x=>x.space==='counter').map(x=>({p:x,x:x.x,y:x.y})):[];drag={p,sx:e.clientX,sy:e.clientY,x:p.x,y:p.y,w:r.width,h:r.height,followers};e.currentTarget.setPointerCapture(e.pointerId);render();e.preventDefault()}
+    addEventListener('pointermove',e=>{if(!drag)return;const dx=(e.clientX-drag.sx)/drag.w*100,dy=(e.clientY-drag.sy)/drag.h*100;drag.p.x=+(drag.x+dx).toFixed(2);drag.p.y=+(drag.y+dy).toFixed(2);drag.followers.forEach(f=>{f.p.x=+(f.x+dx).toFixed(2);f.p.y=+(f.y+dy).toFixed(2)});render()});addEventListener('pointerup',()=>drag=null);
+    function resizeSelected(value){const p=items.find(x=>x.id===selected),base=defaults.find(x=>x.id===selected),h0=heightPct(p),cx=p.x+p.w/2,feet=p.y+h0,followers=p.id==='counter'?items.filter(x=>x.space==='counter').map(x=>({p:x,left:(x.x-p.x)/p.w,top:(x.y-p.y)/h0,width:x.w/p.w})):[];p.w=+(base.w*value/100).toFixed(2);const h=heightPct(p);p.x=+(cx-p.w/2).toFixed(2);p.y=+(feet-h).toFixed(2);followers.forEach(f=>{f.p.x=+(p.x+f.left*p.w).toFixed(2);f.p.y=+(p.y+f.top*h).toFixed(2);f.p.w=+(f.width*p.w).toFixed(2)});render()}
     size.oninput=()=>resizeSelected(+size.value);document.querySelector('#minus').onclick=()=>resizeSelected(Math.max(60,+size.value-1));document.querySelector('#plus').onclick=()=>resizeSelected(Math.min(140,+size.value+1));
     document.querySelector('#grid').onchange=e=>stage.classList.toggle('show-grid',e.target.checked);document.querySelector('#box').onchange=e=>stage.classList.toggle('show-box',e.target.checked);
     document.querySelector('#copy').onclick=async e=>{try{await navigator.clipboard.writeText(cssText());e.currentTarget.textContent='Kopiert ✓';setTimeout(()=>e.currentTarget.textContent='Positionen kopieren',1500)}catch{cssOut.focus();alert('Bitte den CSS-Block unten manuell kopieren.')}};
-    document.querySelector('#reset').onclick=()=>{const i=items.findIndex(p=>p.id===selected),d=defaults[i];items[i]={...d};render()};document.querySelector('#reset-all').onclick=()=>{items=defaults.map(d=>({...d}));render()};
-    addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))return;const p=items.find(x=>x.id===selected),r=stage.getBoundingClientRect(),step=e.shiftKey?8:1;p.x+=({ArrowLeft:-step,ArrowRight:step}[e.key]||0)/r.width*100;p.y+=({ArrowUp:-step,ArrowDown:step}[e.key]||0)/r.height*100;render();e.preventDefault()});
+    document.querySelector('#reset').onclick=()=>{const i=items.findIndex(p=>p.id===selected),d=defaults[i];items[i]={...d};if(selected==='counter')items=items.map(p=>p.space==='counter'?{...defaults.find(d=>d.id===p.id)}:p);render()};document.querySelector('#reset-all').onclick=()=>{items=defaults.map(d=>({...d}));render()};
+    addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))return;const p=items.find(x=>x.id===selected),r=stage.getBoundingClientRect(),step=e.shiftKey?8:1,dx=({ArrowLeft:-step,ArrowRight:step}[e.key]||0)/r.width*100,dy=({ArrowUp:-step,ArrowDown:step}[e.key]||0)/r.height*100;p.x+=dx;p.y+=dy;if(p.id==='counter')items.filter(x=>x.space==='counter').forEach(x=>{x.x+=dx;x.y+=dy});render();e.preventDefault()});
     const days=document.querySelector('#days');TIPS.forEach((_,i)=>{const b=document.createElement('button');b.className='day';b.textContent='Tag '+(i+1);b.onclick=()=>{day=i+1;render()};days.appendChild(b)});render();
   </script>
 </body>
