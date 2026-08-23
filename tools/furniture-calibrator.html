@@ -66,16 +66,16 @@
     const TIPS=[82,85,88,91,94,97,99.5];
     const DAY1=[[5.92,71.84],[50,52.39],[94.08,72.58],[55.5,82],[44.5,82]];
     const defaults=[
-      {id:'left',label:'Tisch links',selector:'.cafe-table--left',space:'floor',kind:'table',x:29.68,y:48.03,w:12.28,ratio:1,z:7,src:'../assets/sprites/props/placeholder-table-chair-set-v2.png'},
+      {id:'left',label:'Tisch links',selector:'.cafe-table--left',space:'floor',kind:'table',x:29.29,y:53.24,w:12.28,ratio:1,z:7,src:'../assets/sprites/props/placeholder-table-chair-set-v2.png'},
       {id:'right',label:'Tisch rechts',selector:'.cafe-table--right',space:'floor',kind:'table',x:51.54,y:48.15,w:12.28,ratio:1,z:7,src:'../assets/sprites/props/placeholder-table-chair-set-v2.png'},
-      {id:'back',label:'Tisch hinten',selector:'.cafe-table--back',space:'floor',kind:'table',x:40.76,y:39.68,w:10.52,ratio:1,z:7,src:'../assets/sprites/props/placeholder-table-chair-set-v2.png'},
-      {id:'plant',label:'Pflanze',selector:'.cafe-decor-plant',space:'world-px',kind:'plant',x:14.92,y:49.60,w:5.04,ratio:44/52,pixelWidth:44,pixelHeight:52,z:6,src:'../assets/sprites/props/placeholder-cafe-plant.png'},
-      {id:'shelf',label:'Regal',selector:'.cafe-furniture-shelf',space:'world',kind:'wall',x:76,y:34,w:16,ratio:2.37,z:5,src:'../assets/sprites/props/placeholder-cafe-shelf-v04-hd.png'},
-      {id:'counter',label:'Theke',selector:'.cafe-counter',space:'floor',kind:'fixed',x:60.18,y:49.85,w:28.04,ratio:384/224,z:4,src:'../assets/sprites/props/placeholder-cafe-counter-v04-hd.png'},
-      {id:'machine',label:'Maschine',selector:'.cafe-coffee-machine',space:'counter',kind:'fixed',x:63.27,y:47.03,w:7.28,ratio:.725,z:8,src:'../assets/sprites/props/placeholder-cafe-coffee-machine-v04-hd.png'},
-      {id:'register',label:'Kasse',selector:'.cafe-register',space:'counter',kind:'fixed',x:78.32,y:43.68,w:9.42,ratio:.75,z:8,src:'../assets/sprites/props/placeholder-kassandra-register-v04-hd.png'}
+      {id:'back',label:'Tisch hinten',selector:'.cafe-table--back',space:'floor',kind:'table',x:45.40,y:64.00,w:10.52,ratio:1,z:7,src:'../assets/sprites/props/placeholder-table-chair-set-v2.png'},
+      {id:'plant',label:'Pflanze',selector:'.cafe-decor-plant',space:'world-px',kind:'plant',x:21.83,y:57.87,w:5.04,ratio:44/52,pixelWidth:44,pixelHeight:52,z:6,src:'../assets/sprites/props/placeholder-cafe-plant.png'},
+      {id:'shelf',label:'Regal',selector:'.cafe-furniture-shelf',space:'world',kind:'wall',x:46.37,y:25.73,w:18,ratio:2.37,z:5,src:'../assets/sprites/props/placeholder-cafe-shelf-v04-hd.png'},
+      {id:'counter',label:'Theke',selector:'.cafe-counter',space:'floor',kind:'fixed',x:61.00,y:43.50,w:28.00,ratio:1024/651,z:4,src:'../assets/sprites/props/placeholder-cafe-counter-v05-rotated-hd.png'},
+      {id:'machine',label:'Maschine',selector:'.cafe-coffee-machine',space:'counter',kind:'fixed',x:67.00,y:44.50,w:6.50,ratio:.725,z:8,src:'../assets/sprites/props/placeholder-cafe-coffee-machine-v04-hd.png'},
+      {id:'register',label:'Kasse',selector:'.cafe-register',space:'counter',kind:'fixed',x:81.50,y:47.00,w:5.80,ratio:.75,z:8,src:'../assets/sprites/props/placeholder-kassandra-register-v04-hd.png'}
     ];
-    const storeKey='cafe-apokalypso.furniture-calibrator.v2';
+    const storeKey='cafe-apokalypso.furniture-calibrator.v3';
     let saved={};try{saved=JSON.parse(localStorage.getItem(storeKey)||'{}')}catch{}
     let items=defaults.map(d=>({...d,...saved[d.id]}));let selected='left',day=1,drag=null;
     const stage=document.querySelector('#stage'),objects=document.querySelector('#objects'),size=document.querySelector('#size'),sizeOut=document.querySelector('#size-out'),status=document.querySelector('#status'),cssOut=document.querySelector('#css');

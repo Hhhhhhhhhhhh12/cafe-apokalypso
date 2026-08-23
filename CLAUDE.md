@@ -27,7 +27,7 @@ KRITISCHE Regel: Immer auf gescheite Diversität der Figuren achten (Hauttöne, 
 - `.cafe-side-wall` = Positionierungs-Container, `display: none` (visuell durch Stage-PNG geliefert).
 - `.cafe-floor-growth` = sichtbarer v04-Boden; Day-1-Polygon in Diorama-%: `[(5.92,71.84),(50,52.39),(94.08,72.58),(55.5,82),(44.5,82)]`. Die vordere Spitze wächst von 82 % an Tag 1 auf 99.5 % an Tag 7.
 - `.cafe-floor` = Positionierungs-Container für Gäste: left 5 % / right 6 % / bottom 4 % / height 65 % des Dioramas, `clip-path: polygon(9% 1%, 100% 15%, 88% 100%, 0 84%)`, `background: transparent`. Umrechnung Diorama-% → Floor-%: `floorX = (dioX − 5) / 89 · 100`, `floorY = (dioY − 31) / 65 · 100`.
-- `.cafe-counter` = Positionierungs-Container mit separatem `placeholder-cafe-counter-v04-hd.png`. Kaffeemaschine + KASSANDRA-Kasse sind seine Kinder und nutzen ebenfalls separate v04-HD-Sprites.
+- `.cafe-counter` = Positionierungs-Container mit separatem, um 90° perspektivisch neu gezeichnetem `placeholder-cafe-counter-v05-rotated-hd.png` (Seitenverhältnis 1024:651). Kaffeemaschine + KASSANDRA-Kasse sind seine Kinder und nutzen weiterhin separate v04-HD-Sprites.
 - Décor-Tier-Klassen (`cafe-decor--tier-N`) existieren im DOM und sind per CSS sichtbar (Sprites aktiv seit feat/pixel-props-pixellab).
 - Serve-Menü (Produktliste) ist aus dem Diorama heraus in die ActionPanel-Sidebar verlagert (`.serve-menu`). Kein floating UI über dem Spielbereich mehr.
 - Paula-Walk-Choreografie: Phasen-Maschine in CafePlaceholder.tsx (`at-door` → `walking` → `idle`), Tür-Startposition ist relativ zu `.cafe-queue` (left −195 % / bottom 130 %).

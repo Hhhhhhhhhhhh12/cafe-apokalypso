@@ -934,12 +934,12 @@ h3 {
 
 .cafe-counter {
   /* Fixed furniture overlay; independent from the growing floor mask. */
-  top: 29%;
-  left: 62%;
+  top: 19.23%;
+  left: 62.92%;
   z-index: 4;
-  width: 31.5%;
+  width: 31.46%;
   height: auto;
-  aspect-ratio: 384 / 224;
+  aspect-ratio: 1024 / 651;
   border: none;
   border-radius: 7px;
   background: transparent;
@@ -976,10 +976,11 @@ h3 {
 .cafe-coffee-machine {
   position: absolute;
   /* Stands on the painted counter top at the L-junction (left end of the bar). */
-  top: -8%;
-  left: 13%;
-  width: 22%;
-  height: 52%;
+  top: 3.16%;
+  left: 21.43%;
+  width: 23.21%;
+  height: auto;
+  aspect-ratio: 0.725;
   border: 3px solid transparent;
   border-radius: 6px 6px 4px 4px;
   background: transparent;
@@ -1042,11 +1043,13 @@ h3 {
 .cafe-register {
   position: absolute;
   /* Stands on the right end of the painted counter top. */
-  top: -3%;
-  right: 8%;
-  width: 21%;
-  height: 48%;
-  transform: skewY(2deg);
+  top: 11.06%;
+  right: auto;
+  left: 73.21%;
+  width: 20.71%;
+  height: auto;
+  aspect-ratio: 0.75;
+  transform: none;
   border: 3px solid transparent;
   border-radius: 6px;
   background: transparent;
@@ -1224,8 +1227,8 @@ button.cafe-table {
 }
 
 .cafe-table--left {
-  top: 26.20%;
-  left: 27.73%;
+  top: 34.22%;
+  left: 27.29%;
   width: 13.80%;
   height: auto;
   aspect-ratio: 1;
@@ -1239,13 +1242,12 @@ button.cafe-table {
   aspect-ratio: 1;
 }
 
-/* Back table — sits in the gap between Bohn and the counter/machine, further
-   back in the isometric floor so it reads a touch smaller/higher than the
-   two front tables. Hosts Nele + Fatou instead of crowding a third chair
-   onto the front tables (whose sprite only draws two chairs). */
+/* Legacy "back" table slot — moved to the front tip in the accepted layout.
+   It stays slightly smaller than the other sets and hosts Nele + Fatou rather
+   than crowding a third chair onto either two-chair set. */
 .cafe-table--back {
-  top: 13.35%;
-  left: 40.18%;
+  top: 50.77%;
+  left: 45.40%;
   width: 11.82%;
   height: auto;
   aspect-ratio: 1;
@@ -1831,8 +1833,8 @@ button.cafe-table {
 }
 
 .cafe-decor-plant {
-  left: 14.92%;
-  top: 49.60%;
+  left: 21.83%;
+  top: 57.87%;
   z-index: 5;
   width: 44px;
   height: 52px;
@@ -1898,10 +1900,10 @@ button.cafe-table {
 
 .cafe-furniture-shelf {
   position: absolute;
-  top: 34%;
-  left: 76%;
+  top: 25.73%;
+  left: 46.37%;
   z-index: 5;
-  width: 16%;
+  width: 18%;
   height: 12%;
   background: url("../../assets/sprites/props/placeholder-cafe-shelf-v04-hd.png") center / contain no-repeat;
   image-rendering: auto;
@@ -4242,7 +4244,7 @@ button.cafe-table {
 
 /* Furniture is independent from the growing room shell. */
 .cafe-counter {
-  background: url("../../assets/sprites/props/placeholder-cafe-counter-v04-hd.png") center / contain no-repeat !important;
+  background: url("../../assets/sprites/props/placeholder-cafe-counter-v05-rotated-hd.png") center / contain no-repeat !important;
 }
 .cafe-counter__front,
 .cafe-counter__ledge {
