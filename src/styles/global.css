@@ -1154,7 +1154,6 @@ h3 {
   /* Furniture-free Stage Base (nofurniture-fix) paints no tables, so the bought
      seating shows the real pixel sprite instead of the old CSS ghost boxes.
      Sub-shapes (__top / chairs / pseudo legs) are neutralised below. */
-  background-image: url("../../assets/sprites/props/placeholder-table-chair-set-v3-hd.png");
   background-repeat: no-repeat;
   background-position: center bottom;
   background-size: contain;
@@ -1226,6 +1225,7 @@ button.cafe-table {
   width: 12.92%;
   height: auto;
   aspect-ratio: 1;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-table-left-v04-hd.png");
 }
 
 .cafe-table--right {
@@ -1234,6 +1234,7 @@ button.cafe-table {
   width: 12.92%;
   height: auto;
   aspect-ratio: 1;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-table-round-v04-hd.png");
 }
 
 /* Legacy "back" table slot — moved to the front tip in the accepted layout.
@@ -1245,6 +1246,7 @@ button.cafe-table {
   width: 10.67%;
   height: auto;
   aspect-ratio: 1;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-table-front-v04-hd.png");
 }
 
 .cafe-table__top {
@@ -1827,14 +1829,14 @@ button.cafe-table {
 }
 
 .cafe-decor-plant {
-  left: 24.5%;
-  top: 59.5%;
+  left: 19.5%;
+  top: 56%;
   z-index: 5;
-  width: 4.4%;
+  width: 6%;
   height: auto;
-  aspect-ratio: 44 / 52;
-  background: url("../../assets/sprites/props/placeholder-cafe-plant.png") center bottom / contain no-repeat;
-  image-rendering: pixelated;
+  aspect-ratio: 995 / 1024;
+  background: url("../../assets/sprites/props/placeholder-cafe-plant-v04-hd.png") center bottom / contain no-repeat;
+  image-rendering: auto;
 }
 
 /* Hidden: replaced by the sprite above. Kept as fallback if the image is absent. */
@@ -1858,24 +1860,19 @@ button.cafe-table {
 
 .cafe-decor-plant.cafe-decor--tier-2 {
   opacity: 1;
-  background-image: url("../../assets/sprites/props/placeholder-cafe-plant-t2.png");
+  background-image: url("../../assets/sprites/props/placeholder-cafe-plant-v04-hd.png");
+  filter: saturate(1.04) brightness(1.02);
 }
 
 .cafe-decor-plant.cafe-decor--tier-3 {
   opacity: 1;
-  background-image: url("../../assets/sprites/props/placeholder-cafe-plant-t3.png");
+  background-image: url("../../assets/sprites/props/placeholder-cafe-plant-v04-hd.png");
+  filter: saturate(1.12) brightness(1.06) drop-shadow(0 3px 4px rgba(75, 48, 30, 0.18));
 }
 
 /* Counter pot plant (plant2) — small herb/succulent sitting on the counter surface. */
 .cafe-decor-plant2 {
-  position: absolute;
-  left: 78%;
-  top: 55%;
-  z-index: 5;
-  width: 32px;
-  height: 40px;
-  background: url("../../assets/sprites/props/placeholder-cafe-plant.png") center bottom / contain no-repeat;
-  image-rendering: pixelated;
+  display: none;
 }
 
 .cafe-decor-plant2.cafe-decor--tier-1 {
@@ -1895,13 +1892,13 @@ button.cafe-table {
 
 .cafe-furniture-shelf {
   position: absolute;
-  top: 27%;
-  left: 44%;
+  top: 26%;
+  left: 76%;
   z-index: 5;
-  width: 12.5%;
+  width: 16%;
   height: auto;
-  aspect-ratio: 1024 / 756;
-  background: url("../../assets/sprites/props/placeholder-cafe-shelf-v04-hd.png") center / contain no-repeat;
+  aspect-ratio: 1024 / 683;
+  background: url("../../assets/sprites/props/placeholder-cafe-shelf-v05-stocked-hd.png") center / contain no-repeat;
   image-rendering: auto;
 }
 
@@ -1925,7 +1922,7 @@ button.cafe-table {
 /* Box sizes mirror each sprite's own aspect ratio and are scaled against a
    standing guest (108px ≈ an adult), so a cat reads at roughly knee height. */
 .cafe-pet-cat {
-  left: 31%;
+  left: 25.5%;
   top: 67%;
   width: 16px;
   height: 28px;
@@ -1933,7 +1930,7 @@ button.cafe-table {
 }
 /* Curled on the counter ledge (top edge sits at 65.9%) like a stray croissant. */
 .cafe-pet-dragon {
-  left: 68%;
+  left: 70%;
   top: 62.5%;
   width: 14px;
   height: 26px;
@@ -1941,11 +1938,19 @@ button.cafe-table {
 }
 /* Beside plant2 (78–81.7%), clear of the counter box (starts at 58%/65.9%). */
 .cafe-pet-fluff {
-  left: 74%;
+  left: 79%;
   top: 58%;
   width: 16px;
   height: 20px;
   background-image: url("../../assets/sprites/guests/placeholder-pet-fluff.png");
+}
+
+/* The little café gains its stranger residents gradually instead of looking
+   fully dressed on day one. */
+.cafe-diorama--growth-day-1 .cafe-pet-dragon,
+.cafe-diorama--growth-day-1 .cafe-pet-fluff,
+.cafe-diorama--growth-day-2 .cafe-pet-fluff {
+  display: none;
 }
 
 /*
@@ -1959,13 +1964,14 @@ button.cafe-table {
    ── */
 .cafe-decor-clock {
   position: absolute;
-  left: 23.0%;
-  top: 30.0%;
+  left: 14.5%;
+  top: 31.5%;
   z-index: 8;
-  width: 56px;
-  height: 56px;
-  background: url("../../assets/sprites/props/placeholder-cafe-clock.png") center / contain no-repeat;
-  image-rendering: pixelated;
+  width: 9%;
+  height: auto;
+  aspect-ratio: 1024 / 683;
+  background: url("../../assets/sprites/props/placeholder-cafe-clock-v04-hd.png") center / contain no-repeat;
+  image-rendering: auto;
 }
 
 .cafe-decor-clock.cafe-decor--tier-1 {
@@ -1974,14 +1980,16 @@ button.cafe-table {
 
 .cafe-decor-clock.cafe-decor--tier-2 {
   opacity: 1;
-  background-image: url("../../assets/sprites/props/placeholder-cafe-clock-t2.png");
+  background-image: url("../../assets/sprites/props/placeholder-cafe-clock-v04-hd.png");
+  filter: saturate(1.05) brightness(1.03);
 }
 
 .cafe-decor-clock.cafe-decor--tier-3 {
   opacity: 1;
-  background-image: url("../../assets/sprites/props/placeholder-cafe-clock-t3.png");
-  width: 56px;
-  height: 72px;
+  width: 9%;
+  height: auto;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-clock-v04-hd.png");
+  filter: saturate(1.12) brightness(1.06);
 }
 
 /*
@@ -1991,13 +1999,14 @@ button.cafe-table {
  */
 .cafe-decor-lamp {
   position: absolute;
-  left: 65.0%;
-  top: 26.0%;
+  left: 52%;
+  top: 38%;
   z-index: 4;
-  width: 40px;
-  height: 64px;
-  background: url("../../assets/sprites/props/placeholder-cafe-lamp.png") center bottom / contain no-repeat;
-  image-rendering: pixelated;
+  width: 7%;
+  height: auto;
+  aspect-ratio: 2 / 3;
+  background: url("../../assets/sprites/props/placeholder-cafe-lamp-v04-hd.png") center bottom / contain no-repeat;
+  image-rendering: auto;
 }
 
 .cafe-decor-lamp.cafe-decor--tier-1 {
@@ -2006,16 +2015,18 @@ button.cafe-table {
 
 .cafe-decor-lamp.cafe-decor--tier-2 {
   opacity: 1;
-  background-image: url("../../assets/sprites/props/placeholder-cafe-lamp-t2.png");
-  width: 46px;
-  height: 72px;
+  width: 7%;
+  height: auto;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-lamp-v04-hd.png");
+  filter: saturate(1.04) brightness(1.04);
 }
 
 .cafe-decor-lamp.cafe-decor--tier-3 {
   opacity: 1;
-  background-image: url("../../assets/sprites/props/placeholder-cafe-lamp-t3.png");
-  width: 42px;
-  height: 64px;
+  width: 7%;
+  height: auto;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-lamp-v04-hd.png");
+  filter: saturate(1.1) brightness(1.08) drop-shadow(0 0 8px rgba(244, 192, 105, 0.22));
 }
 
 /*
@@ -2025,13 +2036,14 @@ button.cafe-table {
  */
 .cafe-decor-cups {
   position: absolute;
-  left: 61.0%;
-  top: 72.0%;
+  left: 66.5%;
+  top: 49.5%;
   z-index: 6;
-  width: 32px;
-  height: 27px;
-  background: url("../../assets/sprites/props/placeholder-cafe-cups.png") center / contain no-repeat;
-  image-rendering: pixelated;
+  width: 7%;
+  height: auto;
+  aspect-ratio: 1024 / 683;
+  background: url("../../assets/sprites/props/placeholder-cafe-cups-v04-hd.png") center / contain no-repeat;
+  image-rendering: auto;
 }
 
 .cafe-decor-cups.cafe-decor--tier-1 {
@@ -2040,16 +2052,18 @@ button.cafe-table {
 
 .cafe-decor-cups.cafe-decor--tier-2 {
   opacity: 1;
-  background-image: url("../../assets/sprites/props/placeholder-cafe-cups-t2.png");
-  width: 35px;
-  height: 29px;
+  width: 7%;
+  height: auto;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-cups-v04-hd.png");
+  filter: saturate(1.04) brightness(1.03);
 }
 
 .cafe-decor-cups.cafe-decor--tier-3 {
   opacity: 1;
-  background-image: url("../../assets/sprites/props/placeholder-cafe-cups-t3.png");
-  width: 29px;
-  height: 35px;
+  width: 7%;
+  height: auto;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-cups-v04-hd.png");
+  filter: saturate(1.1) brightness(1.06);
 }
 
 /* cafe-decor-shelf removed — diorama background already has painted shelves */
