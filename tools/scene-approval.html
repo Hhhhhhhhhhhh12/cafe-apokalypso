@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Café Apokalypso – Szenenaufbau</title>
+  <style>
+    :root{--paper:#f3e7d7;--card:#fffaf0;--ink:#3d2a23;--wine:#92332f;--teal:#16606c;--muted:#7a6153}
+    *{box-sizing:border-box}
+    body{margin:0;background:linear-gradient(180deg,#f8efe2,var(--paper));color:var(--ink);font:15px/1.45 ui-rounded,"Avenir Next",system-ui,sans-serif}
+    header{max-width:1440px;margin:auto;padding:26px 28px 14px}
+    h1{margin:0;font-size:clamp(24px,3vw,38px);letter-spacing:-.025em}
+    header p{max-width:850px;margin:8px 0 0;color:var(--muted)}
+    .progress{display:flex;align-items:center;gap:8px;margin-top:17px;flex-wrap:wrap}
+    .step{padding:6px 10px;border:1px solid #cbb19b;border-radius:999px;background:#fff6e9;color:var(--muted);font-size:12px;font-weight:750}
+    .step.active{border-color:var(--teal);background:var(--teal);color:white}
+    .arrow{color:#aa8c74}
+    main{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:1440px;margin:auto;padding:12px 28px 30px}
+    figure{margin:0;overflow:hidden;border:2px solid var(--ink);border-radius:14px;background:var(--card);box-shadow:5px 7px 0 rgba(61,42,35,.14)}
+    figcaption{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:14px 16px;border-bottom:1px solid #d9c5b2}
+    .title{font-size:17px;font-weight:850}.note{margin-top:2px;color:var(--muted);font-size:12px}
+    .badge{flex:none;padding:5px 8px;border-radius:999px;background:#eadbd0;color:#654b3f;font-size:11px;font-weight:850;text-transform:uppercase;letter-spacing:.06em}
+    .badge.target{background:#dcebe6;color:#245b50}
+    .scene{position:relative;aspect-ratio:16/9;display:grid;place-items:center;overflow:hidden;background:radial-gradient(circle at 50% 43%,#fffdf8 0,#f6ebdc 72%,#ead6c0 100%)}
+    .scene img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;image-rendering:auto}
+    .approval{display:flex;justify-content:space-between;gap:12px;padding:11px 16px;border-top:1px solid #e0cdbb;color:var(--muted);font-size:12px}
+    .approval strong{color:var(--wine)}
+    @media(max-width:900px){main{grid-template-columns:1fr}header,main{padding-left:16px;padding-right:16px}}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Szenenaufbau – Gegenstand für Gegenstand</h1>
+    <p>Links steht immer nur der bereits freigegebene Stand. Rechts bleibt das ausgearbeitete Zielbild als feste Orientierung. Pro Runde kommt links genau ein Gegenstand hinzu.</p>
+    <div class="progress" aria-label="Fortschritt">
+      <span class="step active">0 · Hintergrund</span><span class="arrow">→</span><span class="step">1 · erster Gegenstand</span><span class="arrow">→</span><span class="step">… einzeln freigeben</span>
+    </div>
+  </header>
+  <main>
+    <figure>
+      <figcaption>
+        <div><div class="title">Aktueller Stand</div><div class="note">Tag 1 · nur Hintergrund · keine losen Objekte</div></div>
+        <span class="badge">zur Abnahme</span>
+      </figcaption>
+      <div class="scene">
+        <img src="../assets/backgrounds/placeholder-cafe-stage-v07-day-1.png" alt="Leerer warmer Caféraum am ersten Tag">
+      </div>
+      <div class="approval"><span>Schritt 0</span><strong>Bitte nur den Hintergrund beurteilen</strong></div>
+    </figure>
+    <figure>
+      <figcaption>
+        <div><div class="title">Zielbild</div><div class="note">Tag 7 · vollständig eingerichtet · nur visuelle Richtung</div></div>
+        <span class="badge target">Referenz</span>
+      </figcaption>
+      <div class="scene">
+        <img src="../assets/backgrounds/placeholder-cafe-target-v01.png" alt="Zielbild des vollständig eingerichteten Cafés">
+      </div>
+      <div class="approval"><span>Endzustand</span><span>Wird nicht automatisch ins Spiel übernommen</span></div>
+    </figure>
+  </main>
+</body>
+</html>
