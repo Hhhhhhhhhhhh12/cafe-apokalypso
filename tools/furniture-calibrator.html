@@ -16,10 +16,10 @@
     .stage-card,.panel{border:2px solid var(--ink);border-radius:12px;background:var(--cream);box-shadow:4px 5px 0 rgba(61,42,35,.16)}
     .stage-card{padding:10px}.stage{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;background:#d4bfa0;border-radius:7px;touch-action:none;user-select:none}
     .layer{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;pointer-events:none;image-rendering:auto}
-    .floor{z-index:1;clip-path:polygon(5.92% 71.84%,50% 52.39%,94.08% 72.58%,55.5% var(--tip),44.5% var(--tip))}.shell{z-index:2}
+    .floor{z-index:1}.shell{z-index:2}.floor,.shell,.item img{image-rendering:pixelated}
     .grid{display:none;position:absolute;inset:0;z-index:20;pointer-events:none;background-image:linear-gradient(rgba(22,96,108,.18) 1px,transparent 1px),linear-gradient(90deg,rgba(22,96,108,.18) 1px,transparent 1px);background-size:5% 5%}.stage.show-grid .grid{display:block}
     .safe{position:absolute;inset:0;z-index:19;width:100%;height:100%;pointer-events:none}.safe polygon{fill:rgba(22,96,108,.035);stroke:rgba(22,96,108,.7);stroke-width:.35;stroke-dasharray:1.2 1}
-    .item{position:absolute;z-index:7;cursor:grab;touch-action:none}.item:active{cursor:grabbing}.item img{display:block;width:100%;height:100%;object-fit:contain;image-rendering:auto;pointer-events:none}
+    .item{position:absolute;z-index:7;cursor:grab;touch-action:none}.item:active{cursor:grabbing}.item img{display:block;width:100%;height:100%;object-fit:contain;image-rendering:pixelated;pointer-events:none}
     .item.sel::after{content:attr(data-label);position:absolute;left:50%;bottom:100%;transform:translate(-50%,-4px);padding:2px 6px;border-radius:5px;background:var(--teal);color:white;font-size:11px;white-space:nowrap}
     .item.sel{filter:drop-shadow(0 0 2px white) drop-shadow(0 0 2px var(--teal))}.stage.show-box .item{outline:1px dashed var(--amber)}
     .item.unsafe{filter:drop-shadow(0 0 3px #d02f2f)}.item.unsafe.sel::after{background:#a52b2b}
@@ -39,9 +39,9 @@
   </header>
   <main>
     <section class="stage-card">
-      <div class="stage" id="stage" style="--tip:82%">
-        <img class="layer floor" src="../assets/backgrounds/placeholder-cafe-floor-v04-clean-hd.png" alt="">
-        <img class="layer shell" src="../assets/backgrounds/placeholder-cafe-shell-v05-growth-clean.png" alt="">
+      <div class="stage" id="stage">
+        <img class="layer floor" src="../assets/backgrounds/placeholder-cafe-floor-v06-day-1.png" alt="">
+        <img class="layer shell" src="../assets/backgrounds/placeholder-cafe-shell-v06-redesign.png" alt="">
         <svg class="safe" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polygon id="safe-poly"></polygon></svg>
         <div class="grid"></div>
       </div>
@@ -63,19 +63,22 @@
   </main>
   <script>
     const FLOOR={left:5,top:31,width:89,height:65};
-    const TIPS=[82,85,88,91,94,97,99.5];
-    const DAY1=[[5.92,71.84],[50,52.39],[94.08,72.58],[55.5,82],[44.5,82]];
+    const FLOOR_ASSETS=Array.from({length:7},(_,i)=>`../assets/backgrounds/placeholder-cafe-floor-v06-day-${i+1}.png`);
+    const DAY1=[[8,61.6],[50,45.7],[92,61.6],[78,72],[50,77],[22,72]];
     const defaults=[
-      {id:'left',label:'Tisch links',selector:'.cafe-table--left',space:'floor',kind:'table',x:29.50,y:55.50,w:11.50,ratio:1,z:7,src:'../assets/sprites/props/placeholder-cafe-table-left-v05-simple.png'},
-      {id:'right',label:'Tisch Mitte',selector:'.cafe-table--right',space:'floor',kind:'table',x:45.00,y:51.50,w:11.50,ratio:1,z:7,src:'../assets/sprites/props/placeholder-cafe-table-round-v05-simple.png'},
-      {id:'back',label:'Tisch vorne',selector:'.cafe-table--back',space:'floor',kind:'table',x:40.80,y:65.00,w:9.50,ratio:1,z:7,src:'../assets/sprites/props/placeholder-cafe-table-front-v05-simple.png'},
-      {id:'plant',label:'Pflanze',selector:'.cafe-decor-plant',space:'world',kind:'plant',x:19.50,y:56.00,w:6.00,ratio:995/1024,z:6,src:'../assets/sprites/props/placeholder-cafe-plant-v05-simple.png'},
-      {id:'shelf',label:'Regal',selector:'.cafe-furniture-shelf',space:'world',kind:'wall',x:76.00,y:26.00,w:16.00,ratio:1024/683,z:5,src:'../assets/sprites/props/placeholder-cafe-shelf-v06-simple.png'},
-      {id:'counter',label:'Theke',selector:'.cafe-counter',space:'floor',kind:'counter',x:59.00,y:48.00,w:26.50,ratio:1024/651,z:4,src:'../assets/sprites/props/placeholder-cafe-counter-v06-simple.png'},
-      {id:'machine',label:'Maschine',selector:'.cafe-coffee-machine',space:'counter',kind:'fixed',x:63.77,y:48.60,w:5.70,ratio:1.5,z:8,src:'../assets/sprites/props/placeholder-cafe-coffee-machine-v05-simple.png'},
-      {id:'register',label:'Kasse',selector:'.cafe-register',space:'counter',kind:'fixed',x:78.08,y:50.69,w:5.04,ratio:585/589,z:8,src:'../assets/sprites/props/placeholder-kassandra-register-v05-simple.png'}
+      {id:'left',label:'Tisch links',selector:'.cafe-table--left',space:'floor',kind:'table',x:25.00,y:54.00,w:11.00,ratio:1161/742,z:7,src:'../assets/sprites/props/placeholder-cafe-table-v06-redesign.png'},
+      {id:'right',label:'Tisch Mitte',selector:'.cafe-table--right',space:'floor',kind:'table',x:44.00,y:52.00,w:11.00,ratio:1161/742,z:7,src:'../assets/sprites/props/placeholder-cafe-table-v06-redesign.png'},
+      {id:'back',label:'Tisch vorne',selector:'.cafe-table--back',space:'floor',kind:'table',x:34.00,y:63.00,w:9.50,ratio:1161/742,z:7,src:'../assets/sprites/props/placeholder-cafe-table-v06-redesign.png'},
+      {id:'plant',label:'Pflanze',selector:'.cafe-decor-plant',space:'world',kind:'plant',x:15.00,y:51.00,w:5.80,ratio:790/1100,z:6,src:'../assets/sprites/props/placeholder-cafe-plant-v06-redesign.png'},
+      {id:'shelf',label:'Regal',selector:'.cafe-furniture-shelf',space:'world',kind:'wall',x:77.00,y:27.00,w:14.00,ratio:1069/781,z:5,src:'../assets/sprites/props/placeholder-cafe-shelf-v07-redesign.png'},
+      {id:'lamp',label:'Stehlampe',selector:'.cafe-decor-lamp',space:'world',kind:'wall',x:48.30,y:31.50,w:4.20,ratio:467/1438,z:5,src:'../assets/sprites/props/placeholder-cafe-lamp-v06-redesign.png'},
+      {id:'clock',label:'Uhr',selector:'.cafe-decor-clock',space:'world',kind:'wall',x:18.50,y:23.00,w:5.50,ratio:701/719,z:6,src:'../assets/sprites/props/placeholder-cafe-clock-v06-redesign.png'},
+      {id:'counter',label:'Theke',selector:'.cafe-counter',space:'floor',kind:'counter',x:57.00,y:41.00,w:24.00,ratio:1181/769,z:4,src:'../assets/sprites/props/placeholder-cafe-counter-v07-redesign.png'},
+      {id:'machine',label:'Maschine',selector:'.cafe-coffee-machine',space:'counter',kind:'fixed',x:59.40,y:41.00,w:6.72,ratio:987/1001,z:8,src:'../assets/sprites/props/placeholder-cafe-coffee-machine-v06-redesign.png'},
+      {id:'cups',label:'Tassen',selector:'.cafe-counter .cafe-decor-cups',space:'counter',kind:'fixed',x:68.04,y:45.72,w:3.60,ratio:782/873,z:8,src:'../assets/sprites/props/placeholder-cafe-cups-v06-redesign.png'},
+      {id:'register',label:'Kasse',selector:'.cafe-register',space:'counter',kind:'fixed',x:75.00,y:44.89,w:3.84,ratio:855/928,z:8,src:'../assets/sprites/props/placeholder-kassandra-register-v06-redesign.png'}
     ];
-    const storeKey='cafe-apokalypso.furniture-calibrator.v7';
+    const storeKey='cafe-apokalypso.furniture-calibrator.v9';
     let saved={};try{saved=JSON.parse(localStorage.getItem(storeKey)||'{}')}catch{}
     let items=defaults.map(d=>({...d,...saved[d.id]}));let selected='left',day=1,drag=null;
     const stage=document.querySelector('#stage'),objects=document.querySelector('#objects'),size=document.querySelector('#size'),sizeOut=document.querySelector('#size-out'),status=document.querySelector('#status'),cssOut=document.querySelector('#css');
@@ -87,7 +90,7 @@
     const persist=()=>{const out={};items.forEach(p=>out[p.id]={x:p.x,y:p.y,w:p.w});localStorage.setItem(storeKey,JSON.stringify(out))};
     function cssText(){return items.map(p=>{const base=defaults.find(d=>d.id===p.id);if(p.space==='floor'){const left=(p.x-FLOOR.left)/FLOOR.width*100,top=(p.y-FLOOR.top)/FLOOR.height*100,width=p.w/FLOOR.width*100;return `${p.selector} {\n  left: ${left.toFixed(2)}%;\n  top: ${top.toFixed(2)}%;\n  width: ${width.toFixed(2)}%;\n  height: auto;\n  aspect-ratio: ${p.kind==='table'?'1':p.ratio.toFixed(3)};\n}`}if(p.space==='counter'){const counter=items.find(x=>x.id==='counter'),counterH=heightPct(counter),left=(p.x-counter.x)/counter.w*100,top=(p.y-counter.y)/counterH*100,width=p.w/counter.w*100;return `${p.selector} {\n  left: ${left.toFixed(2)}%;\n  ${p.id==='register'?'right: auto;\n  ':''}top: ${top.toFixed(2)}%;\n  width: ${width.toFixed(2)}%;\n  height: auto;\n  aspect-ratio: ${p.ratio.toFixed(3)};\n}`}if(p.space==='world-px'){const scale=p.w/base.w;return `${p.selector} {\n  left: ${p.x.toFixed(2)}%;\n  top: ${p.y.toFixed(2)}%;\n  width: ${Math.round(p.pixelWidth*scale)}px;\n  height: ${Math.round(p.pixelHeight*scale)}px;\n}`}return `${p.selector} {\n  left: ${p.x.toFixed(2)}%;\n  top: ${p.y.toFixed(2)}%;\n  width: ${p.w.toFixed(2)}%;\n  height: auto;\n  aspect-ratio: ${p.ratio.toFixed(3)};\n}`}).join('\n\n')}
     function render(){
-      stage.style.setProperty('--tip',TIPS[day-1]+'%');stage.querySelectorAll('.item').forEach(n=>n.remove());
+      stage.querySelector('.floor').src=FLOOR_ASSETS[day-1];stage.querySelectorAll('.item').forEach(n=>n.remove());
       items.forEach(p=>{const el=document.createElement('div');el.className='item'+(p.id===selected?' sel':'')+(safe(p)?'':' unsafe');el.dataset.id=p.id;el.dataset.label=p.label;el.style.left=p.x+'%';el.style.top=p.y+'%';el.style.width=p.w+'%';el.style.aspectRatio=p.ratio;el.style.zIndex=p.z;el.innerHTML=`<img src="${p.src}" alt="${p.label}">`;el.addEventListener('pointerdown',down);stage.appendChild(el)});
       objects.innerHTML='';items.forEach(p=>{const floorCheck=p.kind==='table'||p.kind==='counter',okay=safe(p),badge=floorCheck?(okay?'Tag 1 sicher':'außerhalb'):'verschiebbar';const b=document.createElement('button');b.className='object'+(p.id===selected?' on':'');b.innerHTML=`<span>${p.label}</span><span class="badge ${okay?'':'bad'}">${badge}</span>`;b.onclick=()=>{selected=p.id;render()};objects.appendChild(b)});
       const current=items.find(p=>p.id===selected),base=defaults.find(p=>p.id===selected);const pct=Math.round(current.w/base.w*100);size.value=pct;sizeOut.textContent=pct+' %';const okay=safe(current),floorCheck=current.kind==='table'||current.kind==='counter';status.className='status'+(okay?'':' bad');status.textContent=floorCheck?(okay?'Tag 1 sicher':'Steht an Tag 1 außerhalb des Bodens'):'Frei verschiebbar';cssOut.textContent=cssText();persist();
@@ -101,7 +104,7 @@
     document.querySelector('#copy').onclick=async e=>{try{await navigator.clipboard.writeText(cssText());e.currentTarget.textContent='Kopiert ✓';setTimeout(()=>e.currentTarget.textContent='Positionen kopieren',1500)}catch{cssOut.focus();alert('Bitte den CSS-Block unten manuell kopieren.')}};
     document.querySelector('#reset').onclick=()=>{const i=items.findIndex(p=>p.id===selected),d=defaults[i];items[i]={...d};if(selected==='counter')items=items.map(p=>p.space==='counter'?{...defaults.find(d=>d.id===p.id)}:p);render()};document.querySelector('#reset-all').onclick=()=>{items=defaults.map(d=>({...d}));render()};
     addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))return;const p=items.find(x=>x.id===selected),r=stage.getBoundingClientRect(),step=e.shiftKey?8:1,dx=({ArrowLeft:-step,ArrowRight:step}[e.key]||0)/r.width*100,dy=({ArrowUp:-step,ArrowDown:step}[e.key]||0)/r.height*100;p.x+=dx;p.y+=dy;if(p.id==='counter')items.filter(x=>x.space==='counter').forEach(x=>{x.x+=dx;x.y+=dy});render();e.preventDefault()});
-    const days=document.querySelector('#days');TIPS.forEach((_,i)=>{const b=document.createElement('button');b.className='day';b.textContent='Tag '+(i+1);b.onclick=()=>{day=i+1;render()};days.appendChild(b)});render();
+    const days=document.querySelector('#days');FLOOR_ASSETS.forEach((_,i)=>{const b=document.createElement('button');b.className='day';b.textContent='Tag '+(i+1);b.onclick=()=>{day=i+1;render()};days.appendChild(b)});render();
   </script>
 </body>
 </html>

@@ -4561,3 +4561,173 @@ html.cafe-colorblind-mode .options-menu__tag--coming-soon {
   background: #fff5e6;
   color: #664400;
 }
+
+/* === Café v06 redesign =====================================================
+   The shell and all seven daily floor layers are cut from one room master.
+   Daily PNGs carry their own clean pixel trim; browser clip paths are disabled. */
+.cafe-floor-growth {
+  clip-path: none !important;
+  image-rendering: pixelated;
+  transition: opacity 0.45s ease;
+}
+
+.cafe-stage-base {
+  image-rendering: pixelated;
+}
+
+.cafe-counter {
+  top: 15.38%;
+  left: 58.43%;
+  z-index: 4;
+  width: 26.97%;
+  height: auto;
+  aspect-ratio: 1181 / 769;
+  background: url("../../assets/sprites/props/placeholder-cafe-counter-v07-redesign.png") center bottom / contain no-repeat !important;
+  image-rendering: pixelated;
+}
+
+.cafe-coffee-machine {
+  top: 0;
+  left: 10%;
+  width: 28%;
+  height: auto;
+  aspect-ratio: 987 / 1001;
+}
+
+.cafe-register {
+  top: 14%;
+  right: auto;
+  left: 75%;
+  width: 16%;
+  height: auto;
+  aspect-ratio: 855 / 928;
+}
+
+.cafe-register__screen {
+  display: none;
+}
+
+.cafe-register--awake .cafe-pilot-asset--kassandra-register {
+  filter: brightness(1.06) drop-shadow(0 0 4px rgba(22, 96, 108, 0.48));
+}
+
+.cafe-counter .cafe-decor-cups {
+  top: 17%;
+  left: 46%;
+  z-index: 7;
+  width: 15%;
+  height: auto;
+  aspect-ratio: 782 / 873;
+  background: url("../../assets/sprites/props/placeholder-cafe-cups-v06-redesign.png") center bottom / contain no-repeat;
+  image-rendering: pixelated;
+}
+
+.cafe-counter .cafe-decor-cups.cafe-decor--tier-1,
+.cafe-counter .cafe-decor-cups.cafe-decor--tier-2,
+.cafe-counter .cafe-decor-cups.cafe-decor--tier-3 {
+  width: 15%;
+  opacity: 1;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-cups-v06-redesign.png");
+}
+
+.cafe-table {
+  aspect-ratio: 1161 / 742;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-table-v06-redesign.png");
+  image-rendering: pixelated;
+}
+
+.cafe-table--left {
+  top: 35.38%;
+  left: 22.47%;
+  width: 12.36%;
+  aspect-ratio: 1161 / 742;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-table-v06-redesign.png");
+}
+
+.cafe-table--right {
+  top: 32.31%;
+  left: 43.82%;
+  width: 12.36%;
+  aspect-ratio: 1161 / 742;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-table-v06-redesign.png");
+}
+
+.cafe-table--back {
+  top: 49.23%;
+  left: 32.58%;
+  width: 10.67%;
+  aspect-ratio: 1161 / 742;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-table-v06-redesign.png");
+}
+
+.cafe-table--tier-3::after {
+  display: none;
+}
+
+.cafe-decor-plant {
+  top: 51%;
+  left: 15%;
+  z-index: 5;
+  width: 5.8%;
+  height: auto;
+  aspect-ratio: 790 / 1100;
+  background: url("../../assets/sprites/props/placeholder-cafe-plant-v06-redesign.png") center bottom / contain no-repeat;
+  image-rendering: pixelated;
+}
+
+.cafe-decor-plant.cafe-decor--tier-1,
+.cafe-decor-plant.cafe-decor--tier-2,
+.cafe-decor-plant.cafe-decor--tier-3 {
+  width: 5.8%;
+  opacity: 1;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-plant-v06-redesign.png");
+}
+
+.cafe-furniture-shelf {
+  top: 27%;
+  left: 77%;
+  z-index: 5;
+  width: 14%;
+  height: auto;
+  aspect-ratio: 1069 / 781;
+  background: url("../../assets/sprites/props/placeholder-cafe-shelf-v07-redesign.png") center / contain no-repeat;
+  image-rendering: pixelated;
+}
+
+.cafe-decor-clock {
+  top: 23%;
+  left: 18.5%;
+  z-index: 6;
+  width: 5.5%;
+  height: auto;
+  aspect-ratio: 701 / 719;
+  background: url("../../assets/sprites/props/placeholder-cafe-clock-v06-redesign.png") center / contain no-repeat;
+  image-rendering: pixelated;
+}
+
+.cafe-decor-clock.cafe-decor--tier-1,
+.cafe-decor-clock.cafe-decor--tier-2,
+.cafe-decor-clock.cafe-decor--tier-3 {
+  width: 5.5%;
+  opacity: 1;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-clock-v06-redesign.png");
+}
+
+.cafe-decor-lamp {
+  top: 31.5%;
+  left: 48.3%;
+  z-index: 4;
+  width: 4.2%;
+  height: auto;
+  aspect-ratio: 467 / 1438;
+  background: url("../../assets/sprites/props/placeholder-cafe-lamp-v06-redesign.png") center bottom / contain no-repeat;
+  image-rendering: pixelated;
+}
+
+.cafe-decor-lamp.cafe-decor--tier-1,
+.cafe-decor-lamp.cafe-decor--tier-2,
+.cafe-decor-lamp.cafe-decor--tier-3 {
+  width: 4.2%;
+  opacity: 1;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-lamp-v06-redesign.png");
+}

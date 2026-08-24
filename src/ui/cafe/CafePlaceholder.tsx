@@ -3,10 +3,16 @@ import type { GameState, TableId } from "../../game/types/game";
 import type { ProductId } from "../../game/types/content";
 import { getDioramaGuestVisibility, getNextGuestPreview, getNarrativeEventCards } from "../../game/engine/selectors";
 import { kassandraMessages } from "../../game/data/kassandra";
-import floorGrowthAsset from "../../../assets/backgrounds/placeholder-cafe-floor-v04-clean-hd.png";
-import stageShellAsset from "../../../assets/backgrounds/placeholder-cafe-shell-v05-growth-clean.png";
-import coffeeMachineAsset from "../../../assets/sprites/props/placeholder-cafe-coffee-machine-v05-simple.png";
-import kassandraRegisterAsset from "../../../assets/sprites/props/placeholder-kassandra-register-v05-simple.png";
+import floorDay1Asset from "../../../assets/backgrounds/placeholder-cafe-floor-v06-day-1.png";
+import floorDay2Asset from "../../../assets/backgrounds/placeholder-cafe-floor-v06-day-2.png";
+import floorDay3Asset from "../../../assets/backgrounds/placeholder-cafe-floor-v06-day-3.png";
+import floorDay4Asset from "../../../assets/backgrounds/placeholder-cafe-floor-v06-day-4.png";
+import floorDay5Asset from "../../../assets/backgrounds/placeholder-cafe-floor-v06-day-5.png";
+import floorDay6Asset from "../../../assets/backgrounds/placeholder-cafe-floor-v06-day-6.png";
+import floorDay7Asset from "../../../assets/backgrounds/placeholder-cafe-floor-v06-day-7.png";
+import stageShellAsset from "../../../assets/backgrounds/placeholder-cafe-shell-v06-redesign.png";
+import coffeeMachineAsset from "../../../assets/sprites/props/placeholder-cafe-coffee-machine-v06-redesign.png";
+import kassandraRegisterAsset from "../../../assets/sprites/props/placeholder-kassandra-register-v06-redesign.png";
 import bohnGuestAsset from "../../../assets/sprites/guests/placeholder-guest-bohn.png";
 import strangeGuestAsset from "../../../assets/sprites/guests/placeholder-guest-strange.png";
 import cemSeatedAsset from "../../../assets/sprites/guests/placeholder-guest-cem-seated.png";
@@ -20,6 +26,15 @@ import fatouSeatedAsset from "../../../assets/sprites/guests/placeholder-guest-f
 
 const QUEUE_ROTATION = ["kemal", "cem", "mira", "lukas", "christa", "fatou"] as const;
 type QueueGuest = (typeof QUEUE_ROTATION)[number];
+const FLOOR_GROWTH_ASSETS = [
+  floorDay1Asset,
+  floorDay2Asset,
+  floorDay3Asset,
+  floorDay4Asset,
+  floorDay5Asset,
+  floorDay6Asset,
+  floorDay7Asset,
+] as const;
 
 /** Window-safe reduced-motion check, callable during render. */
 function prefersReducedMotion(): boolean {
@@ -272,14 +287,18 @@ export function CafePlaceholder({ gameState, onCleanTable }: CafePlaceholderProp
           </span>
         )}
         <div className="cafe-world">
-          <img className="cafe-floor-growth" src={floorGrowthAsset} alt="" aria-hidden="true" />
+          <img
+            className="cafe-floor-growth"
+            src={FLOOR_GROWTH_ASSETS[Math.max(0, Math.min(6, gameState.day - 1))]}
+            alt=""
+            aria-hidden="true"
+          />
           <img className="cafe-stage-base" src={stageShellAsset} alt="" aria-hidden="true" />
           {isDusty && <div className="cafe-dust" aria-hidden="true" />}
 
           {/* Décor props — positioned absolute via CSS, tier drives sprite */}
           <div className={`cafe-decor-clock cafe-decor--tier-${gameState.decor?.clock ?? 1}`} aria-hidden="true" />
           <div className={`cafe-decor-lamp cafe-decor--tier-${gameState.decor?.lamp ?? 1}`} aria-hidden="true" />
-          <div className={`cafe-decor-cups cafe-decor--tier-${gameState.decor?.cups ?? 1}`} aria-hidden="true" />
           <div className={`cafe-plant cafe-decor-plant cafe-decor--tier-${gameState.decor?.plant ?? 1}`} aria-hidden="true" />
           <div className={`cafe-decor-plant2 cafe-decor--tier-${gameState.decor?.plant2 ?? 1}`} aria-hidden="true" />
           <div className={`cafe-furniture-shelf cafe-decor--tier-${gameState.decor?.shelf ?? 1}`} aria-hidden="true" />
@@ -354,6 +373,11 @@ export function CafePlaceholder({ gameState, onCleanTable }: CafePlaceholderProp
                   <span className="cafe-register__receipt cafe-register__receipt--long" />
                 )}
               </div>
+
+              <div
+                className={`cafe-decor-cups cafe-decor--tier-${gameState.decor?.cups ?? 1}`}
+                aria-hidden="true"
+              />
 
               <div className="cafe-counter-props">
                 <span />
