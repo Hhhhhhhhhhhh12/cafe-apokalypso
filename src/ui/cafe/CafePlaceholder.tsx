@@ -4,9 +4,9 @@ import type { ProductId } from "../../game/types/content";
 import { getDioramaGuestVisibility, getNextGuestPreview, getNarrativeEventCards } from "../../game/engine/selectors";
 import { kassandraMessages } from "../../game/data/kassandra";
 import floorGrowthAsset from "../../../assets/backgrounds/placeholder-cafe-floor-v04-clean-hd.png";
-import stageShellAsset from "../../../assets/backgrounds/placeholder-cafe-shell-v04-clean-hd.png";
-import coffeeMachineAsset from "../../../assets/sprites/props/placeholder-cafe-coffee-machine-v04-hd.png";
-import kassandraRegisterAsset from "../../../assets/sprites/props/placeholder-kassandra-register-v04-hd.png";
+import stageShellAsset from "../../../assets/backgrounds/placeholder-cafe-shell-v05-growth-clean.png";
+import coffeeMachineAsset from "../../../assets/sprites/props/placeholder-cafe-coffee-machine-v05-simple.png";
+import kassandraRegisterAsset from "../../../assets/sprites/props/placeholder-kassandra-register-v05-simple.png";
 import bohnGuestAsset from "../../../assets/sprites/guests/placeholder-guest-bohn.png";
 import strangeGuestAsset from "../../../assets/sprites/guests/placeholder-guest-strange.png";
 import cemSeatedAsset from "../../../assets/sprites/guests/placeholder-guest-cem-seated.png";
@@ -249,7 +249,7 @@ export function CafePlaceholder({ gameState, onCleanTable }: CafePlaceholderProp
           weirdnessClass,
         ].join(" ")}
         role="img"
-        aria-label={`3/4 café room on Day ${gameState.day}: counter, coffee machine, register, queue, ${gameState.equipment.seating >= 1 ? "two tables, " : "standing room only, "}door, window, storage shelf, and menu board.`}
+        aria-label={`3/4 café room on Day ${gameState.day}: counter, coffee machine, register, queue, ${gameState.equipment.seating >= 1 ? "three tables, " : "standing room only, "}door, window, storage shelf, and menu board.`}
       >
         {coinTick && (
           <span key={`coin-${coinTick.key}`} className="cafe-coin-tick" aria-hidden="true">
