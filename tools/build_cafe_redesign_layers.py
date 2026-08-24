@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build deterministic room-shell and seven floor-growth layers from one master."""
+"""Build seven precomposited daily café stages from one room master."""
 
 from __future__ import annotations
 
@@ -7,10 +7,11 @@ import argparse
 from collections import deque
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFilter
+from PIL import Image, ImageChops, ImageDraw, ImageFilter
 
 
 CANVAS = (1672, 941)
+TOP_SAFE_MARGIN = 4
 FLOOR_BACK = ((8.0, 61.6), (50.0, 45.7), (92.0, 61.6))
 DAY_TIPS = (77.0, 80.6, 84.2, 87.8, 91.4, 95.0, 98.6)
 FLOOR_SHOULDERS_X = (22.0, 78.0)
@@ -78,10 +79,12 @@ def build(master_path: Path, output_dir: Path) -> None:
     if master.mode != "RGBA" or master.getchannel("A").getextrema() == (255, 255):
         master = remove_connected_light_background(master)
     master = master.resize(CANVAS, Image.Resampling.LANCZOS)
-    master.save(output_dir / "placeholder-cafe-master-v06-redesign.png", optimize=True)
+    master_destination = output_dir / "placeholder-cafe-master-v06-redesign.png"
+    if master_path.resolve() != master_destination.resolve():
+        master.save(master_destination, optimize=True)
 
-    # The wall shell and every daily floor are cut from this exact master. A
-    # two-pixel overlap at the wall/floor seam prevents sampling gaps at any DPR.
+    # Each day is exported as one finished stage. Walls and floor therefore
+    # share one alpha map and can never drift apart during browser scaling.
     shell_region = [
         (0.0, 0.0),
         (100.0, 0.0),
@@ -92,10 +95,6 @@ def build(master_path: Path, output_dir: Path) -> None:
         (0.0, 62.0),
     ]
     shell_mask = antialiased_polygon(shell_region)
-    shell_alpha = Image.composite(master.getchannel("A"), Image.new("L", CANVAS, 0), shell_mask)
-    shell = master.copy()
-    shell.putalpha(shell_alpha)
-    shell.save(output_dir / "placeholder-cafe-shell-v06-redesign.png", optimize=True)
 
     edge_color = (91, 47, 29, 255)
     for day, tip in enumerate(DAY_TIPS, start=1):
@@ -106,10 +105,11 @@ def build(master_path: Path, output_dir: Path) -> None:
             (50.0, tip),
             (FLOOR_SHOULDERS_X[0], shoulder_y),
         ]
-        mask = antialiased_polygon(polygon)
-        alpha = Image.composite(master.getchannel("A"), Image.new("L", CANVAS, 0), mask)
-        layer = master.copy()
-        layer.putalpha(alpha)
+        floor_mask = antialiased_polygon(polygon)
+        stage_mask = ImageChops.lighter(shell_mask, floor_mask)
+        stage_alpha = ImageChops.multiply(master.getchannel("A"), stage_mask)
+        stage = master.copy()
+        stage.putalpha(stage_alpha)
 
         # Pixel-art trim belongs to each daily layer, so the visible edge is
         # intentional and never a browser clip-path or a leftover white fringe.
@@ -118,12 +118,17 @@ def build(master_path: Path, output_dir: Path) -> None:
         trim_draw.line(
             [pct_point(point) for point in polygon[2:]] + [pct_point(polygon[0])],
             fill=edge_color,
-            width=5,
+            width=3,
             joint="curve",
         )
-        trim.putalpha(Image.composite(trim.getchannel("A"), Image.new("L", CANVAS, 0), mask.filter(ImageFilter.MaxFilter(7))))
-        layer = Image.alpha_composite(layer, trim)
-        layer.save(output_dir / f"placeholder-cafe-floor-v06-day-{day}.png", optimize=True)
+        stage = Image.alpha_composite(stage, trim)
+
+        # Keep even the roof tip off the file edge. Four source pixels become
+        # roughly two CSS pixels in the landscape viewport: enough to avoid a
+        # clipped silhouette without visibly shifting the room geometry.
+        framed_stage = Image.new("RGBA", CANVAS, (0, 0, 0, 0))
+        framed_stage.alpha_composite(stage, dest=(0, TOP_SAFE_MARGIN))
+        framed_stage.save(output_dir / f"placeholder-cafe-stage-v07-day-{day}.png", optimize=True)
 
 
 def main() -> None:

@@ -4562,17 +4562,15 @@ html.cafe-colorblind-mode .options-menu__tag--coming-soon {
   color: #664400;
 }
 
-/* === Café v06 redesign =====================================================
-   The shell and all seven daily floor layers are cut from one room master.
-   Daily PNGs carry their own clean pixel trim; browser clip paths are disabled. */
+/* === Café v07 precomposited stage ==========================================
+   Each day uses one complete room PNG. Wall and floor edges are never scaled
+   as separate browser layers, eliminating alpha seams and registration drift. */
 .cafe-floor-growth {
-  clip-path: none !important;
-  image-rendering: pixelated;
-  transition: opacity 0.45s ease;
+  display: none !important;
 }
 
 .cafe-stage-base {
-  image-rendering: pixelated;
+  image-rendering: auto;
 }
 
 .cafe-counter {
@@ -4583,7 +4581,7 @@ html.cafe-colorblind-mode .options-menu__tag--coming-soon {
   height: auto;
   aspect-ratio: 1181 / 769;
   background: url("../../assets/sprites/props/placeholder-cafe-counter-v07-redesign.png") center bottom / contain no-repeat !important;
-  image-rendering: pixelated;
+  image-rendering: auto;
 }
 
 .cafe-coffee-machine {
@@ -4619,7 +4617,7 @@ html.cafe-colorblind-mode .options-menu__tag--coming-soon {
   height: auto;
   aspect-ratio: 782 / 873;
   background: url("../../assets/sprites/props/placeholder-cafe-cups-v06-redesign.png") center bottom / contain no-repeat;
-  image-rendering: pixelated;
+  image-rendering: auto;
 }
 
 .cafe-counter .cafe-decor-cups.cafe-decor--tier-1,
@@ -4633,7 +4631,7 @@ html.cafe-colorblind-mode .options-menu__tag--coming-soon {
 .cafe-table {
   aspect-ratio: 1161 / 742;
   background-image: url("../../assets/sprites/props/placeholder-cafe-table-v06-redesign.png");
-  image-rendering: pixelated;
+  image-rendering: auto;
 }
 
 .cafe-table--left {
@@ -4672,7 +4670,7 @@ html.cafe-colorblind-mode .options-menu__tag--coming-soon {
   height: auto;
   aspect-ratio: 790 / 1100;
   background: url("../../assets/sprites/props/placeholder-cafe-plant-v06-redesign.png") center bottom / contain no-repeat;
-  image-rendering: pixelated;
+  image-rendering: auto;
 }
 
 .cafe-decor-plant.cafe-decor--tier-1,
@@ -4691,7 +4689,7 @@ html.cafe-colorblind-mode .options-menu__tag--coming-soon {
   height: auto;
   aspect-ratio: 1069 / 781;
   background: url("../../assets/sprites/props/placeholder-cafe-shelf-v07-redesign.png") center / contain no-repeat;
-  image-rendering: pixelated;
+  image-rendering: auto;
 }
 
 .cafe-decor-clock {
@@ -4702,7 +4700,7 @@ html.cafe-colorblind-mode .options-menu__tag--coming-soon {
   height: auto;
   aspect-ratio: 701 / 719;
   background: url("../../assets/sprites/props/placeholder-cafe-clock-v06-redesign.png") center / contain no-repeat;
-  image-rendering: pixelated;
+  image-rendering: auto;
 }
 
 .cafe-decor-clock.cafe-decor--tier-1,
@@ -4721,7 +4719,7 @@ html.cafe-colorblind-mode .options-menu__tag--coming-soon {
   height: auto;
   aspect-ratio: 467 / 1438;
   background: url("../../assets/sprites/props/placeholder-cafe-lamp-v06-redesign.png") center bottom / contain no-repeat;
-  image-rendering: pixelated;
+  image-rendering: auto;
 }
 
 .cafe-decor-lamp.cafe-decor--tier-1,
@@ -4730,4 +4728,96 @@ html.cafe-colorblind-mode .options-menu__tag--coming-soon {
   width: 4.2%;
   opacity: 1;
   background-image: url("../../assets/sprites/props/placeholder-cafe-lamp-v06-redesign.png");
+}
+
+/* The v07 room is shallower than the former shell. Seat anchors therefore use
+   the actual table geometry instead of the old low floor slots. Back-seat
+   guests sit behind a table (z4), front-seat guests in front (z6). */
+.placeholder-guest-seated .cafe-pilot-asset--guest {
+  bottom: -4px;
+  width: 76px;
+  height: 76px;
+}
+
+.placeholder-guest-seated::after,
+.placeholder-guest-seated .guest-status {
+  display: none;
+}
+
+.placeholder-guest-normal-03 {
+  top: 29%;
+  bottom: auto;
+  left: 24.6%;
+  z-index: 4;
+}
+
+.placeholder-guest-normal-05 {
+  top: 43.9%;
+  bottom: auto;
+  left: 29.1%;
+  z-index: 6;
+}
+
+.placeholder-guest-normal-04 {
+  top: 25.9%;
+  right: auto;
+  bottom: auto;
+  left: 49.1%;
+  z-index: 4;
+}
+
+.placeholder-guest-normal-06 {
+  top: 41.5%;
+  right: auto;
+  bottom: auto;
+  left: 52.9%;
+  z-index: 6;
+}
+
+.placeholder-guest-normal-08 {
+  top: 42.3%;
+  bottom: auto;
+  left: 33.1%;
+  z-index: 4;
+}
+
+.placeholder-guest-normal-09 {
+  top: 52.4%;
+  bottom: auto;
+  left: 39.3%;
+  z-index: 6;
+}
+
+.placeholder-guest-normal-07 {
+  top: 38%;
+  bottom: auto;
+  left: 15%;
+  z-index: 6;
+}
+
+.placeholder-guest-strange-01 {
+  top: 30%;
+  bottom: auto;
+  left: 62%;
+  z-index: 6;
+}
+
+.placeholder-guest-strange-02 {
+  top: 49%;
+  right: auto;
+  bottom: auto;
+  left: 68%;
+  z-index: 6;
+}
+
+.placeholder-guest-strange-03 {
+  top: 33%;
+  bottom: auto;
+  left: 7%;
+  z-index: 6;
+}
+
+/* The redesigned door moved right; Paula now starts centered in its opening. */
+.placeholder-guest-normal-01.placeholder-guest--at-door {
+  left: -118%;
 }

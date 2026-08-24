@@ -21,26 +21,26 @@ KRITISCHE Regel: Immer auf gescheite Diversität der Figuren achten (Hauttöne, 
 
 ## Diorama-Geometrie (nicht neu herleiten!)
 
-**Aktueller Raum: warmes Pixel-Diorama v06** — `placeholder-cafe-master-v06-redesign.png` ist die gemeinsame Quelle für Raumhülle und Boden. `tools/build_cafe_redesign_layers.py` schneidet daraus `placeholder-cafe-shell-v06-redesign.png` und sieben fertige Tagesböden `placeholder-cafe-floor-v06-day-{1..7}.png`. Dadurch stammen Wand-/Bodennähte und Pixelkanten immer aus demselben Master; es gibt keinen Browser-Clip und keine alte Vollboden-Kante in der Shell. `.cafe-stage-base { display: block }`; nur der Boden wächst. Sämtliche Möbel bleiben separate transparente Sprites.
+**Aktueller Raum: warmes Pixel-Diorama v07** — `placeholder-cafe-master-v06-redesign.png` ist die gemeinsame Quelle für Raumhülle und Boden. `tools/build_cafe_redesign_layers.py` baut daraus sieben komplett vormontierte Tagesbilder `placeholder-cafe-stage-v07-day-{1..7}.png`. App und Kalibrator zeigen pro Tag exakt ein Hintergrund-PNG; Wand und Boden werden nie als getrennte Browser-Layer skaliert. Dadurch gibt es an ihren Alpha-Kanten keine Doppelränder oder Versätze. `.cafe-stage-base { display: block }`; nur der darin vormontierte Boden wächst. Sämtliche Möbel bleiben separate transparente Sprites.
 
 **WICHTIG: NIEMALS `.cafe-back-wall` oder `.cafe-side-wall` sichtbar machen oder `.cafe-stage-base` auf `display:none` setzen** — das bricht das Diorama-Layout komplett. Diese sind Positionierungs-Container, nicht visuelle Layer.
 
 - `.cafe-back-wall` = Positionierungs-Container, `display: none` (visuell durch Stage-PNG geliefert). Enthält: `.cafe-window` (display:none), `.cafe-menu-board` (display:none), `.cafe-storage` (rechts, sichtbar als Décor-Slot).
 - `.cafe-side-wall` = Positionierungs-Container, `display: none` (visuell durch Stage-PNG geliefert).
-- `.cafe-floor-growth` = je Tag ein fertig maskiertes v06-PNG, `clip-path: none`. Feste Rückkante in Diorama-%: `[(8,61.6),(50,45.7),(92,61.6)]`. Die Schultern liegen bei x 22/78; ihre y-Position und die Mittelspitze wachsen über die sieben Tage von 72/77 % auf 93.6/98.6 %. Die sichtbare Außenkante wird im Build-Skript direkt in jeden Tagesboden gezeichnet.
+- `.cafe-stage-base` = je Tag ein vollständiges v07-Raum-PNG. Feste Boden-Rückkante in Diorama-%: `[(8,61.6),(50,45.7),(92,61.6)]`. Die Schultern liegen bei x 22/78; ihre y-Position und die Mittelspitze wachsen über die sieben Tage von 72/77 % auf 93.6/98.6 %. Die sichtbare Außenkante wird im Build-Skript direkt in das jeweilige Tagesbild gezeichnet. `.cafe-floor-growth` bleibt ausgeblendet und darf nicht als zweite Bildschicht zurückkehren.
 - `.cafe-floor` = ungeclippter Positionierungs-Container für Gäste und Möbel: left 5 % / right 6 % / bottom 4 % / height 65 % des Dioramas, `clip-path: none`, `background: transparent`. Umrechnung Diorama-% → Floor-%: `floorX = (dioX − 5) / 89 · 100`, `floorY = (dioY − 31) / 65 · 100`.
 - `.cafe-counter` = `placeholder-cafe-counter-v07-redesign.png` (1181:769), Tag-1-sicher bei x 57 % / y 41 % / Breite 24 % im Diorama. Maschine, KASSANDRA-Kasse und Tassen sind seine Kinder und bewegen sich gekoppelt mit der Theke.
-- Querformat-Möblierung: Tische liegen bei 25/54/11 %, 44/52/11 % und 34/63/9,5 % (x/y/Breite im Diorama). Alle nutzen das randlose `placeholder-cafe-table-v06-redesign.png`; Pflanze, Regal, Lampe, Uhr, Tassen, Maschine und Kasse sind eigene v06/v07-Redesign-Sprites im gleichen Pixelstil. Der Möbelkalibrator nutzt Store-Version v9, wechselt dieselben sieben Tagesboden-PNGs wie die App und zeigt alle losen Möbel.
+- Querformat-Möblierung: Tische liegen bei 25/54/11 %, 44/52/11 % und 34/63/9,5 % (x/y/Breite im Diorama). Alle nutzen das randlose `placeholder-cafe-table-v06-redesign.png`; Pflanze, Regal, Lampe, Uhr, Tassen, Maschine und Kasse sind eigene v06/v07-Redesign-Sprites im gleichen Pixelstil. Der Möbelkalibrator nutzt Store-Version v10, wechselt dieselben sieben vormontierten v07-Tagesbilder wie die App und zeigt alle losen Möbel.
 - Décor-Tier-Klassen (`cafe-decor--tier-N`) existieren im DOM und sind per CSS sichtbar.
 - Serve-Menü (Produktliste) ist aus dem Diorama heraus in die ActionPanel-Sidebar verlagert (`.serve-menu`). Kein floating UI über dem Spielbereich mehr.
-- Paula-Walk-Choreografie: Phasen-Maschine in CafePlaceholder.tsx (`at-door` → `walking` → `idle`), Tür-Startposition ist relativ zu `.cafe-queue` (left −195 % / bottom 130 %).
+- Paula-Walk-Choreografie: Phasen-Maschine in CafePlaceholder.tsx (`at-door` → `walking` → `idle`), Tür-Startposition ist relativ zu `.cafe-queue` (left −118 % / bottom 130 %).
 
 ## Sprite-Pipeline
 
 - Ablage: `assets/sprites/guests/` und `assets/sprites/props/`, Schema `placeholder-<name>[-t2|-t3].png`
 - Hintergrund/Artefakt-Entfernung per PIL (bewährt): helle Pixel (`r,g,b > 200`) mit Sättigung `(max−min)/max < 0.25` → alpha 0. Bei Teilbereichen (z. B. Standscheibe unter Füßen) Maske auf Zeilenbereich begrenzen.
 - Nach Generierung immer Randspalten/-zeilen auf Artefakte prüfen (`alpha > 40`-Zählung je Randspalte).
-- Gäste-Sprites rendern 108 px hoch (`.cafe-pilot-asset--guest`), `image-rendering: pixelated`.
+- Sitzende Gäste-Sprites rendern im v07-Raum 76 px hoch, stehende Gäste und Paula 108 px; `image-rendering: pixelated` bleibt für Figuren aktiv.
 
 ## Savegame-Testing
 

@@ -3,14 +3,13 @@ import type { GameState, TableId } from "../../game/types/game";
 import type { ProductId } from "../../game/types/content";
 import { getDioramaGuestVisibility, getNextGuestPreview, getNarrativeEventCards } from "../../game/engine/selectors";
 import { kassandraMessages } from "../../game/data/kassandra";
-import floorDay1Asset from "../../../assets/backgrounds/placeholder-cafe-floor-v06-day-1.png";
-import floorDay2Asset from "../../../assets/backgrounds/placeholder-cafe-floor-v06-day-2.png";
-import floorDay3Asset from "../../../assets/backgrounds/placeholder-cafe-floor-v06-day-3.png";
-import floorDay4Asset from "../../../assets/backgrounds/placeholder-cafe-floor-v06-day-4.png";
-import floorDay5Asset from "../../../assets/backgrounds/placeholder-cafe-floor-v06-day-5.png";
-import floorDay6Asset from "../../../assets/backgrounds/placeholder-cafe-floor-v06-day-6.png";
-import floorDay7Asset from "../../../assets/backgrounds/placeholder-cafe-floor-v06-day-7.png";
-import stageShellAsset from "../../../assets/backgrounds/placeholder-cafe-shell-v06-redesign.png";
+import stageDay1Asset from "../../../assets/backgrounds/placeholder-cafe-stage-v07-day-1.png";
+import stageDay2Asset from "../../../assets/backgrounds/placeholder-cafe-stage-v07-day-2.png";
+import stageDay3Asset from "../../../assets/backgrounds/placeholder-cafe-stage-v07-day-3.png";
+import stageDay4Asset from "../../../assets/backgrounds/placeholder-cafe-stage-v07-day-4.png";
+import stageDay5Asset from "../../../assets/backgrounds/placeholder-cafe-stage-v07-day-5.png";
+import stageDay6Asset from "../../../assets/backgrounds/placeholder-cafe-stage-v07-day-6.png";
+import stageDay7Asset from "../../../assets/backgrounds/placeholder-cafe-stage-v07-day-7.png";
 import coffeeMachineAsset from "../../../assets/sprites/props/placeholder-cafe-coffee-machine-v06-redesign.png";
 import kassandraRegisterAsset from "../../../assets/sprites/props/placeholder-kassandra-register-v06-redesign.png";
 import bohnGuestAsset from "../../../assets/sprites/guests/placeholder-guest-bohn.png";
@@ -26,14 +25,14 @@ import fatouSeatedAsset from "../../../assets/sprites/guests/placeholder-guest-f
 
 const QUEUE_ROTATION = ["kemal", "cem", "mira", "lukas", "christa", "fatou"] as const;
 type QueueGuest = (typeof QUEUE_ROTATION)[number];
-const FLOOR_GROWTH_ASSETS = [
-  floorDay1Asset,
-  floorDay2Asset,
-  floorDay3Asset,
-  floorDay4Asset,
-  floorDay5Asset,
-  floorDay6Asset,
-  floorDay7Asset,
+const DAILY_STAGE_ASSETS = [
+  stageDay1Asset,
+  stageDay2Asset,
+  stageDay3Asset,
+  stageDay4Asset,
+  stageDay5Asset,
+  stageDay6Asset,
+  stageDay7Asset,
 ] as const;
 
 /** Window-safe reduced-motion check, callable during render. */
@@ -288,12 +287,11 @@ export function CafePlaceholder({ gameState, onCleanTable }: CafePlaceholderProp
         )}
         <div className="cafe-world">
           <img
-            className="cafe-floor-growth"
-            src={FLOOR_GROWTH_ASSETS[Math.max(0, Math.min(6, gameState.day - 1))]}
+            className="cafe-stage-base"
+            src={DAILY_STAGE_ASSETS[Math.max(0, Math.min(6, gameState.day - 1))]}
             alt=""
             aria-hidden="true"
           />
-          <img className="cafe-stage-base" src={stageShellAsset} alt="" aria-hidden="true" />
           {isDusty && <div className="cafe-dust" aria-hidden="true" />}
 
           {/* Décor props — positioned absolute via CSS, tier drives sprite */}
