@@ -17,7 +17,8 @@ Die finale Spielgrafik soll konsistent, wiederverwendbar und technisch sauber se
 
 ## Stilrichtung
 
-- Anfangsperspektive und aktuelle Möbel-Einzelabnahme: klare isometrische Spielansicht mit `placeholder-cafe-background-v10-isometric.png` und `placeholder-cafe-target-v04-isometric.png`
+- Anfangsperspektive und aktuelle Möbel-Einzelabnahme: helle, kompakte isometrische Tag-1-Spielansicht mit Tür links, `placeholder-cafe-background-v11-isometric-day1.png` und `placeholder-cafe-target-v05-isometric-day1.png`
+- Isometrische Wachstumsreferenz: der größere Raum aus `placeholder-cafe-background-v10-isometric.png` und `placeholder-cafe-target-v04-isometric.png` bleibt für einen späteren Tag oder Ausbau erhalten.
 - Spätere Makro-Perspektive: echte Draufsicht mit den erhaltenen Referenzen `placeholder-cafe-background-v09-topdown.png` und `placeholder-cafe-target-v03-topdown.png`
 - Spätere Langzeit-Perspektive: warmes erhöhtes 3/4-Diorama als großer Fortschrittsmoment mit `placeholder-cafe-background-v08-fullfloor.png` und `placeholder-cafe-target-v02-fullfloor.png`
 - Sämtliche neuen Perspektivkonzepte bleiben bis zur ausdrücklichen Abnahme außerhalb der Runtime; die App bleibt währenddessen auf v07.
