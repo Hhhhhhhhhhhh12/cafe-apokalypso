@@ -9,7 +9,7 @@ Scope:
 - static web app
 - local browser save
 - first 7 in-game days
-- one small top-down pixel-inspired café view
+- one small isometric pixel-inspired café view
 - placeholder or CSS-based pixel-style art
 - basic guest flow
 - basic products
@@ -136,7 +136,7 @@ Focus:
 - pricing strategy
 - economic pressure without harsh failure states
 - café upgrades and layout growth
-- a staged camera-perspective change once the café has visibly grown
+- an unlockable true top-down management view once the café has visibly grown
 
 Possible systems:
 
@@ -158,9 +158,9 @@ Success criteria:
 
 Camera progression:
 
-- The opening café and the complete first-week approval flow use a clear, true top-down view.
-- The warmer elevated 3/4 view is reserved as a later-game visual transition, so the new perspective communicates that the café has grown instead of appearing at the start.
-- `placeholder-cafe-background-v08-fullfloor.png` and `placeholder-cafe-target-v02-fullfloor.png` remain the preserved visual reference for that later transition; they are not the current runtime or approval view.
+- The opening café and the current step-by-step approval flow use a clear isometric game view.
+- Phase 2 can unlock the preserved true top-down view as a strategic layout and macro-management perspective: `placeholder-cafe-background-v09-topdown.png` and `placeholder-cafe-target-v03-topdown.png`.
+- All new camera concepts remain outside the runtime until explicit approval; the app stays on v07 during the approval flow.
 
 ## Phase 3: Apocalypse Systems
 
@@ -209,6 +209,7 @@ Focus:
 - more products and strange recipes
 - long-term achievements
 - repeatable but varied weeks
+- an elevated 3/4 presentation as a major visual growth reveal
 
 Possible systems:
 
@@ -226,6 +227,7 @@ Possible systems:
   loosely coupled to cleanliness with delay, not 1:1 — see GAME_DESIGN "Living plants").
   Kumquat (`special`) is exempt: never wilts, optional daily rustle.
 - major recurring mythological arcs
+- staged camera transition using the preserved `placeholder-cafe-background-v08-fullfloor.png` and `placeholder-cafe-target-v02-fullfloor.png` references
 
 Success criteria:
 

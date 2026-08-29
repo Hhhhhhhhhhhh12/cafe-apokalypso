@@ -8,7 +8,7 @@ KI ist ein Konzept- und Beschleunigungswerkzeug, aber nicht die alleinige Quelle
 
 Die finale Spielgrafik soll konsistent, wiederverwendbar und technisch sauber sein:
 
-- einheitliche Perspektive
+- phasenintern einheitliche Perspektive
 - einheitliche Pixelgröße
 - wiedererkennbare Farbpalette
 - saubere Sprite-Sheets
@@ -17,9 +17,10 @@ Die finale Spielgrafik soll konsistent, wiederverwendbar und technisch sauber se
 
 ## Stilrichtung
 
-- Anfangsperspektive: echte Draufsicht für das kleine Café und die Möbel-Einzelabnahme
-- Spätere Perspektive: warmes erhöhtes 3/4-Diorama als inszenierter Fortschrittsmoment nach sichtbarem Café-Wachstum
-- Referenz für den späteren Wechsel: `placeholder-cafe-background-v08-fullfloor.png` und `placeholder-cafe-target-v02-fullfloor.png`
+- Anfangsperspektive und aktuelle Möbel-Einzelabnahme: klare isometrische Spielansicht mit `placeholder-cafe-background-v10-isometric.png` und `placeholder-cafe-target-v04-isometric.png`
+- Spätere Makro-Perspektive: echte Draufsicht mit den erhaltenen Referenzen `placeholder-cafe-background-v09-topdown.png` und `placeholder-cafe-target-v03-topdown.png`
+- Spätere Langzeit-Perspektive: warmes erhöhtes 3/4-Diorama als großer Fortschrittsmoment mit `placeholder-cafe-background-v08-fullfloor.png` und `placeholder-cafe-target-v02-fullfloor.png`
+- Sämtliche neuen Perspektivkonzepte bleiben bis zur ausdrücklichen Abnahme außerhalb der Runtime; die App bleibt währenddessen auf v07.
 - Hauptansicht: kleines volles Pixel-Café
 - Keine Seitenansicht als Standard
 - Seitenansicht nur für Spezialmissionen oder Event-Szenen
