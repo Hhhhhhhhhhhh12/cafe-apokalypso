@@ -9,7 +9,7 @@ Scope:
 - static web app
 - local browser save
 - first 7 in-game days
-- one small 3/4 pixel-inspired café view
+- one small top-down pixel-inspired café view
 - placeholder or CSS-based pixel-style art
 - basic guest flow
 - basic products
@@ -136,6 +136,7 @@ Focus:
 - pricing strategy
 - economic pressure without harsh failure states
 - café upgrades and layout growth
+- a staged camera-perspective change once the café has visibly grown
 
 Possible systems:
 
@@ -154,6 +155,12 @@ Success criteria:
 - decisions become more strategic
 - the café still remains visually central
 - management panels support the café rather than replacing it
+
+Camera progression:
+
+- The opening café and the complete first-week approval flow use a clear, true top-down view.
+- The warmer elevated 3/4 view is reserved as a later-game visual transition, so the new perspective communicates that the café has grown instead of appearing at the start.
+- `placeholder-cafe-background-v08-fullfloor.png` and `placeholder-cafe-target-v02-fullfloor.png` remain the preserved visual reference for that later transition; they are not the current runtime or approval view.
 
 ## Phase 3: Apocalypse Systems
 

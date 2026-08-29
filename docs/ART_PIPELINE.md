@@ -17,7 +17,9 @@ Die finale Spielgrafik soll konsistent, wiederverwendbar und technisch sauber se
 
 ## Stilrichtung
 
-- Perspektive: 3/4-Diorama
+- Anfangsperspektive: echte Draufsicht für das kleine Café und die Möbel-Einzelabnahme
+- Spätere Perspektive: warmes erhöhtes 3/4-Diorama als inszenierter Fortschrittsmoment nach sichtbarem Café-Wachstum
+- Referenz für den späteren Wechsel: `placeholder-cafe-background-v08-fullfloor.png` und `placeholder-cafe-target-v02-fullfloor.png`
 - Hauptansicht: kleines volles Pixel-Café
 - Keine Seitenansicht als Standard
 - Seitenansicht nur für Spezialmissionen oder Event-Szenen
