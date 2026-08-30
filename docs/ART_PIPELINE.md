@@ -17,11 +17,12 @@ Die finale Spielgrafik soll konsistent, wiederverwendbar und technisch sauber se
 
 ## Stilrichtung
 
-- Anfangsperspektive und aktuelle Möbel-Einzelabnahme: helle, kompakte isometrische Tag-1-Spielansicht mit Tür links, `placeholder-cafe-background-v11-isometric-day1.png` und `placeholder-cafe-target-v05-isometric-day1.png`
+- Anfangsperspektive und aktuelle Möbel-Einzelabnahme: helle, kompakte isometrische Tag-1-Spielansicht mit Tür links und bereinigten Fenstern, `placeholder-cafe-background-v12-isometric-day1-windows.png` und `placeholder-cafe-target-v06-isometric-day1-windows.png`
 - Isometrische Wachstumsreferenz: der größere Raum aus `placeholder-cafe-background-v10-isometric.png` und `placeholder-cafe-target-v04-isometric.png` bleibt für einen späteren Tag oder Ausbau erhalten.
 - Spätere Makro-Perspektive: echte Draufsicht mit den erhaltenen Referenzen `placeholder-cafe-background-v09-topdown.png` und `placeholder-cafe-target-v03-topdown.png`
 - Spätere Langzeit-Perspektive: warmes erhöhtes 3/4-Diorama als großer Fortschrittsmoment mit `placeholder-cafe-background-v08-fullfloor.png` und `placeholder-cafe-target-v02-fullfloor.png`
 - Sämtliche neuen Perspektivkonzepte bleiben bis zur ausdrücklichen Abnahme außerhalb der Runtime; die App bleibt währenddessen auf v07.
+- Tageszeit ist von Kamera und Raumwachstum getrennt: Tag, Dämmerung und Nacht verwenden je freigegebener Raumstufe dieselbe Geometrie, Bildgröße und dieselben Prop-Anker; variiert werden nur Farbkorrektur sowie separate Fenster-, Lampen- und Schattenlayer. Keine Möbel in Lichtvarianten einbacken und keine vollständige Szene neu generieren.
 - Hauptansicht: kleines volles Pixel-Café
 - Keine Seitenansicht als Standard
 - Seitenansicht nur für Spezialmissionen oder Event-Szenen

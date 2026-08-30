@@ -158,10 +158,11 @@ Success criteria:
 
 Camera progression:
 
-- The opening café and the current step-by-step approval flow use the bright, compact, left-entrance isometric Day-1 view: `placeholder-cafe-background-v11-isometric-day1.png` and `placeholder-cafe-target-v05-isometric-day1.png`.
+- The opening café and the current step-by-step approval flow use the bright, compact, left-entrance isometric Day-1 view: `placeholder-cafe-background-v12-isometric-day1-windows.png` and `placeholder-cafe-target-v06-isometric-day1-windows.png`.
 - The previous v10/v04 isometric room remains preserved as a visibly larger café-growth reference for a later day or expansion step.
 - Phase 2 can unlock the preserved true top-down view as a strategic layout and macro-management perspective: `placeholder-cafe-background-v09-topdown.png` and `placeholder-cafe-target-v03-topdown.png`.
 - All new camera concepts remain outside the runtime until explicit approval; the app stays on v07 during the approval flow.
+- A future day-night lighting cycle stays independent of camera and room growth: each approved room stage keeps identical geometry and prop positions, while day, dusk, and night change only color grading, window light, practical lights, and shadows.
 
 ## Phase 3: Apocalypse Systems
 
