@@ -27,7 +27,9 @@
     .scene{position:relative;aspect-ratio:16/9;display:grid;place-items:center;overflow:hidden;background:radial-gradient(circle at 50% 43%,#fffdf8 0,#f6ebdc 72%,#ead6c0 100%)}
     .scene img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;image-rendering:auto}
     .scene .approval-prop{inset:auto;height:auto;object-fit:contain;image-rendering:pixelated}
-    .scene .approval-prop--table{left:38.85%;top:45.2%;width:16.71%;image-rendering:auto}
+    .scene > img:first-child{z-index:0}
+    .scene .approval-prop--table{left:38.85%;top:45.2%;width:16.71%;image-rendering:auto;z-index:2}
+    .scene .approval-prop--chair-front-right{left:45.84%;top:53.85%;width:13.5%;height:21.18%;object-fit:fill;image-rendering:auto;z-index:3}
     .approval{display:flex;justify-content:space-between;gap:12px;padding:11px 16px;border-top:1px solid #e0cdbb;color:var(--muted);font-size:12px}
     .approval strong{color:var(--wine)}
     .approval.approved strong{color:#245b50}
@@ -37,22 +39,23 @@
 <body>
   <header>
     <h1>Szenenaufbau – Gegenstand für Gegenstand</h1>
-    <p>Links steht immer nur der bereits freigegebene Stand. Rechts bleibt das ausgearbeitete Zielbild als feste Orientierung. Pro Runde kommt links genau ein Gegenstand hinzu.</p>
+    <p>Links stehen der freigegebene Stand und genau ein neuer Gegenstand zur Abnahme. Rechts bleibt das ausgearbeitete Zielbild als feste Orientierung.</p>
     <div class="progress" aria-label="Fortschritt">
-      <span class="step done">✓ 0 · Hintergrund</span><span class="arrow">→</span><span class="step done">✓ 1 · Tisch</span><span class="arrow">→</span><span class="step active">2 · nächster Gegenstand</span>
+      <span class="step done">✓ 0 · Hintergrund</span><span class="arrow">→</span><span class="step done">✓ 1 · Tisch</span><span class="arrow">→</span><span class="step active">2 · erster Stuhl</span>
     </div>
   </header>
   <main>
     <figure>
       <figcaption>
-        <div><div class="title">Freigegebener Stand</div><div class="note">Tag 1 v12 · Boden unverändert · Referenztisch visuell abgenommen</div></div>
-        <span class="badge approved">abgenommen</span>
+        <div><div class="title">Freigegebener Stand + erster Stuhl</div><div class="note">Tag 1 v12 · Hintergrund und Tisch unverändert · nur den neuen Stuhl beurteilen</div></div>
+        <span class="badge">zur Abnahme</span>
       </figcaption>
       <div class="scene">
         <img src="../assets/backgrounds/placeholder-cafe-background-v12-isometric-day1-windows.png" alt="Heller kompakter Tag-1-Caféraum mit sauber gezeichneten Rundbogenfenstern und Eingang links">
-        <img class="approval-prop approval-prop--table" src="../assets/sprites/props/placeholder-cafe-table-round-v09-target-reference.png" alt="Separater runder Cafétisch nach der freigegebenen Endzustand-Referenz">
+        <img class="approval-prop approval-prop--table approval-prop--approved" src="../assets/sprites/props/placeholder-cafe-table-round-v09-target-reference.png" alt="Abgenommener runder Cafétisch nach der freigegebenen Endzustand-Referenz">
+        <img class="approval-prop approval-prop--chair-front-right approval-prop--candidate" src="../assets/sprites/props/placeholder-cafe-chair-front-right-v01-target-reference.png" alt="Erster separater Holzstuhl rechts vor dem abgenommenen Tisch zur visuellen Abnahme">
       </div>
-      <div class="approval approved"><span>Schritt 1 · abgeschlossen</span><strong>Tisch abgenommen</strong></div>
+      <div class="approval"><span>Schritt 2 · nur neuer Stuhl</span><strong>Stuhl zur Abnahme</strong></div>
     </figure>
     <figure>
       <figcaption>
