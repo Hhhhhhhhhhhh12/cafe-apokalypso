@@ -70,7 +70,7 @@ export function App() {
   }, [gameState.cafeClosed, gameState.demoComplete]);
 
   // Boot splash: show before Day 1 of a fresh run, once per browser run. The
-  // ack flag is cleared on reset so a new café week re-shows it (roguelite tone).
+  // ack flag is cleared on reset so a replay re-shows it (roguelite tone).
   const isFreshDayOne =
     gameState.day === 1 &&
     !gameState.demoComplete &&
@@ -164,7 +164,7 @@ export function App() {
         >
           <p className="eyebrow">End of week one</p>
           <h2 id="demo-complete-title" ref={closureHeadingRef} tabIndex={-1}>
-            The first café week is over
+            Seven days. Week one complete.
           </h2>
           <p>
             Seven days served. The official letter has arrived, the register has
@@ -173,11 +173,11 @@ export function App() {
             this café — and you want to know what happens on Day 8.
           </p>
           <p className="demo-complete-banner__teaser">
-            Week two is where the weirdness stops being deniable. That café week
-            is not built yet. For now, the loop begins again.
+            Day 8 belongs to week two, where the weirdness stops being deniable.
+            Week two is not built yet. For now, replay week one from Day 1.
           </p>
           <button type="button" onClick={handleReset}>
-            Start the next café week
+            Replay week one
           </button>
         </section>
       ) : null}

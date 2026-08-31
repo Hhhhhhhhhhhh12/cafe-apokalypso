@@ -70,8 +70,11 @@ describe("App intro/outro screens", () => {
     const text = visibleText(markup);
 
     expect(markup).toContain("demo-complete-banner");
-    expect(text).toContain("The first café week is over");
-    expect(text).toContain("Start the next café week");
+    expect(text).toContain("Seven days. Week one complete.");
+    expect(text).toContain("Day 8 belongs to week two");
+    expect(text).toContain("Week two is not built yet");
+    expect(text).toContain("Replay week one");
+    expect(text).not.toContain("Start the next café week");
     expect(markup).not.toContain("intro-cinema");
   });
 });
