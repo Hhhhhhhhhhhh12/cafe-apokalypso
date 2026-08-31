@@ -162,19 +162,15 @@ export function App() {
           role="alert"
           aria-labelledby="demo-complete-title"
         >
-          <p className="eyebrow">End of week one</p>
+          <p className="eyebrow">Week one complete</p>
           <h2 id="demo-complete-title" ref={closureHeadingRef} tabIndex={-1}>
-            Seven days. Week one complete.
+            7 of 7 days served
           </h2>
           <p>
-            Seven days served. The official letter has arrived, the register has
-            opinions it did not have on Monday, and the guestbook is still
-            quietly editing the line about previous runs. Something is wrong with
-            this café — and you want to know what happens on Day 8.
+            The letter is open. The register is talking. The guestbook remembers.
           </p>
           <p className="demo-complete-banner__teaser">
-            Day 8 belongs to week two, where the weirdness stops being deniable.
-            Week two is not built yet. For now, replay week one from Day 1.
+            Next unlock: Day 8, week two. Not built yet. Replay from Day 1.
           </p>
           <button type="button" onClick={handleReset}>
             Replay week one
