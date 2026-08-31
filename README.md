@@ -4,21 +4,26 @@ A cozy-absurd café management soft-roguelite about running a small pixel café 
 
 ## Demo
 
-Playable browser demo: _coming soon_
+[Play Café Apokalypso in your browser](https://hhhhhhhhhhhh12.github.io/cafe-apokalypso/)
 
-Target URL after GitHub Pages setup:
+The deployed vertical slice covers the complete first café week from Day 1 through the Day 7 cliffhanger. It runs as a static browser app: no install, backend, account, or real AI API is required. Progress is saved locally in the browser.
 
-```text
-https://hhhhhhhhhhhh12.github.io/cafe-apokalypso/
-```
+The demo is still in active development. Final art, presentation polish, and balancing are not complete, and approved screenshots or GIFs will be added only after the current graphics review.
 
-The MVP runs as a static browser app: no backend, no accounts, no real AI API, local save only.
+## What You Can Try
+
+- play through all seven days and reach the end-of-week letter
+- serve a changing mix of regular and increasingly strange guests
+- manage money, supplies, cleanliness, stress, reputation, and limited daily actions
+- adjust prices and daily offers, run advertising, and assign temporary help as systems unlock
+- consult KASSANDRA, encounter scripted events, and unlock local achievements
+- leave and resume via the local browser save, or reset the week for another run
 
 ## Current Status
 
-Early concept / pre-production.
+Playable seven-day browser demo / vertical slice, in active development.
 
-Current goal: a portfolio-ready seven-day vertical slice that communicates the core identity of the game without pretending to be the full long-term version.
+The complete first-week loop is implemented and publicly deployed. It communicates the core identity and progression of the game without pretending to be the full long-term version or a final production MVP.
 
 ## Core Idea
 
@@ -77,7 +82,7 @@ Every day should unlock or reveal something meaningful.
 
 ## Technical Direction
 
-Planned MVP stack:
+Current demo stack:
 
 - Vite
 - React
@@ -110,7 +115,7 @@ npm run test
 npm run build
 ```
 
-The current app is an early placeholder shell. It includes a day-one state, resource HUD, placeholder 3/4 café area, action panel, and defensive localStorage reset flow.
+The current app includes setup, open-café, and closing phases across Days 1–7; progressive management and story unlocks; local save and reset flows; and a clear end-of-week handoff. Visual presentation and game balance remain in development.
 
 ## Documentation
 
