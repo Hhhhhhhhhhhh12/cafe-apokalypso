@@ -49,7 +49,7 @@ Included:
 - one café room in a 3/4 pixel-inspired view
 - basic order flow, products, ingredients, supplies, money, reputation, cleanliness, stress, and hidden weirdness
 - normal and subtly strange guests
-- prices, daily offers, advertising, and temporary staff
+- offer-board review, advertising, and temporary staff
 - deterministic day modifiers, learned guest preferences, and KASSANDRA run fragments
 - KASSANDRA cash-register update
 - local browser save and achievements
@@ -67,7 +67,7 @@ Out of scope:
 
 - Day 1: core order flow and first coffee-machine anomaly
 - Day 2: guest behavior differences
-- Day 3: prices, supplies, daily offers, and optional temporary help
+- Day 3: offer-board review, supplies, and optional temporary help
 - Day 4: advertising and first appearance of Herr Grau
 - Day 5: stronger delegation pressure and first staff-flavored narrative beats
 - Day 6: KASSANDRA update
