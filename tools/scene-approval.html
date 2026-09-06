@@ -30,6 +30,7 @@
     .scene > img:first-child{z-index:0}
     .scene .approval-prop--counter-body{left:52.94%;top:22.6%;width:38.46%;height:48.45%;object-fit:fill;image-rendering:auto;z-index:10}
     .scene .approval-prop--espresso-machine{left:68.9%;top:21.4%;width:12.2%;image-rendering:auto;z-index:11}
+    .scene .approval-prop--coffee-grinder{left:77.9%;top:27%;width:7.6%;image-rendering:auto;z-index:12}
     .scene .approval-prop--chair-back-left{left:36.49%;top:45.09%;width:13.13%;height:23.32%;object-fit:fill;image-rendering:auto;z-index:20}
     .scene .approval-prop--table{left:38.85%;top:45.2%;width:16.71%;image-rendering:auto;z-index:21}
     .scene .approval-prop--chair-front-right{left:45.84%;top:53.85%;width:13.5%;height:21.18%;object-fit:fill;image-rendering:auto;z-index:22}
@@ -44,24 +45,25 @@
     <h1>Szenenaufbau – Gegenstand für Gegenstand</h1>
     <p>Links stehen der freigegebene Stand und genau ein neuer Gegenstand zur Abnahme. Rechts bleibt das ausgearbeitete Zielbild als feste Orientierung.</p>
     <div class="progress" aria-label="Fortschritt">
-      <span class="step done">✓ 0 · Hintergrund</span><span class="arrow">→</span><span class="step done">✓ 1 · Tisch</span><span class="arrow">→</span><span class="step done">✓ 2 · erster Stuhl</span><span class="arrow">→</span><span class="step done">✓ 3 · zweiter Stuhl</span><span class="arrow">→</span><span class="step done">✓ 4 · Thekenkörper</span><span class="arrow">→</span><span class="step active">5 · Espressomaschine</span>
+      <span class="step done">✓ 0 · Hintergrund</span><span class="arrow">→</span><span class="step done">✓ 1 · Tisch</span><span class="arrow">→</span><span class="step done">✓ 2 · erster Stuhl</span><span class="arrow">→</span><span class="step done">✓ 3 · zweiter Stuhl</span><span class="arrow">→</span><span class="step done">✓ 4 · Thekenkörper</span><span class="arrow">→</span><span class="step done">✓ 5 · Espressomaschine</span><span class="arrow">→</span><span class="step active">6 · Kaffeemühle</span>
     </div>
   </header>
   <main>
     <figure>
       <figcaption>
-        <div><div class="title">Freigegebener Stand + Espressomaschine</div><div class="note">Theke abgenommen · neu: Maschine auf der hinteren Arbeitszeile, Bedienseite zum Personalgang</div></div>
+        <div><div class="title">Freigegebener Stand + Kaffeemühle</div><div class="note">Espressomaschine abgenommen · neu: Kaffeemühle rechts daneben, Bedienseite zum Personalgang</div></div>
         <span class="badge">zur Abnahme</span>
       </figcaption>
       <div class="scene">
         <img src="../assets/backgrounds/placeholder-cafe-background-v12-isometric-day1-windows.png" alt="Heller kompakter Tag-1-Caféraum mit sauber gezeichneten Rundbogenfenstern und Eingang links">
         <img class="approval-prop approval-prop--counter-body approval-prop--approved" src="../assets/sprites/props/placeholder-cafe-counter-body-v02-target-reference.png" alt="Abgenommener Thekenkörper v02 mit hinterer Personal-Arbeitszeile und parallel ausgerichtetem Fronttresen">
-        <img class="approval-prop approval-prop--espresso-machine approval-prop--candidate" src="../assets/sprites/props/placeholder-cafe-espresso-machine-v01-target-reference.png" alt="Neue silberne Espressomaschine auf der hinteren Arbeitszeile, mit zwei Siebträgern und Bedienseite zum Personalgang">
+        <img class="approval-prop approval-prop--espresso-machine approval-prop--approved" src="../assets/sprites/props/placeholder-cafe-espresso-machine-v01-target-reference.png" alt="Abgenommene silberne Espressomaschine auf der hinteren Arbeitszeile, mit zwei Siebträgern und Bedienseite zum Personalgang">
+        <img class="approval-prop approval-prop--coffee-grinder approval-prop--candidate" src="../assets/sprites/props/placeholder-cafe-coffee-grinder-v01-target-reference.png" alt="Neue Kaffeemühle mit Bohnenbehälter rechts neben der Espressomaschine auf der Personal-Arbeitszeile">
         <img class="approval-prop approval-prop--chair-back-left approval-prop--approved" src="../assets/sprites/props/placeholder-cafe-chair-back-left-v01-target-reference.png" alt="Abgenommener zweiter Holzstuhl links hinter dem mittleren Tisch">
         <img class="approval-prop approval-prop--table approval-prop--approved" src="../assets/sprites/props/placeholder-cafe-table-round-v09-target-reference.png" alt="Abgenommener runder Cafétisch nach der freigegebenen Endzustand-Referenz">
         <img class="approval-prop approval-prop--chair-front-right approval-prop--approved" src="../assets/sprites/props/placeholder-cafe-chair-front-right-v01-target-reference.png" alt="Abgenommener erster Holzstuhl rechts vor dem mittleren Tisch">
       </div>
-      <div class="approval"><span>Schritt 5 · nur Espressomaschine</span><strong>Maschine zur Abnahme</strong></div>
+      <div class="approval"><span>Schritt 6 · nur Kaffeemühle</span><strong>Kaffeemühle zur Abnahme</strong></div>
     </figure>
     <figure>
       <figcaption>
