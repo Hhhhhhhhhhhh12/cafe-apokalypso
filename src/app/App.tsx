@@ -5,6 +5,7 @@ import {
   getBrowserStorage,
   loadGameState,
   resetSavedGameState,
+  SAVE_KEY,
   saveGameState,
   type StorageLike
 } from "../game/engine/save";
@@ -15,6 +16,10 @@ import { ActionPanel } from "../ui/components/ActionPanel";
 import { CafeScene } from "../ui/cafe/CafeScene";
 import { IntroSequence } from "../ui/components/IntroSequence";
 import { OptionsMenu } from "../ui/components/OptionsMenu";
+import {
+  StorageStatusMessage,
+  type StorageStatusKind
+} from "../ui/components/StorageStatusMessage";
 import { DayProgressPanel } from "../ui/panels/DayProgressPanel";
 import { ResourceHud } from "../ui/panels/ResourceHud";
 
@@ -34,6 +39,9 @@ function readBootAck(storage: StorageLike | null): boolean {
 
 export function App() {
   const storage = useMemo(() => getBrowserStorage(), []);
+  const [storageStatus, setStorageStatus] = useState<StorageStatusKind | null>(
+    () => (storage ? null : "unavailable")
+  );
   const [gameState, dispatch] = useReducer(
     gameReducer,
     storage,
@@ -43,7 +51,13 @@ export function App() {
 
   useEffect(() => {
     if (storage) {
-      saveGameState(gameState, storage);
+      const result = saveGameState(gameState, storage);
+      setStorageStatus((currentStatus) => {
+        if (!result.ok) {
+          return currentStatus === "reset-failed" ? currentStatus : "save-failed";
+        }
+        return currentStatus === "save-failed" ? null : currentStatus;
+      });
     }
   }, [gameState, storage]);
 
@@ -92,12 +106,20 @@ export function App() {
 
   function handleReset() {
     if (storage) {
-      resetSavedGameState(storage);
+      const resetResult = resetSavedGameState(storage);
+      let nextStorageStatus: StorageStatusKind | null = resetResult.ok
+        ? null
+        : resetResult.failedKeys.includes(SAVE_KEY)
+          ? "reset-failed"
+          : "cleanup-failed";
       try {
         storage.removeItem(BOOT_ACK_KEY);
       } catch {
-        // ignore
+        nextStorageStatus ??= "cleanup-failed";
       }
+      setStorageStatus(nextStorageStatus);
+    } else {
+      setStorageStatus("unavailable");
     }
     setBootAcknowledged(false);
     setAchievementQueue([]);
@@ -136,6 +158,8 @@ export function App() {
           </div>
         </div>
       </header>
+
+      <StorageStatusMessage status={storageStatus} />
 
       {gameState.cafeClosed ? (
         <section className="cafe-closed-banner" role="alert" aria-labelledby="cafe-closed-title">

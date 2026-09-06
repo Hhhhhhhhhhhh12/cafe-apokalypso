@@ -53,6 +53,22 @@ describe("App intro/outro screens", () => {
     expect(visibleText(markup)).toContain("Skip");
   });
 
+  it("keeps a fresh run playable when browser storage is unavailable", () => {
+    vi.stubGlobal("window", {
+      get localStorage() {
+        throw new DOMException("Storage access denied", "SecurityError");
+      }
+    });
+
+    const markup = renderToStaticMarkup(<App />);
+    const text = visibleText(markup);
+
+    expect(markup).toContain("intro-cinema");
+    expect(text).toContain("Browser storage is unavailable");
+    expect(text).toContain("keep playing");
+    expect(text).toContain("will not survive a reload");
+  });
+
   it("shows the demo-complete banner after Day 7 and hides the intro", () => {
     const storage = createMemoryStorage();
     saveGameState(
