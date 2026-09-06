@@ -8,7 +8,20 @@ This roadmap distinguishes code that exists, isolated work awaiting integration,
 
 ## Current evidence and first-wave results
 
-The review used source inspection, local Git history and the three existing task records. No tests, simulations, builds or browser QA were run for this roadmap update; no live deployment or GitHub issue status was rechecked.
+The review used source inspection, local Git history and the existing task records. This coordinating task ran no tests, simulations, builds or browser QA; no live deployment or GitHub issue status was rechecked. The follow-up below records separately executed checks from the implementation task and does not imply verification of the shared graphics checkout.
+
+### Confirmed implementation follow-up — 2026-09-06
+
+The user confirmed the two-lane plan. Both tasks now have real, committed results in separate clean worktrees; their earlier setup-only status is superseded. No duplicate task is needed. The app's general task list omitted them during this check, but their actual task records and Git results were recovered and inspected.
+
+| Package / task | Delivered evidence | Verification and next gate |
+|---|---|---|
+| P0/P1 — Café Integration und Speichersicherheit | Task `01a076f6-34ca-7cd1-a675-0a3112d439e2`; worktree `bdca`; branch `codex/p0-p1-save-resilience`, tip `0edcdfb`. D1/D2 were reused as `9bae62f` → `d7dfdeb` → `3835bf0` → `94f40d5`, followed by the storage fix. Base `565d40e` was confirmed by fetch in that task. | The task records user-approved installation, 4 focused files / **57 passing tests** and a passing typecheck at `0edcdfb`. This is not a combined U1/graphics result. Full-suite/build/browser release evidence is not established by this coordination review. |
+| U1 — Café Bedienbausteine für Gast und Lager | Task `01a076f6-15f9-7d11-a880-92d0020640d3`; worktree `e0dc`; branch `codex/u1-live-controls`, tip `58e6a82`, base `565d40e`. Both extracted controls are imported and used by `ActionPanel`; no graphics or engine changes. | Read-only review found no static blockers. Seven focused component tests were authored. **User deferred tests/typecheck with “später” in that task**; do not restart them from this roadmap confirmation. |
+
+Both result tips are still absent from the inspected shared graphics HEAD `5af1d3b`. The tasks' changed file sets do not overlap. Preserve their commits; the next delivery gate is deliberate integration and approved verification, followed by the U2 interaction slice. The outside panels remain in the current UI.
+
+The save task reported dependency-audit warnings (1 moderate, 3 high) during its approved installation. These are not failing focused tests, but require separate dependency triage before release; do not run an automatic dependency upgrade or modify the parallel package changes from this coordination task.
 
 Git snapshot at the start of the review:
 
@@ -18,8 +31,8 @@ Git snapshot at the start of the review:
 
 | ID / existing task | Evidence and status | Remaining work |
 |---|---|---|
-| D1 — Café README und Demo-Status | **Delivered separately, not integrated** into either reviewed ref: `54e566a` updates README; `36cd492` updates `index.html` metadata. Both exist in the clean `2a18` worktree. | Reuse both commits; refresh public claims before publishing. Screenshots/GIFs wait for approved graphics. |
-| D2 — Café Day-7 Replay-Klarheit | **Delivered separately, not integrated**: `45a0543` followed by `88e8e1a`, touching only `src/app/App.tsx` and `tests/intro-outro.test.tsx`. The task records 4 focused tests passing on 2026-09-01 at `88e8e1a`, after user approval. This is historical evidence for that commit, not an integrated-suite result. | Preserve and integrate the complete two-commit change; the former `41cc` worktree is gone and no branch currently contains its tip, although both commit objects are still available. |
+| D1 — Café README und Demo-Status | Original `54e566a` updates README; `36cd492` updates `index.html` metadata. Both are now reused in the isolated P0/P1 branch as `9bae62f` / `d7dfdeb`, not yet in the shared graphics checkout. | Integrate the delivered branch deliberately; refresh public claims before publishing. Screenshots/GIFs wait for approved graphics. |
+| D2 — Café Day-7 Replay-Klarheit | Original `45a0543` → `88e8e1a` is now reused in P0/P1 as `3835bf0` → `94f40d5`. Original tip is preserved on `codex/day7-outro-preserved`; former `41cc` worktree remains gone. The original task recorded 4 passing focused tests on 2026-09-01; newer P0/P1 evidence is above. | Preserve the complete delivered branch during integration. Historical or isolated tests do not establish a passing combined graphics/U1 branch. |
 | A1 — Café Accessibility-Audit | **Audit delivered; implementation deferred by the user on 2026-09-01**: “später. Am Spiel wird sich nch sehr viel ändern”. Read-only audit, no implementation commit. | Revisit after gameplay and layout stabilize. Preserve existing accessibility contracts meanwhile. |
 
 Task record IDs, for retrieval without creating duplicate tasks:
@@ -49,15 +62,15 @@ Status: **active planning and integration backlog**. Work-package status below i
 
 ### P0 — Integrate existing results
 
-Next delivery step; graphics-independent, one integration owner.
+**Delivered in the isolated P0/P1 branch; shared-branch integration remains open.** Graphics-independent, one integration owner.
 
-- Secure D2 on a named ref before repository cleanup; its full tip is `88e8e1a1386400a1882ce95dfa9e2150de98a53b`. Refresh the remote baseline and review D1/D2 against it in an isolated worktree.
-- Integrate D1 in order (`54e566a` → `36cd492`) and D2 in order (`45a0543` → `88e8e1a`). Their file sets are disjoint. Coordinate any `App.tsx` edits with P1.
+- D2 is secured on `codex/day7-outro-preserved`; full tip `88e8e1a1386400a1882ce95dfa9e2150de98a53b`. The implementation task fetched and confirmed `origin/main` at `565d40e` before its isolated integration.
+- D1 and D2 were integrated in their original order; see the exact picked commits above. Reuse that delivered work rather than repeating the cherry-picks or copy edits. Coordinate further `App.tsx` edits with P1/U2.
 - Acceptance: the selected integration branch contains the reviewed README/metadata and honest Week-1 replay copy, preserves reset/focus behavior, and records focused verification for that branch after approval. Publishing remains a later step.
 
 ### P1 — Reliable save and reset
 
-**Ready to scope; not implemented.** Static finding: `saveGameState` and `resetSavedGameState` call `setItem` / `removeItem` without handling exceptions. `App.tsx` saves in an effect and clears storage before dispatching reset. Storage failures can therefore interrupt those paths; this was not reproduced at runtime in this review.
+**Implemented and focused-checked at `0edcdfb` in the isolated P0/P1 task; not yet in the shared graphics checkout.** The fix returns explicit storage-mutation results, handles write/remove failures, attempts all legacy keys and preserves in-memory reset with an honest storage warning. The original unhandled calls remain in the shared checkout until integration.
 
 - Scope: `src/game/engine/save.ts`, relevant `App.tsx` call sites and focused save tests. Start App changes after D2 integration.
 - Acceptance: a denied/full store does not stop the active session; unsuccessful persistence is communicated honestly; explicit reset still starts a fresh session even if storage removal fails. Preserve the save key, migration chain and normal reload behavior.
@@ -93,7 +106,7 @@ Next delivery step; graphics-independent, one integration owner.
 
 ### U1 — Reusable controls for café interactions
 
-**Ready for a bounded implementation task; graphics-independent.** Extract guest/order/product controls and the supply-purchase controls from `ActionPanel.tsx` into small typed components under `src/ui/interactions/`. The current `ActionPanel` must use them immediately; do not create an unused UI framework.
+**Implemented at `58e6a82` in its isolated task; tests/typecheck explicitly deferred by the user.** Guest/order/product controls and supply-purchase controls now live under `src/ui/interactions/` and are actually used by that branch's `ActionPanel`. This is graphics-independent preparation, not a migrated gameplay screen. The shared checkout does not yet contain it.
 
 - Preserve DOM semantics/order, existing classes, copy, costs, callbacks, disabled reasons and native keyboard behavior. No engine, geometry, renderer, `App.tsx`, dependency or global CSS changes.
 - The current `ActionPanel.tsx` is identical on the inspected graphics checkout and stored `origin/main`; recheck that fact on the actual task baseline before editing.
@@ -148,9 +161,9 @@ This revision used read-only subagents for implementation evidence, Git/first-wa
 
 Independent implementation work uses separate worktrees from an agreed committed baseline. Read-only subagents may inspect the shared checkout. Hand off an ID, exact files/commits, acceptance criterion and unresolved decision; avoid repeated full-repo audits and duplicated tasks. Never let multiple writers change `App.tsx`, shared selectors, `global.css` or save migrations at once.
 
-### Next implementation dispatch
+### Implementation handoffs and next gate
 
-Run exactly two separate tasks from the same committed project baseline; record the actual starting commit in each handoff. Refresh/reconcile remote differences deliberately during P0, not by blindly merging the graphics branch.
+The following two tasks were dispatched and delivered from the same committed baseline `565d40e`; their actual task IDs and results are recorded above. Continue those tasks instead of launching replacements. Reconcile the shared graphics branch deliberately at integration, not by blindly merging it into either result.
 
 1. **P0 + P1, integration and save safety:** reuse D1/D2, then implement resilient persistence/reset. Sole `App.tsx` owner. Canonical prompt: `R-CAFE-SAVE-20260906` in [Prompts](PROMPTS.md).
 2. **U1, café interaction controls:** extract and wire the live guest/product and restock components. Canonical prompt: `R-CAFE-CONTROLS-20260906` in [Prompts](PROMPTS.md).
