@@ -1,25 +1,16 @@
 import {
   canCompleteCurrentDay,
-  getAvailableProducts,
   getDayCoachHint,
   getDecorUpgradeOptions,
   getEquipmentShopOptions,
-  getGuestPatienceState,
-  getIngredientLabel,
   getMissingRequiredActions,
-  getNextGuestPreview,
-  getRestockPreview,
   getVisibleStaffOptions,
   hasActionCapacity,
   type DayCoachTarget
 } from "../../game/engine/selectors";
 import { weekOneEvents } from "../../game/data/events";
 import type { EventDefinition } from "../../game/types/content";
-import {
-  getHelperTaskHint,
-  getHelperTaskLabel,
-  PATIENCE_TICK
-} from "../../game/engine/management";
+import { getHelperTaskHint, getHelperTaskLabel } from "../../game/engine/management";
 import type { ProductId, StaffOptionId, UpgradeId } from "../../game/types/content";
 import type {
   DecorSlotId,
@@ -29,6 +20,8 @@ import type {
   IngredientKey
 } from "../../game/types/game";
 import { weekOneUpgrades } from "../../game/data/upgrades";
+import { GuestOrderControls } from "../interactions/GuestOrderControls";
+import { SupplyPurchaseControls } from "../interactions/SupplyPurchaseControls";
 
 interface ActionPanelProps {
   gameState: GameState;
@@ -87,8 +80,6 @@ const helperTasks: Record<StaffOptionId, HelperTaskId[]> = {
   nino: ["barista", "counter"],
   nele: ["marketing", "counter"]
 };
-
-const restockIngredients: IngredientKey[] = ["coffee", "milk", "pastries"];
 
 export function ActionPanel({
   gameState,
@@ -239,10 +230,7 @@ function OpenDayControls({
   onCompleteDay: () => void;
   canCloseDay: boolean;
 }) {
-  const nextGuest = getNextGuestPreview(gameState);
-  const patienceState = getGuestPatienceState(gameState);
   const canAct = hasActionCapacity(gameState);
-  const products = getAvailableProducts(gameState);
   const advertisingCanUseBonus = gameState.dayManagement.extraAdvertisingActions > 0;
   const canUseAdvertisingAction = canAct || advertisingCanUseBonus;
   const actionLockReason = canAct
@@ -256,73 +244,10 @@ function OpenDayControls({
 
   return (
     <>
-      {nextGuest ? (
-        // Not a live region: the next-guest preview updates on every serve, so
-        // announcing it would pile up on the status line. It stays a labelled,
-        // navigable block instead. See GitHub #70.
-        <div className="next-guest" aria-label="Next guest in line">
-          <div className="next-guest__header">
-            <span className="next-guest__label">Next in line:</span>
-            {/* Guest names are German proper nouns/titles (Pendler, Herr, Frau mit rotem
-                Regenschirm…) in an otherwise-English UI; mark them so screen readers
-                pronounce them in German. See GitHub #71. */}
-            <strong lang="de">{nextGuest.name}</strong>
-          </div>
-          {patienceState ? (
-            <span
-              className={`next-guest__patience next-guest__patience--${patienceState.label.toLowerCase()}${patienceState.critical ? " next-guest__patience--critical" : ""}`}
-              aria-label={`Guest patience: ${patienceState.label}`}
-            >
-              <span className="next-guest__patience-label">{patienceState.label}</span>
-              <span className="next-guest__patience-bar" aria-hidden="true">
-                {Array.from({ length: patienceState.max / PATIENCE_TICK }, (_, i) => (
-                  <span
-                    key={i}
-                    className={`next-guest__patience-pip${
-                      i * PATIENCE_TICK < patienceState.patience ? " next-guest__patience-pip--filled" : ""
-                    }`}
-                  />
-                ))}
-              </span>
-              {patienceState.messyPenalty ? (
-                <span className="next-guest__patience-messy" aria-label="Messy tables reduced patience">
-                  messy tables
-                </span>
-              ) : null}
-            </span>
-          ) : null}
-          {nextGuest.orderLine ? (
-            <span className="next-guest__order">"{nextGuest.orderLine}"</span>
-          ) : null}
-          {nextGuest.learningCue ? (
-            <span className="next-guest__cue">{nextGuest.learningCue}</span>
-          ) : null}
-          {nextGuest.wants ? (
-            <span className="next-guest__fit">Likely order: {nextGuest.wants}.</span>
-          ) : null}
-        </div>
-      ) : null}
-
-      {products.length > 0 && (
-        <div className="serve-menu" aria-label="Serve a product">
-          <p className="serve-menu__label">Serve</p>
-          <div className="serve-menu__items">
-            {products.map((product) => (
-              <button
-                key={product.id}
-                type="button"
-                className={`serve-menu__item${product.name === nextGuest?.wants ? " serve-menu__item--suggested" : ""}`}
-                onClick={() => onServeProduct(product.id)}
-                disabled={!canAct}
-                title={!canAct ? "No actions left this shift." : undefined}
-              >
-                <span className="serve-menu__name">{product.name}</span>
-                <span className="serve-menu__price">€{product.basePrice}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+      <GuestOrderControls
+        gameState={gameState}
+        onServeProduct={onServeProduct}
+      />
 
       <div className="action-budget" aria-label="Daily action capacity">
         <span>Actions left</span>
@@ -634,69 +559,14 @@ function RestockPanel({
   onBuyEquipment: (slot: EquipmentSlotId) => void;
   onBuyUpgrade: (upgradeId: UpgradeId) => void;
 }) {
-  const preview = getRestockPreview(gameState);
   const decorOptions = getDecorUpgradeOptions(gameState);
 
-  if (gameState.demoComplete) {
-    return (
-      <div className="restock-panel" aria-label="Demo complete">
-        <p>The Day-7 letter has arrived. Restock is locked for the demo ending.</p>
-      </div>
-    );
-  }
-
-  const nothingToBuy = restockIngredients.every(
-    (i) => gameState.pendingSupplyPurchase[i] === 0
-  );
-
   return (
-    <div className="restock-panel" aria-label="Buy supplies for tomorrow">
-      <h3>Restock</h3>
-      {restockIngredients.map((ingredient) => {
-        const qty = gameState.pendingSupplyPurchase[ingredient];
-        const stock = gameState.supplies[ingredient];
-        const cap = preview.maxPurchase[ingredient];
-        return (
-          <div className="restock-row" key={ingredient}>
-            <span className="restock-row__label">
-              {getIngredientLabel(ingredient)}
-              <span className="restock-row__stock">{stock} in stock</span>
-            </span>
-            <div className="stepper">
-              <button
-                type="button"
-                aria-label={`Buy one fewer ${getIngredientLabel(ingredient)}`}
-                disabled={qty <= 0}
-                onClick={() => onSetSupplyPurchase(ingredient, qty - 1)}
-              >
-                −
-              </button>
-              <output aria-label={`${getIngredientLabel(ingredient)} units to buy`}>
-                {qty > 0 ? `+${qty}` : "—"}
-              </output>
-              <button
-                type="button"
-                aria-label={`Buy one more ${getIngredientLabel(ingredient)}`}
-                disabled={qty >= cap}
-                onClick={() => onSetSupplyPurchase(ingredient, qty + 1)}
-              >
-                +
-              </button>
-            </div>
-          </div>
-        );
-      })}
-      <button
-        type="button"
-        className="restock-confirm"
-        disabled={!nothingToBuy && !preview.canAfford}
-        onClick={onConfirmSupplyPurchase}
-      >
-        {nothingToBuy
-          ? "Open tomorrow without restocking"
-          : `Restock · €${preview.totalCost} → €${preview.balanceAfter} left`}
-      </button>
-
+    <SupplyPurchaseControls
+      gameState={gameState}
+      onSetSupplyPurchase={onSetSupplyPurchase}
+      onConfirmSupplyPurchase={onConfirmSupplyPurchase}
+    >
       <div className="decor-shop" aria-label="Upgrade café décor">
         <h3>Décor</h3>
         {decorOptions.map((option) => (
@@ -730,7 +600,7 @@ function RestockPanel({
       />
 
       <UpgradeShop gameState={gameState} onBuyUpgrade={onBuyUpgrade} />
-    </div>
+    </SupplyPurchaseControls>
   );
 }
 
