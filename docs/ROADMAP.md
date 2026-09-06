@@ -4,6 +4,8 @@ Planning review: **2026-09-06**. Immediate target: the browser-playable seven-da
 
 This roadmap distinguishes code that exists, isolated work awaiting integration, explicit visual approval, and release verification. None of those states implies the others. Future phases are retained below as direction, not implementation orders.
 
+**UI direction added 2026-09-06:** the user wants no persistent text at the edges of the gameplay screen. Information and actions should live in the café or in focused interaction stages belonging to its objects. U1–U3 below translate that direction into incremental work; the [UI Sheet](art/UI_STYLE_GUIDE.md) records the proposed functional mapping. This is a target, not a claim that today's side panels have been removed.
+
 ## Current evidence and first-wave results
 
 The review used source inspection, local Git history and the three existing task records. No tests, simulations, builds or browser QA were run for this roadmap update; no live deployment or GitHub issue status was rechecked.
@@ -59,6 +61,7 @@ Next delivery step; graphics-independent, one integration owner.
 
 - Scope: `src/game/engine/save.ts`, relevant `App.tsx` call sites and focused save tests. Start App changes after D2 integration.
 - Acceptance: a denied/full store does not stop the active session; unsuccessful persistence is communicated honestly; explicit reset still starts a fresh session even if storage removal fails. Preserve the save key, migration chain and normal reload behavior.
+- Keep the storage-result contract independent of its display location. A small accessible warning can later move into U2/U3; do not add a permanent sidebar for it.
 - Keep cross-run progression and export/import outside this fix. One owner handles storage and any necessary state-contract changes.
 
 ### P2 — Week-one character canon
@@ -78,6 +81,7 @@ Next delivery step; graphics-independent, one integration owner.
 - Scope: relevant action/status copy in `ActionPanel.tsx`, `management.ts`, `selectors.ts`, the reducer and specific content files. Reserve exact files with P2 before writing.
 - Acceptance: the player can understand a choice before acting and recognize its actual consequence afterward; status and recap match state changes. Keep text compact, real HTML and accessible through existing controls.
 - No unplanned changes to the economy, no new tutorial system, no free-pricing or new advertising simulation hidden inside a copy task.
+- Coordinate with U1–U3: improve reusable action text once, then show it at the relevant café station. Do not build a second, text-heavy side-panel presentation that the in-world migration immediately replaces.
 
 ### P4 — Week-one pacing
 
@@ -86,6 +90,32 @@ Next delivery step; graphics-independent, one integration owner.
 - Produce one matrix: day → new decision → action/reading load → expected payoff → observed evidence gap. A 15–20-minute target requires a real player session; action counts alone do not establish session duration or enjoyment.
 - After P2/P3 stabilize and QA is approved, evaluate one complete week. Adjust only the evidenced pacing issue with a small, explicit change to action budgets, unlock timing or economy.
 - Acceptance: each day introduces something meaningful, consequences are understandable, weirdness escalates on time and the Day-7 hook lands. Record the played build and results; do not claim these outcomes from test-file existence.
+
+### U1 — Reusable controls for café interactions
+
+**Ready for a bounded implementation task; graphics-independent.** Extract guest/order/product controls and the supply-purchase controls from `ActionPanel.tsx` into small typed components under `src/ui/interactions/`. The current `ActionPanel` must use them immediately; do not create an unused UI framework.
+
+- Preserve DOM semantics/order, existing classes, copy, costs, callbacks, disabled reasons and native keyboard behavior. No engine, geometry, renderer, `App.tsx`, dependency or global CSS changes.
+- The current `ActionPanel.tsx` is identical on the inspected graphics checkout and stored `origin/main`; recheck that fact on the actual task baseline before editing.
+- Acceptance: one implementation of each extracted control group remains in active use and can be hosted at a guest/counter or storage stage later. Author focused regressions, but run checks only after approval. This delivery is reusable live code, not the completed in-world layout.
+
+### U2 — A complete Day-1 interaction route inside the café
+
+**Next visible gameplay slice after U1 and the P0/P1 integration baseline.** Use the existing runtime and gameplay rules; no new graphics are required. One integrator owns `App.tsx`, the chosen renderer and narrowly scoped styles during this step.
+
+- Fresh start → machine-location setup purchase → opening sign → guest/counter product selection → table cleaning → door closure → ledger result → storage purchase or continue without purchase.
+- Guest/object selection opens one focused contextual stage; Back/Close and Escape return to the café. Keep text as real HTML, maintain focus and offer reachable entries for absent or unbought props. Opening a stage spends no game action.
+- `take_order` / `prepare_drink` are currently complete default-product service aliases. Do not turn them into an extra three-step order/brew/pay mechanic.
+- Acceptance: an approved user walkthrough can finish that route without relying on edge panels. Exact values and costs are inspectable, shortages and unavailable actions are understandable, and the correct table IDs survive renderer integration. Proposed station layout still needs visual review.
+
+### U3 — Complete the café-first screen
+
+**After the U2 interaction review, before calling the new UI complete.** Move the remaining seven-day functions according to the [UI Sheet coverage table](art/UI_STYLE_GUIDE.md): offer/advertising board, staff plan, equipment/décor, KASSANDRA, objectives/events, letter/ending, options/reset and error feedback.
+
+- Replace persistent outside HUD, action/story columns and gameplay header/footer copy only after all their functions have accessible entry points. No silent removal of resources, conditions, story content or recovery controls.
+- Short feedback stays near its cause; long text opens on its own stage. Do not simply move every old panel on top of the café image. Preserve existing story availability; a new persistent journal is a separate feature decision.
+- Acceptance: the full week, fresh start, reload, day-end restocking, both closure reasons and Day-7 replay remain reachable without persistent edge text. Complete approved keyboard/reflow/visual checks on this final layout, in coordination with A1.
+- U1 is immediate groundwork; U2/U3 are not permission to rewrite the screen or approve final UI artwork in advance. Freeze their release inclusion after the first interaction review; the user specified a long-term target, not a new demo deadline.
 
 ### G1 — Continue graphics approval, then port to runtime
 
@@ -105,16 +135,29 @@ Recheck these findings on the selected integrated renderer before fixing them. E
 
 ## Subagent work and file ownership
 
-This revision used three read-only subagents: implementation evidence, Git/first-wave results, and scope/parallelism. The main agent owns this roadmap edit. New visible tasks are unnecessary for repeating those audits; continue from the evidence above.
+This revision used read-only subagents for implementation evidence, Git/first-wave results, scope/parallelism and the new UI function mapping. The main agent owns this roadmap and interaction-sheet edit. Do not create more visible audit tasks; use the two bounded implementation handoffs below.
 
 | Lane | Useful parallel subagent work | Write boundary / dependency |
 |---|---|---|
 | Integration / P0 | Review the two existing commit chains and their acceptance evidence independently. | One integration owner; `App.tsx` edits serialized with P1 and later A1. |
 | Persistence / P1 | Review error paths and propose the storage-result contract. | Engine owner: `save.ts`, later App integration and focused tests. Save migrations/state types are single-owner. |
+| Café controls / U1 | Independently review guest/product and restock control extraction. | `ActionPanel.tsx`, `src/ui/interactions/` and dedicated new tests only; serialize P3 edits to the same file. No App, renderer, engine or global CSS writes. |
+| In-world integration / U2–U3 | Review functional coverage against the UI Sheet. | Starts after U1 and P0/P1; one App/renderer/style integrator coordinates with G1. Do not overlap graphics placement edits. |
 | Content / P2–P4 | Draft the cast matrix and inspect action/copy evidence in parallel, read-only. | One writer per named content/selector file. Finish shared data changes before balancing against them. |
 | Graphics / G1 | Continue the existing graphics task and explicit user approvals. | Graphics owner: assets, approval tools, café renderer, `global.css`, art docs and mirrored geometry/pipeline instructions. |
 
 Independent implementation work uses separate worktrees from an agreed committed baseline. Read-only subagents may inspect the shared checkout. Hand off an ID, exact files/commits, acceptance criterion and unresolved decision; avoid repeated full-repo audits and duplicated tasks. Never let multiple writers change `App.tsx`, shared selectors, `global.css` or save migrations at once.
+
+### Next implementation dispatch
+
+Run exactly two separate tasks from the same committed project baseline; record the actual starting commit in each handoff. Refresh/reconcile remote differences deliberately during P0, not by blindly merging the graphics branch.
+
+1. **P0 + P1, integration and save safety:** reuse D1/D2, then implement resilient persistence/reset. Sole `App.tsx` owner. Canonical prompt: `R-CAFE-SAVE-20260906` in [Prompts](PROMPTS.md).
+2. **U1, café interaction controls:** extract and wire the live guest/product and restock components. Canonical prompt: `R-CAFE-CONTROLS-20260906` in [Prompts](PROMPTS.md).
+
+G1 continues in its existing graphics task. No duplicate README, replay or accessibility task. P2 can receive a short Nele-entry-day proposal via a read-only subagent; data changes still await that decision. P3/P4 follow on the selected UI/content baseline.
+
+Recommended settings: `gpt-5.6-sol` / high thinking for P0/P1, medium for the mechanical U1 extraction. These are recommendations, not permission to override the user's configured task model. Reduce tokens by using these fixed file lists and handing off exact commits instead of repeating repository-wide audits.
 
 ## Demo acceptance and release sequence
 

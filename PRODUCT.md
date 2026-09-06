@@ -28,7 +28,7 @@ Dry, warm, precise. The game is not winking at the player; it is completely seri
 1. **The café first, the strangeness second.** Every UI decision should make the café feel real and grounded before it makes it feel strange. The player must care about the normal before they notice the abnormal.
 2. **Restraint amplifies.** The UI does not explain or dramatize the weirdness. Unusual things appear in normal UI containers, delivered in the same dry tone as the coffee order. The dissonance is the effect.
 3. **Warmth through specificity, not sweetness.** Warmth comes from texture, dark wood tones, exact typography, and precise spacing — not from pastel colors or rounded-everything.
-4. **Every panel has a reason.** No chrome for chrome's sake. Each UI region (HUD, diorama, action panel, KASSANDRA terminal) earns its visual presence by serving a distinct gameplay role.
+4. **Operate the café from inside the café.** The target gameplay screen has no persistent text rails, resource dashboard or action sidebar around the scene. Guests and objects are the entry points for actions and information. Longer interactions open one focused, object-related stage (for example the counter, store room or ledger), with a clear return to the café. Keep text real, readable and keyboard-accessible; do not bake it into artwork. Existing side panels remain a migration fallback until their functions have reachable replacements. See the [UI Sheet](docs/art/UI_STYLE_GUIDE.md).
 5. **Escalation is earned.** Visual shifts across the 7 days (from warm café normalcy to subtle UI glitches and strange type) should feel discovered, not designed-in-advance. The day-7 screen should feel like a different place than day-1 — but only in retrospect.
 
 ## Accessibility & Inclusion

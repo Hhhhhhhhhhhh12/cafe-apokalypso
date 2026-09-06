@@ -1066,3 +1066,118 @@ Before using Claude Code, Codex, ClickUp, Antigravity, or another tool for broad
 - broad code generation task
 - new tool or dependency
 - anything likely to require rollback if wrong
+
+## Prompt R-CAFE-SAVE-20260906: Integrate delivered work and make saves resilient
+
+Target: Codex, separate project worktree. Recommended model/thinking: `gpt-5.6-sol` / high; use the configured model unless the user chooses otherwise. Implementation authorized by the roadmap follow-up on 2026-09-06; test execution is not authorized.
+
+```text
+Implement roadmap P0 then P1 for Café Apokalypso. Read AGENTS.md/CLAUDE.md,
+docs/PROJECT_CANON.md, docs/QUALITY_CHECKLIST.md, the P0/P1 and UI-direction
+sections of docs/ROADMAP.md, and docs/art/UI_STYLE_GUIDE.md. The current handoff
+source is /Users/Heineken/Code/cafe-apokalypso/docs/PROMPTS.md,
+prompt R-CAFE-SAVE-20260906; if your default-branch worktree has older docs,
+read the named files from that source checkout without changing it.
+
+First record your actual HEAD, branch and clean/dirty status. Preserve all
+unrelated edits. Work only in your isolated worktree. Preserve the existing
+Day-7 result on a named codex/ ref before cleanup; tip:
+88e8e1a1386400a1882ce95dfa9e2150de98a53b.
+Inspect the remote baseline and any differences before choosing integration
+commits; a fetch is allowed, but no push, publish, whole graphics-branch merge
+or change to the shared checkout. Record a changed baseline explicitly.
+
+Reuse existing work, not a replacement implementation:
+D1 README/index.html: 54e566a6dc42eedba64df996d9bf29ba2fa582dc then
+36cd49223e64e8680ef6929e72c1cf99526476b3.
+D2 App/replay test: 45a0543a4305f7f3cdaed939ba0ba78161f48f15 then
+88e8e1a1386400a1882ce95dfa9e2150de98a53b.
+Check whether they are already present; integrate both chains in order when
+needed. Preserve the target renderer's callback shape and reset/focus behavior.
+Historical D2 test results do not verify your integration.
+
+Then handle save write/remove exceptions with an explicit result contract.
+Denied/unavailable/full storage must not interrupt gameplay. Reset must start
+a fresh in-memory run even if a stored key cannot be removed. Attempt removal
+of the remaining legacy keys even if one removal fails. Report failure honestly,
+including that an old save may return on reload if persistence remains denied.
+Preserve normal save/load, keys, migrations and boot/replay semantics. Keep
+game-progress state separate from storage-status UI; no fake saved message.
+
+You alone own src/app/App.tsx in this wave. Other allowed writes:
+src/game/engine/save.ts, dedicated save/reset tests, the D1/D2 file sets above,
+and one small storage-status component if necessary. The status component must
+be movable into the future cafe stage; do not add a permanent sidebar. Reuse
+existing styles. Do not touch ActionPanel.tsx, graphics/assets, renderer,
+global.css, package files, game rules, state migrations, or the shared roadmap.
+No new dependencies, telemetry, backend, export/import or cross-run system.
+
+Read-only source/diff review and writing focused tests are allowed. Ask the
+user before running any technical tests, typecheck, build, simulation, browser
+QA or dependency installation. Proposed checks after approval: the relevant
+save/reset tests plus tests/intro-outro.test.tsx; npm run typecheck; broader
+suite/build only with matching approval. Do not run them automatically.
+
+After implementation, inspect the exact diff and commit only owned files.
+Label unexecuted verification explicitly; never claim tests pass from inspection.
+Hand off prompt ID, actual model if available (otherwise unknown), baseline,
+branch/commits, owned files, remaining integration risks and requested checks.
+Do not merge, push or deploy. Keep updates and the final handoff concise and German.
+```
+
+## Prompt R-CAFE-CONTROLS-20260906: Reusable guest and storage controls
+
+Target: Codex, separate project worktree. Recommended model/thinking: `gpt-5.6-sol` / medium; use the configured model unless the user chooses otherwise. Implementation authorized by the roadmap follow-up on 2026-09-06; test execution is not authorized.
+
+```text
+Implement roadmap U1 for Café Apokalypso: reusable live controls as the first
+step toward no persistent text around the café. Read AGENTS.md/CLAUDE.md,
+docs/PROJECT_CANON.md, docs/QUALITY_CHECKLIST.md, docs/ART_PIPELINE.md,
+docs/ART_STYLEGUIDE.md and docs/art/UI_STYLE_GUIDE.md. Read only U1 and the
+file-ownership section in docs/ROADMAP.md. Current handoff source:
+/Users/Heineken/Code/cafe-apokalypso/docs/PROMPTS.md,
+prompt R-CAFE-CONTROLS-20260906. If your default-branch worktree has older
+docs, read those named files from the source checkout without changing it.
+
+Record actual HEAD, branch and dirty state. Work only in your isolated worktree
+and preserve unrelated changes. Inspect ActionPanel.tsx and only the selectors,
+types and tests relevant to this extraction; no new repository-wide audit.
+
+Extract the existing guest/order preview plus product selection, and the
+end-of-day supply-purchase controls, into small typed components under
+src/ui/interactions/. ActionPanel must import and use those components in
+the existing positions immediately. Preserve DOM order/semantics, classes,
+copy, callback signatures, costs, affordability, disabled reasons, action and
+bonus limits, labels and focus behavior. Keep upgrade/decor sections in their
+current place unless moving an inseparable wrapper is strictly necessary.
+
+Opening a future view costs no game action. Current take_order/prepare_drink
+each perform a complete default-product service; do not create an additional
+order/brew/pay mechanic. Do not change the economy or selectors. The goal is
+one reusable implementation actually used by the game, not an unused abstract
+station framework, new screen, floating grid, hotspot or final UI design.
+
+Allowed writes: src/ui/components/ActionPanel.tsx, new components in
+src/ui/interactions/, and dedicated new focused test files for these controls.
+Do not edit App.tsx (owned by the save/integration task), engine/data/types,
+renderer, CSS, graphics, asset mappings, package files, shared docs or existing
+intro-outro/save tests. Do not integrate the graphics branch, add dependencies,
+remove the side panels or restart the deferred accessibility audit.
+
+Acceptance: ActionPanel uses both extracted groups without duplicated controls
+or changed behavior; the props permit a later guest/counter or storage host.
+Write focused regression tests for callback payloads, unavailable serving,
+stock purchase limits, affordability, zero-purchase continuation and demo-end
+lock behavior. Preserve current accessible names; do not change visuals.
+
+Ask the user before technical tests, typecheck, build, simulation, browser QA
+or dependency installation. Suggested commands after approval: npx vitest run
+with only the new focused test paths, then npm run typecheck. No automatic runs.
+Read-only source/diff review and authoring tests are allowed.
+
+Review the exact diff and commit only owned files. Report prompt ID, actual
+model if available (otherwise unknown), baseline, branch/commits, changed files
+and unexecuted verification. Clearly state that the screen still uses its
+existing panels: object placement is U2, not part of this extraction. Do not
+merge, push or deploy. Keep updates and final handoff concise and German.
+```

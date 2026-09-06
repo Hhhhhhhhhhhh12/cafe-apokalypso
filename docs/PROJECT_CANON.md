@@ -97,6 +97,16 @@ No side-view as the default gameplay view.
 
 Side-view may only be used later for special missions or event scenes.
 
+## In-world interaction direction
+
+User decision, 2026-09-06: the eventual gameplay screen should have no persistent text at its edges. Actions and information belong in the café or on their related interaction stages, not in surrounding dashboard panels.
+
+Guests, tables, the counter, storage, the door and KASSANDRA act as entry points. Longer content opens one focused detail stage with a clear return to the café. “Stage” initially means a contextual interaction view, not a new location, camera system or gameplay mechanic. Exact visual composition still requires review.
+
+The approved direction is to reduce persistent text, not remove essential information. Costs, conditions, warnings, settings, reset and story content must remain discoverable and accessible. Text and controls remain real HTML/React. Opening a view costs no game action; moving controls must preserve existing rules.
+
+See [UI Sheet](art/UI_STYLE_GUIDE.md) for the proposed mapping and [Roadmap](ROADMAP.md) U1–U3 for incremental delivery. Existing side panels describe the current implementation, not the long-term product target. Remove them only when functional replacements are complete.
+
 ## Technical constraints
 
 - Vite
