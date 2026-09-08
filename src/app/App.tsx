@@ -17,6 +17,8 @@ import { CafeScene } from "../ui/cafe/CafeScene";
 import { IntroSequence } from "../ui/components/IntroSequence";
 import { OptionsMenu } from "../ui/components/OptionsMenu";
 import {
+  type PendingResetStorageStatus,
+  resolveStorageStatusAfterSave,
   StorageStatusMessage,
   type StorageStatusKind
 } from "../ui/components/StorageStatusMessage";
@@ -48,16 +50,18 @@ export function App() {
     (availableStorage) =>
       availableStorage ? loadGameState(availableStorage) : createFreshRunState()
   );
+  const pendingResetStorageRef = useRef<PendingResetStorageStatus | null>(null);
 
   useEffect(() => {
     if (storage) {
       const result = saveGameState(gameState, storage);
-      setStorageStatus((currentStatus) => {
-        if (!result.ok) {
-          return currentStatus === "reset-failed" ? currentStatus : "save-failed";
-        }
-        return currentStatus === "save-failed" ? null : currentStatus;
-      });
+      const pendingReset = pendingResetStorageRef.current;
+      if (result.ok && pendingReset) {
+        pendingResetStorageRef.current = null;
+      }
+      setStorageStatus((currentStatus) =>
+        resolveStorageStatusAfterSave(currentStatus, result.ok, pendingReset)
+      );
     }
   }, [gameState, storage]);
 
@@ -107,18 +111,27 @@ export function App() {
   function handleReset() {
     if (storage) {
       const resetResult = resetSavedGameState(storage);
-      let nextStorageStatus: StorageStatusKind | null = resetResult.ok
-        ? null
-        : resetResult.failedKeys.includes(SAVE_KEY)
-          ? "reset-failed"
-          : "cleanup-failed";
+      const currentSaveRemovalFailed =
+        !resetResult.ok && resetResult.failedKeys.includes(SAVE_KEY);
+      let cleanupFailed =
+        !resetResult.ok && resetResult.failedKeys.some((key) => key !== SAVE_KEY);
       try {
         storage.removeItem(BOOT_ACK_KEY);
       } catch {
-        nextStorageStatus ??= "cleanup-failed";
+        cleanupFailed = true;
       }
-      setStorageStatus(nextStorageStatus);
+      pendingResetStorageRef.current = currentSaveRemovalFailed || cleanupFailed
+        ? { currentSaveRemovalFailed, cleanupFailed }
+        : null;
+      setStorageStatus(
+        currentSaveRemovalFailed
+          ? "reset-failed"
+          : cleanupFailed
+            ? "cleanup-failed"
+            : null
+      );
     } else {
+      pendingResetStorageRef.current = null;
       setStorageStatus("unavailable");
     }
     setBootAcknowledged(false);
