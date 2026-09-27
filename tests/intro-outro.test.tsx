@@ -53,6 +53,22 @@ describe("App intro/outro screens", () => {
     expect(visibleText(markup)).toContain("Skip");
   });
 
+  it("keeps a fresh run playable when browser storage is unavailable", () => {
+    vi.stubGlobal("window", {
+      get localStorage() {
+        throw new DOMException("Storage access denied", "SecurityError");
+      }
+    });
+
+    const markup = renderToStaticMarkup(<App />);
+    const text = visibleText(markup);
+
+    expect(markup).toContain("intro-cinema");
+    expect(text).toContain("Browser storage is unavailable");
+    expect(text).toContain("keep playing");
+    expect(text).toContain("will not survive a reload");
+  });
+
   it("shows the demo-complete banner after Day 7 and hides the intro", () => {
     const storage = createMemoryStorage();
     saveGameState(
@@ -70,8 +86,12 @@ describe("App intro/outro screens", () => {
     const text = visibleText(markup);
 
     expect(markup).toContain("demo-complete-banner");
-    expect(text).toContain("The first café week is over");
-    expect(text).toContain("Start the next café week");
+    expect(text).toContain("Week one complete");
+    expect(text).toContain("7 of 7 days served");
+    expect(text).toContain("Next unlock: Day 8, week two");
+    expect(text).toContain("Not built yet");
+    expect(text).toContain("Replay week one");
+    expect(text).not.toContain("Start the next café week");
     expect(markup).not.toContain("intro-cinema");
   });
 });
