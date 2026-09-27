@@ -10,6 +10,10 @@ const LEGACY_SAVE_KEYS = [
 
 export type StorageLike = Pick<Storage, "getItem" | "setItem" | "removeItem">;
 
+export type StorageMutationResult =
+  | { ok: true }
+  | { ok: false; failedKeys: readonly string[] };
+
 export function getBrowserStorage(): StorageLike | null {
   if (typeof window === "undefined") {
     return null;
@@ -42,13 +46,30 @@ export function loadGameState(storage: StorageLike): GameState {
   }
 }
 
-export function saveGameState(state: GameState, storage: StorageLike): void {
-  storage.setItem(SAVE_KEY, JSON.stringify(state));
+export function saveGameState(
+  state: GameState,
+  storage: StorageLike
+): StorageMutationResult {
+  try {
+    storage.setItem(SAVE_KEY, JSON.stringify(state));
+    return { ok: true };
+  } catch {
+    return { ok: false, failedKeys: [SAVE_KEY] };
+  }
 }
 
-export function resetSavedGameState(storage: StorageLike): void {
-  storage.removeItem(SAVE_KEY);
-  for (const legacyKey of LEGACY_SAVE_KEYS) {
-    storage.removeItem(legacyKey);
+export function resetSavedGameState(storage: StorageLike): StorageMutationResult {
+  const failedKeys: string[] = [];
+
+  for (const key of [SAVE_KEY, ...LEGACY_SAVE_KEYS]) {
+    try {
+      storage.removeItem(key);
+    } catch {
+      failedKeys.push(key);
+    }
   }
+
+  return failedKeys.length === 0
+    ? { ok: true }
+    : { ok: false, failedKeys };
 }

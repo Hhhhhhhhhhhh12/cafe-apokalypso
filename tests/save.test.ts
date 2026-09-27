@@ -86,11 +86,65 @@ describe("save safety", () => {
     const storage = createMemoryStorage();
     const state = createInitialGameState();
 
-    saveGameState(state, storage);
+    expect(saveGameState(state, storage)).toEqual({ ok: true });
     expect(loadGameState(storage)).toEqual(state);
 
-    resetSavedGameState(storage);
+    expect(resetSavedGameState(storage)).toEqual({ ok: true });
     expect(loadGameState(storage)).toEqual(createFreshRunState());
+  });
+
+  it("reports a rejected write without interrupting the active state", () => {
+    const state = createInitialGameState();
+    const storage: StorageLike = {
+      getItem: () => null,
+      setItem: () => {
+        throw new DOMException("Storage quota exceeded", "QuotaExceededError");
+      },
+      removeItem: () => {}
+    };
+
+    expect(saveGameState(state, storage)).toEqual({
+      ok: false,
+      failedKeys: [SAVE_KEY]
+    });
+    expect(state).toEqual(createInitialGameState());
+  });
+
+  it("attempts every save key when one removal is rejected", () => {
+    const attemptedKeys: string[] = [];
+    const rejectedKey = SAVE_KEY;
+    const initialState = createInitialGameState();
+    const savedState = {
+      ...initialState,
+      resources: {
+        ...initialState.resources,
+        money: 99
+      }
+    };
+    const values = new Map([[SAVE_KEY, JSON.stringify(savedState)]]);
+    const storage: StorageLike = {
+      getItem: (key) => values.get(key) ?? null,
+      setItem: (key, value) => void values.set(key, value),
+      removeItem: (key) => {
+        attemptedKeys.push(key);
+        if (key === rejectedKey) {
+          throw new DOMException("Storage access denied", "SecurityError");
+        }
+        values.delete(key);
+      }
+    };
+
+    expect(resetSavedGameState(storage)).toEqual({
+      ok: false,
+      failedKeys: [rejectedKey]
+    });
+    expect(attemptedKeys).toEqual([
+      SAVE_KEY,
+      "cafe-apokalypso.save.v1",
+      "cafe-apokalypso.save.v2",
+      "cafe-apokalypso.save.v3"
+    ]);
+    expect(loadGameState(storage)).toEqual(savedState);
   });
 
   it("preserves valid progress through reload-style save/load", () => {
