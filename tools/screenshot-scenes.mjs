@@ -4,7 +4,8 @@
 //
 // Playwright ist bewusst KEINE Projekt-Dependency (schwerer Browser-Download).
 // Einmalige Einrichtung zum Neu-Erzeugen der Screenshots:
-//   npm i -D playwright && npx playwright install chromium
+//   npm i --no-save --package-lock=false playwright && npx playwright install chromium
+// Nur lokal in node_modules; package.json und package-lock.json bleiben unverändert.
 //
 // Voraussetzung: Dev-Server läuft (npm run dev) auf BASE (Default 5173).
 // Aufruf:  node tools/screenshot-scenes.mjs
@@ -40,6 +41,9 @@ const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, dev
 // 1) Volle Spiel-UI (Startzustand) — zeigt HUD, Diorama, Action-Panel zusammen.
 await page.goto(APP, { waitUntil: "networkidle" });
 await page.locator(".cafe-diorama").first().waitFor();
+// Das Intro verdeckt die UI für ca. 8,8 s. Auf sein tatsächliches Ende warten,
+// statt die Aufnahme an eine feste Intro-Dauer zu koppeln.
+await page.locator(".intro-cinema").waitFor({ state: "detached", timeout: 30_000 });
 await page.waitForTimeout(400);
 await page.screenshot({ path: join(OUT, "full-ui-day1.png") });
 console.log("✓ full-ui-day1.png");

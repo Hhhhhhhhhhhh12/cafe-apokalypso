@@ -5,8 +5,10 @@ Mitarbeitende, ohne den Dev-Server starten zu müssen.
 
 > Neu erzeugen (nach Änderungen an Szene/Assets): Dev-Server starten
 > (`npm run dev`), dann `node tools/screenshot-scenes.mjs`. Einmalige
-> Einrichtung: `npm i -D playwright && npx playwright install chromium`
-> (Playwright ist bewusst keine Projekt-Dependency).
+> Einrichtung: `npm i --no-save --package-lock=false playwright && npx playwright install chromium`
+> (Playwright ist bewusst keine Projekt-Dependency; nur lokale Installation in
+> `node_modules`, ohne Änderungen an `package.json` oder `package-lock.json`).
+> Die Vollansicht wird erst nach dem Ende des Intros aufgenommen.
 
 ## Volle Spiel-UI (Tag 1, vor Öffnung)
 
