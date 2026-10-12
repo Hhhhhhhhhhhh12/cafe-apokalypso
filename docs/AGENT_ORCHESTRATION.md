@@ -1,3 +1,5 @@
+> **Role update (2026-10-12):** The project owner has moved primary coordination to Codex. The historical role split and handoff order below are retained for provenance, **not** as the active operating model. Codex now handles planning, documentation, review, and implementation with scoped PRs; the owner approves major canon/scope decisions. See [CODEX_HANDOFF.md](CODEX_HANDOFF.md).
+
 # Agent Orchestration
 
 ## Purpose
