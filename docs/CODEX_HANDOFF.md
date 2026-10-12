@@ -19,7 +19,8 @@ When documents disagree, **report the contradiction** rather than silently chang
 - Published demo: https://hhhhhhhhhhhh12.github.io/cafe-apokalypso/
 - Main view: pixel-art 3/4 café diorama. `src/ui/cafe/CafeScene.tsx` and `src/ui/cafe/scene.ts` own current scene composition/position data, not old `CafePlaceholder.tsx`.
 - `AGENTS.md` records a historical test count; run tests to establish the actual current count.
-- At migration review, open PRs included #190 (live guest/supply controls), #186 (onboarding documentation), #180 (screenshots), #177 (sprites), #175 (v06 screenshot), and dependency PRs. Recheck before merging or starting work.
+- PR #190 (`codex/u1-live-controls`) was listed as open by GitHub at migration review (`merged=false`). Its implementation is already on `main` in commit `9c60669` (`Extract reusable cafe interaction controls (#190)`); all five files changed by the PR have identical blob SHAs on `main` and its head branch. Treat the code and tests as integrated: do not reimplement them or attempt to merge #190. The redundant PR was closed without merging after this comparison.
+- Other PRs listed as open at migration review included #186 (onboarding documentation), #180 (screenshots), #177 (sprites), #175 (v06 screenshot), and dependency PRs. Recheck before merging or starting work.
 
 ## What comes next
 Prioritize **validation**, not reconstruction: onboarding and clarity, balance, consequence visibility, UI readability, screenshot/demo flow, save resilience, accessibility, and responsive behavior. Keep visual work consistent with existing style and approval gates. No new mechanics or broad refactors without approval.
