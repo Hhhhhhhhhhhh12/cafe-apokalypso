@@ -144,10 +144,18 @@ UI-Logik.
 - Vor dem Committen: `npm run typecheck && npm run test && npm run build` grün.
 - PRs klein und reviewbar halten; Ziel, Kontext und Akzeptanzkriterien mitliefern.
 
-### KI-Rollen (falls du mit den Tools arbeitest)
-- **ChatGPT** — Konzept, Prompts, Design-Konsolidierung
-- **Claude Code** — Doku, Architektur-Review, Konsistenz-Checks, Planung
-- **Codex** — fokussierte Implementierung, Tests, Bugfixes, UI-Komponenten (Credits sind begrenzt, keine „bau das ganze Spiel“-Prompts)
+### KI-Arbeitsweise
+
+> **Aktuelle Rollenentscheidung (13.10.2026):** Codex ist der primäre Arbeitsbereich
+> für Projektkoordination, Planung, Dokumentation, Reviews und Implementierung.
+> Den aktuellen Projektstand und die verbindlichen Arbeitsregeln findest du in
+> [docs/CODEX_HANDOFF.md](CODEX_HANDOFF.md).
+
+> Die frühere Rollenverteilung ist nur noch historisch: ChatGPT für Konzept und
+> Design-Konsolidierung, Claude Code für Dokumentation, Architektur-Reviews,
+> Konsistenzprüfungen und Planung sowie Codex hauptsächlich für Implementierung,
+> Tests, Fehlerbehebungen und UI-Komponenten. Sie beschreibt nicht mehr den
+> aktuellen Projekt-Workflow.
 
 ---
 
@@ -205,7 +213,8 @@ er ersetzt keinen dieser Schritte.
 | Technische Struktur & Constraints | [`docs/TECH_ARCHITECTURE.md`](TECH_ARCHITECTURE.md) |
 | Art-Richtung & Asset-Pipeline | [`docs/ART_STYLEGUIDE.md`](ART_STYLEGUIDE.md), [`docs/ART_PIPELINE.md`](ART_PIPELINE.md) |
 | Qualitäts-Checkliste (bindend) | [`docs/QUALITY_CHECKLIST.md`](QUALITY_CHECKLIST.md) |
-| Den KI-/Handoff-Workflow | [`docs/WORKFLOW.md`](WORKFLOW.md), [`docs/AGENT_ORCHESTRATION.md`](AGENT_ORCHESTRATION.md) |
+| **Aktuelle Projektkoordination und Codex-Handoff** | [`docs/CODEX_HANDOFF.md`](CODEX_HANDOFF.md) |
+| Historische KI-Rollen und ältere Workflow-Notizen | [`docs/WORKFLOW.md`](WORKFLOW.md), [`docs/AGENT_ORCHESTRATION.md`](AGENT_ORCHESTRATION.md) |
 | Roadmap & Langfrist-Richtung | [`docs/ROADMAP.md`](ROADMAP.md) |
 
 Und im Repo-Root: [`README.md`](../README.md), [`PRODUCT.md`](../PRODUCT.md),
