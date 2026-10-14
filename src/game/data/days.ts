@@ -15,7 +15,7 @@ export const weekOneDays = [
       completionHint: "Serve 2 customers and clean the tables before closing."
     },
     unlocks: ["take order", "prepare coffee", "accept payment", "clean tables"],
-    guestIds: ["pendler-kemal", "freelancerin-nele"],
+    guestIds: ["pendler-kemal"],
     eventIds: ["day-1-opening-rhythm", "day-1-coffee-machine-flicker"]
   },
   {
