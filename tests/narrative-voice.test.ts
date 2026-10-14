@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  getDioramaGuestVisibility,
   getManagementHudLabels,
   getNarrativeEventCards,
   getNextGuestPreview,
@@ -58,14 +59,26 @@ describe("guest serve lines", () => {
     expect(getServeLineForCustomer(dayFour, 3)).toBe(herrGrau?.serveLine);
   });
 
-  it("stays in the normal pool when no strange guests are present that day", () => {
+  it("keeps Nele out of Day 1 and introduces her from Day 2", () => {
     const dayOne = stateForDay(1);
-    // Day 1 has only normal guests (Kemal, Nele), so even index >= 3 stays normal.
-    const dayOneNormalLines = weekOneGuests
-      .filter((g) => g.category === "normal" && ["pendler-kemal", "freelancerin-nele"].includes(g.id))
-      .map((g) => g.serveLine);
+    const kemal = weekOneGuests.find((guest) => guest.id === "pendler-kemal");
 
-    expect(dayOneNormalLines).toContain(getServeLineForCustomer(dayOne, 5));
+    // Day 1 has one guest in its normal pool, so the two-customer opening
+    // repeats Kemal until another Day 1 guest is approved.
+    expect(getServeLineForCustomer(dayOne, 0)).toBe(kemal?.serveLine);
+    expect(getServeLineForCustomer(dayOne, 1)).toBe(kemal?.serveLine);
+    expect(getServeLineForCustomer(dayOne, 5)).toBe(kemal?.serveLine);
+
+    const initial = createInitialGameState();
+    const seatedState = (day: DayNumber): GameState => ({
+      ...initial,
+      day,
+      equipment: { ...initial.equipment, seating: 1 },
+      dayManagement: { ...initial.dayManagement, customersServed: 1 }
+    });
+
+    expect(getDioramaGuestVisibility(seatedState(1)).nele).toBe(false);
+    expect(getDioramaGuestVisibility(seatedState(2)).nele).toBe(true);
   });
 });
 
