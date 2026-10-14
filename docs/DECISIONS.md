@@ -16,7 +16,7 @@ Nele is a **save-state-persistent** character. Where all other guests are re-ini
 - KASSANDRA does not classify her. Her entry is blank, missing, or produces an error. This is intentional and must not be "fixed."
 - Her line *"The café is authentic. I am not sure whether that is good."* has a double meaning: she has seen many versions of this café.
 - Long-term: what KASSANDRA marks as `[REDACTED]` in its boot sequence may be Nele.
-- Nele may appear from **Day 1** as a regular guest (not only Day 5 as temp help). Her early presence is low-key; no meta-reveal in Week 1.
+- Nele first appears on **Day 2**, not Day 1. This timing was confirmed by the user on 2026-10-14 and supersedes the earlier permission below. Her presence remains low-key; no meta-reveal in Week 1. The 2026-06-03 decision permitted a Day 1 appearance but did not require one.
 
 **KASSANDRA boot hook (approved):**
 
