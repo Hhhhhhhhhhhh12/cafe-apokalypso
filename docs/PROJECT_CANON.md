@@ -67,7 +67,7 @@ The canonical introduction is the `IntroSequence` component (5-beat Day 1 overla
 
 ### Nele
 
-Nele is a recurring guest, tone anchor, and save-state-persistent character. She appears later in the week — not from Day 1. Unlike all other guests, she persists across runs — she has been here in previous weeks and previous collapses. Her dry humor is recognition, not observation.
+Nele is a recurring guest, tone anchor, and save-state-persistent character. Her first appearance is on Day 2; she does not appear on Day 1. Unlike all other guests, she persists across runs — she has been here in previous weeks and previous collapses. Her dry humor is recognition, not observation.
 
 KASSANDRA does not classify her. Her entry is blank or absent. This is intentional and must not be fixed.
 
