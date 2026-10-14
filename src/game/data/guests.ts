@@ -125,7 +125,7 @@ export const weekOneGuests = [
     id: "freelancerin-nele",
     name: "Freelancerin Nele",
     category: "normal",
-    firstDay: 1,
+    firstDay: 2,
     behaviorTags: ["dry-humor", "observant", "freelancer", "persistent"],
     summary:
       "Dry, observant recurring guest and early tone anchor. Persists across runs. She is not Meda. KASSANDRA does not classify her.",
