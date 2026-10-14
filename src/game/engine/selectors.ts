@@ -283,7 +283,7 @@ export function getDioramaGuestVisibility(
     christa: state.day >= 2 && customersServed >= 2,
     bohn: state.day >= 3 && customersServed >= 1,
     strange: state.day >= 4 && customersServed >= 3,
-    nele: customersServed >= 1,
+    nele: state.day >= 2 && customersServed >= 1,
     meda: state.day >= 5 && customersServed >= 1,
     roterRegenschirm: state.day >= 7 && customersServed >= 2,
     fatou: state.day >= 2 && customersServed >= 1
