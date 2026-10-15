@@ -101,6 +101,25 @@ describe("day openers and unlock messages", () => {
     }
   });
 
+  it("introduces Day 2 newcomers without inventing multiple returning Day 1 guests", () => {
+    const [dayOne, dayTwo] = weekOneDays;
+    const dayOneGuestIds = new Set<string>(dayOne.guestIds);
+    const returningGuests = dayTwo.guestIds.filter((id) => dayOneGuestIds.has(id));
+
+    expect(dayOne.guestIds).toEqual(["pendler-kemal"]);
+    expect(returningGuests).toEqual(["pendler-kemal"]);
+    expect(dayTwo.guestIds).toContain("freelancerin-nele");
+    expect(dayTwo.dayOpener).toMatch(/yesterday, Kemal/i);
+    expect(dayTwo.dayOpener).toMatch(/new faces/i);
+    expect(dayTwo.dayOpener).not.toMatch(/faces from yesterday have returned/i);
+
+    // Christa is new on Day 2; her first order cannot reference a prior visit.
+    const christa = weekOneGuests.find((guest) => guest.id === "cappuccino-christa");
+    expect(christa?.firstDay).toBe(2);
+    expect(christa?.orderLine ?? "").not.toMatch(/yesterday/i);
+    expect(christa?.sampleLines.join(" ") ?? "").not.toMatch(/yesterday/i);
+  });
+
   it("provides unlock messages for days 3-6 only", () => {
     const withUnlock = (weekOneDays as readonly DayDefinition[])
       .filter((day) => Boolean(day.unlockMessage))
