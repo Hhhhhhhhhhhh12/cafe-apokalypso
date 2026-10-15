@@ -90,8 +90,8 @@ export const weekOneGuests = [
     firstDay: 2,
     behaviorTags: ["quality-expectations", "higher-spend", "foam-precision"],
     summary: "Pays better and has precise expectations for cappuccino foam.",
-    sampleLines: ["The foam was good yesterday. Today I am open to evidence."],
-    orderLine: "Cappuccino, please. The foam was good yesterday. Today I am open to evidence.",
+    sampleLines: ["I have standards about cappuccino foam. Today I am open to evidence."],
+    orderLine: "Cappuccino, please. I have standards about foam. Today I am open to evidence.",
     learningCue: "Christa studies the cup before she studies the price.",
     preferredProductId: "cappuccino",
     serveLine:
@@ -125,7 +125,7 @@ export const weekOneGuests = [
     id: "freelancerin-nele",
     name: "Freelancerin Nele",
     category: "normal",
-    firstDay: 1,
+    firstDay: 2,
     behaviorTags: ["dry-humor", "observant", "freelancer", "persistent"],
     summary:
       "Dry, observant recurring guest and early tone anchor. Persists across runs. She is not Meda. KASSANDRA does not classify her.",

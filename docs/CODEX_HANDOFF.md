@@ -26,7 +26,7 @@ When documents disagree, **report the contradiction** rather than silently chang
 Prioritize **validation**, not reconstruction: onboarding and clarity, balance, consequence visibility, UI readability, screenshot/demo flow, save resilience, accessibility, and responsive behavior. Keep visual work consistent with existing style and approval gates. No new mechanics or broad refactors without approval.
 
 ## Open reconciliation items
-- Nele timing: `PROJECT_CANON.md` says later in week; approved `DECISIONS.md` allows Day 1. Confirm intended canon and implementation before editing.
+- Nele timing (resolved 2026-10-14): her first appearance is Day 2. `PROJECT_CANON.md`, `DECISIONS.md`, and the game data are aligned.
 - Older `docs/art/PILOT_ASSET_INTAKE.md` refers to removed `CafePlaceholder.tsx`; mark historical or update through a separate focused PR.
 - Older agent orchestration and prompt docs contain historical role splits and old implementation tasks; do not treat them as a current task queue.
 - Existing open documentation PR #186 may overlap this handoff. Resolve duplication during review.

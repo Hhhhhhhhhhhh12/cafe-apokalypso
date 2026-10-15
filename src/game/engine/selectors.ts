@@ -283,7 +283,7 @@ export function getDioramaGuestVisibility(
     christa: state.day >= 2 && customersServed >= 2,
     bohn: state.day >= 3 && customersServed >= 1,
     strange: state.day >= 4 && customersServed >= 3,
-    nele: customersServed >= 1,
+    nele: state.day >= 2 && customersServed >= 1,
     meda: state.day >= 5 && customersServed >= 1,
     roterRegenschirm: state.day >= 7 && customersServed >= 2,
     fatou: state.day >= 2 && customersServed >= 1
@@ -378,7 +378,7 @@ export function getDayCoachHint(state: GameState): DayCoachHint | null {
 
   if (state.day === 2) {
     if (served === 0) {
-      return { text: "The regulars are back. Serve the morning crowd and keep an eye on stress.", target: "serve" };
+      return { text: "Kemal is back, and the morning crowd has grown. Serve them and keep an eye on stress.", target: "serve" };
     }
     if (!roomCared && served >= 2) {
       return { text: "A quick clean now keeps the room calm and stress down.", target: "clean" };
