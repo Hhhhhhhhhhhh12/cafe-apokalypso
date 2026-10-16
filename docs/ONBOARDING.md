@@ -69,7 +69,7 @@ Die Pflicht-Checks vor jedem Commit/PR:
 
 ```bash
 npm run typecheck  # tsc --noEmit  ← WICHTIG, siehe Fallstrick unten
-npm run test       # vitest run — 322 Tests, müssen grün bleiben
+npm run test       # Vitest-Suite ausführen; alle Tests müssen bestehen
 npm run build      # Produktions-Build
 ```
 
@@ -130,7 +130,7 @@ UI-Logik.
 - **localStorage** als einziger Speicher — kein Backend, keine Accounts, kein Tracking
 - **Kein echtes AI-API** (KASSANDRA ist skriptgesteuert)
 - **Deterministische Logik** — gleicher State + gleiche Action → gleicher nächster State (macht Tests/Balancing einfach)
-- **Tests:** Vitest, aktuell **322 Tests** — müssen grün bleiben
+- **Tests:** Vitest (`npm run test`); vor dem PR vollständig ausführen, alle Tests müssen bestehen
 - **Barrierefreiheit:** WCAG 2.1 AA (Kontrast ≥ 4.5:1, Touch-Targets ≥ 44px, Tastaturnavigation, `prefers-reduced-motion`)
 - **Diversität der Figuren** (Hauttöne, Körperformen, Hintergründe) ist eine harte Projekt-Vorgabe
 
@@ -225,5 +225,3 @@ Und im Repo-Root: [`README.md`](../README.md), [`PRODUCT.md`](../PRODUCT.md),
 
 Viel Spaß — und wenn etwas beim Setup hakt, ist das fast immer ein fehlendes
 `npm install` oder ein Node-Versionsthema. Willkommen an Bord. ☕
-</content>
-</invoke>

@@ -15,7 +15,7 @@ export const weekOneDays = [
       completionHint: "Serve 2 customers and clean the tables before closing."
     },
     unlocks: ["take order", "prepare coffee", "accept payment", "clean tables"],
-    guestIds: ["pendler-kemal", "freelancerin-nele"],
+    guestIds: ["pendler-kemal"],
     eventIds: ["day-1-opening-rhythm", "day-1-coffee-machine-flicker"]
   },
   {
@@ -24,7 +24,7 @@ export const weekOneDays = [
     milestone:
       "Guest behavior differences: patience, spend, seat time, and quality expectations.",
     dayOpener:
-      "A few faces from yesterday have returned. Each of them seems to have a different idea about what coffee is for. The morning is developing something like a rhythm.",
+      "Yesterday, Kemal made up the entire customer base. Today he is back, along with several new faces, each with a different idea about what coffee is for. The morning is developing something like a rhythm.",
     objective: {
       id: "day-2-regular-rhythm",
       day: 2,

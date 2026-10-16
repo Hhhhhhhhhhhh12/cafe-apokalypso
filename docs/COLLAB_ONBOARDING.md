@@ -16,7 +16,7 @@ Stand dieses Dokuments: 2026-07-18.
 ```bash
 npm install
 npm run dev            # Port 5173, öffnet /cafe-apokalypso/
-npx vitest run         # Testsuite, muss grün bleiben (aktuell 322 Tests)
+npm run test           # Vollständige Testsuite ausführen; alle Tests müssen bestehen
 ```
 
 - Stack: React + Vite + TypeScript. Cozy-Management-Spiel über 7 Tage, langsam
@@ -90,11 +90,11 @@ Details in `AGENTS.md` / `CLAUDE.md` und `docs/ART_PIPELINE.md`.
   ohne Vergangenheit, weiß so viel wie die Spielerin, will einfach aufmachen.
 - Paulas Blankheit und Neles Run-Persistenz sind **zwei getrennte Mysterien** —
   nicht zusammenführen.
-- Nele kommt **später** dazu (nicht mehr Day-1-Anker).
-- Offene Canon-Folgearbeit: Paula aus den Gäste-Rostern in `src/game/data/days.ts`
-  + `QUEUE_ROTATION` entfernen, Ersatzfigur für den freien Pendler-Slot
-  (Sprite-Pipeline + Diversitäts-Regel), `docs/PROJECT_CANON.md` aktualisieren
-  (sagt noch „Nele ab Day 1").
+- Neles erster Auftritt ist **Tag 2** (seit PR #193; nicht Tag 1).
+  Verbindlicher Figurenkanon: `docs/PROJECT_CANON.md`.
+- Ältere Folgearbeitsnotizen zu Paula in Gäste-Rostern, `QUEUE_ROTATION` und
+  einem Ersatz für den Pendler-Slot vor einer Umsetzung anhand von `main` und
+  aktuellen Issues überprüfen; nicht ungeprüft als offene Aufgaben übernehmen.
 
 ## 6. Effizienz-Regeln (für Agents besonders)
 

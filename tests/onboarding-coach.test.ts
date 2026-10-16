@@ -57,6 +57,12 @@ describe("first-week onboarding coach (#PHASE3)", () => {
     expect(getDayCoachHint(state)?.target).toBe(null);
   });
 
+  it("names the lone returning guest when coaching Day 2", () => {
+    const hint = getDayCoachHint(openDay(2));
+    expect(hint?.text).toContain("Kemal");
+    expect(hint?.text).toMatch(/grown/i);
+  });
+
   it("highlights the daily offer first thing on Day 3", () => {
     const hint = getDayCoachHint(openDay(3));
     expect(hint?.target).toBe("offer");
