@@ -1,0 +1,59 @@
+name: PR 180 screenshot refresh (temporary)
+
+on:
+  push:
+    branches: [docs/screenshots-for-scharon]
+    paths:
+      - .github/workflows/pr180-screenshot-refresh.yml
+      - tools/screenshot-scenes.mjs
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install project dependencies
+        run: npm ci
+      - name: Install Playwright without changing manifests
+        run: |
+          npm i --no-save --package-lock=false playwright
+          npx playwright install --with-deps chromium
+          test -z "$(git status --porcelain -- package.json package-lock.json)"
+      - name: Build and test
+        run: |
+          npm run typecheck
+          npm run test
+          npm run build
+      - name: Start Vite and generate all screenshots
+        run: |
+          npm run dev -- --host 127.0.0.1 > /tmp/cafe-vite.log 2>&1 &
+          for attempt in $(seq 1 40); do
+            if curl --fail --silent --output /dev/null http://127.0.0.1:5173/cafe-apokalypso/; then break; fi
+            sleep 1
+          done
+          curl --fail http://127.0.0.1:5173/cafe-apokalypso/ > /dev/null
+          node tools/screenshot-scenes.mjs
+          file docs/screenshots/*.png
+      - name: Include full UI preview in diagnostic log
+        run: |
+          echo FULL_UI_IMAGE_BEGIN
+          base64 -w 180 docs/screenshots/full-ui-day1.png | sed 's/^/IMG64:/'
+          echo FULL_UI_IMAGE_END
+      - name: Commit refreshed screenshots to PR branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/screenshots/*.png
+          if git diff --cached --quiet; then
+            echo "No changed screenshots"
+          else
+            git commit -m "docs: regenerate screenshots on current main"
+            git push origin HEAD:docs/screenshots-for-scharon
+          fi

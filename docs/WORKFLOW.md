@@ -1,3 +1,9 @@
+> **Rollenhinweis (13.10.2026):** Die KI-Rollen und die Handoff-Reihenfolge in
+> diesem Dokument sind historisch. Codex ist inzwischen der primäre Arbeitsbereich
+> für Projektkoordination, Planung, Dokumentation, Reviews und Implementierung.
+> Aktuelle Anleitung: [`CODEX_HANDOFF.md`](CODEX_HANDOFF.md). Die übrigen GitHub-
+> und PR-Prozesshinweise bleiben nutzbar, sofern sie dem Handoff nicht widersprechen.
+
 # Workflow
 
 ## Agent Roles

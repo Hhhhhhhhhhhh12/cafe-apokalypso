@@ -69,7 +69,7 @@ Die Pflicht-Checks vor jedem Commit/PR:
 
 ```bash
 npm run typecheck  # tsc --noEmit  ← WICHTIG, siehe Fallstrick unten
-npm run test       # vitest run — 322 Tests, müssen grün bleiben
+npm run test       # Vitest-Suite ausführen; alle Tests müssen bestehen
 npm run build      # Produktions-Build
 ```
 
@@ -130,7 +130,7 @@ UI-Logik.
 - **localStorage** als einziger Speicher — kein Backend, keine Accounts, kein Tracking
 - **Kein echtes AI-API** (KASSANDRA ist skriptgesteuert)
 - **Deterministische Logik** — gleicher State + gleiche Action → gleicher nächster State (macht Tests/Balancing einfach)
-- **Tests:** Vitest, aktuell **322 Tests** — müssen grün bleiben
+- **Tests:** Vitest (`npm run test`); vor dem PR vollständig ausführen, alle Tests müssen bestehen
 - **Barrierefreiheit:** WCAG 2.1 AA (Kontrast ≥ 4.5:1, Touch-Targets ≥ 44px, Tastaturnavigation, `prefers-reduced-motion`)
 - **Diversität der Figuren** (Hauttöne, Körperformen, Hintergründe) ist eine harte Projekt-Vorgabe
 
@@ -144,10 +144,18 @@ UI-Logik.
 - Vor dem Committen: `npm run typecheck && npm run test && npm run build` grün.
 - PRs klein und reviewbar halten; Ziel, Kontext und Akzeptanzkriterien mitliefern.
 
-### KI-Rollen (falls du mit den Tools arbeitest)
-- **ChatGPT** — Konzept, Prompts, Design-Konsolidierung
-- **Claude Code** — Doku, Architektur-Review, Konsistenz-Checks, Planung
-- **Codex** — fokussierte Implementierung, Tests, Bugfixes, UI-Komponenten (Credits sind begrenzt, keine „bau das ganze Spiel“-Prompts)
+### KI-Arbeitsweise
+
+> **Aktuelle Rollenentscheidung (13.10.2026):** Codex ist der primäre Arbeitsbereich
+> für Projektkoordination, Planung, Dokumentation, Reviews und Implementierung.
+> Den aktuellen Projektstand und die verbindlichen Arbeitsregeln findest du in
+> [docs/CODEX_HANDOFF.md](CODEX_HANDOFF.md).
+
+> Die frühere Rollenverteilung ist nur noch historisch: ChatGPT für Konzept und
+> Design-Konsolidierung, Claude Code für Dokumentation, Architektur-Reviews,
+> Konsistenzprüfungen und Planung sowie Codex hauptsächlich für Implementierung,
+> Tests, Fehlerbehebungen und UI-Komponenten. Sie beschreibt nicht mehr den
+> aktuellen Projekt-Workflow.
 
 ---
 
@@ -195,6 +203,8 @@ er ersetzt keinen dieser Schritte.
 | Wenn du … willst | lies |
 |---|---|
 | **Den Kanon verstehen** (zuerst!) | [`docs/PROJECT_CANON.md`](PROJECT_CANON.md) |
+| **Prozess/Architektur-Tiefe** (Render-Schicht, Branch-/Merge-Workflow, Pipeline) | [`docs/COLLAB_ONBOARDING.md`](COLLAB_ONBOARDING.md) |
+| **Kick-off-Entscheidungen** Team (Rollen, Review-Kultur, Lizenz) | [`docs/COLLAB_AGENDA.md`](COLLAB_AGENDA.md) |
 | Bindende Design-/Tech-Entscheidungen | [`docs/DECISIONS.md`](DECISIONS.md) |
 | Gameplay-Systeme & Spielerfahrung | [`docs/GAME_DESIGN.md`](GAME_DESIGN.md) |
 | Den Management-Loop von Woche 1 | [`docs/MANAGEMENT_TRADEOFF_DESIGN.md`](MANAGEMENT_TRADEOFF_DESIGN.md) |
@@ -203,7 +213,8 @@ er ersetzt keinen dieser Schritte.
 | Technische Struktur & Constraints | [`docs/TECH_ARCHITECTURE.md`](TECH_ARCHITECTURE.md) |
 | Art-Richtung & Asset-Pipeline | [`docs/ART_STYLEGUIDE.md`](ART_STYLEGUIDE.md), [`docs/ART_PIPELINE.md`](ART_PIPELINE.md) |
 | Qualitäts-Checkliste (bindend) | [`docs/QUALITY_CHECKLIST.md`](QUALITY_CHECKLIST.md) |
-| Den KI-/Handoff-Workflow | [`docs/WORKFLOW.md`](WORKFLOW.md), [`docs/AGENT_ORCHESTRATION.md`](AGENT_ORCHESTRATION.md) |
+| **Aktuelle Projektkoordination und Codex-Handoff** | [`docs/CODEX_HANDOFF.md`](CODEX_HANDOFF.md) |
+| Historische KI-Rollen und ältere Workflow-Notizen | [`docs/WORKFLOW.md`](WORKFLOW.md), [`docs/AGENT_ORCHESTRATION.md`](AGENT_ORCHESTRATION.md) |
 | Roadmap & Langfrist-Richtung | [`docs/ROADMAP.md`](ROADMAP.md) |
 
 Und im Repo-Root: [`README.md`](../README.md), [`PRODUCT.md`](../PRODUCT.md),
@@ -214,5 +225,3 @@ Und im Repo-Root: [`README.md`](../README.md), [`PRODUCT.md`](../PRODUCT.md),
 
 Viel Spaß — und wenn etwas beim Setup hakt, ist das fast immer ein fehlendes
 `npm install` oder ein Node-Versionsthema. Willkommen an Bord. ☕
-</content>
-</invoke>

@@ -39,12 +39,24 @@ const browser = await chromium.launch(
 const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 2 });
 
 // 1) Volle Spiel-UI (Startzustand) — zeigt HUD, Diorama, Action-Panel zusammen.
-await page.goto(APP, { waitUntil: "networkidle" });
-await page.locator(".cafe-diorama").first().waitFor();
-// Das Intro verdeckt die UI für ca. 8,8 s. Auf sein tatsächliches Ende warten,
-// statt die Aufnahme an eine feste Intro-Dauer zu koppeln.
-await page.locator(".intro-cinema").waitFor({ state: "detached", timeout: 30_000 });
+await page.goto(APP, { waitUntil: "domcontentloaded" });
+// Frischer Browser-Kontext: das Intro muss zunächst erscheinen. Dadurch kann
+// state: "detached" nicht versehentlich vor dem React-Mount erfolgreich sein.
+const intro = page.locator(".intro-cinema");
+await intro.waitFor({ state: "visible", timeout: 15_000 });
+for (const [name, selector] of [
+  ["HUD", ".resource-panel"],
+  ["Diorama", ".cafe-diorama"],
+  ["Aktionsbereich", ".action-panel"]
+]) {
+  await page.locator(selector).first().waitFor({ state: "visible", timeout: 15_000 });
+}
+// Erst nach dem wirklichen Ende der 8,8-s-Intro-Sequenz aufnehmen.
+await intro.waitFor({ state: "detached", timeout: 30_000 });
 await page.waitForTimeout(400);
+if (await intro.count() !== 0) {
+  throw new Error("Screenshot abgebrochen: Intro-Overlay ist noch vorhanden.");
+}
 await page.screenshot({ path: join(OUT, "full-ui-day1.png") });
 console.log("✓ full-ui-day1.png");
 

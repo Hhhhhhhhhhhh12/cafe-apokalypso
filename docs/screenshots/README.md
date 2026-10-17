@@ -8,7 +8,13 @@ Mitarbeitende, ohne den Dev-Server starten zu müssen.
 > Einrichtung: `npm i --no-save --package-lock=false playwright && npx playwright install chromium`
 > (Playwright ist bewusst keine Projekt-Dependency; nur lokale Installation in
 > `node_modules`, ohne Änderungen an `package.json` oder `package-lock.json`).
-> Die Vollansicht wird erst nach dem Ende des Intros aufgenommen.
+> Die Vollansicht wird erst nach dem nachgewiesenen Erscheinen **und**
+> vollständigen Verschwinden des Intros aufgenommen. Das Skript prüft ausserdem,
+> ob HUD, Diorama und Aktionsbereich sichtbar sind.
+>
+> Für eine Aktualisierung nach Story-/UI-Änderungen zuerst den PR-Branch mit
+> `main` synchronisieren. Die vier PNGs neu erzeugen und insbesondere
+> `full-ui-day1.png` **visuell prüfen**, bevor dieser PR gemergt wird.
 
 ## Volle Spiel-UI (Tag 1, vor Öffnung)
 
