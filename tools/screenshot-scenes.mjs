@@ -50,6 +50,7 @@ for (const [name, selector] of [
   ["Aktionsbereich", ".action-panel"]
 ]) {
   await page.locator(selector).first().waitFor({ state: "visible", timeout: 15_000 });
+  console.log(`✓ ${name} sichtbar`);
 }
 // Erst nach dem wirklichen Ende der 8,8-s-Intro-Sequenz aufnehmen.
 await intro.waitFor({ state: "detached", timeout: 30_000 });
