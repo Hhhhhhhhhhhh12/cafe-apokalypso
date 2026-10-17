@@ -16,6 +16,13 @@ Mitarbeitende, ohne den Dev-Server starten zu müssen.
 > `main` synchronisieren. Die vier PNGs neu erzeugen und insbesondere
 > `full-ui-day1.png` **visuell prüfen**, bevor dieser PR gemergt wird.
 
+**Bildprüfung am 17.10.2026:** alle vier PNGs nach Abgleich mit `main`
+(inklusive PR #193) neu erzeugt.
+`full-ui-day1.png` (2880 × 3132 px) visuell geprüft: kein Intro-Overlay,
+HUD, vollständiges Diorama, Action-Panel und Tagesbereich lesbar und
+nicht abgeschnitten.
+[Erfolgreicher GitHub-Actions-Lauf](https://github.com/Hhhhhhhhhhhh12/cafe-apokalypso/actions/runs/39014982183).
+
 ## Volle Spiel-UI (Tag 1, vor Öffnung)
 
 HUD, Diorama und Action-Panel im Zusammenspiel — eine Ganzseitenaufnahme,
