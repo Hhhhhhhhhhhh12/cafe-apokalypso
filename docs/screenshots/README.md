@@ -18,8 +18,9 @@ Mitarbeitende, ohne den Dev-Server starten zu müssen.
 
 ## Volle Spiel-UI (Tag 1, vor Öffnung)
 
-HUD, Diorama und Action-Panel im Zusammenspiel — der Bildschirm, an dem
-gearbeitet wird.
+HUD, Diorama und Action-Panel im Zusammenspiel — eine Ganzseitenaufnahme,
+damit auch die unterhalb des sichtbaren Browserfensters liegenden Elemente
+vollständig zu sehen sind.
 
 ![Volle Spiel-UI, Tag 1](full-ui-day1.png)
 

@@ -58,7 +58,7 @@ await page.waitForTimeout(400);
 if (await intro.count() !== 0) {
   throw new Error("Screenshot abgebrochen: Intro-Overlay ist noch vorhanden.");
 }
-await page.screenshot({ path: join(OUT, "full-ui-day1.png") });
+await page.screenshot({ path: join(OUT, "full-ui-day1.png"), fullPage: true });
 console.log("✓ full-ui-day1.png");
 
 // 2) Diorama je Tageszustand aus dem Lookbook (nur die Bühne, ohne Panels).
