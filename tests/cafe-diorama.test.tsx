@@ -93,16 +93,17 @@ describe("café diorama view", () => {
     expect(dayEnd).not.toContain("cafe-pilot-asset--kemal-standing");
   });
 
-  it("shows seated guests based on customersServed count", () => {
-    const base = createInitialGameState();
-    const none = renderCafe({ ...base, dayPhase: "open", dayManagement: { ...base.dayManagement, customersServed: 0 } });
-    const one = renderCafe({ ...base, dayPhase: "open", dayManagement: { ...base.dayManagement, customersServed: 1 } });
-    const two = renderCafe({ ...base, dayPhase: "open", dayManagement: { ...base.dayManagement, customersServed: 2 } });
-
-    expect(none).not.toContain("placeholder-guest-normal-03");
-    expect(one).toContain("placeholder-guest-normal-03");
-    expect(one).not.toContain("placeholder-guest-normal-04");
-    expect(two).toContain("placeholder-guest-normal-04");
+  it("seats only served Day 2 guests and never the current queue guest", () => {
+    const base = cafeStateFor(2, 3);
+    const markup = renderCafe({ ...base, dayManagement: {
+      ...base.dayManagement,
+      servedGuestIds: ["pendler-kemal", "laptop-lukas", "lieferfahrer-cem"]
+    } });
+    expect(markup).toContain("cafe-pilot-asset--christa-standing");
+    expect(markup).toContain("placeholder-guest-cem-seated.png");
+    expect(markup).toContain("placeholder-guest-lukas-seated.png");
+    expect(markup).not.toContain("placeholder-guest-mira-seated.png");
+    expect(markup).not.toContain("placeholder-guest-christa-seated.png");
   });
 
   it("renders dirty tables as clickable clean-table buttons (#130)", () => {
@@ -151,23 +152,15 @@ describe("café diorama view", () => {
     expect(markup).toMatch(/cafe-decor-cups[^"]*cafe-decor--tier-3/);
   });
 
-  it("uses day and served-count thresholds for Bohn and the first strange guest", () => {
-    expect(getDioramaGuestVisibility(cafeStateFor(2, 3)).bohn).toBe(false);
-    expect(getDioramaGuestVisibility(cafeStateFor(3, 0)).bohn).toBe(false);
-    expect(getDioramaGuestVisibility(cafeStateFor(3, 1)).bohn).toBe(true);
-
+  it("seats strange guests only after their own service", () => {
+    const state = cafeStateFor(4, 4);
+    state.dayManagement.servedGuestIds = ["pendler-kemal", "laptop-lukas", "lieferfahrer-cem", "herr-grau"];
+    expect(getDioramaGuestVisibility(state).strange).toBe(true);
+    // The same guest is next again: do not duplicate them at a table.
+    const markup = renderCafe(state);
+    expect(markup).toContain("cafe-pilot-asset--strange-standing");
+    expect(markup).not.toContain("placeholder-guest-strange.png");
     expect(getDioramaGuestVisibility(cafeStateFor(3, 3)).strange).toBe(false);
-    expect(getDioramaGuestVisibility(cafeStateFor(4, 2)).strange).toBe(false);
-    expect(getDioramaGuestVisibility(cafeStateFor(4, 3)).strange).toBe(true);
-  });
-
-  it("renders Bohn and the first strange guest sprites when thresholds are met", () => {
-    const markup = renderCafe(cafeStateFor(4, 3));
-
-    expect(markup).toContain("placeholder-guest-bohn.png");
-    expect(markup).toContain("placeholder-guest-strange.png");
-    expect(markup).toContain("cafe-pilot-asset--bohn");
-    expect(markup).toContain("cafe-pilot-asset--strange");
   });
 
   it("keeps the explicit weirdness cue behind the visibility gate", () => {

@@ -1256,6 +1256,11 @@ button.cafe-table {
 .cafe-pilot-asset--bohn-standing    { background-image: url("../../assets/sprites/guests/placeholder-guest-bohn.png"); }
 .cafe-pilot-asset--grau-standing    { background-image: url("../../assets/sprites/guests/placeholder-guest-grau.png"); }
 
+.cafe-pilot-asset--nele-standing { background-image: url("../../assets/sprites/guests/placeholder-guest-nele.png"); }
+.cafe-pilot-asset--strange-standing { background-image: url("../../assets/sprites/guests/placeholder-guest-grau.png"); }
+.cafe-pilot-asset--meda-standing { background-image: url("../../assets/sprites/guests/placeholder-guest-meda.png"); }
+.cafe-pilot-asset--roterRegenschirm-standing { background-image: url("../../assets/sprites/guests/placeholder-guest-roter-regenschirm.png"); }
+
 /* Seated guests slide up on first appearance (one-shot on DOM mount). */
 @keyframes guest-seat-in {
   from {

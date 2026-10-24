@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type MouseEvent } from "react";
 import type { GameState } from "../../game/types/game";
-import type { ProductId } from "../../game/types/content";
-import { getDioramaGuestVisibility, getNextGuestPreview, getNarrativeEventCards } from "../../game/engine/selectors";
+import type { GuestId, ProductId } from "../../game/types/content";
+import { getDioramaGuestVisibility, getGuestForCustomer, getNextGuestPreview, getNarrativeEventCards } from "../../game/engine/selectors";
 import { kassandraMessages } from "../../game/data/kassandra";
 import {
   COUNTER_FRAME,
@@ -27,8 +27,19 @@ import medaGuestAsset from "../../../assets/sprites/guests/placeholder-guest-med
 import roterRegenschirmGuestAsset from "../../../assets/sprites/guests/placeholder-guest-roter-regenschirm.png";
 import fatouSeatedAsset from "../../../assets/sprites/guests/placeholder-guest-fatou-seated.png";
 
-const QUEUE_ROTATION = ["kemal", "cem", "mira", "lukas", "christa", "fatou"] as const;
-type QueueGuest = (typeof QUEUE_ROTATION)[number];
+const GUEST_SPRITES = {
+  "pendler-kemal": "kemal",
+  "lieferfahrer-cem": "cem",
+  "nachbarin-mira": "mira",
+  "laptop-lukas": "lukas",
+  "cappuccino-christa": "christa",
+  "pendlerin-fatou": "fatou",
+  "herr-bohn": "bohn",
+  "freelancerin-nele": "nele",
+  "herr-grau": "strange",
+  "meda": "meda",
+  "frau-roter-regenschirm": "roterRegenschirm",
+} as const satisfies Record<GuestId, string>;
 
 const SEATED_GUESTS = [
   { key: "cem", asset: cemSeatedAsset, label: "Cem · Seated" },
@@ -47,6 +58,7 @@ const SEATED_GUESTS = [
 function prefersReducedMotion(): boolean {
   return (
     typeof window !== "undefined" &&
+    typeof window.matchMedia === "function" &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches
   );
 }
@@ -101,7 +113,9 @@ export function CafeScene({ gameState, onCleanTables }: CafeSceneProps) {
   const isOpen = gameState.dayPhase === "open";
   const isDayEnd = gameState.dayPhase === "day_end";
 
-  const showQueueGuest = isOpen && actionPointsRemaining > 0;
+  const queuePosition = customersServed + gameState.dayManagement.guestsLost;
+  const selectedGuest = getGuestForCustomer(gameState, queuePosition);
+  const showQueueGuest = isOpen && actionPointsRemaining > 0 && Boolean(selectedGuest);
 
   // Patience signal — add impatient class when guest has < 30 % patience left
   const { currentGuestPatience, currentGuestPatienceMax } = gameState.dayManagement;
@@ -111,52 +125,43 @@ export function CafeScene({ gameState, onCleanTables }: CafeSceneProps) {
       : 1;
   const guestIsImpatient = isOpen && showQueueGuest && patienceRatio < 0.3;
 
-  // Paula entrance phases
-  const [paulaPhase, setPaulaPhase] = useState<
+  // Queue guest entrance and departure phases
+  const [guestPhase, setGuestPhase] = useState<
     "at-door" | "walking" | "idle" | "walking-to-counter" | "exiting-east"
-  >("at-door");
+  >(() => prefersReducedMotion() ? "idle" : "at-door");
 
-  const [queueGuest, setQueueGuest] = useState<QueueGuest>(
-    () => QUEUE_ROTATION[customersServed % QUEUE_ROTATION.length]
-  );
+  const queueKey = `${gameState.day}:${queuePosition}:${showQueueGuest}`;
+  const [queueSnapshot, setQueueSnapshot] = useState({
+    key: queueKey, day: gameState.day, served: customersServed, guest: selectedGuest,
+  });
+  const queueGuest = queueSnapshot.guest;
+  const reducedMotion = prefersReducedMotion();
 
-  // Adjust-during-render: when the queue toggles, snapshot the guest for this
-  // opening and place Paula. With reduced motion she goes straight to idle.
-  const [prevShowQueueGuest, setPrevShowQueueGuest] = useState(showQueueGuest);
-  if (prevShowQueueGuest !== showQueueGuest) {
-    setPrevShowQueueGuest(showQueueGuest);
-    if (showQueueGuest) {
-      setQueueGuest(QUEUE_ROTATION[customersServed % QUEUE_ROTATION.length]);
-      setPaulaPhase(prefersReducedMotion() ? "idle" : "at-door");
-    } else {
-      setPaulaPhase("at-door");
-    }
+  // Keep the departing customer's identity until their exit completes. Resets,
+  // walkouts and rapid serves during an entrance must still advance the sprite.
+  if (queueSnapshot.key !== queueKey) {
+    const animateServe = gameState.day === queueSnapshot.day &&
+      customersServed > queueSnapshot.served && guestPhase === "idle" && !reducedMotion;
+    setQueueSnapshot({
+      key: queueKey, day: gameState.day, served: customersServed,
+      guest: animateServe ? queueSnapshot.guest : selectedGuest,
+    });
+    setGuestPhase(animateServe ? "walking-to-counter" : reducedMotion ? "idle" : "at-door");
   }
 
-  // The walk itself stays in an effect: it needs a painted "at-door" frame
-  // before flipping to "walking", so the set happens inside rAF callbacks.
+  // A fresh entrance needs a painted at-door frame. Depend on the phase as
+  // well as the queue key so repeated guests (Day 1: Kemal twice) restart too.
   useEffect(() => {
-    if (!showQueueGuest || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      return;
-    }
+    if (!showQueueGuest || guestPhase !== "at-door" || reducedMotion) return;
     let raf2 = 0;
     const raf1 = requestAnimationFrame(() => {
-      raf2 = requestAnimationFrame(() => setPaulaPhase("walking"));
+      raf2 = requestAnimationFrame(() => setGuestPhase("walking"));
     });
     return () => {
       cancelAnimationFrame(raf1);
       cancelAnimationFrame(raf2);
     };
-  }, [showQueueGuest]);
-
-  // Adjust-during-render: a completed serve sends idle Paula to the counter.
-  const [prevServed, setPrevServed] = useState(customersServed);
-  if (prevServed !== customersServed) {
-    setPrevServed(customersServed);
-    if (customersServed > prevServed && paulaPhase === "idle" && !prefersReducedMotion()) {
-      setPaulaPhase("walking-to-counter");
-    }
-  }
+  }, [showQueueGuest, guestPhase, queueKey, reducedMotion]);
 
   // A2: Serve reaction bubble — first sentence of statusMessage, shown 2.5 s
   const [serveReaction, setServeReaction] = useState<{ text: string; key: number } | null>(null);
@@ -257,13 +262,13 @@ export function CafeScene({ gameState, onCleanTables }: CafeSceneProps) {
     console.info(`[scene] left: ${x.toFixed(1)}%, bottom: ${bottom.toFixed(1)}%`);
   }, []);
 
-  // Paula's inline position per phase; class transitions animate the change.
-  const paulaSpot =
-    paulaPhase === "at-door"
+  // Queue guest inline position per phase; class transitions animate the change.
+  const guestSpot =
+    guestPhase === "at-door"
       ? { ...PAULA_PATH.atDoor, transition: "none" as const }
-      : paulaPhase === "walking-to-counter"
+      : guestPhase === "walking-to-counter"
         ? PAULA_PATH.toCounter
-        : paulaPhase === "exiting-east"
+        : guestPhase === "exiting-east"
           ? PAULA_PATH.exitEast
           : PAULA_PATH.queue;
 
@@ -290,22 +295,22 @@ export function CafeScene({ gameState, onCleanTables }: CafeSceneProps) {
         aria-label={`3/4 café room on Day ${gameState.day}: counter, coffee machine, register, queue, ${gameState.equipment.seating >= 1 ? "two tables, " : "standing room only, "}door, window, storage shelf, and menu board.`}
       >
         {coinTick && (
-          <span key={coinTick.key} className="cafe-coin-tick" aria-hidden="true">
+          <span key={`coinTick-${coinTick.key}`} className="cafe-coin-tick" aria-hidden="true">
             +€{coinTick.money.toFixed(2)}{coinTick.rep > 0 ? " ★" : ""}
           </span>
         )}
         {serveReaction && (
-          <span key={serveReaction.key} className="cafe-serve-reaction" aria-hidden="true">
+          <span key={`serveReaction-${serveReaction.key}`} className="cafe-serve-reaction" aria-hidden="true">
             {serveReaction.text}
           </span>
         )}
         {ambientEvent && (
-          <span key={ambientEvent.key} className="cafe-ambient-event" aria-hidden="true">
+          <span key={`ambientEvent-${ambientEvent.key}`} className="cafe-ambient-event" aria-hidden="true">
             {ambientEvent.text}
           </span>
         )}
         {kassandraAside && (
-          <span key={kassandraAside.key} className="cafe-kassandra-aside" aria-hidden="true">
+          <span key={`kassandraAside-${kassandraAside.key}`} className="cafe-kassandra-aside" aria-hidden="true">
             {kassandraAside.text}
           </span>
         )}
@@ -406,70 +411,70 @@ export function CafeScene({ gameState, onCleanTables }: CafeSceneProps) {
             </>
           )}
 
-          {/* Warteschlange: Paula-Wegpunkte aus scene.ts, Übergänge aus CSS */}
+          {/* Warteschlange: gemeinsame Wegpunkte aus scene.ts, Übergänge aus CSS */}
           {showQueueGuest ||
-          paulaPhase === "walking-to-counter" ||
-          paulaPhase === "exiting-east" ? (
+          guestPhase === "walking-to-counter" ||
+          guestPhase === "exiting-east" ? (
             <span
-              style={{ ...spotStyle({ ...paulaSpot, z: PAULA_PATH.z, centered: true }), ...("transition" in paulaSpot ? { transition: paulaSpot.transition } : {}) }}
+              data-guest-id={queueGuest?.id}
+              data-queue-phase={guestPhase}
+              style={{ ...spotStyle({ ...guestSpot, z: PAULA_PATH.z, centered: true }), ...("transition" in guestSpot ? { transition: guestSpot.transition } : {}) }}
               className={[
                 "placeholder-guest",
                 "placeholder-guest-normal-01",
-                paulaPhase === "at-door" ? "placeholder-guest--at-door" : "",
-                paulaPhase === "walking-to-counter"
+                guestPhase === "at-door" ? "placeholder-guest--at-door" : "",
+                guestPhase === "walking-to-counter"
                   ? "placeholder-guest--walking-to-counter"
-                  : paulaPhase === "exiting-east"
+                  : guestPhase === "exiting-east"
                     ? "placeholder-guest--exiting-east"
                     : "",
-                guestIsImpatient && paulaPhase === "idle"
+                guestIsImpatient && guestPhase === "idle"
                   ? "cafe-guest--impatient"
                   : "",
               ]
                 .filter(Boolean)
                 .join(" ")}
               onTransitionEnd={(e) => {
-                if (e.propertyName === "left" && paulaPhase === "walking") {
-                  setPaulaPhase("idle");
+                if (e.target !== e.currentTarget) return;
+                if (e.propertyName === "left" && guestPhase === "walking") {
+                  setGuestPhase("idle");
                 }
                 if (
                   e.propertyName === "bottom" &&
-                  paulaPhase === "walking-to-counter"
+                  guestPhase === "walking-to-counter"
                 ) {
                   if (
                     !window.matchMedia("(prefers-reduced-motion: reduce)").matches
                   ) {
-                    setPaulaPhase("exiting-east");
+                    setGuestPhase("exiting-east");
                   } else if (showQueueGuest) {
-                    setPaulaPhase("idle");
+                    setGuestPhase("idle");
                   } else {
-                    setPaulaPhase("at-door");
+                    setGuestPhase("at-door");
                   }
                 }
-                if (e.propertyName === "left" && paulaPhase === "exiting-east") {
-                  const upNext =
-                    QUEUE_ROTATION[customersServed % QUEUE_ROTATION.length];
-                  setQueueGuest(upNext);
+                if (e.propertyName === "left" && guestPhase === "exiting-east") {
+                  setQueueSnapshot({
+                    key: queueKey, day: gameState.day, served: customersServed, guest: selectedGuest,
+                  });
                   if (
                     showQueueGuest &&
                     !window.matchMedia("(prefers-reduced-motion: reduce)").matches
                   ) {
-                    setPaulaPhase("at-door");
-                    requestAnimationFrame(() => {
-                      requestAnimationFrame(() => setPaulaPhase("walking"));
-                    });
+                    setGuestPhase("at-door");
                   } else if (showQueueGuest) {
-                    setPaulaPhase("idle");
+                    setGuestPhase("idle");
                   } else {
-                    setPaulaPhase("at-door");
+                    setGuestPhase("at-door");
                   }
                 }
               }}
             >
               <span
-                className={`cafe-pilot-asset cafe-pilot-asset--standing cafe-pilot-asset--${queueGuest}-standing`}
+                className={`cafe-pilot-asset cafe-pilot-asset--standing cafe-pilot-asset--${queueGuest ? GUEST_SPRITES[queueGuest.id] : ""}-standing`}
                 aria-hidden="true"
               />
-              {paulaPhase === "idle" && nextGuest?.wants && (
+              {guestPhase === "idle" && queueGuest?.id === selectedGuest?.id && nextGuest?.wants && (
                 <span
                   className="cafe-guest-thought-bubble"
                   aria-label={`Guest wants: ${nextGuest.wants}`}
@@ -477,18 +482,16 @@ export function CafeScene({ gameState, onCleanTables }: CafeSceneProps) {
                   {nextGuest.wants}
                 </span>
               )}
-              {paulaPhase === "idle" && (
+              {guestPhase === "idle" && (
                 <span className="guest-status guest-status--waiting">Waiting</span>
               )}
             </span>
           ) : null}
-          <span style={spotStyle(GUEST_SPOTS.waitingExtra)} className="placeholder-guest placeholder-guest-normal-02">
-            <span className="guest-status guest-status--waiting">Waiting</span>
-          </span>
 
           {/* Sitzende Gäste — Sichtbarkeit aus dem Selector, Platz aus scene.ts */}
           {SEATED_GUESTS.map(({ key, asset, label, ...guest }) =>
-            visibleGuests[key] ? (
+            visibleGuests[key] && !(queueGuest && GUEST_SPRITES[queueGuest.id] === key &&
+              (showQueueGuest || guestPhase === "walking-to-counter" || guestPhase === "exiting-east")) ? (
               <span
                 key={key}
                 style={spotStyle(GUEST_SPOTS[key])}

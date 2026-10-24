@@ -353,3 +353,27 @@ describe("save migration", () => {
     expect(migrated.equipment).toEqual({ machine: 2, seating: 0, register: 1 });
   });
 });
+
+describe("daily served guest history", () => {
+  it("preserves seated guest identities over a save round trip", () => {
+    const state = createInitialGameState();
+    state.day = 2;
+    state.dayManagement.customersServed = 2;
+    state.dayManagement.servedGuestIds = ["pendler-kemal", "laptop-lukas"];
+    const storage = createMemoryStorage();
+    expect(saveGameState(state, storage).ok).toBe(true);
+    expect(loadGameState(storage).dayManagement.servedGuestIds).toEqual(state.dayManagement.servedGuestIds);
+  });
+
+  it("accepts existing saves without the optional service history", () => {
+    const state = createInitialGameState();
+    delete state.dayManagement.servedGuestIds;
+    expect(loadGameState(createMemoryStorage(JSON.stringify(state)))).toEqual(state);
+  });
+
+  it("rejects malformed service history", () => {
+    const state = createInitialGameState();
+    const raw = { ...state, dayManagement: { ...state.dayManagement, servedGuestIds: "Kemal" } };
+    expect(loadGameState(createMemoryStorage(JSON.stringify(raw)))).toEqual(createFreshRunState());
+  });
+});

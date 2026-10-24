@@ -216,6 +216,7 @@ export function createInitialDayManagement(
     actionPointsRemaining: ACTION_BUDGET_BY_DAY[day],
     actionPointsSpent: 0,
     customersServed: 0,
+    servedGuestIds: [],
     moneyEarned: 0,
     moneySpent: 0,
     suppliesUsed: { coffee: 0, milk: 0, pastries: 0 },

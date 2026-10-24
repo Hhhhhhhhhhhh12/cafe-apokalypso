@@ -74,7 +74,7 @@ describe("guest serve lines", () => {
       ...initial,
       day,
       equipment: { ...initial.equipment, seating: 1 },
-      dayManagement: { ...initial.dayManagement, customersServed: 1 }
+      dayManagement: { ...initial.dayManagement, customersServed: 1, servedGuestIds: ["freelancerin-nele"] }
     });
 
     expect(getDioramaGuestVisibility(seatedState(1)).nele).toBe(false);
