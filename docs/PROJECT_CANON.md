@@ -145,13 +145,20 @@ Generated images are not final production assets by default. They must be review
 
 All agents must read this file first before making changes.
 
+**Current workspace decision (2026-10-12, reconciled 2026-10-27):** Codex is the
+primary workspace for coordination, planning, documentation, reviews and
+implementation. See [CODEX_HANDOFF.md](CODEX_HANDOFF.md). The role descriptions
+below preserve the earlier division of work; they do not require a Claude-first
+handoff or limit Codex to implementation. Existing approval and scope gates remain
+in force. This clarification does not change game or narrative canon.
+
 Handoff prompts should not be copied directly from chat when they are actually used.
 
 The canonical source for reusable handoff prompts is `docs/PROMPTS.md`.
 
 Every prompt that is actually handed to Claude Code, Codex or another tool should be recorded in Git history (branch, commit, or PR). ClickUp is an optional overview layer, not a required gate. GitHub + repository Markdown remain canonical.
 
-### Claude Code
+### Claude Code — historical role split
 
 Use Claude Code for:
 - documentation consolidation
@@ -161,7 +168,7 @@ Use Claude Code for:
 
 Claude Code should ask before broad edits.
 
-### Codex
+### Codex — historical role split
 
 Use Codex carefully because credits are limited.
 
@@ -187,7 +194,11 @@ Examples:
 
 When in doubt, ask first.
 
-## First implementation order
+## Historical first implementation order
+
+The Day 1–7 core loop already exists. This list records the original build order,
+not a current backlog or an instruction to recreate completed systems. Use
+[CODEX_HANDOFF.md](CODEX_HANDOFF.md) and live issues/PRs to select validation work.
 
 1. Documentation sanity check
 2. Technical architecture

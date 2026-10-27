@@ -3,10 +3,17 @@
 Cozy-Management-Spiel (React + Vite + TypeScript), 7 Tage, langsam kippende Stimmung.
 KRITISCHE Regel: Immer auf gescheite Diversität der Figuren achten (Hauttöne, Körperformen, Hintergründe).
 
+> Aktuelle Übergabe und Rollen: [`docs/CODEX_HANDOFF.md`](docs/CODEX_HANDOFF.md).
+> Codex ist der primäre Arbeitsbereich. Gemeinsames Projektwissen mit `AGENTS.md`
+> synchron halten; werkzeugspezifische Befehle dürfen abweichen.
+> Code beschreibt das implementierte Verhalten; `docs/PROJECT_CANON.md` und
+> `docs/DECISIONS.md` beschreiben die freigegebene Spielabsicht. Widersprüche
+> melden, nicht stillschweigend durch eine Änderung des Kanons auflösen.
+
 ## Befehle
 
 - Dev-Server: `preview_start` mit Name `cafe-apokalypso` (Port 5173, definiert in `.claude/launch.json`)
-- Tests: `npx vitest run` (322 Tests, müssen grün bleiben)
+- Tests: `npm run test` (vollständige Suite muss grün sein; aktuelle Testzahl aus dem Prüflauf)
 - Für Preview-/Kalibrier-Arbeit: Skill `.claude/skills/cafe-preview/SKILL.md` lesen und befolgen
 
 ## Token-Arbeitsregeln
@@ -21,7 +28,7 @@ KRITISCHE Regel: Immer auf gescheite Diversität der Figuren achten (Hauttöne, 
 
 **Positionen sind DATEN, kein Magic-Number-CSS mehr.** Seit dem Render-Neustart liegen alle Szenen-Anker in [`src/ui/cafe/scene.ts`](src/ui/cafe/scene.ts) — EIN Koordinatensystem („Stage-%": Prozent der `.cafe-world`-Box, x von links, y von unten). Die Render-Komponente ist [`src/ui/cafe/CafeScene.tsx`](src/ui/cafe/CafeScene.tsx) (flache Sprite-Liste, Positionen inline aus `scene.ts`). `CafePlaceholder.tsx` und das alte Floor-/Queue-/Wall-Container-System sind gelöscht.
 
-- **Kalibrieren = Zahl in `scene.ts` ändern.** Kein CSS-Positionsblock mehr suchen. Im Dev-Modus loggt ein Klick in die Szene die Stage-%-Koordinate (`[scene] left: …%, bottom: …%`) → direkt übernehmen.
+- **Kalibrieren = Zahl in `scene.ts` ändern.** Kein CSS-Positionsblock mehr suchen. Im Dev-Modus loggt ein Klick in die Szene die Koordinate (`[scene] left: …%, bottom: …%`) → direkt übernehmen.
 - **CSS macht nur noch Aussehen**, nicht Ort: Sprite-Größen, Tier-Varianten, Personality-Animationen (breathe/fidget/lean), Filter/Opacity bleiben in `global.css` (Klassen `cafe-decor-*`, `placeholder-guest-normal-NN`, `cafe-table--tier-N`).
 
 **Hintergrund:** `assets/backgrounds/placeholder-cafe-stage-base-v06-pixellab.png` — echte Pixel-Art aus Pixellab (`create_map_object`, 400×284 roh mit 400 px = API-Maximum, 2× nearest-neighbour auf 800×568; Seitenverhältnis auf die Render-Box abgestimmt → quadratische Art-Pixel; high detail). `.cafe-stage-base { display: block; image-rendering: pixelated }` — **nie auf `display:none` setzen**, das PNG ist die einzige Raumdarstellung. **v06-Messwerte (Stage-%):** Tür 11–24, Fensterglas 31,5–44,5 und 50–61 Breite, Wand/Boden-Linie ≈ 68 %, Tresen x 63,5–100 mit Deckfläche y 54–63. **Zoom-Crop:** `--cafe-zoom: 1.35` zeigt nur x 12,7–87,3 / y 14,6–89,4 — Props rechts von x ≈ 87 sind unsichtbar.
