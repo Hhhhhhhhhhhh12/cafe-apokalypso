@@ -8,7 +8,7 @@ bottom-center, Randspalten sauber). Noch **nicht** ins Diorama verdrahtet
 ## Fertig ✓
 
 ### Kellner / Staff (Autonomie-Feature #73/#132)
-- `guests/placeholder-staff-jana.png` — 96×96, statisch (Süd/Front)
+- `guests/placeholder-staff-jana.png` — 96×96, statisch (Süd/Front); am 27.10.2026 durch den visuell abgenommenen Export ersetzt — [Jana-Abnahme und PNG-Prüfnachweis](../../docs/art/ART_REVIEW_LOG.md#jana--static-sprite-2026-10-27). Gilt nur für das Standbild, nicht für das Walk-Sheet.
 - `guests/placeholder-staff-nino.png` — 96×96, statisch
 - `guests/placeholder-staff-nele.png` — 96×96, statisch (aus Nele-Gast abgeleitet, mit Schürze)
 - `guests/placeholder-staff-jana-walk-sheet.png` — 612×68, 9 Frames (Frame ~68px), Walk Ost
