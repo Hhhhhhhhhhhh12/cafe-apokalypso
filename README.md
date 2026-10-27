@@ -98,8 +98,15 @@ The code should clearly separate game engine logic, structured game data, and Re
 Install dependencies:
 
 ```bash
-npm install
+npm ci
 ```
+
+The compiler and lint tooling temporarily use separate TypeScript packages:
+
+- `@typescript/native` is an npm alias for TypeScript 7; it provides `tsc` for `npm run typecheck`.
+- `typescript` is an npm alias for `@typescript/typescript6`; it provides the TypeScript 6 compiler API required by typescript-eslint and the separate `tsc6` command.
+
+This follows [Microsoft's side-by-side setup](https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/#running-side-by-side-with-typescript-6.0). Keep both aliases until typescript-eslint supports the native compiler API; bypassing peer checks with `--force` or `--legacy-peer-deps` is not required.
 
 Start the local browser app:
 
@@ -110,6 +117,7 @@ npm run dev
 Run the required checks:
 
 ```bash
+npm run lint
 npm run typecheck
 npm run test
 npm run build
