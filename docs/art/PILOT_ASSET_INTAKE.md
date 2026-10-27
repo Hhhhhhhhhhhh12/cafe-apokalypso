@@ -1,17 +1,30 @@
-# Pilot Asset Intake Plan
+# Pilot Asset Intake Plan — Historical Archive
 
-Intake control document for the first curated pixel-art pilot assets.
+> **Historical document. Do not use this file as a current implementation plan.**
+> It records the early pilot-asset pipeline and extraction history. The current
+> renderer, asset workflow, approvals and task queue live in `AGENTS.md`,
+> `docs/ART_PIPELINE.md`, `docs/ART_STYLEGUIDE.md`, `docs/CODEX_HANDOFF.md`, the
+> current source tree, and live GitHub issues/PRs. In particular, the former
+> `CafePlaceholder.tsx` renderer and the Stage Base v04 generation task documented
+> below are superseded by the current `CafeScene.tsx` / `scene.ts` architecture and
+> the v06 stage. Historical measurements, tool costs and test counts must not be
+> treated as current facts.
+>
+> This file remains versioned for provenance: it explains how provisional assets
+> were produced and reviewed. Personal machine paths have been removed.
+
 Source context: PROMPT-10D (café stage dominance) and its Asset Request Report.
 
 ---
 
 ## 1. Purpose
 
-This document controls **how the first curated pilot assets enter the project**.
+This document **historically controlled** how the first curated pilot assets entered the project.
 
-It is the gatekeeping plan between art exploration (external moodboards, AI image
-tools) and the repository. No pilot PNG should enter `assets/` or `src/assets/`
-until it has passed the approval checklist defined here.
+It was the gatekeeping plan between art exploration (external moodboards, AI image
+tools) and the repository. For new work, use the current art-pipeline and review
+documents named in the archive notice above; the checklist below is retained as
+historical provenance.
 
 These pilot assets are **provisional vertical-slice assets, not final art**:
 
@@ -68,9 +81,10 @@ then defer everything that needs the normal style locked or an animation system.
 Specifications for every asset in Batch 1 and Batch 2. All pilot assets:
 **transparent PNG · pixel-readable at game scale · static only for MVP**.
 
-The "existing CSS fallback" column names the placeholder element already present in
-`src/ui/cafe/CafePlaceholder.tsx` whose CSS classes are kept so the diorama layout
-still composes. Note: pilot assets are currently wired via static ESM imports, so
+The "existing CSS fallback" notes below refer to the **former**
+`src/ui/cafe/CafePlaceholder.tsx` architecture. That component has been removed;
+current scene composition lives in `src/ui/cafe/CafeScene.tsx` and
+`src/ui/cafe/scene.ts`. Preserve these notes only as historical context. Note: pilot assets are currently wired via static ESM imports, so
 Vite resolves each PNG at dev/build time — an absent statically-imported file breaks
 the build rather than falling back to CSS. Keep the asset committed (or switch it to
 a truly optional runtime reference) if the app must survive a missing file.
@@ -179,13 +193,11 @@ to the `sprite-*` convention in [CAFE_DIORAMA_DIRECTION.md](CAFE_DIORAMA_DIRECTI
 
 Raw AI Studio / Gemini / Nano Banana outputs **remain outside the repository**.
 
-Suggested external working folder (iCloud workspace, not versioned):
+Use an **external, unversioned asset workspace** for raw generations and discarded
+variants. Do not record a contributor's personal absolute filesystem path in the
+public repository.
 
-```text
-/Users/Heineken/Library/Mobile Documents/com~apple~CloudDocs/Claude/Moodboards Apokalypso
-```
-
-This folder is an exploration and experiment space, **not** a canonical source for
+That workspace is an exploration and experiment space, **not** a canonical source for
 implementation, assets, or Codex tasks.
 
 - Raw generated sheets, variant batches, discarded directions, and large image files
@@ -232,8 +244,10 @@ A future implementation prompt (PROMPT-10E-B) **may**:
   `src/assets/sprites/guests/`.
 - Add optional, typed asset references / a mapping from asset key → import (with a
   defined fallback when the asset is absent).
-- Insert approved assets into the existing café stage layout in
-  `src/ui/cafe/CafePlaceholder.tsx`, at the insertion points named in §3.
+- Historical instruction: approved assets were to be inserted into
+  `src/ui/cafe/CafePlaceholder.tsx`. **Do not execute this now.** The component has
+  been removed; use the current `CafeScene.tsx` / `scene.ts` architecture and a
+  current scoped issue for any new integration.
 - Keep all CSS placeholder/fallback classes (listed in §3) intact as fallback.
 - Add tests proving the app renders **both with and without** the assets present.
 
@@ -282,8 +296,8 @@ Not needed yet:
   - background / layered Day 1–7 art
   - animations / sprite sheets / 8-direction sets
 
-Deliver as cropped single PNGs into the external Moodboards folder.
-Only approved crops enter the repo later.
+Deliver raw/candidate files only to an external unversioned asset workspace.
+Only reviewed, intentionally selected assets may enter the repository.
 ```
 
 ---
@@ -381,7 +395,7 @@ and was **not** committed.
 - **Status:** provisional pilot asset; **not final art**. Not yet wired into
   React/CSS — extraction only. Awaiting explicit user approval before treating as canonical.
 - **Source:** `ca-asset-batch-03-guest-cem-raw-v01.png` (Pixellab.ai generation,
-  external asset inbox `/Users/Heineken/Code/cafe-apokalypso-asset-inbox/`).
+  external unversioned asset workspace; original personal filesystem path removed).
   Raw batch generated with Paula as style reference, humanoid, front 3/4 view.
 - **Selected frame:** row 1 / col 1 (olive green jacket, shoulder bag, standing
   3/4-front pose) — cleanest silhouette, distinct from Paula's yellow coat, reads
@@ -416,8 +430,9 @@ Mira guest sprite extracted from `2026-06-01_mira-teal-v03.png` (Google AI Studi
 Nano Banana, 1024×1024, 5-pose sheet). Raw sheet stays in the external asset inbox
 `raw/` folder and was **not** committed.
 
-- **Status:** provisional pilot asset; **not final art**. Wired into
-  `CafePlaceholder.tsx` as seated-guest slot 2.
+- **Historical status:** provisional pilot asset; **not final art**. It was wired
+  into the former `CafePlaceholder.tsx` renderer as seated-guest slot 2. The current
+  renderer is `CafeScene.tsx`; verify current source before changing this asset.
 - **Design decision:** Mira wears a **dark teal coat** with **orange/auburn hair**
   to read as visually distinct from Paula (yellow coat) when both are on screen.
   An earlier yellow-coat Mira draft was rejected for being too close to Paula.
@@ -445,9 +460,9 @@ character generation proved weak. Props are Pixellab's strength.
   ≤128 px) as `style_images`. This anchors palette/outline/warmth so output matches
   the AI-Studio house style instead of generic RPG pixels. **Note:** when `style_images`
   is set, `size` must be omitted (the largest style image determines output size).
-- **Cost:** each `create_1_direction_object` returns a **16-frame review pack** for
-  **20 generations**; select best frames with `select_object_frames`, discard with
-  `dismiss_review`.
+- **Historical tool note (2026-06-01):** the workflow then returned a 16-frame
+  review pack and was recorded as costing 20 generations. Tool behavior/pricing can
+  change; verify current PixelLab documentation before relying on this.
 - **First batch (review packs assessed, best frames saved to inbox `candidates/`):**
   - Potted plant → `pixellab-plant-lush.png`, `pixellab-plant-classic.png`
   - Wall clock → `pixellab-clock-round.png` (normal), `pixellab-clock-pendulum.png`
@@ -461,7 +476,7 @@ character generation proved weak. Props are Pixellab's strength.
 
 ## 14. Café layout coherence pass (2026-06-01)
 
-CSS cleanup of `CafePlaceholder.tsx` / `global.css` to fix overlaps against the
+Historical CSS cleanup of the former `CafePlaceholder.tsx` / `global.css` to fix overlaps against the
 painted Stage Base v03 (no asset changes):
 
 - Hidden the faded **ghost furniture** (CSS tables, counter slab/front/ledge,
@@ -472,7 +487,8 @@ painted Stage Base v03 (no asset changes):
 - Moved the **waiting guest (Paula)** out of the cramped bottom-right corner into the
   open painted floor.
 - Wired real **Cem** + **Mira** sprites into the seated-guest slots (were CSS blobs).
-- All 66 tests pass; `tsc --noEmit` clean. Still provisional — the real fix remains
+- Historical verification note: that pass reported 66 tests and a clean
+  `tsc --noEmit`. This is **not** a current test result. Still provisional — the then-planned fix was
   the front-3/4 **Stage Base v04** (see §"Stage Base v04" brief below).
 
 ---
@@ -492,7 +508,7 @@ painted Stage Base v03 (no asset changes):
   room bounding box, yielding real transparency around the room so the CSS diorama
   gradient/walls show through the corners.
 - **Integration:** rendered as a low-z-index layer (`.cafe-stage-base`, z-index 2)
-  inside `CafePlaceholder.tsx`, sitting above the CSS wall placeholders and below
+  inside the former `CafePlaceholder.tsx`, sitting above the CSS wall placeholders and below
   the `.cafe-floor` stacking context so existing props/guests render on top. The CSS
   floor surface (`.cafe-floor` fill/border/shadow, `.cafe-floor__tiles`,
   `.cafe-room-shadow`) had its visual prominence reduced to transparent/0 opacity so
@@ -510,7 +526,11 @@ painted Stage Base v03 (no asset changes):
 
 ---
 
-## Stage Base v04 — front-3/4 generation brief
+## Stage Base v04 — historical generation brief (superseded by v06)
+
+> **Do not execute this generation brief.** v04 was an intermediate planned stage;
+> the repository now uses the v06 stage described in `AGENTS.md`. This section is
+> retained only to preserve the decision and art-pipeline history.
 
 **Decision context:** the projection question is resolved — Option (A), front-3/4 stays
 canonical, and Stage Base v03 (corner-isometric) is to be **replaced** by a
@@ -559,9 +579,9 @@ family as the props.
 ### Tooling
 
 Candidate tool: an **external pixel tool (e.g. PixelLab)** rather than a general image
-model, for cleaner pixel output and easier alpha. Raw output stays in the external asset
-inbox (`/Users/Heineken/Code/cafe-apokalypso-asset-inbox/`, see
-[../ART_PIPELINE.md](../ART_PIPELINE.md)); only the cropped, approved PNG enters the repo.
+model, for cleaner pixel output and easier alpha. Raw output stays in an external, unversioned asset workspace (see
+[../ART_PIPELINE.md](../ART_PIPELINE.md)); only a reviewed, intentionally selected
+PNG may enter the repository.
 
 ### Intended repo path (after approval)
 
