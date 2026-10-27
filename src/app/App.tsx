@@ -16,12 +16,12 @@ import { ActionPanel } from "../ui/components/ActionPanel";
 import { CafeScene } from "../ui/cafe/CafeScene";
 import { IntroSequence } from "../ui/components/IntroSequence";
 import { OptionsMenu } from "../ui/components/OptionsMenu";
+import { StorageStatusMessage } from "../ui/components/StorageStatusMessage";
 import {
   type PendingResetStorageStatus,
   resolveStorageStatusAfterSave,
-  StorageStatusMessage,
   type StorageStatusKind
-} from "../ui/components/StorageStatusMessage";
+} from "../ui/components/storageStatus";
 import { DayProgressPanel } from "../ui/panels/DayProgressPanel";
 import { ResourceHud } from "../ui/panels/ResourceHud";
 
