@@ -1,10 +1,8 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
-import {
-  resolveStorageStatusAfterSave,
-  StorageStatusMessage
-} from "../src/ui/components/StorageStatusMessage";
+import { StorageStatusMessage } from "../src/ui/components/StorageStatusMessage";
+import { resolveStorageStatusAfterSave } from "../src/ui/components/storageStatus";
 
 describe("storage status message", () => {
   it("keeps an unstyled live region mounted when persistence is healthy", () => {

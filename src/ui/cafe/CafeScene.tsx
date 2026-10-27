@@ -258,7 +258,6 @@ export function CafeScene({ gameState, onCleanTables }: CafeSceneProps) {
     const box = worldRef.current.getBoundingClientRect();
     const x = ((e.clientX - box.left) / box.width) * 100;
     const bottom = (1 - (e.clientY - box.top) / box.height) * 100;
-    // eslint-disable-next-line no-console
     console.info(`[scene] left: ${x.toFixed(1)}%, bottom: ${bottom.toFixed(1)}%`);
   }, []);
 
