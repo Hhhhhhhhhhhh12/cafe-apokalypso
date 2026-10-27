@@ -3,10 +3,17 @@
 Cozy-Management-Spiel (React + Vite + TypeScript), 7 Tage, langsam kippende Stimmung.
 KRITISCHE Regel: Immer auf gescheite Diversität der Figuren achten (Hauttöne, Körperformen, Hintergründe).
 
+> Aktuelle Übergabe und Rollen: [`docs/CODEX_HANDOFF.md`](docs/CODEX_HANDOFF.md).
+> Codex ist der primäre Arbeitsbereich. Gemeinsames Projektwissen mit `AGENTS.md`
+> synchron halten; werkzeugspezifische Befehle dürfen abweichen.
+> Code beschreibt das implementierte Verhalten; `docs/PROJECT_CANON.md` und
+> `docs/DECISIONS.md` beschreiben die freigegebene Spielabsicht. Widersprüche
+> melden, nicht stillschweigend durch eine Änderung des Kanons auflösen.
+
 ## Befehle
 
 - Dev-Server: `preview_start` mit Name `cafe-apokalypso` (Port 5173, definiert in `.claude/launch.json`)
-- Tests: `npx vitest run` (322 Tests, müssen grün bleiben)
+- Tests: `npm run test` (vollständige Suite muss grün sein; aktuelle Testzahl aus dem Prüflauf)
 - Für Preview-/Kalibrier-Arbeit: Skill `.claude/skills/cafe-preview/SKILL.md` lesen und befolgen
 
 ## Token-Arbeitsregeln
