@@ -131,11 +131,11 @@ Image tools may be used for art direction, moodboards, concept images, visual re
 
 Allowed art-direction tools include:
 - OpenAI ImageGen
-- Nano Banana / Gemini image tools
-- Google AI Studio for image experiments if useful
 - Figma, Excalidraw, GoodNotes, Aseprite or similar non-coding visual tools
 
-These tools are not coding agents and should not write directly to the repository.
+These tools are for art direction. Repository changes follow the review and approval process.
+
+Gemini, Google AI Studio and Nano Banana were retired from this project on 2026-11-05. Existing asset records retain their provenance.
 
 Antigravity may be evaluated later as a coding/review tool, but it is not part of the art pipeline and does not replace image-generation tools.
 

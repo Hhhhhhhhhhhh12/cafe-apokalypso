@@ -37,7 +37,7 @@ Out of scope for MVP:
 - full 8-direction character sprite sets
 - complete animation system
 - complete Day 1–7 art layering
-- committing raw AI Studio / Gemini / Nano Banana image batches as production assets
+- committing raw generated image batches as production assets
 - complex staff scheduling
 - real-time pathfinding
 - advanced animations
@@ -64,7 +64,7 @@ Out of scope:
 - full walking/idle/sitting animation sets for all characters
 - complete art layers for every day from Day 1 to Day 7
 - generated UI text baked into image assets
-- raw AI Studio / Gemini / Nano Banana image sheets committed into the repository as assets
+- raw generated image sheets committed into the repository as assets
 
 Rules:
 

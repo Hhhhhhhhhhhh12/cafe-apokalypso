@@ -156,9 +156,8 @@ AI tool roles:
 - ChatGPT acts as creative director, product owner, reviewer, and orchestration layer.
 - Claude Code is used for repository structure, documentation, architecture, refactoring plans, and larger cross-file reasoning.
 - Codex is used for concrete implementation tasks, feature work, tests, bug fixes, and focused pull-request-style changes.
-- Google AI Studio is used as an ideas and content lab for guest concepts, dialogue variants, event ideas, tone experiments, and alternative content drafts.
 
-Google AI Studio does not write directly to the repository and does not make canonical decisions. Its outputs must be reviewed and curated before being transferred into repository documentation or game data.
+Guest concepts, dialogue variants, event ideas, and tone experiments enter the project documentation or game data after review and approval.
 
 No additional coding AI agent will be added during the early MVP setup. Additional tools may be used later only for independent review, specialized asset work, or clearly isolated support tasks.
 

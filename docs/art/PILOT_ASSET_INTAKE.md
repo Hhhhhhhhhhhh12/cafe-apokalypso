@@ -191,7 +191,7 @@ to the `sprite-*` convention in [CAFE_DIORAMA_DIRECTION.md](CAFE_DIORAMA_DIRECTI
 
 ## 4. External working folder rule
 
-Raw AI Studio / Gemini / Nano Banana outputs **remain outside the repository**.
+Raw generated image outputs **remain outside the repository**.
 
 Use an **external, unversioned asset workspace** for raw generations and discarded
 variants. Do not record a contributor's personal absolute filesystem path in the
@@ -467,8 +467,9 @@ character generation proved weak. Props are Pixellab's strength.
   - Potted plant → `pixellab-plant-lush.png`, `pixellab-plant-classic.png`
   - Wall clock → `pixellab-clock-round.png` (normal), `pixellab-clock-pendulum.png`
     (candidate for the Day-7 clock anomaly / weirdness escalation)
-- **Verdict:** style-referenced Pixellab props match the café look well — pipeline is
-  **AI Studio for characters, Pixellab for props/furniture/tiles**.
+- **Verdict at the time:** style-referenced Pixellab props matched the café look.
+  The pilot used AI Studio for characters and Pixellab for props, furniture and tiles.
+  Current tool choices are documented in [PROJECT_CANON.md](../PROJECT_CANON.md).
 - **Status:** all provisional candidates in the external inbox; none committed to the
   repo yet. They enter `assets/` only after the §5 approval checklist + user sign-off.
 

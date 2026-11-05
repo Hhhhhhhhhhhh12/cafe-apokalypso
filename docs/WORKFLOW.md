@@ -293,7 +293,7 @@ Do not overwrite existing notes from other chats without review. Prefer additive
 
 ## Visual Exploration Workflow
 
-Visual exploration with Gemini, Google AI Studio, Nano Banana, image prompts, generated references, and moodboard Markdown files is handled separately from implementation work.
+Visual exploration with approved image tools, prompts, generated references, and moodboard Markdown files is handled separately from implementation work.
 
 Rules:
 
@@ -303,13 +303,13 @@ Rules:
 - A visual decision becomes binding only when it is transferred into `docs/ART_STYLEGUIDE.md`, `docs/ART_PIPELINE.md`, or another relevant canonical document.
 - Codex implementation prompts must treat moodboards as reference material only, not as direct implementation instructions.
 - Claude Code may summarize moodboards and propose canonical art-rule updates, but must mark them as proposals until the user approves them.
-- Codex must not convert Gemini, Google AI Studio, or Nano Banana outputs into final assets.
+- Codex needs explicit approval before turning generated references into production assets.
 
 Recommended visual exploration branches:
 
 - `art/moodboard-cafe-interior-001`
 - `art/day1-day7-visual-progression`
-- `art/google-ai-studio-gemini-references`
+- `art/visual-references`
 
 ## Art Review and Approval Requirement
 
