@@ -3,7 +3,7 @@ import { gameReducer } from "../game/engine/reducer";
 import { createFreshRunState } from "../game/engine/gameState";
 import {
   getBrowserStorage,
-  loadGameState,
+  readGameSave,
   resetSavedGameState,
   SAVE_KEY,
   saveGameState,
@@ -41,19 +41,20 @@ function readBootAck(storage: StorageLike | null): boolean {
 
 export function App() {
   const storage = useMemo(() => getBrowserStorage(), []);
-  const [storageStatus, setStorageStatus] = useState<StorageStatusKind | null>(
-    () => (storage ? null : "unavailable")
-  );
-  const [gameState, dispatch] = useReducer(
-    gameReducer,
-    storage,
-    (availableStorage) =>
-      availableStorage ? loadGameState(availableStorage) : createFreshRunState()
+  const [initialSave] = useState(() => storage ? readGameSave(storage) : null);
+  const [storageStatus, setStorageStatus] = useState<StorageStatusKind | null>(() => {
+    if (!initialSave) return "unavailable";
+    return initialSave.status === "load-failed" ? "load-failed" : null;
+  });
+  const [gameState, dispatch] = useReducer(gameReducer, initialSave, (save) =>
+    save?.status === "loaded" ? save.state : createFreshRunState()
   );
   const pendingResetStorageRef = useRef<PendingResetStorageStatus | null>(null);
 
+  const canAutoSave = storageStatus !== "load-failed";
+
   useEffect(() => {
-    if (storage) {
+    if (storage && canAutoSave) {
       const result = saveGameState(gameState, storage);
       const pendingReset = pendingResetStorageRef.current;
       if (result.ok && pendingReset) {
@@ -63,7 +64,7 @@ export function App() {
         resolveStorageStatusAfterSave(currentStatus, result.ok, pendingReset)
       );
     }
-  }, [gameState, storage]);
+  }, [gameState, storage, canAutoSave]);
 
   // Achievement toast queue — detect newly unlocked achievements each render
   const seenAchievementsRef = useRef<readonly string[]>(gameState.unlockedAchievements);
