@@ -219,7 +219,7 @@ It must not be used for art direction, asset generation, moodboards, or characte
 
 ### Image and Art-Direction Tools
 
-Image tools (OpenAI ImageGen, Nano Banana / Gemini image tools, Google AI Studio image experiments) are art-direction tools only.
+Approved image tools are used for art direction.
 
 They are used for:
 
@@ -252,13 +252,11 @@ art/day1-day7-visual-progression
 art/character-sheets
 ```
 
-This applies to repository edits, not to raw image generation. Raw AI Studio / Gemini / Nano Banana image outputs may continue to be saved in the external moodboard working folder until they are reviewed and curated.
+This applies to repository edits, not to raw image generation. Raw generated images can be saved in the external moodboard working folder until they are reviewed and curated.
 
-### Gemini / Google AI Studio / Nano Banana Workflow
+### External image exploration
 
-Gemini, Google AI Studio, and Nano Banana may be used to reduce Codex credit usage for visual exploration.
-
-Explorative Google-AI-Studio-/Gemini outputs and raw moodboards are stored outside the code repository. The current canonical external working location is the local asset inbox documented in [ART_PIPELINE.md](ART_PIPELINE.md):
+Exploratory image outputs and raw moodboards are stored outside the code repository. The current canonical external working location is the local asset inbox documented in [ART_PIPELINE.md](ART_PIPELINE.md):
 
 ```text
 /Users/Heineken/Code/cafe-apokalypso-asset-inbox/
@@ -286,22 +284,19 @@ Do not use them for:
 Recommended flow:
 
 1. ChatGPT creates the art brief, review sheet, and prompt variants.
-2. Gemini / Google AI Studio / Nano Banana generates visual options outside the repo.
+2. An approved image tool generates visual options outside the repo.
 3. The user selects or rejects directions.
 4. Raw image batches, prompt experiments, and rejected variants stay in the external moodboard folder.
 5. Approved decisions are summarized in `docs/art/` and, if binding, in `docs/ART_STYLEGUIDE.md` or `docs/ART_PIPELINE.md`.
 6. Codex only implements placeholders, metadata, rendering, or explicitly approved assets.
 
-
-For now, Google image tools should be treated as moodboard and concept tools, not production tools.
-
 ## Visual Tool Coordination
 
-Gemini, Google AI Studio, Nano Banana, and moodboard Markdown files are visual exploration inputs. They must not be treated as direct implementation instructions.
+Generated reference images and moodboard Markdown files are visual exploration inputs. They must not be treated as direct implementation instructions.
 
 Rules:
 - Claude Code may summarize moodboards and extract candidate art-direction decisions, but must mark them as candidates unless they are already reflected in `docs/ART_STYLEGUIDE.md` or `docs/ART_PIPELINE.md`.
-- Codex must not convert Gemini, Google AI Studio, or Nano Banana outputs into final assets.
+- Codex needs explicit approval before turning generated references into production assets.
 - Codex must not mix moodboard Markdown edits with gameplay, UI, engine, data-model, test, or build-system commits.
 - Visual-reference branches should use the `art/*` prefix.
 - Implementation branches should stay separate from visual exploration branches.

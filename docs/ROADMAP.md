@@ -87,7 +87,7 @@ Art pilot boundaries:
 
 - in scope: first curated Day-1 café background or background slice, 4–6 approved normal guest sprites, one barista/staff sprite, 6–10 café props, and 1–2 weirdness overlay props
 - in scope: local/internal art review tooling if it helps select, annotate, and export review notes for guest and prop candidates
-- out of scope: full final art pass, full 8-direction character sets, complete animation system, all guest sprites, complete Day 1–7 art layering, or committing raw AI Studio / Gemini / Nano Banana image batches
+- out of scope: full final art pass, full 8-direction character sets, complete animation system, all guest sprites, complete Day 1–7 art layering, or committing raw generated image batches
 
 ## Phase 1.5: Week 2 Expansion
 

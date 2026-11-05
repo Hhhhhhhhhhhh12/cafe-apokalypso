@@ -27,7 +27,7 @@ Die finale Spielgrafik soll konsistent, wiederverwendbar und technisch sauber se
 
 ## Explorative Moodboards und externe Arbeitsdateien
 
-Explorative Moodboards, Google-AI-Studio-/Gemini-Tests, Prompt-Experimente und rohe Bildvarianten werden nicht direkt im Code-Repository versioniert.
+Explorative Moodboards, Prompt-Experimente und rohe Bildvarianten werden nicht direkt im Code-Repository versioniert.
 
 Der aktuelle kanonische externe Arbeitsbereich ist die lokale Asset-Inbox:
 
@@ -59,7 +59,7 @@ Zulässig im Repo sind kurze Entscheidungsdokumente, zum Beispiel:
 
 Nicht im Repo versioniert werden sollen:
 
-- rohe Google-AI-Studio-/Gemini-Exports
+- rohe Exporte aus Bildgeneratoren
 - große Bildserien
 - ungeprüfte Prompt-Historien
 - Variantenordner aus Experimenten
@@ -68,7 +68,7 @@ Nicht im Repo versioniert werden sollen:
 
 ## Moodboards and external AI image tools
 
-Gemini, Google AI Studio, Nano Banana and similar tools may be used for visual exploration, reference generation, style comparison, prompt testing and moodboard work.
+Approved image tools may be used for visual exploration, reference generation, style comparison, prompt testing and moodboard work.
 
 Their outputs are not production assets by default.
 
@@ -96,7 +96,7 @@ Codex and Claude Code rules:
 
 - Claude Code may summarize moodboards and propose canonical art-rule updates.
 - Codex may use approved canonical art rules for layout and placeholder implementation.
-- Codex must not treat raw Gemini, Google AI Studio or Nano Banana outputs as final assets.
+- Codex treats raw image outputs as reference material.
 - Codex must not generate, import, or commit final art assets without explicit approval.
 
 ## Tool-Rollen
@@ -200,7 +200,7 @@ Pilotumfang:
 Nicht Teil des Pilots:
 
 - vollständige finale Grafikproduktion
-- rohe AI-Studio-/Gemini-/Nano-Banana-Bildbatches im Repo
+- rohe generierte Bildserien im Repo
 - komplette 8-Richtungs-Character-Sets
 - vollständige Walk-/Idle-/Sitz-Animationen für alle Figuren
 - vollständige Day-1-bis-Day-7-Art-Layer
