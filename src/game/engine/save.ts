@@ -26,24 +26,33 @@ export function getBrowserStorage(): StorageLike | null {
   }
 }
 
-export function loadGameState(storage: StorageLike): GameState {
+export type GameLoadResult =
+  | { status: "loaded"; state: GameState }
+  | { status: "missing" | "load-failed" };
+
+export function readGameSave(storage: StorageLike): GameLoadResult {
   try {
     const rawSave = storage.getItem(SAVE_KEY);
 
-    if (!rawSave) {
-      return createFreshRunState();
+    if (rawSave === null) {
+      return { status: "missing" };
     }
 
     const parsedSave: unknown = migrateRawSave(JSON.parse(rawSave));
 
     if (!isValidGameState(parsedSave)) {
-      return createFreshRunState();
+      return { status: "load-failed" };
     }
 
-    return parsedSave;
+    return { status: "loaded", state: parsedSave };
   } catch {
-    return createFreshRunState();
+    return { status: "load-failed" };
   }
+}
+
+export function loadGameState(storage: StorageLike): GameState {
+  const result = readGameSave(storage);
+  return result.status === "loaded" ? result.state : createFreshRunState();
 }
 
 export function saveGameState(

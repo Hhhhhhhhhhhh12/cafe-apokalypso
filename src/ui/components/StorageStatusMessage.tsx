@@ -3,6 +3,8 @@ import type { StorageStatusKind } from "./storageStatus";
 const STORAGE_STATUS_MESSAGES: Record<StorageStatusKind, string> = {
   unavailable:
     "Browser storage is unavailable. You can keep playing, but this session will not survive a reload.",
+  "load-failed":
+    "The existing save could not be loaded and was left untouched. You can play this week without saving. Reset / New Game replaces the old save and turns saving back on.",
   "save-failed":
     "Progress continues in this session, but it could not be saved. A reload may not preserve this session.",
   "cleanup-failed":
