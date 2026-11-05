@@ -116,3 +116,35 @@ Verification is limited to the authorized PNG checks and source/diff inspection.
 ### Integration boundary
 
 Only Nele's static staff PNG, this evidence entry and its inventory reference change. No rendering code, game data, dependencies or workflows change; no merge. The existing Lookbook automatically displays PNGs from this directory when this branch is used; this is not gameplay wiring or gameplay acceptance. Other batch-inventory statements remain historical and are not validated by this Nele-only entry.
+
+## Jana — walk sprite sheet v03
+
+The project owner approved the revised style, the visible left/right support-leg change in the v03 loop, and then the animation played back from the exact exported PNG on light and dark backgrounds. The owner authorized adding this sheet and its verification to PR #177.
+
+- Asset: [placeholder-staff-jana-walk-sheet.png](../../assets/sprites/guests/placeholder-staff-jana-walk-sheet.png).
+- Eight right-facing frames from left to right. ImageGen supplied the first four poses and the revised second half. The PNG preserves that approved sequence with nearest-neighbour sampling and a 90% alpha threshold.
+- Scope: Jana's walk asset. The approved stand image remains a separate asset and the walk is not wired into the game. The previous 9-frame sheet is recoverable from parent commit `640a9ad5852d49117d45430fae577ec935ae6306`.
+
+| Check | Result |
+| --- | --- |
+| PNG integrity and layout | Valid 768×96 RGBA PNG, eight 96×96 cells in one row |
+| Transparency and pixel edges | Alpha 0 or 255 only, no active cell-edge pixels. Inspected at 4× with no smoothing on light and dark backgrounds |
+| Pixel connectivity | One 8-connected opaque component per frame, with no detached opaque pixels |
+| Alignment | Lowest visible row is y=87 (zero-based) in each cell, matching the stand image baseline |
+| Animated preview | Eight frames at 120 ms each, played from the exported PNG and visually approved |
+| Final SHA-256 | `efec8c53c2f555fec43867ec21627c525de720faf33508eb63530d68659a11c3` |
+
+Per-frame visible bounds in cell-local coordinates, with right and bottom exclusive:
+
+| Frame | Visible bounds | Opaque pixels |
+| --- | --- | --- |
+| 1 | `(34, 19, 64, 88)` | 922 |
+| 2 | `(36, 20, 61, 88)` | 885 |
+| 3 | `(39, 20, 58, 88)` | 801 |
+| 4 | `(38, 19, 66, 88)` | 833 |
+| 5 | `(34, 20, 68, 88)` | 918 |
+| 6 | `(34, 20, 59, 88)` | 862 |
+| 7 | `(36, 20, 62, 88)` | 889 |
+| 8 | `(34, 20, 68, 88)` | 956 |
+
+Verification covers the asset export. The PNG and preview file checks took about 0.06 seconds. No app test, build, or gameplay check was run for this entry.
