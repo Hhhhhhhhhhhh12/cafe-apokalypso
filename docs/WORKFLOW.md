@@ -54,6 +54,12 @@ Use GitHub Actions as soon as code exists.
 
 GitHub is not the place for binding design canon unless the decision is also reflected in the relevant Markdown documentation.
 
+### GitHub Pages deployment
+
+Publishing the playable demo is a separate release step. In GitHub Actions,
+open **Deploy to GitHub Pages**, select **Run workflow**, and choose `main`
+when that revision is approved for publication. Merges continue to run CI.
+
 ### GitHub Issues
 
 Use Issues for:
