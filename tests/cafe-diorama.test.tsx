@@ -93,6 +93,29 @@ describe("café diorama view", () => {
     expect(dayEnd).not.toContain("cafe-pilot-asset--kemal-standing");
   });
 
+  it("shows Nino only during an open day with his assignment locked", () => {
+    const state: GameState = {
+      ...cafeStateFor(3, 0),
+      helperAssignment: {
+        helperId: "nino",
+        taskId: "barista",
+        locked: true,
+        dailyCost: 1,
+        flavorLine: "",
+        autonomyLevel: "micromanagement",
+      },
+    };
+    const ninoClass = 'class="cafe-staff-nino"';
+    const assignment = state.helperAssignment!;
+
+    expect(renderCafe(state)).toContain(ninoClass);
+    expect(renderCafe({ ...state, day: 2 })).not.toContain(ninoClass);
+    expect(renderCafe({ ...state, dayPhase: "day_end" })).not.toContain(ninoClass);
+    expect(renderCafe({ ...state, helperAssignment: null })).not.toContain(ninoClass);
+    expect(renderCafe({ ...state, helperAssignment: { ...assignment, locked: false } })).not.toContain(ninoClass);
+    expect(renderCafe({ ...state, helperAssignment: { ...assignment, helperId: "jana", taskId: "cleaning" } })).not.toContain(ninoClass);
+  });
+
   it("seats only served Day 2 guests and never the current queue guest", () => {
     const base = cafeStateFor(2, 3);
     const markup = renderCafe({ ...base, dayManagement: {

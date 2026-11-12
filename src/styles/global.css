@@ -1140,6 +1140,73 @@ button.cafe-table {
   }
 }
 
+.cafe-staff-nino {
+  --nino-walk-duration: 960ms;
+  width: 108px;
+  height: 108px;
+  pointer-events: none;
+}
+
+.cafe-staff-nino > span {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+}
+
+.cafe-staff-nino__stand {
+  /* Match the visible height of the walk pose and align the feet. */
+  bottom: -11px;
+  width: 128px;
+  height: 128px;
+  background: url("../../assets/sprites/guests/placeholder-staff-nino.png") no-repeat center / contain;
+}
+
+.cafe-staff-nino__walk {
+  visibility: hidden;
+  bottom: -6px;
+  width: 108px;
+  height: 108px;
+  background-image: url("../../assets/sprites/guests/placeholder-staff-nino-walk-sheet.png");
+  background-size: 864px 108px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cafe-staff-nino {
+    animation: cafe-nino-arrive var(--nino-walk-duration) linear;
+  }
+
+  .cafe-staff-nino__stand {
+    animation: cafe-nino-stand var(--nino-walk-duration) step-end both;
+  }
+
+  .cafe-staff-nino__walk {
+    animation:
+      cafe-nino-walk var(--nino-walk-duration) steps(8) both,
+      cafe-nino-hide-walk var(--nino-walk-duration) step-end both;
+  }
+}
+
+@keyframes cafe-nino-arrive {
+  from { left: 50%; }
+}
+
+@keyframes cafe-nino-stand {
+  from { visibility: hidden; }
+  to { visibility: visible; }
+}
+
+@keyframes cafe-nino-walk {
+  from { background-position-x: 0; }
+  to { background-position-x: -864px; }
+}
+
+@keyframes cafe-nino-hide-walk {
+  from { visibility: visible; }
+  to { visibility: hidden; }
+}
+
 .cafe-pilot-asset--paula,
 .cafe-pilot-asset--guest {
   left: 50%;

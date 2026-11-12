@@ -7,6 +7,7 @@ import {
   COUNTER_FRAME,
   DECOR_SPOTS,
   GUEST_SPOTS,
+  NINO_ARRIVAL,
   PAULA_PATH,
   STAGE_DETAIL_SPOTS,
   TABLE_SPOTS,
@@ -111,6 +112,13 @@ export function CafeScene({ gameState, onCleanTables }: CafeSceneProps) {
   // --- State-driven guest + prop visibility ---
   const { customersServed, actionPointsRemaining } = gameState.dayManagement;
   const isOpen = gameState.dayPhase === "open";
+  const showNino =
+    gameState.day >= 3 &&
+    isOpen &&
+    !gameState.cafeClosed &&
+    !gameState.demoComplete &&
+    gameState.helperAssignment?.helperId === "nino" &&
+    gameState.helperAssignment.locked;
   const isDayEnd = gameState.dayPhase === "day_end";
 
   const queuePosition = customersServed + gameState.dayManagement.guestsLost;
@@ -408,6 +416,13 @@ export function CafeScene({ gameState, onCleanTables }: CafeSceneProps) {
                 );
               })}
             </>
+          )}
+
+          {showNino && (
+            <div className="cafe-staff-nino" style={spotStyle(NINO_ARRIVAL)} aria-hidden="true">
+              <span className="cafe-staff-nino__stand" />
+              <span className="cafe-staff-nino__walk" />
+            </div>
           )}
 
           {/* Warteschlange: gemeinsame Wegpunkte aus scene.ts, Übergänge aus CSS */}
