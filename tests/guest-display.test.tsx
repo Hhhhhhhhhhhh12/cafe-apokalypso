@@ -17,20 +17,22 @@ function render(state: ReturnType<typeof stateFor>) {
 }
 
 describe("engine-driven guest display", () => {
-  it("serves and renders only Kemal throughout Day 1, with or without seats", () => {
+  it("renders the two required Day 1 guests and then optional Fatou", () => {
+    const expected: GuestId[] = ["pendler-kemal", "pendlerin-paula", "pendlerin-fatou"];
     for (const seating of [0, 1]) {
       let state = stateFor(1);
       state.equipment.seating = seating;
       for (let served = 0; served <= 2; served++) {
-        expect(getGuestForCustomer(state, served)?.id).toBe("pendler-kemal");
-        expect(getNextGuestPreview(state)?.name).toBe("Pendler Kemal");
+        const guest = getGuestForCustomer(state, served);
+        expect(guest?.id).toBe(expected[served]);
+        expect(getNextGuestPreview(state)?.name).toBe(guest?.name);
         const markup = render(state);
-        expect(markup).toContain('data-guest-id="pendler-kemal"');
-        expect(markup).not.toMatch(/cafe-pilot-asset--(?:cem|nele|paula)/);
+        expect(markup).toContain(`data-guest-id="${expected[served]}"`);
+        expect(markup).not.toMatch(/cafe-pilot-asset--(?:cem|nele)/);
         expect(Object.values(getDioramaGuestVisibility(state)).every((v) => !v)).toBe(true);
         if (served < 2) state = serve(state);
       }
-      expect(state.dayManagement.servedGuestIds).toEqual(["pendler-kemal", "pendler-kemal"]);
+      expect(state.dayManagement.servedGuestIds).toEqual(expected.slice(0, 2));
     }
   });
 
@@ -38,24 +40,22 @@ describe("engine-driven guest display", () => {
     let state = stateFor(2);
     state.dayManagement.actionPointsRemaining = 20;
     state.supplies = { coffee: 30, milk: 30, pastries: 30 };
-    const expected: GuestId[] = ["pendler-kemal", "laptop-lukas", "lieferfahrer-cem", "cappuccino-christa", "herr-bohn", "freelancerin-nele", "pendlerin-fatou", "nachbarin-mira"];
+    const expected: GuestId[] = ["pendler-kemal", "pendlerin-paula", "laptop-lukas", "lieferfahrer-cem", "cappuccino-christa", "herr-bohn", "pendlerin-fatou", "nachbarin-mira"];
     for (const id of expected) {
       const guest = getGuestForCustomer(state, state.dayManagement.customersServed);
       expect(guest?.id).toBe(id);
       expect(getNextGuestPreview(state)?.name).toBe(guest?.name);
       expect(render(state)).toContain(`data-guest-id="${id}"`);
-      if (id === "freelancerin-nele") expect(getDioramaGuestVisibility(state).nele).toBe(false);
       state = serve(state);
       expect(state.dayManagement.servedGuestIds?.[state.dayManagement.customersServed - 1]).toBe(id);
     }
-    expect(getDioramaGuestVisibility(state).nele).toBe(true);
-    expect(render(state)).not.toContain("cafe-pilot-asset--paula");
+    expect(getDioramaGuestVisibility(state).nele).toBe(false);
   });
 
   it("does not seat walked-out guests and advances the queue on a walkout", () => {
     let state = stateFor(2);
-    // Kemal leaves; Lukas is the next engine customer.
-    state.dayManagement.guestsLost = 1;
+    // Kemal and Paula leave; Lukas is the next engine customer.
+    state.dayManagement.guestsLost = 2;
     expect(render(state)).toContain('data-guest-id="laptop-lukas"');
     state = serve(state);
     expect(state.dayManagement.servedGuestIds).toEqual(["laptop-lukas"]);
@@ -68,22 +68,22 @@ describe("engine-driven guest display", () => {
     const state = stateFor(2);
     state.dayManagement.helperExtraOrdersRemaining = 1;
     const next = serve(state);
-    expect(next.dayManagement.servedGuestIds).toEqual(["pendler-kemal", "laptop-lukas"]);
-    expect(getDioramaGuestVisibility(next).lukas).toBe(true);
+    expect(next.dayManagement.servedGuestIds).toEqual(["pendler-kemal", "pendlerin-paula"]);
+    expect(getDioramaGuestVisibility(next).lukas).toBe(false);
   });
 
   it("gates even recorded guests by the day roster and their first appearance", () => {
     const state = stateFor(1);
     state.dayManagement.customersServed = 8;
     state.dayManagement.servedGuestIds = ["lieferfahrer-cem", "freelancerin-nele", "pendlerin-fatou", "herr-grau"];
-    expect(Object.values(getDioramaGuestVisibility(state)).every((v) => !v)).toBe(true);
+    expect(getDioramaGuestVisibility(state)).toMatchObject({ cem: false, nele: false, fatou: true, strange: false });
   });
 
   it("handles old saves conservatively without inventing who walked out", () => {
     const state = stateFor(2);
     delete state.dayManagement.servedGuestIds;
     state.dayManagement.customersServed = 3;
-    expect(getDioramaGuestVisibility(state).cem).toBe(true);
+    expect(getDioramaGuestVisibility(state).lukas).toBe(true);
     state.dayManagement.guestsLost = 1;
     expect(Object.values(getDioramaGuestVisibility(state)).every((v) => !v)).toBe(true);
   });
@@ -95,7 +95,7 @@ describe("daily guest history compatibility", () => {
     delete state.dayManagement.servedGuestIds;
     state.dayManagement.customersServed = 2;
     const next = serve(state);
-    expect(next.dayManagement.servedGuestIds).toEqual(["pendler-kemal", "laptop-lukas", "lieferfahrer-cem"]);
+    expect(next.dayManagement.servedGuestIds).toEqual(["pendler-kemal", "pendlerin-paula", "laptop-lukas"]);
   });
 
   it("resets seated identities when opening the next day", () => {

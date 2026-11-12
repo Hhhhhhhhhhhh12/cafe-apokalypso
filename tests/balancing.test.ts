@@ -18,6 +18,7 @@ import {
   SUPPLY_CAPS,
   SUPPLY_UNIT_COSTS,
   createHelperAssignment,
+  createInitialDayManagement,
   getEarnedPrice,
   getHelperAutonomyLevel,
   getReputationIncomeFactor
@@ -299,26 +300,40 @@ describe("balancing: staff helpers differ from no-helper baseline", () => {
     expect(state.resources.cleanliness).toBeGreaterThanOrEqual(45);
   });
 
-  it("no-helper on day 4 produces the solo floor penalty flavor line", () => {
-    // Construct a ready-to-close day 4 state without a helper
-    const closedState = gameReducer(
+  it("leaves two Day-4 actions for recovery after advertising and two orders", () => {
+    const dayFour = createDayStartState(4);
+    let state = gameReducer(
       {
-        ...createDayStartState(4),
-        dayPhase: "open",
-        dayManagement: {
-          ...createInitialGameState().dayManagement,
-          customersServed: 1
-        },
-        completedActions: ["take_order"]
+        ...dayFour,
+        resources: { ...dayFour.resources, stress: 40, cleanliness: 50 },
+        dayManagement: createInitialDayManagement(dayFour.resources.reputation, 4)
       },
-      { type: "complete_day" }
+      { type: "open_day" }
     );
 
-    const flavorLines = closedState.daySummary?.flavorLines ?? [];
-    const hasSoloPenaltyLine = flavorLines.some((line) =>
-      line.includes("Stress +10")
-    );
-    expect(hasSoloPenaltyLine).toBe(true);
+    state = gameReducer(state, { type: "run_advertising", adType: "flyer" });
+    state = gameReducer(state, { type: "serve_product", productId: "filterkaffee" });
+    state = gameReducer(state, { type: "serve_product", productId: "espresso" });
+
+    expect(state.dayManagement.customersServed).toBe(2);
+    expect(state.dayManagement.actionPointsRemaining).toBe(2);
+    expect(state.resources.stress).toBe(40);
+
+    state = gameReducer(state, { type: "clean_tables" });
+    expect(state.resources.cleanliness).toBe(58);
+    expect(state.resources.stress).toBe(35);
+    expect(state.dayManagement.actionPointsRemaining).toBe(1);
+
+    state = gameReducer(state, { type: "complete_day" });
+    expect(state.resources.stress).toBe(25);
+    expect(state.daySummary?.objectiveCompleted).toBe(true);
+    expect(
+      state.daySummary?.flavorLines.some((line) => line.includes("Stress +10"))
+    ).toBe(false);
+
+    state = gameReducer(state, { type: "confirm_supply_purchase" });
+    expect(state.day).toBe(5);
+    expect(state.resources.stress).toBe(5);
   });
 
   it("Nino (counter) reduces opening stress by 8", () => {
@@ -419,7 +434,7 @@ describe("helper autonomy state machine", () => {
   });
 
   it("micromanagement-level helper never produces autonomous actions across a full idle day", () => {
-    let state = createDayStartState(3);
+    let state = createDayStartState(4);
     state = gameReducer(state, { type: "select_helper", helperId: "jana", taskId: "cleaning" });
     state = { ...state, helperAssignment: { ...state.helperAssignment!, autonomyLevel: "micromanagement" } };
     state = gameReducer(state, { type: "open_day" });
@@ -431,7 +446,7 @@ describe("helper autonomy state machine", () => {
     expect(state.dayManagement.helperAutonomousActions).toBe(0);
   });
 
-  it("learning/autonomous-level Jana clears a dirty table on eligible idle actions", () => {
+  it("keeps Day 3 clearing on request and automates clearing in later shifts", () => {
     let learningState = createDayStartState(3);
     learningState = gameReducer(learningState, {
       type: "select_helper",
@@ -446,8 +461,8 @@ describe("helper autonomy state machine", () => {
     for (let i = 0; i < 4; i++) {
       learningState = gameReducer(learningState, { type: "check_supplies" });
     }
-    expect(learningState.dayManagement.helperAutonomousActions).toBeGreaterThan(0);
-    expect(learningState.dayManagement.dirtyTableIds).toEqual([]);
+    expect(learningState.dayManagement.helperAutonomousActions).toBe(0);
+    expect(learningState.dayManagement.dirtyTableIds).toEqual(["left"]);
 
     let autonomousState = createDayStartState(5);
     autonomousState = gameReducer(autonomousState, {
@@ -485,7 +500,7 @@ describe("helper autonomy state machine", () => {
   });
 
   it("Nino (barista) gives reputation bonus for espresso (baristaReputationBonus increments)", () => {
-    let state = createDayStartState(3);
+    let state = createDayStartState(4);
     state = gameReducer(state, {
       type: "select_helper",
       helperId: "nino",
@@ -651,6 +666,7 @@ describe("balancing: fresh setup reaches Day-4 autonomy", () => {
   it("lets a table-first café afford Jana's cleaning shift on Day 4", () => {
     let state = createFreshRunState();
     state = gameReducer(state, { type: "buy_equipment", slot: "machine" });
+    state = gameReducer(state, { type: "buy_equipment", slot: "grinder" });
     state = gameReducer(state, { type: "buy_equipment", slot: "seating" });
     state = gameReducer(state, { type: "finish_setup" });
 

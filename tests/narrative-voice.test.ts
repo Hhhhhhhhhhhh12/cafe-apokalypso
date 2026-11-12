@@ -4,6 +4,7 @@ import {
   getManagementHudLabels,
   getNarrativeEventCards,
   getNextGuestPreview,
+  getGuestForCustomer,
   getServeLineForCustomer,
   getVisibleDaySevenLetter
 } from "../src/game/engine/selectors";
@@ -18,6 +19,18 @@ function stateForDay(day: DayNumber, overrides: Partial<GameState> = {}): GameSt
 }
 
 describe("guest serve lines", () => {
+  it("does not select Nele before Day 3, then includes her in the normal pool", () => {
+    for (const day of [1, 2] as const) {
+      for (let index = 0; index < 12; index += 1) {
+        expect(getGuestForCustomer(stateForDay(day), index)?.id).not.toBe("freelancerin-nele");
+      }
+    }
+    const dayThreeGuests = Array.from({ length: 8 }, (_, index) =>
+      getGuestForCustomer(stateForDay(3), index)?.id
+    );
+    expect(dayThreeGuests).toContain("freelancerin-nele");
+  });
+
   it("returns the served guest's narrative serve line, not developer copy", () => {
     const line = getServeLineForCustomer(stateForDay(1), 0);
     const kemal = weekOneGuests.find((guest) => guest.id === "pendler-kemal");
@@ -58,14 +71,21 @@ describe("guest serve lines", () => {
     expect(getServeLineForCustomer(dayFour, 3)).toBe(herrGrau?.serveLine);
   });
 
-  it("stays in the normal pool when no strange guests are present that day", () => {
+  it("serves Kemal, Paula and Fatou as distinct Day-1 guests", () => {
     const dayOne = stateForDay(1);
-    // Day 1 has only normal guests (Kemal, Nele), so even index >= 3 stays normal.
-    const dayOneNormalLines = weekOneGuests
-      .filter((g) => g.category === "normal" && ["pendler-kemal", "freelancerin-nele"].includes(g.id))
-      .map((g) => g.serveLine);
+    const kemal = weekOneGuests.find((guest) => guest.id === "pendler-kemal");
+    const fatou = weekOneGuests.find((guest) => guest.id === "pendlerin-fatou");
+    const paula = weekOneGuests.find((guest) => guest.id === "pendlerin-paula");
+    const nele = weekOneGuests.find((guest) => guest.id === "freelancerin-nele");
 
-    expect(dayOneNormalLines).toContain(getServeLineForCustomer(dayOne, 5));
+    expect(getServeLineForCustomer(dayOne, 0)).toBe(kemal?.serveLine);
+    expect(getServeLineForCustomer(dayOne, 1)).toBe(paula?.serveLine);
+    expect(getServeLineForCustomer(dayOne, 2)).toBe(fatou?.serveLine);
+    expect(getServeLineForCustomer(dayOne, 0)).not.toBe(
+      getServeLineForCustomer(dayOne, 1)
+    );
+    expect(getServeLineForCustomer(dayOne, 5)).toBe(fatou?.serveLine);
+    expect(getServeLineForCustomer(dayOne, 5)).not.toBe(nele?.serveLine);
   });
 });
 

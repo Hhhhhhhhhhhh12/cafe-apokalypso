@@ -37,13 +37,26 @@ describe("action consequence feedback", () => {
     expect(after.statusMessage).toContain("This action: Cleanliness +2 · Stress −2 · Actions −1.");
   });
 
+  it("reports the cost of cleaning a specific table only when it was dirty", () => {
+    const before = openDay();
+    before.dayManagement.dirtyTableIds = ["left"];
+
+    const blocked = gameReducer(before, { type: "clean_table", tableId: "right" });
+    expect(blocked.statusMessage).not.toContain("This action:");
+    expect(blocked.dayManagement.actionPointsSpent).toBe(before.dayManagement.actionPointsSpent);
+
+    const cleaned = gameReducer(before, { type: "clean_table", tableId: "left" });
+    expect(cleaned.dayManagement.dirtyTableIds).toEqual([]);
+    expect(cleaned.statusMessage).toContain("Actions −1");
+  });
+
   it("reports the actual substitute income and milk shortage consequence", () => {
     const before = openDay();
     before.supplies.milk = 0;
     const after = gameReducer(before, { type: "serve_product", productId: "cappuccino" });
     expect(after.statusMessage).toContain("Cappuccino becomes");
-    const income = (after.resources.money - before.resources.money).toFixed(2);
-    expect(after.statusMessage).toContain(`This action: +€${income}`);
+    const income = after.resources.money - before.resources.money;
+    expect(after.statusMessage).toContain(`This action: +${formatAsche(income)}`);
     expect(after.statusMessage).toContain("Stress +5");
     expect(after.statusMessage).toContain("Rep −1");
     expect(after.statusMessage).not.toContain("Milk −1");
@@ -55,7 +68,7 @@ describe("action consequence feedback", () => {
     const after = gameReducer(before, { type: "serve_product", productId: "filterkaffee" });
     expect(after.statusMessage).toContain("orders nothing");
     expect(after.statusMessage).toContain("This action:");
-    expect(after.statusMessage).not.toContain("+€");
+    expect(after.statusMessage).not.toMatch(/\+[\d.]+ Asche/);
     expect(after.statusMessage).not.toContain("Coffee −");
   });
 
@@ -68,7 +81,7 @@ describe("action consequence feedback", () => {
     expect(after.dayManagement.customersServed - before.dayManagement.customersServed).toBe(2);
     expect(after.statusMessage).toContain("Coffee −2");
     expect(after.statusMessage).toContain("Cleanliness −2");
-    expect(after.statusMessage).toContain(`+€${(after.resources.money - before.resources.money).toFixed(2)}`);
+    expect(after.statusMessage).toContain(`+${formatAsche(after.resources.money - before.resources.money)}`);
   });
 
   it("reports net stress when cleaning and a walkout happen together", () => {
@@ -104,8 +117,9 @@ describe("action consequence feedback", () => {
     const before = openDay();
     before.dayManagement.offerReviewed = offerReviewed;
     const product = getProductById("filterkaffee");
-    expect(getExpectedProductIncome(before, product)).toBe(offerReviewed ? 1.69 : 1.54);
+    expect(getExpectedProductIncome(before, product)).toBe(offerReviewed ? 1.7 : 1.5);
     const after = gameReducer(before, { type: "serve_product", productId: product.id });
     expect(after.resources.money - before.resources.money).toBeCloseTo(getExpectedProductIncome(before, product));
   });
 });
+import { formatAsche } from "../src/game/engine/currency";

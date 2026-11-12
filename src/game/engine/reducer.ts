@@ -22,6 +22,7 @@ import {
   getIngredientLabel,
   getKassandraConsultLine,
   getMoneyRecoveryWarning,
+  getServedGuestIds,
   getServeLineForCustomer
 } from "./selectors";
 import { getObjectiveStatus } from "./objectives";
@@ -408,7 +409,7 @@ function applySuccessfulServe(
       ...management,
       customersServed: management.customersServed + 1,
       servedGuestIds: servedGuest
-        ? [...(management.servedGuestIds ?? []), servedGuest.id]
+        ? [...getServedGuestIds({ ...workingState, dayManagement: management }), servedGuest.id]
         : management.servedGuestIds,
       moneyEarned: clampResource(management.moneyEarned + earned),
       suppliesUsed: addSupplies(management.suppliesUsed, suppliesUsed)

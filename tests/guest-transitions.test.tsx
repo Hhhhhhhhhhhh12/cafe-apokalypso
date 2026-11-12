@@ -67,13 +67,13 @@ afterEach(() => {
 });
 
 describe("guest entrance, departure and seat handover", () => {
-  it("restarts Kemal's entrance after the first Day 1 order", () => {
+  it("introduces Paula after the first Day 1 order", () => {
     const state = createInitialGameState();
     render(state); arrive();
     serve(state);
     expect(guest()).toBe("pendler-kemal");
     exit(); arrive();
-    expect(guest()).toBe("pendler-kemal");
+    expect(guest()).toBe("pendlerin-paula");
     expect(container.querySelector(".placeholder-guest-seated")).toBeNull();
     expect(container.querySelector(".cafe-pilot-asset--cem-standing")).toBeNull();
   });
@@ -84,6 +84,9 @@ describe("guest entrance, departure and seat handover", () => {
     state = serve(state);
     expect(guest()).toBe("pendler-kemal");
     expect(container.querySelector(".cafe-guest-thought-bubble")).toBeNull();
+    exit(); arrive();
+    expect(guest()).toBe("pendlerin-paula");
+    state = serve(state);
     exit(); arrive();
     expect(guest()).toBe("laptop-lukas");
     serve(state);
@@ -102,6 +105,8 @@ describe("guest entrance, departure and seat handover", () => {
     render(state);
     expect(phase()).toBe("idle");
     state = serve(state);
+    expect(guest()).toBe("pendlerin-paula");
+    state = serve(state);
     expect(guest()).toBe("laptop-lukas");
     expect(phase()).toBe("idle");
     state = serve(state);
@@ -118,7 +123,7 @@ describe("guest entrance, departure and seat handover", () => {
     const state = createInitialGameState();
     render({ ...state, day: 2 }); arrive();
     render({ ...state, day: 2, dayManagement: { ...state.dayManagement, guestsLost: 1 } });
-    expect(guest()).toBe("laptop-lukas");
+    expect(guest()).toBe("pendlerin-paula");
     arrive();
     render({ ...state, day: 3 });
     expect(guest()).toBe("pendler-kemal");
@@ -131,12 +136,12 @@ describe("guest entrance, departure and seat handover", () => {
     render(state);
     frame(); frame(); // still walking in
     state = serve(state);
-    expect(guest()).toBe("laptop-lukas");
+    expect(guest()).toBe("pendlerin-paula");
     arrive();
     state = serve(state);
     expect(phase()).toBe("walking-to-counter");
     serve(state); // another order before the prior exit finishes
-    expect(guest()).toBe("cappuccino-christa");
+    expect(guest()).toBe("lieferfahrer-cem");
     arrive();
   });
 

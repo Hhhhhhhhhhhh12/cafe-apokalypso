@@ -6,14 +6,22 @@
  * doesn't support effects/storage).
  */
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { App } from "../src/app/App";
 import { OptionsMenu } from "../src/ui/components/OptionsMenu";
 
 describe("options menu (#67, #68, #128)", () => {
   it("renders a collapsed, labelled disclosure button in the app header", () => {
-    const markup = renderToStaticMarkup(<App />);
+    vi.stubGlobal("window", {
+      localStorage: { getItem: (key: string) => key === "cafe-apokalypso.booted.v1" ? "1" : null }
+    });
+    let markup: string;
+    try {
+      markup = renderToStaticMarkup(<App />);
+    } finally {
+      vi.unstubAllGlobals();
+    }
     expect(markup).toContain("options-menu__button");
     expect(markup).toContain('aria-expanded="false"');
     expect(markup).toContain('aria-controls=');

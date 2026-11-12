@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createFreshRunState, createInitialGameState } from "../src/game/engine/gameState";
+import { CURRENT_GAME_STATE_VERSION, createFreshRunState, createInitialGameState } from "../src/game/engine/gameState";
 import { gameReducer } from "../src/game/engine/reducer";
 import { getEmployeeLevel, getEmployeeLevelBonuses } from "../src/game/engine/management";
 import {
@@ -14,7 +14,7 @@ describe("initial game state", () => {
   it("starts as a serializable day-one café state", () => {
     const state = createInitialGameState();
 
-    expect(state.version).toBe(18);
+    expect(state.version).toBe(CURRENT_GAME_STATE_VERSION);
     expect(state.decor).toEqual({ plant: 1, plant2: 1, shelf: 1, clock: 1, lamp: 1, cups: 1 });
     expect(state.run.runNumber).toBe(1);
     expect(state.run.modifierIds).toHaveLength(7);
@@ -27,11 +27,12 @@ describe("initial game state", () => {
     expect(state.demoComplete).toBe(false);
     expect(state.cafeClosed).toBe(false);
     expect(state.closureReason).toBe(null);
+    expect(state.moneyZeroStreak).toBe(0);
     expect(state.reputationZeroStreak).toBe(0);
     expect(state.resources.reputation).toBe(25);
     expect(state.completedActions).toEqual([]);
     expect(state.objectiveResults).toEqual([]);
-    expect(state.dayManagement.actionPointsRemaining).toBe(3);
+    expect(state.dayManagement.actionPointsRemaining).toBe(4);
     expect(getObjectiveStatus(state).objective.title).toBe("Close the first shift");
     expect(getObjectiveStatus(state).status).toBe("active");
     expect(state.unlocks).toEqual({
@@ -112,13 +113,36 @@ describe("initial game state", () => {
     expect(resetState).toEqual(createFreshRunState());
   });
 
-  it("records soft-run memory fragments without ending the week", () => {
+  it("clears Nele's gameplay memory and run fragments on a new run", () => {
+    const base = createInitialGameState();
+    const state: GameState = {
+      ...base,
+      day: 3,
+      guestMemory: {
+        "freelancerin-nele": {
+          visits: 2,
+          matchedPreferences: 1,
+          knownPreferenceId: "espresso"
+        }
+      },
+      run: { ...base.run, memoryFragments: ["guest-preference-ledger"] }
+    };
+    const reset = gameReducer(state, { type: "reset_game" });
+
+    expect(reset.guestMemory).toEqual({});
+    expect(reset.run.memoryFragments).toEqual([]);
+    expect(reset.day).toBe(1);
+  });
+
+  it("records soft-run memory fragments after learning two guest preferences without ending the week", () => {
     let state = createInitialGameState();
-    // The current Day-1 cast is Kemal then Paula; both ask for filter coffee.
+
     state = gameReducer(state, { type: "serve_product", productId: "filterkaffee" });
     state = gameReducer(state, { type: "serve_product", productId: "filterkaffee" });
+
     expect(state.guestMemory["pendler-kemal"]?.knownPreferenceId).toBe("filterkaffee");
     expect(state.guestMemory["pendlerin-paula"]?.knownPreferenceId).toBe("filterkaffee");
+
     state = gameReducer(state, { type: "clean_tables" });
     state = gameReducer(state, { type: "complete_day" });
     state = gameReducer(state, { type: "confirm_supply_purchase" });
@@ -126,6 +150,18 @@ describe("initial game state", () => {
     expect(state.day).toBe(2);
     expect(state.run.memoryFragments).toContain("day-1-objective-completed");
     expect(state.run.memoryFragments).toContain("guest-preference-ledger");
+    expect(state.demoComplete).toBe(false);
+  });
+
+  it("does not record the guest-preference ledger after learning only one guest preference", () => {
+    const state = closeCurrentDay(createInitialGameState());
+
+    expect(state.guestMemory["pendler-kemal"]?.knownPreferenceId).toBe("filterkaffee");
+    expect(state.guestMemory["pendlerin-paula"]?.lastServedProductId).toBe("espresso");
+    expect(state.guestMemory["pendlerin-paula"]?.knownPreferenceId).toBeUndefined();
+    expect(state.day).toBe(2);
+    expect(state.run.memoryFragments).toContain("day-1-objective-completed");
+    expect(state.run.memoryFragments).not.toContain("guest-preference-ledger");
     expect(state.demoComplete).toBe(false);
   });
 });
