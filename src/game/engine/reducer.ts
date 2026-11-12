@@ -213,7 +213,7 @@ function applyAction(state: GameState, action: GameAction): GameState {
       return finishSetup(state);
 
     case "reset_game":
-      return createFreshRunState();
+      return action.freshState ?? createFreshRunState();
 
     default:
       return state;

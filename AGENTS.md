@@ -49,8 +49,8 @@ KRITISCHE Regel: Immer auf gescheite Diversität der Figuren achten (Hauttöne, 
 
 ## Savegame-Testing
 
-- Key: `cafe-apokalypso.save.v4` (siehe `src/game/engine/save.ts`)
-- Testzustand injizieren: Save lesen, Felder patchen (`day`, `dayPhase:'open'`, `decor:{clock:3,lamp:2,cups:2,plant:3,shelf:3}`, `dayManagement.customersServed`, `resources.cleanliness`), zurückschreiben, `location.reload()`. Danach mit `localStorage.removeItem(key)` aufräumen.
+- Key: `cafe-apokalypso.save.v5`. Wenn er fehlt, liest die App einmalig `cafe-apokalypso.save.v4` ein (siehe `src/game/engine/save.ts`).
+- Testzustand injizieren: Save lesen, Felder patchen (`day`, `dayPhase:'open'`, `decor:{clock:3,lamp:2,cups:2,plant:3,shelf:3}`, `dayManagement.customersServed`, `resources.cleanliness`), zurückschreiben, `location.reload()`. Danach im Testprofil beide Spielstandschlüssel aufräumen.
 - Gast-Sichtbarkeit: Warteschlange aus `getGuestForCustomer(customersServed + guestsLost)`. Sitzplätze nur für heute tatsächlich bediente `servedGuestIds`, mit Seating, Tages-Roster und `firstDay` als Gates; kein gleichzeitiges Sitz-/Queue-Duplikat. Tag 1 nur Kemal; Nele ab Tag 2. Alte Saves ohne Service-Historie: nur ohne Walkouts ist der bediente Präfix rekonstruierbar.
 
 ## Pixellab

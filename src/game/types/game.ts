@@ -240,4 +240,4 @@ export type GameAction =
   | { type: "buy_equipment"; slot: EquipmentSlotId }
   | { type: "buy_upgrade"; upgradeId: UpgradeId }
   | { type: "finish_setup" }
-  | { type: "reset_game" };
+  | { type: "reset_game"; freshState?: GameState };
