@@ -46,6 +46,7 @@ KRITISCHE Regel: Immer auf gescheite Diversität der Figuren achten (Hauttöne, 
 - Hintergrund/Artefakt-Entfernung per PIL (bewährt): helle Pixel (`r,g,b > 200`) mit Sättigung `(max−min)/max < 0.25` → alpha 0. Bei Teilbereichen Maske auf Zeilenbereich begrenzen.
 - Nach Generierung immer Randspalten/-zeilen auf Artefakte prüfen (`alpha > 40`-Zählung je Randspalte).
 - Gäste-Sprites rendern 108 px hoch (`.cafe-pilot-asset--guest`), `image-rendering: pixelated`.
+- Bohns Posen und Sitzanker sind in [Herr Bohn im Café](docs/art/BOHN_APPEARANCES.md) dokumentiert.
 
 ## Savegame-Testing
 

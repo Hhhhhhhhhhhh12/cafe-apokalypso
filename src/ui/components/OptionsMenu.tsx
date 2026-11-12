@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState, type Ref } from "react";
 
 /**
  * Display & Accessibility options menu.
@@ -65,7 +65,7 @@ function saveOptions(opts: StoredOptions): void {
   }
 }
 
-export function OptionsMenu({ defaultOpen = false }: { defaultOpen?: boolean }) {
+export function OptionsMenu({ defaultOpen = false, panelRef }: { defaultOpen?: boolean; panelRef?: Ref<HTMLDivElement> }) {
   const [open, setOpen] = useState(defaultOpen);
   // Lazy initializer: loadOptions() is try/catch-safe even where localStorage
   // is unavailable (static server render), so no load-on-mount effect needed.
@@ -116,6 +116,7 @@ export function OptionsMenu({ defaultOpen = false }: { defaultOpen?: boolean }) 
 
       {open ? (
         <div
+          ref={panelRef}
           className="options-menu__panel"
           id={panelId}
           role="group"

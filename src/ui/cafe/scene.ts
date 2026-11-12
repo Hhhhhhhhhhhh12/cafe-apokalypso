@@ -68,7 +68,8 @@ export const GUEST_SPOTS = {
   mira: { right: floorRight(30), bottom: floorY(24), z: 6, legacyClass: "placeholder-guest-normal-04" },
   lukas: { ...f(17, 21), z: 6, legacyClass: "placeholder-guest-normal-05" },
   christa: { right: floorRight(24), bottom: floorY(19), z: 6, legacyClass: "placeholder-guest-normal-06" },
-  bohn: { ...f(34, 38), z: 6, legacyClass: "placeholder-guest-normal-07" },
+  // Right chair at the left table. The seated sprite faces the table.
+  bohn: { left: 29.92, bottom: 19.77, z: 6, legacyClass: "placeholder-guest-normal-07" },
   strange: { ...f(60, 43), z: 6, legacyClass: "placeholder-guest-strange-01" },
   nele: { ...f(50, 52), z: 5, legacyClass: "placeholder-guest-normal-08" },
   meda: { right: floorRight(28), bottom: floorY(31), z: 6, legacyClass: "placeholder-guest-strange-02" },
