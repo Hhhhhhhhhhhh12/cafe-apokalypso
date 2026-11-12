@@ -140,6 +140,7 @@ describe("save safety", () => {
     });
     expect(attemptedKeys).toEqual([
       SAVE_KEY,
+      "cafe-apokalypso.save.v4",
       "cafe-apokalypso.save.v1",
       "cafe-apokalypso.save.v2",
       "cafe-apokalypso.save.v3"

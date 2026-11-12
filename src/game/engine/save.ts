@@ -1,7 +1,8 @@
 import { createFreshRunState, isValidGameState, migrateRawSave } from "./gameState";
 import type { GameState } from "../types/game";
 
-export const SAVE_KEY = "cafe-apokalypso.save.v4";
+export const SAVE_KEY = "cafe-apokalypso.save.v5";
+export const PREVIOUS_SAVE_KEY = "cafe-apokalypso.save.v4";
 const LEGACY_SAVE_KEYS = [
   "cafe-apokalypso.save.v1",
   "cafe-apokalypso.save.v2",
@@ -28,25 +29,47 @@ export function getBrowserStorage(): StorageLike | null {
 
 export type GameLoadResult =
   | { status: "loaded"; state: GameState }
-  | { status: "missing" | "load-failed" };
+  | { status: "missing" }
+  | { status: "load-failed"; rejectedPreviousSave?: string; previousSaveReadFailed?: true };
 
 export function readGameSave(storage: StorageLike): GameLoadResult {
+  let rawSave: string | null;
+  let fromPreviousKey = false;
   try {
-    const rawSave = storage.getItem(SAVE_KEY);
-
+    rawSave = storage.getItem(SAVE_KEY);
     if (rawSave === null) {
-      return { status: "missing" };
+      fromPreviousKey = true;
+      rawSave = storage.getItem(PREVIOUS_SAVE_KEY);
     }
-
-    const parsedSave: unknown = migrateRawSave(JSON.parse(rawSave));
-
-    if (!isValidGameState(parsedSave)) {
-      return { status: "load-failed" };
-    }
-
-    return { status: "loaded", state: parsedSave };
   } catch {
-    return { status: "load-failed" };
+    return fromPreviousKey
+      ? { status: "load-failed", previousSaveReadFailed: true }
+      : { status: "load-failed" };
+  }
+
+  if (rawSave === null) return { status: "missing" };
+  try {
+    const parsedSave: unknown = migrateRawSave(JSON.parse(rawSave));
+    if (isValidGameState(parsedSave)) {
+      return { status: "loaded", state: parsedSave };
+    }
+  } catch {
+    // Keep rejected bytes available for recovery.
+  }
+
+  return fromPreviousKey
+    ? { status: "load-failed", rejectedPreviousSave: rawSave }
+    : { status: "load-failed" };
+}
+
+export function preserveRejectedPreviousSave(storage: StorageLike, rawSave: string): boolean {
+  try {
+    const current = storage.getItem(SAVE_KEY);
+    if (current !== null) return current === rawSave;
+    storage.setItem(SAVE_KEY, rawSave);
+    return true;
+  } catch {
+    return false;
   }
 }
 
@@ -68,7 +91,7 @@ export function saveGameState(
 }
 
 export function resetSavedGameState(storage: StorageLike): StorageMutationResult {
-  return removeSaveKeys(storage, [SAVE_KEY, ...LEGACY_SAVE_KEYS]);
+  return removeSaveKeys(storage, [SAVE_KEY, PREVIOUS_SAVE_KEY, ...LEGACY_SAVE_KEYS]);
 }
 
 export function clearLegacySaves(storage: StorageLike): StorageMutationResult {

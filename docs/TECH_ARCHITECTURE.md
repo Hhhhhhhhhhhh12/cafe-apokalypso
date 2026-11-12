@@ -212,7 +212,7 @@ The MVP uses localStorage.
 ### Versioning (as implemented)
 
 - The serialized `GameState` carries `version` (currently `11`) and `contentCatalogVersion` (currently `"week-one-v1"`). Supported older saves are migrated before validation; otherwise the loader returns a fresh initial state instead of crashing.
-- The localStorage **key** is currently `cafe-apokalypso.save.v4`. Earlier keys (`...v1`, `...v2`, `...v3`) are treated as legacy and cleared on reset. Note: the storage-key suffix and the in-state schema `version` are tracked separately and are not required to share the same number.
+- The localStorage **key** is `cafe-apokalypso.save.v5`. If absent, the game reads `cafe-apokalypso.save.v4` and stores the loaded state or rejected raw bytes under v5 when storage allows. The previous key stays available to older tabs, whose writes are ignored once v5 exists. Earlier keys (`...v1`, `...v2`, `...v3`) are treated as legacy and cleared on reset. Note: the storage-key suffix and the in-state schema `version` are tracked separately and are not required to share the same number.
 - A "Reset / New Game" control removes the current save and the legacy keys.
 
 Requirements:

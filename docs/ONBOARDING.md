@@ -79,8 +79,8 @@ npm run build      # Produktions-Build
 > lassen, wenn du Datenformen oder Selectors anfasst.
 
 ### Savegame zum Testen
-- localStorage-Key: `cafe-apokalypso.save.v4`
-- Reset über den „Neues Spiel“-Button in der App oder `localStorage.removeItem('cafe-apokalypso.save.v4')`.
+- localStorage-Key: `cafe-apokalypso.save.v5`. Ohne diesen Schlüssel liest die App einen vorhandenen Stand unter `cafe-apokalypso.save.v4` ein.
+- Reset über den „Neues Spiel“-Button in der App.
 
 ---
 

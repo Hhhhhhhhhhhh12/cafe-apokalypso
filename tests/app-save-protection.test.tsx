@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "../src/app/App";
 import * as gameState from "../src/game/engine/gameState";
 import { createFreshRunState, createInitialGameState } from "../src/game/engine/gameState";
-import { SAVE_KEY } from "../src/game/engine/save";
+import { PREVIOUS_SAVE_KEY, SAVE_KEY } from "../src/game/engine/save";
 import type { GameState } from "../src/game/types/game";
 
 const BOOT_KEY = "cafe-apokalypso.booted.v1";
@@ -141,7 +141,7 @@ describe("restarting a week safely", () => {
     const removeItem = vi.spyOn(Storage.prototype, "removeItem");
 
     clickButton(label);
-    expect(confirm).toHaveBeenCalledWith(expect.stringContaining("replaces any existing browser save"));
+    expect(confirm).toHaveBeenCalledWith(expect.stringContaining("replaces the browser save used by this version"));
     expect(setItem).not.toHaveBeenCalled();
     expect(removeItem).not.toHaveBeenCalled();
     expect(container.textContent).toContain("could not be loaded");
@@ -254,6 +254,59 @@ describe("restarting a week safely", () => {
 });
 
 describe("reopening with an existing save", () => {
+  it("imports the previous key and keeps the reset even if an older tab saves afterward", () => {
+    const oldState = { ...createInitialGameState(), day: 3 };
+    const raw = JSON.stringify(oldState);
+    localStorage.setItem(PREVIOUS_SAVE_KEY, raw);
+    renderApp();
+    expect(JSON.parse(localStorage.getItem(SAVE_KEY)!)).toEqual(oldState);
+
+    vi.spyOn(window, "confirm").mockReturnValue(true);
+    clickButton("Reset / New Game");
+    expect(localStorage.getItem(PREVIOUS_SAVE_KEY)).toBe(raw);
+    localStorage.setItem(PREVIOUS_SAVE_KEY, JSON.stringify({ ...oldState, day: 4 }));
+
+    remountApp();
+    expect(JSON.parse(localStorage.getItem(SAVE_KEY)!)).toEqual(createFreshRunState());
+  });
+
+  it.each(["", "{broken json", '{"version":999}'])("preserves rejected previous-key data %j across reload", (raw) => {
+    localStorage.setItem(PREVIOUS_SAVE_KEY, raw);
+    renderApp();
+    expect(container.textContent).toContain("could not be loaded");
+    expect(localStorage.getItem(SAVE_KEY)).toBe(raw);
+    expect(localStorage.getItem(PREVIOUS_SAVE_KEY)).toBe(raw);
+    localStorage.setItem(PREVIOUS_SAVE_KEY, JSON.stringify(createInitialGameState()));
+
+    remountApp();
+    expect(container.textContent).toContain("could not be loaded");
+    expect(localStorage.getItem(SAVE_KEY)).toBe(raw);
+  });
+
+  it.each(["read", "copy"])("keeps autosave paused if the previous save cannot be %s", async (operation) => {
+    const raw = "{broken json";
+    localStorage.setItem(PREVIOUS_SAVE_KEY, raw);
+    const read = Storage.prototype.getItem;
+    if (operation === "read") {
+      vi.spyOn(Storage.prototype, "getItem").mockImplementation(function (this: Storage, key) {
+        if (key === PREVIOUS_SAVE_KEY) throw new DOMException("Cannot read previous save", "SecurityError");
+        return read.call(this, key);
+      });
+    } else {
+      vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+        throw new DOMException("Cannot copy previous save", "QuotaExceededError");
+      });
+    }
+    await act(async () => { root.render(<StrictMode><App /></StrictMode>); });
+    vi.restoreAllMocks();
+    expect(container.textContent).toContain("An older tab may still overwrite the original save");
+    const purchase = container.querySelector<HTMLButtonElement>(".equipment-shop button");
+    if (!purchase) throw new Error("Missing equipment purchase button");
+    act(() => purchase.click());
+    expect(localStorage.getItem(SAVE_KEY)).toBeNull();
+    expect(localStorage.getItem(PREVIOUS_SAVE_KEY)).toBe(raw);
+  });
+
   it.each(["{broken json", '{"version":999}'])("keeps rejected bytes across mounts", (raw) => {
     localStorage.setItem(SAVE_KEY, raw);
     renderApp();

@@ -1,6 +1,7 @@
 export type StorageStatusKind =
   | "unavailable"
   | "load-failed"
+  | "previous-save-unprotected"
   | "save-failed"
   | "cleanup-failed"
   | "reset-failed"

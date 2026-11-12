@@ -4,6 +4,7 @@ import { createFreshRunState } from "../game/engine/gameState";
 import {
   clearLegacySaves,
   getBrowserStorage,
+  preserveRejectedPreviousSave,
   readGameSave,
   saveGameState,
   type StorageLike
@@ -43,7 +44,8 @@ export function App() {
   const [initialSave] = useState(() => storage ? readGameSave(storage) : null);
   const [storageStatus, setStorageStatus] = useState<StorageStatusKind | null>(() => {
     if (!initialSave) return "unavailable";
-    return initialSave.status === "load-failed" ? "load-failed" : null;
+    if (initialSave.status !== "load-failed") return null;
+    return initialSave.previousSaveReadFailed ? "previous-save-unprotected" : "load-failed";
   });
   const [gameState, dispatch] = useReducer(gameReducer, initialSave, (save) =>
     save?.status === "loaded" ? save.state : createFreshRunState()
@@ -51,7 +53,22 @@ export function App() {
   // A confirmed reset saves this exact state before dispatching it.
   const savedResetStateRef = useRef<GameState | null>(null);
 
-  const canAutoSave = storageStatus !== "load-failed" && storageStatus !== "protected-reset-failed";
+  const canAutoSave = storageStatus !== "load-failed" &&
+    storageStatus !== "previous-save-unprotected" && storageStatus !== "protected-reset-failed";
+
+  useEffect(() => {
+    if (!storage || initialSave?.status !== "load-failed" ||
+        initialSave.rejectedPreviousSave === undefined ||
+        preserveRejectedPreviousSave(storage, initialSave.rejectedPreviousSave)) {
+      return;
+    }
+
+    let active = true;
+    queueMicrotask(() => {
+      if (active) setStorageStatus("previous-save-unprotected");
+    });
+    return () => { active = false; };
+  }, [initialSave, storage]);
 
   useEffect(() => {
     if (storage && canAutoSave && gameState !== savedResetStateRef.current) {
@@ -106,7 +123,7 @@ export function App() {
 
   function handleReset() {
     const prompt = storage
-      ? "Start over from Day 1? This replaces any existing browser save."
+      ? "Start over from Day 1? This replaces the browser save used by this version."
       : "Start over from Day 1? Browser storage is unavailable. The new week will only last until you reload or close the game.";
     if (!window.confirm(prompt)) {
       return;
