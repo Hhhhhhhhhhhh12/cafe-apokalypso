@@ -50,7 +50,9 @@ interface ActionPanelProps {
 function resolveFloorLogEvents(gameState: GameState): EventDefinition[] {
   const pending = gameState.pendingEvents;
   if (!pending || pending.length === 0) return [];
-  return weekOneEvents.filter((e) => pending.includes(e.id)) as EventDefinition[];
+  return weekOneEvents.filter(
+    (event) => event.id !== "day-1-first-cup" && pending.includes(event.id)
+  ) as EventDefinition[];
 }
 
 function FloorLog({ events }: { events: EventDefinition[] }) {

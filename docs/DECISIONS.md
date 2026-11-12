@@ -1,5 +1,14 @@
 # Decisions
 
+## DECISION: The first cup introduces the strange café during service
+
+**Status: RESOLVED — Day 1 direction confirmed on 2026-11-12.**
+
+The first successfully served coffee triggers “Rückwärts” directly at the
+counter. The steam rises, pauses and returns to the cup as the crema contracts.
+The camera stays fixed. The machine's “Good morning” after closing returns to
+the same story thread. In-game visual acceptance remains open.
+
 ## DECISION: Freelancerin Mira renamed to Nele + save-state-persistent character concept
 
 **Status: RESOLVED — user-approved (2026-06-03).**

@@ -163,4 +163,7 @@ export const STAGE_DETAIL_SPOTS = {
   door: { left: 10.3, top: 29.5, w: 14.3, h: 43, z: 3 },
 } satisfies Record<string, StageSpot>;
 
+/** Served cup on the visible right-hand ledge of the v06 counter. */
+export const FIRST_CUP_SPOT: StageSpot = { left: 81.8, bottom: 37.3, w: 3.25, z: 9 };
+
 export const WEIRDNESS_SPOT: StageSpot = { right: 13, top: 18, w: 20, h: 32, z: 7 };

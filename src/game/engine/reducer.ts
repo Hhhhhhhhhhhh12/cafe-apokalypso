@@ -528,7 +528,11 @@ function applySuccessfulServe(
   };
 
   // Enqueue any mid-day or guest-related events now that customersServed has advanced.
-  const serveEventIds = getEventsToQueue(servedStateBase, "serve_product");
+  const serveEventIds = getEventsToQueue(
+    servedStateBase,
+    "serve_product",
+    (product.ingredients.coffee ?? 0) > 0
+  );
   const servedState: GameState = {
     ...servedStateBase,
     pendingEvents: serveEventIds.reduce(
@@ -1801,6 +1805,7 @@ function enqueuePendingEvent(pending: readonly EventId[], id: EventId): EventId[
  * - Events with kicker === "Closing" → fire on "complete_day" (regardless of position)
  * - Events with relatedGuestIds → fire on "serve_product" if any id appears in
  *   state.guestHistory (cross-day memory) or state.dayManagement.customersServed > 0
+ * - The Day 1 first-cup event requires a successfully served coffee product.
  * - Middle positions 1..N-2 (not first, not Closing) → fire on "serve_product"
  *   when customersServed >= position
  *
@@ -1808,7 +1813,8 @@ function enqueuePendingEvent(pending: readonly EventId[], id: EventId): EventId[
  */
 function getEventsToQueue(
   state: GameState,
-  context: "open_day" | "serve_product" | "complete_day"
+  context: "open_day" | "serve_product" | "complete_day",
+  servedCoffee = false
 ): EventId[] {
   const currentDay = weekOneDays[state.day - 1];
   const eventIds = currentDay.eventIds as readonly EventId[];
@@ -1841,6 +1847,11 @@ function getEventsToQueue(
     }
 
     if (context === "serve_product" && !isClosing) {
+      if (id === "day-1-first-cup") {
+        if (servedCoffee) result.push(id);
+        continue;
+      }
+
       // Guest-related events: fire as soon as we have any served guest today
       // or the guest appears in the cross-day guestHistory
       if (hasGuestIds) {

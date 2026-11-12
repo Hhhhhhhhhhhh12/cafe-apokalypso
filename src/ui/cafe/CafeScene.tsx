@@ -1,3 +1,5 @@
+import "./firstCup.css";
+import { weekOneEvents } from "../../game/data/events";
 import { useCallback, useEffect, useRef, useState, type MouseEvent } from "react";
 import type { GameState } from "../../game/types/game";
 import type { GuestId, ProductId } from "../../game/types/content";
@@ -6,6 +8,7 @@ import { kassandraMessages } from "../../game/data/kassandra";
 import {
   COUNTER_FRAME,
   DECOR_SPOTS,
+  FIRST_CUP_SPOT,
   GUEST_SPOTS,
   NINO_ARRIVAL,
   PAULA_PATH,
@@ -14,6 +17,7 @@ import {
   WEIRDNESS_SPOT,
   spotStyle,
 } from "./scene";
+import firstCupAsset from "../../../assets/sprites/props/placeholder-cafe-cup-v01-target-reference.png";
 import stageBaseAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v06-pixellab.png";
 import coffeeMachineAsset from "../../../assets/sprites/props/placeholder-cafe-coffee-machine.png";
 import kassandraRegisterAsset from "../../../assets/sprites/props/placeholder-kassandra-register.png";
@@ -27,6 +31,8 @@ import neleSeatedAsset from "../../../assets/sprites/guests/placeholder-guest-ne
 import medaGuestAsset from "../../../assets/sprites/guests/placeholder-guest-meda.png";
 import roterRegenschirmGuestAsset from "../../../assets/sprites/guests/placeholder-guest-roter-regenschirm.png";
 import fatouSeatedAsset from "../../../assets/sprites/guests/placeholder-guest-fatou-seated.png";
+
+const firstCupEvent = weekOneEvents.find((event) => event.id === "day-1-first-cup");
 
 const GUEST_SPRITES = {
   "pendler-kemal": "kemal",
@@ -112,6 +118,13 @@ export function CafeScene({ gameState, onCleanTables }: CafeSceneProps) {
   // --- State-driven guest + prop visibility ---
   const { customersServed, actionPointsRemaining } = gameState.dayManagement;
   const isOpen = gameState.dayPhase === "open";
+  const firstCupQueued = gameState.day === 1 && isOpen &&
+    gameState.pendingEvents.includes("day-1-first-cup");
+  const [firstCup, setFirstCup] = useState({ queued: firstCupQueued, playing: false });
+  // A restored shift may already contain the event. Only a new serve plays it.
+  if (firstCup.queued !== firstCupQueued) {
+    setFirstCup({ queued: firstCupQueued, playing: firstCupQueued });
+  }
   const showNino =
     gameState.day >= 3 &&
     isOpen &&
@@ -288,6 +301,10 @@ export function CafeScene({ gameState, onCleanTables }: CafeSceneProps) {
         <h2 id="cafe-diorama-title">The Café</h2>
       </div>
 
+      <span className="cafe-first-cup-announcement" role="status">
+        {firstCup.playing ? firstCupEvent?.text : ""}
+      </span>
+
       <div
         className={[
           "placeholder-cafe-diorama",
@@ -422,6 +439,14 @@ export function CafeScene({ gameState, onCleanTables }: CafeSceneProps) {
             <div className="cafe-staff-nino" style={spotStyle(NINO_ARRIVAL)} aria-hidden="true">
               <span className="cafe-staff-nino__stand" />
               <span className="cafe-staff-nino__walk" />
+            </div>
+          )}
+
+          {firstCup.playing && (
+            <div style={spotStyle(FIRST_CUP_SPOT)} className="cafe-first-cup" aria-hidden="true">
+              <div className="cafe-first-cup__steam"><span /><span /><span /></div>
+              <img src={firstCupAsset} alt="" />
+              <div className="cafe-first-cup__coffee"><span /></div>
             </div>
           )}
 
