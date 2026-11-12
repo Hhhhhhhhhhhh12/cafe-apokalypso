@@ -1,6 +1,7 @@
-import { useEffect, useRef } from "react";
+import { formatAsche } from "../../game/engine/currency";
 import {
   getCurrentDayDefinition,
+  getCurrentDayOpener,
   getDayEndRecapLine,
   getNarrativeEventCards,
   getVisibleDaySevenLetter,
@@ -23,24 +24,7 @@ export function DayProgressPanel({ gameState }: DayProgressPanelProps) {
   const daySevenLetter = getVisibleDaySevenLetter(gameState);
   const objectiveStatus = getObjectiveStatus(gameState);
 
-  // Close-day moment: when a fresh summary lands, bring the result card into
-  // view so the day's outcome is read where the eye is, not missed in the panel.
   const summary = gameState.daySummary;
-  const summaryRef = useRef<HTMLElement>(null);
-  useEffect(() => {
-    if (summary && gameState.dayPhase === "day_end") {
-      summaryRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    }
-  }, [summary, gameState.dayPhase]);
-
-  // When a new day opens (after purchase confirmation), scroll back to top so
-  // the HUD and diorama are the first thing the player sees.
-  useEffect(() => {
-    if (gameState.dayPhase === "open") {
-      window.scrollTo({ top: 0, behavior: "instant" });
-    }
-  }, [gameState.day, gameState.dayPhase]);
-
   const net = summary
     ? Math.round((summary.moneyEarned - summary.moneySpent - summary.dailyOverhead) * 100) / 100
     : 0;
@@ -65,7 +49,7 @@ export function DayProgressPanel({ gameState }: DayProgressPanelProps) {
         </h2>
       </div>
 
-      <p className="day-opener">{currentDay.dayOpener}</p>
+      <p className="day-opener">{getCurrentDayOpener(gameState)}</p>
 
       <section className="objective-card" aria-labelledby="daily-objective-title">
         <div>
@@ -140,7 +124,6 @@ export function DayProgressPanel({ gameState }: DayProgressPanelProps) {
 
       {gameState.daySummary ? (
         <section
-          ref={summaryRef}
           className="inline-callout day-result-card"
           aria-labelledby="day-summary-title"
         >
@@ -157,7 +140,7 @@ export function DayProgressPanel({ gameState }: DayProgressPanelProps) {
               }`}
             >
               <span className="eyebrow">Net result</span>
-              <strong>{net >= 0 ? `+€${net}` : `-€${Math.abs(net)}`}</strong>
+              <strong>{net >= 0 ? `+${formatAsche(net)}` : `-${formatAsche(Math.abs(net))}`}</strong>
             </div>
             <div className="day-result-headline__item">
               <span className="eyebrow">Served</span>
@@ -171,9 +154,9 @@ export function DayProgressPanel({ gameState }: DayProgressPanelProps) {
           <dl className="summary-list">
             {[
               { label: "Objective", value: `${gameState.daySummary.objectiveCompleted ? "Completed" : "Missed"} · ${gameState.daySummary.objectiveTitle}` },
-              { label: "Money earned", value: `€${gameState.daySummary.moneyEarned}` },
-              { label: "Money spent", value: `€${gameState.daySummary.moneySpent}` },
-              { label: "Daily overhead", value: `-€${gameState.daySummary.dailyOverhead}` },
+              { label: "Money earned", value: `${formatAsche(gameState.daySummary.moneyEarned)}` },
+              { label: "Money spent", value: `${formatAsche(gameState.daySummary.moneySpent)}` },
+              { label: "Daily overhead", value: `-${formatAsche(gameState.daySummary.dailyOverhead)}` },
               { label: "Customers served", value: String(gameState.daySummary.customersServed) },
               ...(gameState.daySummary.guestsLost > 0 ? [{ label: "Walked out", value: String(gameState.daySummary.guestsLost) }] : []),
               ...(gameState.daySummary.bestServeStreak >= 3 ? [{ label: "Best flow", value: `×${gameState.daySummary.bestServeStreak}` }] : []),

@@ -124,24 +124,27 @@ describe("mvp-smoke: Day 4 advertising", () => {
     expect(herrGrau!.firstDay).toBe(4);
   });
 
-  it("day 4 has advertising-related events (herr-grau-coin, flyer-wrong-address)", () => {
+  it("day 4 keeps only the quiet coin events while retaining the other event definitions", () => {
     const state = createDayStartState(4);
     const events = getCurrentDayEvents(state);
     const ids = events.map((e) => e.id);
-    expect(ids).toContain("day-4-herr-grau-coin");
-    expect(ids).toContain("day-4-flyer-wrong-address");
+    expect(ids).toEqual(["day-4-herr-grau-coin", "day-4-bohn-recognizes-coin"]);
+    expect(weekOneEvents.some((event) => event.id === "day-4-poster-before-printed")).toBe(true);
+    expect(weekOneEvents.some((event) => event.id === "day-4-flyer-wrong-address")).toBe(true);
   });
 
-  it("flyer advertising costs money and increases reputation on day 4", () => {
+  it("flyer advertising costs money and grants two reputation without extra stress on day 4", () => {
     let state = createDayStartState(4);
     // Open the day (day 4 starts in day_start phase)
     state = gameReducer(state, { type: "open_day" });
     const moneyBefore = state.resources.money;
     const repBefore = state.resources.reputation;
+    const stressBefore = state.resources.stress;
 
     const next = gameReducer(state, { type: "run_advertising", adType: "flyer" });
     expect(next.resources.money).toBeLessThan(moneyBefore);
-    expect(next.resources.reputation).toBeGreaterThan(repBefore);
+    expect(next.resources.reputation).toBe(repBefore + 2);
+    expect(next.resources.stress).toBe(stressBefore);
   });
 
   it("weirdness is still hidden on day 4", () => {

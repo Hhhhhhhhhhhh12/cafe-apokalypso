@@ -1,3 +1,4 @@
+import { formatAsche } from "../../game/engine/currency";
 import { useEffect, useRef, useState } from "react";
 import { getManagementHudLabels } from "../../game/engine/selectors";
 import { ACTION_BUDGET_BY_DAY } from "../../game/engine/management";
@@ -18,7 +19,7 @@ export function ResourceHud({ gameState }: ResourceHudProps) {
   return (
     <section className="panel resource-panel" aria-label="Café resources">
       <dl className="resource-list">
-        <ResourceItem label="Cash" value={`€${gameState.resources.money}`} numericValue={gameState.resources.money} />
+        <ResourceItem label="Cash" value={`${formatAsche(gameState.resources.money)}`} numericValue={gameState.resources.money} />
         <ResourceItem
           label="Coffee"
           value={gameState.supplies.coffee}

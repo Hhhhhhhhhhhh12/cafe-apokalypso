@@ -4,15 +4,17 @@
  * Verifies:
  * - pendingEvents starts empty on initial state
  * - open_day resets pendingEvents to [] and enqueues the position-0 event
+ * - finish_setup and automatic Day-2 opening enqueue their own opening event
+ * - confirming a restock clears the previous day's event log
  * - serve_product enqueues mid-day positional events as customersServed advances
  * - serve_product enqueues guest-related events once any customer has been served
  * - complete_day enqueues events whose kicker === "Closing"
  * - no duplicates are pushed under any action sequence
- * - getTriggeredEvents returns EventDefinitions in pendingEvents order
+ * - getTriggeredEvents returns today's EventDefinitions in pendingEvents order
  * - save/load round-trip preserves pendingEvents
  */
 import { describe, expect, it } from "vitest";
-import { createInitialGameState, isValidGameState } from "../src/game/engine/gameState";
+import { createFreshRunState, createInitialGameState, isValidGameState } from "../src/game/engine/gameState";
 import { gameReducer } from "../src/game/engine/reducer";
 import { getTriggeredEvents } from "../src/game/engine/selectors";
 import { weekOneDays, weekOneEvents } from "../src/game/data";
@@ -89,27 +91,54 @@ describe("pendingEvents: open_day", () => {
   });
 });
 
+describe("pendingEvents: actual early-week opening routes", () => {
+  it("queues the Day-1 opening event when the setup is finished", () => {
+    const fresh = createFreshRunState();
+    const opened = gameReducer({
+      ...fresh,
+      equipment: { ...fresh.equipment, machine: 1, grinder: 1 }
+    }, { type: "finish_setup" });
+
+    expect(opened.dayPhase).toBe("open");
+    expect(opened.pendingEvents).toEqual([weekOneDays[0].eventIds[0]]);
+  });
+
+  it("replaces the Day-1 log with the Day-2 opening event when restocking", () => {
+    const dayEnd: GameState = {
+      ...createInitialGameState(),
+      dayPhase: "day_end",
+      pendingEvents: ["day-1-opening-rhythm", "day-1-coffee-machine-flicker"]
+    };
+    const opened = gameReducer(dayEnd, { type: "confirm_supply_purchase" });
+
+    expect(opened.day).toBe(2);
+    expect(opened.dayPhase).toBe("open");
+    expect(opened.pendingEvents).toEqual([weekOneDays[1].eventIds[0]]);
+    expect(getTriggeredEvents(opened).every((event) => event.day === 2)).toBe(true);
+  });
+
+  it("clears the Day-2 log before Day-3 helper choices and queues its new event on opening", () => {
+    const dayEnd: GameState = {
+      ...createInitialGameState(),
+      day: 2,
+      dayPhase: "day_end",
+      pendingEvents: ["day-2-herr-bohn-memory", "day-2-rehearsed-rhythm"]
+    };
+    const dayStart = gameReducer(dayEnd, { type: "confirm_supply_purchase" });
+    expect(dayStart.day).toBe(3);
+    expect(dayStart.dayPhase).toBe("day_start");
+    expect(dayStart.pendingEvents).toEqual([]);
+
+    const opened = gameReducer(dayStart, { type: "open_day" });
+    expect(opened.pendingEvents).toEqual([weekOneDays[2].eventIds[0]]);
+  });
+});
+
 // ---------------------------------------------------------------------------
 // serve_product: positional mid-day events
 // ---------------------------------------------------------------------------
 
 describe("pendingEvents: serve_product (positional)", () => {
-  it("reveals the first cup once, after a coffee is served on Day 1", () => {
-    let state = openDayFrom(dayStartState());
-    expect(state.pendingEvents).not.toContain("day-1-first-cup");
-
-    state = gameReducer(state, { type: "serve_product", productId: "croissant" });
-    expect(state.dayManagement.customersServed).toBe(1);
-    expect(state.pendingEvents).not.toContain("day-1-first-cup");
-
-    state = gameReducer(state, { type: "serve_product", productId: "filterkaffee" });
-    expect(getTriggeredEvents(state).map((event) => event.id)).toContain("day-1-first-cup");
-    expect(state.pendingEvents).not.toContain("day-1-coffee-machine-flicker");
-
-    state = gameReducer(state, { type: "serve_product", productId: "espresso" });
-    expect(state.pendingEvents.filter((id) => id === "day-1-first-cup")).toHaveLength(1);
-  });
-
   it("enqueues Day 3 position-1 event when customersServed reaches 1", () => {
     // Day 3 events: [day-3-cash-register-suggestion, day-3-supply-tally, day-3-guest-checks-in]
     // position 1 = day-3-supply-tally, fires when customersServed >= 1
@@ -144,10 +173,10 @@ describe("pendingEvents: serve_product (positional)", () => {
 
 describe("pendingEvents: serve_product (guest-related)", () => {
   it("enqueues a guest-related event at position > 0 after serving on Day 4", () => {
-    // day-4-bohn-recognizes-coin is at position 3 of Day 4 and has relatedGuestIds.
+    // day-4-bohn-recognizes-coin is at position 1 of Day 4 and has relatedGuestIds.
     // It should fire on serve_product, not at open_day.
     const day4Events = weekOneDays[3].eventIds;
-    const bohnCoinEventId = day4Events[3]; // "day-4-bohn-recognizes-coin"
+    const bohnCoinEventId = day4Events[1]; // "day-4-bohn-recognizes-coin"
     expect(bohnCoinEventId).toBe("day-4-bohn-recognizes-coin");
 
     let state = openDayFrom({
@@ -158,7 +187,7 @@ describe("pendingEvents: serve_product (guest-related)", () => {
     expect(state.pendingEvents).not.toContain(bohnCoinEventId);
 
     state = gameReducer(state, { type: "take_order" });
-    expect(state.pendingEvents).toContain(bohnCoinEventId);
+    expect(state.pendingEvents).toEqual(["day-4-herr-grau-coin", bohnCoinEventId]);
   });
 
   it("guest-related event at position 0 is enqueued at open_day (position wins over guest trigger)", () => {
@@ -254,6 +283,16 @@ describe("getTriggeredEvents", () => {
     const events = getTriggeredEvents(state);
     expect(events).toHaveLength(1);
     expect(events[0].id).toBe("day-1-opening-rhythm");
+  });
+
+  it("omits previous-day entries retained in an older save", () => {
+    const state: GameState = {
+      ...createInitialGameState(),
+      day: 2,
+      pendingEvents: ["day-1-coffee-machine-flicker", "day-2-herr-bohn-memory"]
+    };
+    expect(getTriggeredEvents(state).map((event) => event.id))
+      .toEqual(["day-2-herr-bohn-memory"]);
   });
 
   it("reflects events queued after open_day", () => {

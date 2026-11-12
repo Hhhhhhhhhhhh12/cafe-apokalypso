@@ -1,4 +1,6 @@
 import { createFreshRunState, isValidGameState, migrateRawSave } from "./gameState";
+import { ACTION_BUDGET_BY_DAY } from "./management";
+import { formatAsche } from "./currency";
 import type { GameState } from "../types/game";
 
 export const SAVE_KEY = "cafe-apokalypso.save.v5";
@@ -51,7 +53,7 @@ export function readGameSave(storage: StorageLike): GameLoadResult {
   try {
     const parsedSave: unknown = migrateRawSave(JSON.parse(rawSave));
     if (isValidGameState(parsedSave)) {
-      return { status: "loaded", state: parsedSave };
+      return { status: "loaded", state: normalizeLoadedState(parsedSave) };
     }
   } catch {
     // Keep rejected bytes available for recovery.
@@ -76,6 +78,32 @@ export function preserveRejectedPreviousSave(storage: StorageLike, rawSave: stri
 export function loadGameState(storage: StorageLike): GameState {
   const result = readGameSave(storage);
   return result.status === "loaded" ? result.state : createFreshRunState();
+}
+
+function normalizeLoadedState(parsedSave: GameState): GameState {
+  const summary = parsedSave.daySummary;
+  const state: GameState = {
+    ...parsedSave,
+    statusMessage: formatLegacyCurrency(parsedSave.statusMessage),
+    daySummary: summary ? { ...summary, flavorLines: summary.flavorLines.map(formatLegacyCurrency) } : null
+  };
+
+  // Bring unfinished first shifts from the old three-action budget forward once.
+  const management = state.dayManagement;
+  const savedBudget = management.actionPointsRemaining + management.actionPointsSpent;
+  if (state.day === 1 && !state.cafeClosed && !state.demoComplete &&
+    (state.dayPhase === "setup" || state.dayPhase === "open") && savedBudget === 3) {
+    state.dayManagement = {
+      ...management,
+      actionPointsRemaining: ACTION_BUDGET_BY_DAY[1] - management.actionPointsSpent
+    };
+  }
+
+  return state;
+}
+
+function formatLegacyCurrency(text: string): string {
+  return text.replace(/€(-?\d+(?:\.\d+)?)/g, (_, amount: string) => formatAsche(Number(amount)));
 }
 
 export function saveGameState(

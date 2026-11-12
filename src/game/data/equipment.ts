@@ -23,8 +23,8 @@ export interface EquipmentSlotDefinition {
 /**
  * Core café equipment bought before opening (see the "setup" day phase): the
  * coffee machine and the seating furniture. Unlike décor, these start at tier 0
- * (= nothing owned). The starting till (€42) covers exactly the cheapest used
- * machine + used furniture (€18 + €14 = €32), so the player opens bare and
+ * (= nothing owned). The starting till (42 Asche) covers exactly the cheapest used
+ * machine + used furniture (18 Asche + 14 Asche = 32 Asche), so the player opens bare and
  * upgrades later from the day-end shop. See GAME_DESIGN.md and #setup.
  *
  * The machine is required to open (no machine, no café). Seating is optional —
@@ -38,6 +38,8 @@ export interface EquipmentSlotDefinition {
  * physical hardware and is distinct from the KASSANDRA *software* update, a Day-6
  * narrative beat that layers onto whatever till is present (see weekOneUpgrades).
  */
+export const INITIAL_GRINDER_COST = 8;
+
 export const equipmentSlots = [
   {
     id: "machine",
@@ -48,6 +50,24 @@ export const equipmentSlots = [
       { tier: 1, name: "Used Single-Group Machine", cost: 18, reputationBonus: 0, dailyRepBonus: 0 },
       { tier: 2, name: "Refurbished Two-Group", cost: 34, reputationBonus: 2, dailyRepBonus: 0 },
       { tier: 3, name: "Gleaming Espresso Tower", cost: 60, reputationBonus: 4, dailyRepBonus: 1 }
+    ]
+  },
+  {
+    id: "grinder",
+    label: "Coffee Grinder",
+    emptyHint: "The old contraption is gone — buy a grinder before opening.",
+    tiers: [
+      { tier: 0, name: "No Grinder", cost: 0, reputationBonus: 0, dailyRepBonus: 0 },
+      { tier: 1, name: "Used Coffee Grinder", cost: INITIAL_GRINDER_COST, reputationBonus: 0, dailyRepBonus: 0 }
+    ]
+  },
+  {
+    id: "clock",
+    label: "Wall Clock",
+    emptyHint: "The strange old clock was discarded. A replacement can wait.",
+    tiers: [
+      { tier: 0, name: "No Clock", cost: 0, reputationBonus: 0, dailyRepBonus: 0 },
+      { tier: 1, name: "Simple Wall Clock", cost: 10, reputationBonus: 0, dailyRepBonus: 0 }
     ]
   },
   {

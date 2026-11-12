@@ -20,10 +20,10 @@ function openDay(day: DayNumber, overrides: Partial<GameState> = {}): GameState 
 }
 
 describe("first-week onboarding coach (#PHASE3)", () => {
-  it("points a fresh Day 1 player at the first order", () => {
+  it("points a fresh Day 1 player at product selection", () => {
     const hint = getDayCoachHint(openDay(1));
     expect(hint?.target).toBe("serve");
-    expect(hint?.text).toMatch(/first order/i);
+    expect(hint?.text).toMatch(/choose a product/i);
   });
 
   it("nudges Day 1 toward cleaning once two guests are served", () => {
@@ -57,15 +57,10 @@ describe("first-week onboarding coach (#PHASE3)", () => {
     expect(getDayCoachHint(state)?.target).toBe(null);
   });
 
-  it("names the lone returning guest when coaching Day 2", () => {
-    const hint = getDayCoachHint(openDay(2));
-    expect(hint?.text).toContain("Kemal");
-    expect(hint?.text).toMatch(/grown/i);
-  });
-
-  it("highlights the daily offer first thing on Day 3", () => {
+  it("points to the guest order and stock on Day 3", () => {
     const hint = getDayCoachHint(openDay(3));
-    expect(hint?.target).toBe("offer");
+    expect(hint?.target).toBe("serve");
+    expect(hint?.text).toContain("stock");
   });
 
   it("stops coaching after the first three days", () => {

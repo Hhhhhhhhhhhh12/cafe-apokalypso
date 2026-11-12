@@ -1,4 +1,5 @@
 import { weekOneProducts, weekOneStaffOptions } from "../data";
+import { roundAscheEarnings } from "./currency";
 import type {
   GuestDefinition,
   ProductDefinition,
@@ -23,6 +24,9 @@ import type {
  *  fresh café has a small buffer before the reputation fail-state. */
 export const STARTING_REPUTATION = 25;
 
+export const FLYER_COST = 2;
+export const SOCIAL_AD_COST = 5;
+
 export const SUPPLY_CAPS: SupplyState = {
   coffee: 20,
   milk: 20,
@@ -39,9 +43,9 @@ export function getReputationIncomeFactor(reputation: number): number {
   return 0.6 + 0.4 * (clamped / 100);
 }
 
-/** Sale price actually earned, after the reputation income factor, in cents-rounded euros. */
+/** Sale price actually earned, rounded after reputation and any offer multiplier. */
 export function getEarnedPrice(basePrice: number, reputation: number): number {
-  return Math.round(basePrice * getReputationIncomeFactor(reputation) * 100) / 100;
+  return roundAscheEarnings(basePrice * getReputationIncomeFactor(reputation));
 }
 
 /** Fixed daily overhead (rent, utilities) deducted every day at closing. */
@@ -81,7 +85,7 @@ export const COMFORTABLE_CAPACITY_BY_DAY: Record<GameState["day"], number> = {
 };
 
 export const ACTION_BUDGET_BY_DAY: Record<GameState["day"], number> = {
-  1: 3,
+  1: 4,
   2: 4,
   3: 4,
   4: 5,
@@ -221,6 +225,7 @@ export function createInitialDayManagement(
     moneySpent: 0,
     suppliesUsed: { coffee: 0, milk: 0, pastries: 0 },
     cleaningActions: 0,
+    dirtyTableIds: [],
     offerReviewed: false,
     advertisingRun: false,
     socialAdRun: false,
@@ -413,6 +418,18 @@ export function getIngredientRequirement(
   return baseRequirement;
 }
 
+export function canJanaClearTable(state: GameState): boolean {
+  return state.day === 3 &&
+    state.dayPhase === "open" &&
+    state.helperAssignment?.helperId === "jana" &&
+    state.helperAssignment.taskId === "cleaning" &&
+    state.dayManagement.helperAutonomousActions === 0;
+}
+
+export function getHelperDailyCost(helperId: StaffOptionId, regularCost: number, day: GameState["day"]): number {
+  return helperId === "jana" && day === 3 ? 2 : regularCost;
+}
+
 export function createHelperAssignment(
   helperId: StaffOptionId,
   taskId: HelperTaskId,
@@ -428,7 +445,7 @@ export function createHelperAssignment(
     helperId,
     taskId,
     locked: false,
-    dailyCost: staffOption.dailyCost,
+    dailyCost: getHelperDailyCost(helperId, staffOption.dailyCost, day),
     flavorLine: getHelperFlavorLine(helperId, taskId),
     autonomyLevel: getHelperAutonomyLevel(day)
   };
@@ -453,6 +470,16 @@ export function getHelperAutonomyRecapLine(
 
   if (assignment.autonomyLevel === "micromanagement") {
     return `You handled everything today. ${name} watched closely — and took notes.`;
+  }
+
+  if (assignment.taskId !== "cleaning") {
+    const taskRecaps: Record<Exclude<HelperTaskId, "cleaning">, string> = {
+      service: `${name} kept service moving through the shift.`,
+      barista: `${name} stayed on the coffee machine and watched the quality.`,
+      counter: `${name} kept the counter steady from opening.`,
+      marketing: `${name}'s promotion was ready when you needed it.`
+    };
+    return taskRecaps[assignment.taskId];
   }
 
   if (assignment.autonomyLevel === "learning") {
@@ -486,6 +513,40 @@ export function getHelperLabel(assignment: HelperAssignment | null): string {
   )}`;
 }
 
+/** Report completed work rather than the effects offered at hiring. */
+export function getDayFiveHelperRecap(assignment: HelperAssignment, management: DayManagementState): string {
+  const name = weekOneStaffOptions.find((option) => option.id === assignment.helperId)?.name ?? assignment.helperId;
+  const impact = management.dayFiveHelperImpact;
+  const tables = management.helperAutonomousActions;
+  const tableRecap = `${tables} ${tables === 1 ? "table" : "tables"} cleared independently.`;
+  const flyerRecap = management.advertisingRun
+    ? "Bonus flyer used without spending a daily action."
+    : "Bonus flyer unused.";
+
+  if (!impact) {
+    const known = assignment.taskId === "cleaning" ? tableRecap
+      : assignment.taskId === "marketing" ? flyerRecap : "";
+    return [`${name}:`, known, "Detailed helper effects were not recorded in this save."].filter(Boolean).join(" ");
+  }
+
+  const extraOrderRecap = impact.extraOrders > 0
+    ? `${impact.extraOrders} extra ${impact.extraOrders === 1 ? "order" : "orders"} completed without another action.`
+    : "No extra order completed.";
+
+  switch (assignment.taskId) {
+    case "cleaning":
+      return `${name}: ${tableRecap} ${Number(impact.cleanlinessRestored.toFixed(2))} cleanliness points restored by upkeep.`;
+    case "service":
+      return `${name}: ${extraOrderRecap}`;
+    case "barista":
+      return `${name}: +${Number(impact.reputationGained.toFixed(2))} reputation from drinks. ${impact.milkSaved} milk saved.`;
+    case "counter":
+      return `${name}: opening stress reduced by ${Number(impact.openingStressReduction.toFixed(2))}. ${extraOrderRecap}`;
+    case "marketing":
+      return `${name}: ${flyerRecap} ${extraOrderRecap}`;
+  }
+}
+
 export function getHelperTaskLabel(taskId: HelperTaskId): string {
   const labels: Record<HelperTaskId, string> = {
     cleaning: "Cleaning",
@@ -500,7 +561,7 @@ export function getHelperTaskLabel(taskId: HelperTaskId): string {
 
 export function getHelperTaskHint(taskId: HelperTaskId): string {
   const hints: Record<HelperTaskId, string> = {
-    cleaning: "Keeps the tables tidy — cleanliness stays above 45 without spending an action. Each serve still drops cleanliness by 2; Jana resets it quietly.",
+    cleaning: "Keeps the floor tidy — Jana can clear a specific marked table without spending your action. Each serve still drops cleanliness by 2; she also keeps it above 45.",
     service: "Serves a second guest on each order — doubles income per action point while the extra-orders pool lasts.",
     barista: "Espresso and cappuccino earn +1 Rep each (up to 3 times today). Nino also uses slightly less milk on milk drinks.",
     counter: "Steady hands at the till reduce opening stress — Nino saves 8 Stress on arrival, Nele saves 5.",
@@ -516,7 +577,7 @@ export function getHelperFlavorLine(
 ): string {
   // Jana — service/cleaning
   if (helperId === "jana" && taskId === "cleaning") {
-    return "Jana cleaned everything. You are not sure when. Cleanliness held above 45 all shift.";
+    return "Jana kept an eye on the floor. When a marked table needed it, she took it without waiting. Cleanliness held above 45 all shift.";
   }
   if (helperId === "jana" && taskId === "service") {
     return "Jana took orders alongside you. Each action served an extra guest — income roughly doubled per round. She remained calm about the menu gaps.";

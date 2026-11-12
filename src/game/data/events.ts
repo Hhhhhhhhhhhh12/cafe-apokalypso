@@ -38,8 +38,11 @@ export const weekOneEvents = [
     tone: "anomaly",
     kicker: "On the floor",
     trigger: "The first coffee of the café's existence is poured.",
-    text: "Steam rises, hangs in the air, then slips back into the first cup.",
-    flavorLines: ["The crema pulls inward, then settles."]
+    text: "The first cup pours exactly to the line, without you watching it. You decide that is just a steady hand.",
+    flavorLines: [
+      "The crema settles into a shape, then thinks better of it.",
+      "You check the machine's calibration. It has not been calibrated."
+    ]
   },
   {
     id: "day-1-coffee-machine-flicker",

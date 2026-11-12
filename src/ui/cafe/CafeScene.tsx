@@ -37,6 +37,7 @@ const firstCupEvent = weekOneEvents.find((event) => event.id === "day-1-first-cu
 
 const GUEST_SPRITES = {
   "pendler-kemal": "kemal",
+  "pendlerin-paula": "paula",
   "lieferfahrer-cem": "cem",
   "nachbarin-mira": "mira",
   "laptop-lukas": "lukas",

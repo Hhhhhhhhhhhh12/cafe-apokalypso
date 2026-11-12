@@ -34,11 +34,11 @@ export const weekOneDayModifiers = [
   {
     id: "poster-echo",
     day: 4,
-    title: "Poster Echo",
-    summary: "Advertising works, but it also makes the room feel busier.",
+    title: "Midweek Breather",
+    summary: "The first Day-4 flyer costs 2 Asche and grants +2 reputation, with no additional advertising stress.",
     learningHint:
-      "A flyer brings attention. Attention brings customers. Customers bring queue pressure.",
-    effects: ["The first ad grants +2 reputation instead of +1, but adds 2 stress."]
+      "Keep the shift modest: one local ad, two customers, then choose cleaning or preparation.",
+    effects: ["The first Day-4 flyer: 2 Asche · +2 reputation · no additional advertising stress."]
   },
   {
     id: "short-staffed",

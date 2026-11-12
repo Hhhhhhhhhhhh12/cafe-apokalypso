@@ -191,6 +191,36 @@ The mythological/apocalyptic layer is introduced gradually through subtle anomal
 
 The weirdness value exists internally from the start but only becomes visible after the end-of-week hook.
 
+### Decision: Espresso Machine Expansion Starts on Day 4
+
+**Confirmed by the user on 2026-11-12.** Day 4 introduces the espresso machine's
+modular expansion.
+
+**Proposed opening.** The morning queue gives the player a reason to add a second
+brew group. While fitting it, the player discovers an extra connector and hears
+someone on the other end knocking grounds out of a portafilter.
+
+**Proposed modules.** The extra connector leads to a café with the same floor
+plan and different opening hours. A parallel brew group can finish a second
+espresso alongside a local one. When the other café closes and starts its rinse
+cycle, rinse water can flow back through the connection. A second gauge marked
+“BEREIT” and “DIE PUTZEN” signals the change.
+
+- **Rückschlagventil.** Closes the connection during the rinse cycle and pauses
+  the parallel brew group.
+- **Tassenanker.** Keeps the cup and its espresso in the local café when someone
+  clears the tray on the other side. Takes up one spot on the warming tray.
+- **Not-Aus “HIER BLEIBEN”.** Cuts the connections to the other café until
+  closing. The original brew group keeps serving coffee.
+
+The safeguards can be expanded too. A buffer tank can supply two shots while
+the valve is closed. A manifold can share that reserve across multiple brew
+groups, with priority set before opening. Each branch can take further modules.
+Eventually the small service hatch opens onto an entire machine room.
+
+The exact Day 4 trigger and the unlocks, costs and balance of later modules
+remain open.
+
 ### Decision: Early Pacing Must Not Feel Slow
 
 Café Apokalypso should not spend too long as a completely normal café simulation.

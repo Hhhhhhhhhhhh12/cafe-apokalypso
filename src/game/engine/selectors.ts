@@ -8,9 +8,11 @@ import {
   weekOneProducts,
   weekOneStaffOptions
 } from "../data";
+import { DAY_ONE_FATOU_SERVED_FRAGMENT, dayTwoOpenerWithFatou } from "../data/days";
 import {
   ACTION_BUDGET_BY_DAY,
   getCleanlinessLabel,
+  getEarnedPrice,
   getPatienceLabelFromCounter,
   getHelperLabel,
   getProductById,
@@ -56,6 +58,12 @@ export function getCurrentDayDefinition(state: GameState): DayDefinition {
   return weekOneDays[state.day - 1];
 }
 
+export function getCurrentDayOpener(state: GameState): string {
+  return state.day === 2 && state.run.memoryFragments.includes(DAY_ONE_FATOU_SERVED_FRAGMENT)
+    ? dayTwoOpenerWithFatou
+    : getCurrentDayDefinition(state).dayOpener;
+}
+
 export function getCurrentDayModifier(state: GameState): DayModifierDefinition {
   const modifierId = state.run.modifierIds[state.day - 1];
   const modifier =
@@ -67,6 +75,12 @@ export function getCurrentDayModifier(state: GameState): DayModifierDefinition {
 
 export function getAvailableProducts(state: GameState): readonly ProductDefinition[] {
   return weekOneProducts.filter((product) => product.firstDay <= state.day);
+}
+
+/** Estimate the first sale, using the reputation that applies at payment. */
+export function getExpectedProductIncome(state: GameState, product: ProductDefinition, reputation = state.resources.reputation): number {
+  const offerMultiplier = state.dayManagement.offerReviewed ? 1.1 : 1;
+  return getEarnedPrice(product.basePrice * offerMultiplier, reputation);
 }
 
 export function getAvailableGuests(state: GameState): readonly GuestDefinition[] {
@@ -86,7 +100,8 @@ export function getCurrentDayEvents(state: GameState): readonly EventDefinition[
 /**
  * Returns the EventDefinitions for all events that have fired today, in the
  * order they were queued in `state.pendingEvents`. Only includes events that
- * are present in `weekOneEvents` (unknown ids are silently dropped).
+ * belong to the current day and are present in `weekOneEvents`. Unknown ids and
+ * stale entries from previously saved day transitions are silently dropped.
  */
 export function getTriggeredEvents(state: GameState): EventDefinition[] {
   const eventMap = new Map<string, EventDefinition>(
@@ -94,7 +109,7 @@ export function getTriggeredEvents(state: GameState): EventDefinition[] {
   );
   return state.pendingEvents
     .map((id) => eventMap.get(id))
-    .filter((event): event is EventDefinition => event !== undefined);
+    .filter((event): event is EventDefinition => event !== undefined && event.day === state.day);
 }
 
 /**
@@ -111,9 +126,7 @@ export function getNarrativeEventCards(
   const anyGuestServed = state.dayManagement.customersServed > 0;
 
   return getCurrentDayEvents(state).filter((event) => {
-    if (event.tone === "normal") return false;
-    // The first cup plays in the diorama when the coffee is served.
-    if (event.id === "day-1-first-cup") return false;
+    if (event.tone === "normal" || event.id === "day-1-first-cup") return false;
     if (event.kicker === "Closing" && !isClosing) return false;
     if (event.relatedGuestIds && event.relatedGuestIds.length > 0 && !anyGuestServed) return false;
     return true;
@@ -195,7 +208,7 @@ export function getNextGuestPreview(state: GameState): NextGuestPreview | null {
     return null;
   }
 
-  const wantedProductId = guest.preferredProductId ?? guest.appreciatedProductIds?.[0];
+  const wantedProductId = getGuestWantedProductId(state, guest);
   const knownPreferenceId = state.guestMemory[guest.id]?.knownPreferenceId;
   const knownProductName = knownPreferenceId ? getProductById(knownPreferenceId).name : null;
 
@@ -205,8 +218,13 @@ export function getNextGuestPreview(state: GameState): NextGuestPreview | null {
     learningCue: knownProductName
       ? `You remember: ${guest.name} tends toward ${knownProductName}.`
       : guest.learningCue ?? getCurrentDayModifier(state).learningHint,
-    wants: knownProductName ?? (wantedProductId ? getProductById(wantedProductId).name : null)
+    wants: wantedProductId ? getProductById(wantedProductId).name : null
   };
+}
+
+export function getGuestWantedProductId(state: GameState, guest: GuestDefinition) {
+  return state.guestMemory[guest.id]?.knownPreferenceId ??
+    guest.preferredProductId ?? guest.appreciatedProductIds?.[0];
 }
 
 /**
@@ -240,7 +258,10 @@ export function getVisibleStaffOptions(
     return [];
   }
 
-  return weekOneStaffOptions.filter((staffOption) => staffOption.unlockDay <= state.day);
+  return weekOneStaffOptions.filter((staffOption) =>
+    staffOption.unlockDay <= state.day &&
+    (state.day !== 3 || staffOption.id === "jana" || staffOption.id === state.helperAssignment?.helperId)
+  );
 }
 
 export interface DioramaGuestVisibility {
@@ -289,6 +310,44 @@ export function getDioramaGuestVisibility(
   };
 }
 
+export function getEarlySceneGuestVisibility(
+  state: GameState
+): DioramaGuestVisibility {
+  if (state.day >= 4) return getDioramaGuestVisibility(state);
+
+  const { customersServed } = state.dayManagement;
+
+  // No furniture, no sitting: until seating is bought, guests order at the
+  // counter and stand / take away, so no one is shown seated.
+  if (state.equipment.seating < 1) {
+    return {
+      cem: false,
+      mira: false,
+      lukas: false,
+      christa: false,
+      bohn: false,
+      strange: false,
+      nele: false,
+      meda: false,
+      roterRegenschirm: false,
+      fatou: false
+    };
+  }
+
+  return {
+    cem: customersServed >= 1,
+    mira: customersServed >= 2,
+    lukas: customersServed >= 3,
+    christa: state.day >= 2 && customersServed >= 2,
+    bohn: getServedGuestIds(state).includes("herr-bohn"),
+    strange: state.day >= 4 && customersServed >= 3,
+    nele: state.day >= 3 && customersServed >= 1,
+    meda: state.day >= 5 && customersServed >= 1,
+    roterRegenschirm: state.day >= 7 && customersServed >= 2,
+    fatou: customersServed >= 1
+  };
+}
+
 export function getVisibleDaySevenLetter(state: GameState): string | null {
   if (!state.demoComplete || !state.weirdnessVisible) {
     return null;
@@ -297,15 +356,44 @@ export function getVisibleDaySevenLetter(state: GameState): string | null {
   return daySevenHookLetter.body;
 }
 
+/** The same empty-till guidance is used after actions and after loading a save. */
+export function getMoneyRecoveryWarning(state: GameState): string | null {
+  if (state.cafeClosed || state.demoComplete) {
+    return null;
+  }
+
+  const rescueShift = state.moneyZeroStreak > 0 &&
+    (state.dayPhase === "open" || state.dayPhase === "day_start");
+  if (state.resources.money > 0 && !rescueShift) {
+    return null;
+  }
+  const emptyTillPrefix = state.resources.money <= 0 ? "The till is empty. " : "";
+
+  if (state.day === 7) {
+    return rescueShift
+      ? `${emptyTillPrefix}This is your rescue shift: finish with money left after costs to keep the café open. The demo ends after Day 7.`
+      : "The till is empty. Orders from existing stock can still earn money before closing. The demo ends after Day 7.";
+  }
+
+  if (state.dayPhase === "day_end") {
+    return "The till is empty. Tomorrow is your rescue shift: finish it with money left after costs to keep the café open.";
+  }
+
+  return rescueShift
+    ? `${emptyTillPrefix}This is your rescue shift: finish today with money left after costs to keep the café open.`
+    : "The till is empty. Orders from existing stock can rebuild it. Closing with 0 Asche gives you one rescue shift tomorrow.";
+}
+
 export function canCompleteCurrentDay(state: GameState): boolean {
-  if (state.demoComplete || state.dayPhase !== "open") {
+  if (state.cafeClosed || state.demoComplete || state.dayPhase !== "open") {
     return false;
   }
 
   // When all action points are spent, the day can always be closed —
   // this prevents soft-locks (no supplies, no cleaning, etc.).
   // Any missing tasks (cleaning, serving) apply penalties in applyDayEndConsequences.
-  if (state.dayManagement.actionPointsRemaining <= 0) {
+  // An empty till also permits closing with no orders or supplies left.
+  if (state.dayManagement.actionPointsRemaining <= 0 || state.resources.money <= 0) {
     return true;
   }
 
@@ -364,10 +452,10 @@ export function getDayCoachHint(state: GameState): DayCoachHint | null {
 
   if (state.day === 1) {
     if (served === 0) {
-      return { text: "First shift: take the first order to serve the guest in line.", target: "serve" };
+      return { text: "First shift: choose a product to serve the guest in line.", target: "serve" };
     }
     if (served < 2) {
-      return { text: "One more order — today's objective asks for two before you close.", target: "serve" };
+      return { text: "Serve one more guest — today's objective asks for two before you close.", target: "serve" };
     }
     if (!roomCared) {
       return { text: "Wipe the tables before locking up, or reputation takes a small hit.", target: "clean" };
@@ -377,7 +465,7 @@ export function getDayCoachHint(state: GameState): DayCoachHint | null {
 
   if (state.day === 2) {
     if (served === 0) {
-      return { text: "Kemal is back, and the morning crowd has grown. Serve them and keep an eye on stress.", target: "serve" };
+      return { text: "The regulars are back. Serve the morning crowd and keep an eye on stress.", target: "serve" };
     }
     if (!roomCared && served >= 2) {
       return { text: "A quick clean now keeps the room calm and stress down.", target: "clean" };
@@ -385,11 +473,9 @@ export function getDayCoachHint(state: GameState): DayCoachHint | null {
     return null;
   }
 
-  // day === 3
-  if (served === 0 && state.unlocks.pricing && !state.dayManagement.offerReviewed) {
-    return { text: "New today: set the daily offer for a small income boost, then start serving.", target: "offer" };
-  }
-  return null;
+  return served === 0
+    ? { text: "Check the guest's order against what's in stock.", target: "serve" }
+    : null;
 }
 
 /**
@@ -441,13 +527,15 @@ export interface DecorUpgradeOption {
     name: string;
     cost: number;
     reputationBonus: number;
+    dailyCleanBonus: number;
+    dailyRepBonus: number;
     affordable: boolean;
   } | null;
 }
 
 /** Décor shop rows for the day-end review: current look + the next upgrade. */
 export function getDecorUpgradeOptions(state: GameState): DecorUpgradeOption[] {
-  return decorSlots.map((slot) => {
+  return decorSlots.filter((slot) => slot.id !== "clock" || state.equipment.clock >= 1).map((slot) => {
     const currentTier = state.decor[slot.id];
     const currentTierName =
       getDecorTier(slot.id, currentTier)?.name ?? slot.tiers[0].name;
@@ -463,6 +551,8 @@ export function getDecorUpgradeOptions(state: GameState): DecorUpgradeOption[] {
               name: nextTierDef.name,
               cost: nextTierDef.cost,
               reputationBonus: nextTierDef.reputationBonus,
+              dailyCleanBonus: nextTierDef.dailyCleanBonus,
+              dailyRepBonus: nextTierDef.dailyRepBonus,
               affordable: nextTierDef.cost <= state.resources.money
             }
           : null
@@ -482,6 +572,7 @@ export interface EquipmentShopOption {
     name: string;
     cost: number;
     reputationBonus: number;
+    dailyRepBonus: number;
     affordable: boolean;
   } | null;
 }
@@ -507,6 +598,7 @@ export function getEquipmentShopOptions(state: GameState): EquipmentShopOption[]
                 name: nextTierDef.name,
                 cost: nextTierDef.cost,
                 reputationBonus: nextTierDef.reputationBonus,
+                dailyRepBonus: nextTierDef.dailyRepBonus,
                 affordable: nextTierDef.cost <= state.resources.money
               }
             : null
@@ -598,7 +690,7 @@ export function getGuestPatienceState(state: GameState): GuestPatienceState | nu
   // (4 normally, 3 on a messy-café day — see getPatienceLabelFromCounter).
   const totalTicks = max > 0 ? Math.round(max / PATIENCE_TICK) : 0;
   const label = getPatienceLabelFromCounter(actionsWithoutServing, totalTicks);
-  const critical = guestsCanWalkOut(state.day) && label === "Leaving";
+  const critical = guestsCanWalkOut(state.day) && patience <= PATIENCE_TICK;
   const messyPenalty = state.resources.cleanliness < 50;
   return { patience, max, label, critical, messyPenalty };
 }

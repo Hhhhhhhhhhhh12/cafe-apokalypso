@@ -339,7 +339,7 @@ describe("save migration", () => {
       equipment: Record<string, number>;
     };
     expect(migrated.version).toBe(CURRENT_GAME_STATE_VERSION);
-    expect(migrated.equipment).toEqual({ machine: 1, seating: 1, register: 1 });
+    expect(migrated.equipment).toEqual({ machine: 1, grinder: 1, clock: 1, seating: 1, register: 1 });
   });
 
   it("migrateRawSave: preserves existing tiers but backfills the new register slot", () => {
@@ -351,7 +351,7 @@ describe("save migration", () => {
     const migrated = migrateRawSave(raw) as { equipment: Record<string, number> };
     // machine/seating are kept as-is; the register slot (added after these saves
     // were written) is backfilled to the owned baseline tier 1.
-    expect(migrated.equipment).toEqual({ machine: 2, seating: 0, register: 1 });
+    expect(migrated.equipment).toEqual({ machine: 2, grinder: 1, clock: 1, seating: 0, register: 1 });
   });
 });
 

@@ -78,7 +78,7 @@ afterEach(() => {
 describe("Bohn's appearance", () => {
   it("keeps the same age between waiting and sitting while in view", () => {
     const queued = seatedState();
-    queued.dayManagement.customersServed = 4;
+    queued.dayManagement.customersServed = 5;
     queued.dayManagement.actionPointsRemaining = 1;
     queued.dayManagement.servedGuestIds = [];
     render(queued);

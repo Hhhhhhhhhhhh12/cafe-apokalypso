@@ -352,91 +352,422 @@ h3 {
   outline-offset: 3px;
 }
 
-/* --- Diegetic cinematic intro (IntroSequence) -------------------------- */
+/* --- Morning cinematic intro (IntroSequence) -------------------------- */
 
-/* Fixed overlay above the diorama. The veil fades out via JS-driven opacity;
-   subtitles float at the bottom-center with CSS transitions. */
+html:has(.intro-cinema) {
+  scrollbar-gutter: auto;
+  background: #17110f;
+}
+
 .intro-cinema {
   position: fixed;
   inset: 0;
   z-index: 200;
   display: flex;
-  align-items: flex-end;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  padding-bottom: 14%;
+  gap: clamp(12px, 3vh, 28px);
+  padding: 70px 20px 24px;
+  overflow-y: auto;
+  background: #17110f;
+  color: #f4e3c8;
+}
+
+.intro-cinema__scene {
+  position: relative;
+  flex: 0 0 auto;
+  width: min(100%, 960px, 96vh);
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 12px 60px rgba(0, 0, 0, 0.28);
   pointer-events: none;
 }
 
+.intro-cinema__scene .cafe-panel {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.intro-cinema__scene .cafe-panel > .panel-heading {
+  display: none;
+}
+
+.intro-cinema__scene .cafe-diorama {
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+}
+
+.intro-cinema__morning-light,
 .intro-cinema__veil {
   position: absolute;
   inset: 0;
-  background: #0a0605;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .intro-cinema__veil {
-    transition: opacity 2s ease-out;
-  }
-}
-
-.intro-cinema__subtitle {
-  position: relative;
   z-index: 1;
-  font-size: 1rem;
-  line-height: 1.5;
-  color: #e8d5b7;
-  font-style: italic;
-  text-align: center;
-  letter-spacing: 0.03em;
-  padding: 0 2rem;
-  opacity: 0;
   pointer-events: none;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .intro-cinema__subtitle {
-    transition: opacity 0.9s ease;
-  }
+.intro-cinema__morning-light {
+  background: linear-gradient(135deg, rgba(255, 226, 170, 0.16), transparent 65%);
 }
 
-.intro-cinema__subtitle--visible {
-  opacity: 1;
+.intro-cinema__veil {
+  background: #17110f;
 }
 
-.intro-cinema__subtitle--glitch {
-  font-style: normal;
-  font-family: "Courier New", Courier, monospace;
-  color: #4a9e6b;
+.intro-cinema__story {
+  flex: 0 0 auto;
+  width: min(100%, 640px);
+  min-height: 180px;
+  text-align: center;
+}
+
+.intro-cinema__title {
+  margin: 0 0 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #d8b894;
+}
+
+.intro-cinema__caption {
+  min-height: 5.4em;
+}
+
+.intro-cinema__subtitle {
+  margin: 0;
+  font-size: clamp(1rem, 2.4vw, 1.25rem);
+  line-height: 1.65;
+  white-space: pre-line;
+  text-wrap: balance;
+}
+
+.intro-cinema__begin,
+.intro-cinema__skip {
+  min-height: 44px;
+  padding: 10px 18px;
+  font-family: inherit;
   font-size: 0.9rem;
-  letter-spacing: 0.04em;
+  border: 1px solid #a18160;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.intro-cinema__begin {
+  color: #2b1d17;
+  background: #e9c79b;
 }
 
 .intro-cinema__skip {
   position: absolute;
-  top: 1rem;
-  right: 1.2rem;
-  z-index: 2;
-  pointer-events: auto;
-  padding: 6px 14px;
-  font-size: 0.8rem;
-  font-family: inherit;
-  color: rgba(240, 220, 196, 0.5);
-  background: transparent;
-  border: 1px solid rgba(240, 220, 196, 0.18);
-  border-radius: 4px;
-  cursor: pointer;
-  transition: color 0.2s, border-color 0.2s;
+  top: 16px;
+  right: 20px;
+  color: #e9c79b;
+  background: #211815;
+}
+
+.intro-cinema__begin:hover {
+  background: #f4dbb7;
 }
 
 .intro-cinema__skip:hover {
-  color: #e8d5b7;
-  border-color: rgba(240, 220, 196, 0.45);
+  border-color: #e9c79b;
 }
 
+.intro-cinema__begin:focus-visible,
 .intro-cinema__skip:focus-visible {
-  outline: 2px solid #d39a63;
-  outline-offset: 2px;
+  outline: 3px solid #f4dbb7;
+  outline-offset: 4px;
 }
+
+@media (prefers-reduced-motion: no-preference) {
+  .intro-cinema__veil {
+    transition: opacity 3s ease-out;
+  }
+
+  .intro-cinema__subtitle {
+    animation: intro-caption-appear 1s ease-out both;
+  }
+}
+
+@keyframes intro-caption-appear {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (max-height: 600px) {
+  .intro-cinema {
+    justify-content: flex-start;
+  }
+}
+
+/* Arcana intro: an independent 16:9 scene; the approved gameplay geometry is untouched. */
+.intro-cinema--arcana { background: #080908; padding-top: 64px; }
+.intro-cinema--arcana .intro-cinema__scene { width: min(100%, 1180px, max(240px, calc(177.778dvh - 285px))); border-radius: 8px; }
+.intro-cinema--arcana .intro-cinema__story { min-height: 44px; }
+.intro-cinema--arcana .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.intro-cinema--arcana .intro-cinema__icon { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 8px; }
+.arcana-frond, .arcana-vine { position: absolute; object-fit: fill; transform-origin: 52% 1%; pointer-events: none; }
+.arcana-frond { opacity: .83; filter: brightness(.68) saturate(.78); }
+.arcana-frond--one { left: 43.1%; top: .3%; width: 7.7%; height: 25%; rotate: 9deg; }
+.arcana-frond--two { left: 91%; top: 8.5%; width: 7.2%; height: 21%; rotate: -9deg; scale: -1 1; }
+.arcana-motes { position: absolute; inset: 0; opacity: 0; pointer-events: none; }
+.is-open .arcana-motes { opacity: .65; }
+.arcana-motes span { position: absolute; width: 2px; height: 2px; border-radius: 50%; background: #e7d7ac; }
+.arcana-scene { container-type: inline-size; aspect-ratio: 16 / 9; background: #000; isolation: isolate; }
+.arcana-world, .arcana-clean-room { position: absolute; inset: 0; }
+@property --arcana-door-angle {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 0deg;
+}
+.arcana-world {
+  --arcana-door-angle: 0deg;
+  /* Closed leaf along the wall, then a quarter turn along the floor into the room. */
+  --arcana-door-x: calc(-1 * cos(var(--arcana-door-angle)) + .78 * sin(var(--arcana-door-angle)));
+  --arcana-door-y: calc(.324 * cos(var(--arcana-door-angle)) + .52 * sin(var(--arcana-door-angle)));
+  --arcana-door-normal-x: calc(sin(var(--arcana-door-angle)) + .78 * cos(var(--arcana-door-angle)));
+  --arcana-door-normal-y: calc(-.324 * sin(var(--arcana-door-angle)) + .52 * cos(var(--arcana-door-angle)));
+  --arcana-door-gap: clamp(0, calc(1 + var(--arcana-door-x)), 1);
+  --arcana-door-seam: clamp(0, calc(var(--arcana-door-gap) * 4.5), 1);
+  --arcana-door-beam: clamp(0, calc((var(--arcana-door-gap) - .015) * 1.22), 1);
+  --arcana-water-x: 89.7%;
+  --arcana-water-y: 67.6%;
+  --arcana-water-cycle: 2.65s;
+  --arcana-water-delay: .48s;
+  z-index: 1;
+}
+.arcana-world.is-open { --arcana-door-angle: 94deg; }
+/* Direct light and its reflection spread from the opening as the gap widens. */
+.arcana-door-lit-room {
+  position: absolute;
+  inset: 0;
+  mask-image:
+    radial-gradient(ellipse calc(3% + 5% * var(--arcana-door-gap)) 33% at calc(9.7% + 4.1% * var(--arcana-door-gap)) 42.7%, rgb(0 0 0 / var(--arcana-door-seam)) 32%, transparent 100%),
+    radial-gradient(ellipse calc(9% + 51% * var(--arcana-door-gap)) calc(4% + 27% * var(--arcana-door-gap)) at calc(12% + 26% * var(--arcana-door-gap)) calc(57% + 17% * var(--arcana-door-gap)), rgb(0 0 0 / var(--arcana-door-beam)) 7%, rgb(0 0 0 / calc(.8 * var(--arcana-door-beam))) 42%, transparent 100%),
+    radial-gradient(ellipse 114% 108% at 20% 65%, rgb(0 0 0 / calc(.92 * var(--arcana-door-beam))) 5%, rgb(0 0 0 / calc(.74 * var(--arcana-door-beam))) 46%, rgb(0 0 0 / calc(.44 * var(--arcana-door-beam))) 79%, transparent 100%);
+}
+.arcana-room { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.arcana-roof-clean-plate { mask-image: linear-gradient(to right, transparent 87.7%, #000 88.9%, #000 90.2%, transparent 91.6%); }
+/* Reuse only the two touched regions; the approved counter and machinery are from the original. */
+.arcana-clock-detail {
+  mask-image: radial-gradient(ellipse 6.9% 10.7% at 83.8% 20.5%, #000 75%, transparent 100%);
+  clip-path: polygon(79.2% 8%, 91% 8%, 91% 27.7%, 85.7% 27.7%, 85.7% 29.4%, 82.8% 29.4%, 82.8% 26.3%, 79.2% 26.3%);
+}
+.arcana-puddle-detail { mask-image: radial-gradient(ellipse 6.9% 6.4% at var(--arcana-water-x) var(--arcana-water-y), #000 70%, transparent 100%); }
+.arcana-clean-room { opacity: 0; }
+.arcana-doorway {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  --arcana-door-plane: matrix(var(--arcana-door-x), var(--arcana-door-y), 0, 1, 0, 0);
+  --arcana-door-depth-x: calc(7px * var(--arcana-door-normal-x));
+  --arcana-door-depth-y: calc(7px * var(--arcana-door-normal-y));
+}
+.arcana-doorway-shade { transform: scaleX(calc(1 - var(--arcana-door-gap))); }
+.arcana-door-shadow {
+  transform: matrix(var(--arcana-door-x), var(--arcana-door-y), .78, .43, 0, 0);
+  opacity: calc(.65 * var(--arcana-door-gap));
+}
+.arcana-door-face {
+  transform: var(--arcana-door-plane);
+  filter: brightness(calc(.56 + .32 * var(--arcana-door-gap)));
+}
+.arcana-door-rear {
+  transform: translate(var(--arcana-door-depth-x), var(--arcana-door-depth-y)) var(--arcana-door-plane);
+}
+.arcana-door-edge {
+  transform: translate(calc(108px * var(--arcana-door-x)), calc(108px * var(--arcana-door-y)))
+    matrix(var(--arcana-door-normal-x), var(--arcana-door-normal-y), 0, 1, 0, 0);
+}
+.arcana-vine-anchor { position: absolute; width: 13%; height: 41%; transform-origin: 50% 0; }
+.arcana-vine-anchor--one { left: 4.3%; top: 21%; rotate: -19deg; }
+.arcana-vine-anchor--two { left: 11.1%; top: 22%; rotate: 26deg; scale: -1 1; }
+.arcana-vine { inset: 0; width: 100%; height: 100%; filter: brightness(.78) saturate(.83); }
+.is-cut .arcana-vine { opacity: 0; transform: translateY(15%); }
+/* The cat starts inside the room. The diagonal board masks the end of the jump. */
+.arcana-animal-window {
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(84% 27%, 91.8% 27%, 91.8% 29.7%, 97.1% 34.7%, 95.9% 42.1%, 88.6% 46%, 84% 46%);
+}
+.arcana-animal {
+  position: absolute;
+  left: 84.65%;
+  top: 31.5%;
+  width: 10.2%;
+  transform-origin: 62% 48%;
+  filter: brightness(1.32) contrast(1.06) saturate(.78);
+}
+.is-fleeing .arcana-animal { opacity: 0; }
+/* The plant stays beside the bright floor streak. Only the bite moves it. */
+.arcana-floor-vine { position: absolute; left: 58.6%; top: 82.1%; width: 6.6%; height: 17.1%; object-fit: fill; rotate: 75deg; transform-origin: 52% 1%; filter: brightness(.73) saturate(.79); opacity: .88; pointer-events: none; }
+.arcana-plant-bed { position: absolute; left: 55.8%; top: 62.2%; width: 7.9%; height: 14.2%; overflow: hidden; }
+.arcana-plant { position: absolute; left: 0; top: 0; width: 100%; height: auto; filter: brightness(.94) saturate(.77) drop-shadow(-.5px -.5px .6px #dfac703d); }
+.arcana-plant-still { opacity: calc(1 - var(--arcana-bite-layer, 0)); }
+.arcana-plant-bite { opacity: var(--arcana-bite-layer, 0); }
+.arcana-plant-hood { transform-box: view-box; transform-origin: 49.5% 30.5%; }
+@property --arcana-flight-turn {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+@property --arcana-approach-progress {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+.arcana-butterfly { position: absolute; width: 1.1%; height: 1.5%; display: flex; gap: 1px; opacity: 0; filter: drop-shadow(0 0 1.5px #d4b65480); perspective: 28px; }
+.arcana-butterfly i { width: 48%; height: 100%; background: #ffed7a; border-radius: 75% 25% 70% 30%; transform-origin: 100% 50%; }
+.arcana-butterfly i + i { border-radius: 25% 75% 30% 70%; transform-origin: 0 50%; }
+.arcana-butterfly--one { left: 45.6%; top: 67.2%; }
+.arcana-butterfly--two { left: 61.2%; top: 61.8%; }
+.arcana-butterfly--caught { left: 54%; top: 65.5%; }
+.is-open .arcana-butterfly { opacity: 1; }
+.is-snapping .arcana-butterfly--caught { opacity: 0; }
+.arcana-firefly { position: absolute; width: .35%; aspect-ratio: 1; border-radius: 50%; opacity: 0; background: currentColor; box-shadow: 0 0 4px 2px currentColor; }
+.arcana-firefly--cyan { color: #69e5f4; left: 51.5%; top: 24%; --fly-x: -32px; --fly-y: -40px; }
+.arcana-firefly--violet { color: #f672fa; left: 77.5%; top: 61%; --fly-x: 38px; --fly-y: -25px; }
+.arcana-firefly--red { color: #fb7755; left: 8.5%; top: 76%; --fly-x: -42px; --fly-y: 17px; }
+.is-open:not(.is-revealed) .arcana-firefly { opacity: .75; }
+.arcana-water-drop {
+  position: absolute;
+  left: var(--arcana-water-x);
+  top: calc(var(--arcana-water-y) - 16.5%);
+  width: clamp(2px, .36cqw, 3.7px);
+  height: 1.25%;
+  border-radius: 60% 60% 55% 55%;
+  background: linear-gradient(#928a7040, #c4b99d 63%, #f3e4c7 86%, #a59b82);
+  opacity: 0;
+}
+.arcana-puddle-ripple { position: absolute; left: var(--arcana-water-x); top: var(--arcana-water-y); width: 4%; height: 1.4%; border: 1px solid rgba(198, 192, 162, .35); border-radius: 50%; opacity: 0; }
+.intro-cinema__controls { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; min-height: 44px; }
+.intro-cinema__secondary { min-height: 44px; padding: 10px 18px; border: 1px solid #79755d; border-radius: 6px; background: #151b13; color: #d4d2b7; font-size: .9rem; }
+.intro-cinema__secondary:hover { background: #273222; }
+.intro-cinema__secondary:focus-visible { outline: 3px solid #f4dbb7; outline-offset: 4px; }
+.intro-cinema[data-phase="clearing"] .arcana-world { opacity: 0; }
+.intro-cinema[data-phase="clearing"] .arcana-clean-room { opacity: 1; }
+/* Unowned replacement equipment is hidden without moving any prop anchors. */
+.cafe-diorama--no-machine .cafe-coffee-machine,
+.cafe-diorama--no-clock .cafe-decor-clock { visibility: hidden; }
+.cafe-counter-grinder {
+  position: absolute;
+  left: 37%;
+  top: -66%;
+  width: 18%;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .arcana-frond--one { animation: arcana-frond-sway 7.1s ease-in-out infinite alternate; }
+  .arcana-frond--two { animation: arcana-frond-sway 8.6s -3.2s ease-in-out infinite alternate-reverse; }
+  .arcana-vine { animation: arcana-vine-stir 3.7s ease-in-out infinite alternate; }
+  .is-open .arcana-floor-vine { animation: arcana-floor-vine-stir 22s ease-in-out infinite alternate; }
+  /* Independent continuous curves avoid braking at each waypoint. */
+  .is-open .arcana-butterfly--one {
+    animation: arcana-flight-loop 4.6s -1.25s linear infinite;
+    transform: translate(calc(207% * cos(var(--arcana-flight-turn))), calc(83% * sin(var(--arcana-flight-turn)) + 32% * sin(calc(var(--arcana-flight-turn) * 2)))) rotate(calc(18deg * sin(var(--arcana-flight-turn))));
+  }
+  .is-open .arcana-butterfly--two {
+    animation: arcana-flight-loop 5.4s -2.35s linear infinite;
+    transform: translate(calc(30% + 182% * cos(var(--arcana-flight-turn))), calc(124% * sin(var(--arcana-flight-turn)) - 37% * sin(calc(var(--arcana-flight-turn) * 2)))) rotate(calc(-16deg * cos(var(--arcana-flight-turn))));
+  }
+  .is-open .arcana-butterfly--caught {
+    --arcana-approach-turn: calc(113deg + 375deg * var(--arcana-approach-progress));
+    --arcana-approach-envelope: calc(1 - var(--arcana-approach-progress));
+    animation: arcana-flutter-to-bite var(--arcana-flutter-before-bite) linear both;
+    transform: translate(calc((176% * cos(var(--arcana-approach-turn)) - 204%) * var(--arcana-approach-envelope)), calc((104% * sin(var(--arcana-approach-turn)) - 34%) * var(--arcana-approach-envelope))) rotate(calc(19deg * sin(var(--arcana-approach-turn)) * var(--arcana-approach-envelope)));
+  }
+  .arcana-motes { transition: opacity 2s ease-out; }
+  .arcana-motes span { animation: arcana-mote-drift 5s ease-in-out infinite; }
+  .arcana-world.is-open { animation: arcana-door-push var(--arcana-opening-time) cubic-bezier(.52, .08, .63, .82) both; }
+  .is-cut .arcana-vine-anchor--one .arcana-vine { animation: arcana-vine-fall 1.2s .52s both; }
+  .is-cut .arcana-vine-anchor--two .arcana-vine { animation: arcana-vine-fall 1.2s .81s both; }
+  .is-fleeing .arcana-animal { animation: arcana-animal-flee .92s .03s both; }
+  .arcana-butterfly i { animation: arcana-wing .31s ease-in-out infinite; }
+  .arcana-butterfly i + i { animation-direction: reverse; animation-delay: -.045s; }
+  .arcana-butterfly--two i { animation-duration: .36s; }
+  .is-snapping .arcana-butterfly--caught { animation: arcana-caught var(--arcana-catch-time) linear both; }
+  [data-phase="snap"] .arcana-plant { animation: arcana-bite-layer var(--arcana-catch-time) step-end both; }
+  [data-phase="snap"] .arcana-plant-hood { animation: arcana-snap var(--arcana-catch-time) both; }
+  .is-open .arcana-firefly--cyan { animation: arcana-firefly-vanish 3.15s .1s both; }
+  .is-open .arcana-firefly--violet { animation: arcana-firefly-vanish 3.15s .25s both; }
+  .is-open .arcana-firefly--red { animation: arcana-firefly-vanish 3.05s .07s both; }
+  .is-open .arcana-water-drop { animation: arcana-water-drip var(--arcana-water-cycle) var(--arcana-water-delay) linear infinite; }
+  .is-open .arcana-puddle-ripple { animation: arcana-ripple var(--arcana-water-cycle) var(--arcana-water-delay) linear infinite; }
+  .arcana-world, .arcana-clean-room { transition: opacity 2s ease-in-out; }
+}
+@keyframes arcana-door-push {
+  0%, 8% { --arcana-door-angle: 0deg; }
+  28% { --arcana-door-angle: 10deg; animation-timing-function: cubic-bezier(.35, .18, .39, 1); }
+  100% { --arcana-door-angle: 94deg; }
+}
+@keyframes arcana-vine-fall {
+  0% { opacity: 1; transform: none; }
+  17% { transform: rotate(-2deg) translateY(-1%); animation-timing-function: cubic-bezier(.4, .08, .75, .52); }
+  70% { opacity: .88; transform: rotate(8deg) translate(2%, 14%); }
+  100% { opacity: 0; transform: rotate(11deg) translate(4%, 30%); }
+}
+@keyframes arcana-animal-flee {
+  0% { opacity: 1; transform: none; }
+  22% { transform: translate(-3%, 3%) rotate(3deg); animation-timing-function: cubic-bezier(.35, .18, .4, .88); }
+  58% { transform: translate(29%, -27%) rotate(-9deg); }
+  86% { opacity: 1; transform: translate(60%, -59%) rotate(-7deg); }
+  100% { opacity: 0; transform: translate(72%, -78%) rotate(-7deg); }
+}
+@keyframes arcana-wing {
+  0%, 100% { transform: rotateY(55deg); }
+  43% { transform: rotateY(2deg); }
+  72% { transform: rotateY(32deg); }
+}
+@keyframes arcana-flight-loop { from { --arcana-flight-turn: 0deg; } to { --arcana-flight-turn: 360deg; } }
+@keyframes arcana-flutter-to-bite { from { --arcana-approach-progress: 0; } to { --arcana-approach-progress: 1; } }
+/* The third butterfly reaches the mouth at the same time as the hood closes. */
+@keyframes arcana-caught {
+  0% { opacity: 1; transform: none; }
+  17% { opacity: 1; transform: translate(118%, -31%) rotate(-10deg); }
+  35% { opacity: 1; transform: translate(261%, -12%) rotate(9deg); }
+  43% { opacity: 1; transform: translate(339%, 19%) rotate(13deg) scale(.9); }
+  52%, 100% { opacity: 0; transform: translate(365%, 35%) rotate(19deg) scale(.25); }
+}
+@keyframes arcana-bite-layer {
+  0%, 69%, 100% { --arcana-bite-layer: 0; }
+  43% { --arcana-bite-layer: 1; }
+}
+@keyframes arcana-snap {
+  0%, 43% { transform: none; animation-timing-function: cubic-bezier(.53, .04, .65, .58); }
+  52%, 57% { transform: rotate(-22deg); animation-timing-function: cubic-bezier(.24, .6, .34, 1); }
+  69%, 100% { transform: none; }
+}
+@keyframes arcana-frond-sway { from { transform: rotate(-.8deg); } to { transform: rotate(1.45deg); } }
+@keyframes arcana-vine-stir { from { transform: rotate(-.65deg); } to { transform: rotate(.9deg); } }
+@keyframes arcana-floor-vine-stir { from { transform: rotate(-1.3deg); } to { transform: translateY(-1.4%) rotate(1.5deg); } }
+@keyframes arcana-mote-drift { 0% { transform: translate(0, 0); opacity: 0; } 25%, 70% { opacity: .6; } 100% { transform: translate(35px, -28px); opacity: 0; } }
+@keyframes arcana-firefly-vanish {
+  0% { transform: translate(-7px, 8px); opacity: 0; }
+  19% { transform: translate(0, 0); opacity: .72; }
+  42% { transform: translate(8px, -9px); opacity: .76; }
+  64% { transform: translate(5px, -14px); opacity: .65; }
+  83% { opacity: .44; }
+  100% { transform: translate(var(--fly-x), var(--fly-y)); opacity: 0; }
+}
+@keyframes arcana-water-drip {
+  0%, 8% { transform: translate(-50%, 0) scaleY(.54); opacity: 0; }
+  17% { transform: translate(-50%, 8%) scaleY(.77); opacity: .94; animation-timing-function: cubic-bezier(.52, .04, .8, .51); }
+  37% { transform: translate(-50%, 1270%) scaleY(1.12); opacity: .86; }
+  38%, 100% { transform: translate(-50%, 1270%) scaleY(.55); opacity: 0; }
+}
+@keyframes arcana-ripple {
+  0%, 37% { transform: translate(-50%, -50%) scale(.17); opacity: 0; }
+  42% { opacity: .46; animation-timing-function: ease-out; }
+  76%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+}
+@media (max-width: 600px) { .intro-cinema--arcana { padding: 64px 10px 20px; gap: 16px; } .intro-cinema--arcana .intro-cinema__story { min-height: 44px; } }
 
 .panel {
   padding: 18px;
@@ -614,7 +945,7 @@ h3 {
 .cafe-panel {
   grid-column: 1;
   grid-row: 2;
-  min-height: 700px;
+  min-height: auto;
   padding: 10px;
   background:
     linear-gradient(180deg, rgba(255, 248, 237, 0.72), rgba(244, 224, 200, 0.84)),
@@ -641,15 +972,17 @@ h3 {
   --cream: #fff2d8;
   --teal: #16606c;
   --shadow: rgba(43, 32, 27, 0.28);
-  /* Zoom and pan — change via JS style attribute for room expansion */
-  --cafe-zoom: 1.35;
+  /* Only the front floor edge expands; walls and furniture stay fixed. */
+  --cafe-zoom: 1;
   --cafe-pan-x: 0%;
+  --cafe-floor-tip: 82%;
   position: relative;
-  min-height: 625px;
+  min-height: 0;
+  aspect-ratio: 16 / 9;
   overflow: hidden;
   border: 3px solid #3d2a23;
   border-radius: 8px;
-  background: #d4bfa0;
+  background: #f7efe3;
   isolation: isolate;
 }
 
@@ -674,15 +1007,54 @@ h3 {
 
 .cafe-diorama::before {
   z-index: 4;
-  background:
-    linear-gradient(110deg, rgba(255, 249, 226, 0.34), transparent 32%),
-    radial-gradient(circle at 86% 26%, rgba(22, 96, 108, 0.14), transparent 24%);
+  background: radial-gradient(circle at 86% 26%, rgba(22, 96, 108, 0.14), transparent 24%);
   mix-blend-mode: soft-light;
 }
 
 .cafe-diorama::after {
   z-index: 5;
   box-shadow: inset 0 -30px 60px rgba(61, 42, 35, 0.18);
+}
+
+.cafe-back-wall,
+.cafe-side-wall,
+.cafe-floor,
+.cafe-counter,
+.cafe-table,
+.cafe-room-shadow,
+.cafe-plant,
+.placeholder-guest,
+.cafe-weirdness-hint {
+  position: absolute;
+}
+
+.cafe-floor-growth {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  image-rendering: auto;
+  pointer-events: none;
+}
+
+.cafe-floor-growth {
+  z-index: 1;
+  clip-path: polygon(
+    5.92% 71.84%,
+    50% 52.39%,
+    94.08% 72.58%,
+    55.5% var(--cafe-floor-tip),
+    44.5% var(--cafe-floor-tip)
+  );
+  transition: clip-path 3.6s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: clip-path;
+}
+
+.cafe-back-wall,
+.cafe-side-wall {
+  display: none;
 }
 
 .cafe-stage-base {
@@ -693,35 +1065,107 @@ h3 {
   width: 100%;
   height: 100%;
   object-fit: fill;
-  /* v06 stage base is genuine pixel art (Pixellab) — keep pixels crisp */
-  image-rendering: pixelated;
+  /* The wall shell stays fixed while the floor grows underneath. */
+  image-rendering: auto;
 }
 
-/* Detail-Kompositions-Schicht: hochdichte Fenster-/Tür-Sprites über dem
-   400-px-Shell. Position/Größe kommen aus scene.ts (STAGE_DETAIL_SPOTS);
-   hier nur das Aussehen. background-size 100% 100% deckt den im PNG
-   gemalten Rahmen vollständig ab (leichte Streckung bewusst erlaubt). */
-.cafe-stage-detail {
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: 100% 100%;
-  image-rendering: pixelated;
-  pointer-events: none;
-}
-.cafe-stage-detail--window-l,
-.cafe-stage-detail--window-r {
-  background-image: url("../../assets/sprites/props/placeholder-cafe-window-arched.png");
-}
-.cafe-stage-detail--door {
-  background-image: url("../../assets/sprites/props/placeholder-cafe-door.png");
+.cafe-diorama--growth-day-1 { --cafe-floor-tip: 82%; }
+.cafe-diorama--growth-day-2 { --cafe-floor-tip: 85%; }
+.cafe-diorama--growth-day-3 { --cafe-floor-tip: 88%; }
+.cafe-diorama--growth-day-4 { --cafe-floor-tip: 91%; }
+.cafe-diorama--growth-day-5 { --cafe-floor-tip: 94%; }
+.cafe-diorama--growth-day-6 { --cafe-floor-tip: 97%; }
+.cafe-diorama--growth-day-7 { --cafe-floor-tip: 99.5%; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cafe-floor-growth { transition: none; }
 }
 
-/* Stage-PNG liefert Wände/Boden/Theke visuell — alle Szenen-Positionen
-   kommen als Daten aus src/ui/cafe/scene.ts (Inline-Styles der CafeScene).
-   Die alten Zonen-Container (back-wall/side-wall/floor/queue) und ihre
-   CSS-gemalten Relikte (Fenster, Tür, Menütafel) sind entfernt. */
+.cafe-back-wall,
+.cafe-side-wall {
+  display: none;
+}
+
+/* Stage-base PNG supplies walls, floor, counter visually — containers kept for positioning */
+.cafe-floor {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+.cafe-floor__tiles {
+  display: none;
+}
+.cafe-counter {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+.cafe-window,
+.cafe-room-shadow {
+  display: none;
+}
+
+.cafe-window {
+  position: absolute;
+  top: 12%;
+  left: 9%;
+  width: 24%;
+  height: 34%;
+  border: 4px solid #5a392d;
+  background:
+    linear-gradient(90deg, transparent 47%, rgba(90, 57, 45, 0.9) 47% 53%, transparent 53%),
+    linear-gradient(180deg, #f7d88f 0 52%, #8fb7bd 52% 100%);
+  box-shadow: inset 0 -7px 0 rgba(80, 48, 38, 0.2), 5px 7px 0 rgba(66, 39, 31, 0.14);
+}
+
+.cafe-window__light {
+  position: absolute;
+  right: -34%;
+  bottom: -78%;
+  width: 160%;
+  height: 86%;
+  transform: skewX(-24deg);
+  background: rgba(255, 232, 158, 0.24);
+}
+
+.cafe-menu-board {
+  position: absolute;
+  top: 13%;
+  left: 43%;
+  display: grid;
+  gap: 7px;
+  width: 24%;
+  height: 28%;
+  border: 4px solid #3d2a23;
+  border-radius: 6px;
+  padding: 10px 14px;
+  background: #243a35;
+  box-shadow: 5px 7px 0 rgba(66, 39, 31, 0.14);
+}
+
+.cafe-menu-board span {
+  display: block;
+  height: 5px;
+  border-radius: 999px;
+  background: #f2d68a;
+}
+
+.cafe-menu-board span:nth-child(2) {
+  width: 72%;
+  background: #f5efe4;
+}
+
+.cafe-menu-board span:nth-child(3) {
+  width: 48%;
+  background: #d79a74;
+}
 
 .cafe-storage {
+  position: absolute;
+  top: 37%;
+  right: 2%;
+  width: 18%;
+  height: 45%;
   border: 3px solid #4d3026;
   border-radius: 5px;
   background:
@@ -755,11 +1199,101 @@ h3 {
   background: #cdb487;
 }
 
+.cafe-door {
+  position: absolute;
+  right: 13%;
+  bottom: 0;
+  width: 50%;
+  height: 58%;
+  border: 4px solid #4d3026;
+  border-bottom: 0;
+  border-radius: 7px 7px 0 0;
+  background:
+    linear-gradient(90deg, rgba(255, 250, 222, 0.24), transparent 54%),
+    #704333;
+  box-shadow: inset 7px 0 0 rgba(255, 248, 237, 0.12);
+}
+
+.cafe-door span {
+  position: absolute;
+  top: 47%;
+  right: 18%;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #f2c26d;
+}
+
+.cafe-floor {
+  right: 6%;
+  bottom: 4%;
+  left: 5%;
+  z-index: 4;
+  height: 65%;
+  clip-path: none;
+  overflow: visible;
+  border: 3px solid transparent;
+  background: transparent;
+  box-shadow: none;
+}
+
+.cafe-floor__tiles {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(35deg, transparent 47%, var(--floor-line) 48% 52%, transparent 53%),
+    linear-gradient(129deg, transparent 47%, var(--floor-line) 48% 52%, transparent 53%);
+  background-size: 52px 48px;
+  opacity: 0.42;
+}
+
+.cafe-room-shadow {
+  right: 5%;
+  bottom: 7%;
+  left: 7%;
+  z-index: 0;
+  height: 78%;
+  clip-path: polygon(10% 6%, 95% 18%, 85% 95%, 0 80%);
+  background:
+    radial-gradient(ellipse at 34% 32%, rgba(52, 31, 24, 0.2), transparent 36%),
+    radial-gradient(ellipse at 72% 66%, rgba(52, 31, 24, 0.18), transparent 33%);
+  filter: blur(3px);
+  opacity: 0.55;
+}
+
 .cafe-counter {
+  /* Fixed furniture overlay; independent from the growing floor mask. */
+  top: 26.15%;
+  left: 60.67%;
+  z-index: 4;
+  width: 29.78%;
+  height: auto;
+  aspect-ratio: 1024 / 651;
   border: none;
   border-radius: 7px;
   background: transparent;
   box-shadow: none;
+}
+
+.cafe-counter__front {
+  position: absolute;
+  inset: 48% 0 0;
+  border-top: 3px solid rgba(53, 36, 30, 0.75);
+  background:
+    linear-gradient(90deg, transparent 22%, rgba(255, 248, 237, 0.12) 22% 25%, transparent 25% 54%, rgba(255, 248, 237, 0.12) 54% 57%, transparent 57%);
+  opacity: 1;
+}
+
+.cafe-counter__ledge {
+  position: absolute;
+  top: 39%;
+  right: 3%;
+  left: 3%;
+  height: 13%;
+  border-top: 3px solid rgba(53, 36, 30, 0.55);
+  border-bottom: 3px solid rgba(53, 36, 30, 0.3);
+  background: rgba(255, 248, 237, 0.12);
+  opacity: 1;
 }
 
 /*
@@ -770,12 +1304,13 @@ h3 {
  */
 .cafe-coffee-machine {
   position: absolute;
-  /* Stands on the v06 painted counter top (top face y 54-63), left end of the bar. */
-  top: -69.5%;
-  left: 16.6%;
-  width: 22%;
-  height: 52%;
-  border: 3px solid transparent;
+  /* Stands on the painted counter top at the L-junction (left end of the bar). */
+  top: 2%;
+  left: 18%;
+  width: 21.5%;
+  height: auto;
+  aspect-ratio: 3 / 2;
+  border: none;
   border-radius: 6px 6px 4px 4px;
   background: transparent;
   box-shadow: none;
@@ -790,21 +1325,16 @@ h3 {
 }
 
 .cafe-pilot-asset--coffee-machine {
-  inset: -17% -9% -8% -9%;
+  inset: 0;
   z-index: 2;
-  width: 118%;
-  height: 125%;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
+  image-rendering: auto;
 }
 
 .cafe-coffee-machine__screen {
-  position: absolute;
-  top: 16%;
-  left: 28%;
-  width: 44%;
-  height: 14%;
-  border-radius: 3px;
-  background: #1f555f;
+  display: none;
 }
 
 .cafe-coffee-machine__steam {
@@ -835,14 +1365,15 @@ h3 {
  */
 .cafe-register {
   position: absolute;
-  /* Stands on the right end of the v06 painted counter top; stays inside the
-     zoom-crop window (visible img x <= 87). */
-  top: -57%;
-  right: 30.3%;
-  width: 21%;
-  height: 48%;
-  transform: skewY(2deg);
-  border: 3px solid transparent;
+  /* Stands on the right end of the painted counter top. */
+  top: 9%;
+  right: auto;
+  left: 72%;
+  width: 19%;
+  height: auto;
+  aspect-ratio: 585 / 589;
+  transform: none;
+  border: none;
   border-radius: 6px;
   background: transparent;
   box-shadow: none;
@@ -858,11 +1389,12 @@ h3 {
 }
 
 .cafe-pilot-asset--kassandra-register {
-  inset: -38% -30% -18% -30%;
+  inset: 0;
   z-index: 2;
-  width: 160%;
-  height: 156%;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
+  image-rendering: auto;
 }
 
 .cafe-register__screen {
@@ -944,14 +1476,17 @@ h3 {
  * faded so it reads as a soft placeholder hint. Classes retained as fallback.
  */
 .cafe-table {
+  z-index: 5;
+  width: 14%;
+  height: auto;
+  aspect-ratio: 1;
   /* Furniture-free Stage Base (nofurniture-fix) paints no tables, so the bought
      seating shows the real pixel sprite instead of the old CSS ghost boxes.
      Sub-shapes (__top / chairs / pseudo legs) are neutralised below. */
-  background-image: url("../../assets/sprites/props/placeholder-table-chair-set.png");
   background-repeat: no-repeat;
   background-position: center bottom;
   background-size: contain;
-  image-rendering: pixelated;
+  image-rendering: auto;
 }
 
 /* CSS-drawn table/chair shapes replaced by the sprite above */
@@ -1011,6 +1546,36 @@ button.cafe-table {
   border-radius: 50%;
   background: radial-gradient(ellipse at center, rgba(198, 122, 66, 0.4) 0%, rgba(198, 122, 66, 0) 70%);
   z-index: -1;
+}
+
+.cafe-table--left {
+  top: 37.69%;
+  left: 27.53%;
+  width: 12.92%;
+  height: auto;
+  aspect-ratio: 1;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-table-left-v05-simple.png");
+}
+
+.cafe-table--right {
+  top: 31.54%;
+  left: 44.94%;
+  width: 12.92%;
+  height: auto;
+  aspect-ratio: 1;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-table-round-v05-simple.png");
+}
+
+/* Legacy "back" table slot — moved to the front tip in the accepted layout.
+   It stays slightly smaller than the other sets and hosts Nele + Fatou rather
+   than crowding a third chair onto either two-chair set. */
+.cafe-table--back {
+  top: 52.31%;
+  left: 40.22%;
+  width: 10.67%;
+  height: auto;
+  aspect-ratio: 1;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-table-front-v05-simple.png");
 }
 
 .cafe-table__top {
@@ -1084,8 +1649,18 @@ button.cafe-table {
   box-shadow: 0 0 6px rgba(22, 160, 180, 0.5);
 }
 
-.placeholder-guest {
+.cafe-queue {
   position: absolute;
+  /* Moved from the cramped bottom-right corner into the open painted floor so
+     the waiting guest stands in the room rather than against the wall. */
+  left: 34%;
+  bottom: 9%;
+  z-index: 6;
+  width: 16%;
+  height: 41%;
+}
+
+.placeholder-guest {
   /* Scaled up from 22×34 so CSS guest blobs and sprite containers are legible
      at game scale against the Stage Base background. */
   width: 32px;
@@ -1129,9 +1704,14 @@ button.cafe-table {
   border-radius: 50%;
 }
 
+.placeholder-guest-normal-01 {
+  left: 50%;
+  bottom: 8%;
+  transform: translateX(-50%);
+}
+
 /* Paula's entrance: start at the painted door, walk to the queue spot.
-   Wegpunkte liegen in scene.ts (PAULA_PATH); die Transition läuft, sobald
-   die Inline-Position von at-door auf den Queue-Punkt wechselt. */
+   The transition runs when .placeholder-guest--at-door is removed. */
 @media (prefers-reduced-motion: no-preference) {
   .placeholder-guest-normal-01 {
     transition:
@@ -1140,71 +1720,19 @@ button.cafe-table {
   }
 }
 
-.cafe-staff-nino {
-  --nino-walk-duration: 960ms;
-  width: 108px;
-  height: 108px;
-  pointer-events: none;
+/* Calibrated against the painted door: sprite center dio x 8.4%, feet
+   y 56.6%. Percentages are relative to .cafe-queue, hence the overshoot. */
+.placeholder-guest-normal-01.placeholder-guest--at-door {
+  left: -195%;
+  bottom: 130%;
+  transition: none;
 }
 
-.cafe-staff-nino > span {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  background-repeat: no-repeat;
-  image-rendering: pixelated;
-}
-
-.cafe-staff-nino__stand {
-  /* Match the visible height of the walk pose and align the feet. */
-  bottom: -11px;
-  width: 128px;
-  height: 128px;
-  background: url("../../assets/sprites/guests/placeholder-staff-nino.png") no-repeat center / contain;
-}
-
-.cafe-staff-nino__walk {
-  visibility: hidden;
-  bottom: -6px;
-  width: 108px;
-  height: 108px;
-  background-image: url("../../assets/sprites/guests/placeholder-staff-nino-walk-sheet.png");
-  background-size: 864px 108px;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .cafe-staff-nino {
-    animation: cafe-nino-arrive var(--nino-walk-duration) linear;
-  }
-
-  .cafe-staff-nino__stand {
-    animation: cafe-nino-stand var(--nino-walk-duration) step-end both;
-  }
-
-  .cafe-staff-nino__walk {
-    animation:
-      cafe-nino-walk var(--nino-walk-duration) steps(8) both,
-      cafe-nino-hide-walk var(--nino-walk-duration) step-end both;
-  }
-}
-
-@keyframes cafe-nino-arrive {
-  from { left: 50%; }
-}
-
-@keyframes cafe-nino-stand {
-  from { visibility: hidden; }
-  to { visibility: visible; }
-}
-
-@keyframes cafe-nino-walk {
-  from { background-position-x: 0; }
-  to { background-position-x: -864px; }
-}
-
-@keyframes cafe-nino-hide-walk {
-  from { visibility: visible; }
-  to { visibility: hidden; }
+/* Paula's exit: walks toward the counter (north in the painted room).
+   Target overshoots the queue box upward so she disappears into the counter area. */
+.placeholder-guest-normal-01.placeholder-guest--walking-to-counter {
+  left: 60%;
+  bottom: 185%;
 }
 
 .cafe-pilot-asset--paula,
@@ -1305,12 +1833,14 @@ button.cafe-table {
 /* Paula's east exit: slides off-screen right after reaching the counter.
    Uses a faster transition (1.4s) so the exit feels snappy. */
 .placeholder-guest-normal-01.placeholder-guest--exiting-east {
+  left: 420%;
+  bottom: 8%;
   transition:
     left 1.4s linear,
     bottom 0.5s ease-in;
 }
 
-/* Standing queue sprites — all guests share one fine-style 68×68 static sprite,
+/* Standing queue sprites — each guest has a separate transparent static sprite,
    rendered at the same scale as the seated guests (see .cafe-pilot-asset--standing
    base rule below). Idle motion is the shared CSS breathe, so the whole roster
    reads at one consistent size/proportion/pixel scale. */
@@ -1318,14 +1848,14 @@ button.cafe-table {
 .cafe-pilot-asset--mira-standing    { background-image: url("../../assets/sprites/guests/placeholder-guest-mira.png"); }
 .cafe-pilot-asset--lukas-standing   { background-image: url("../../assets/sprites/guests/placeholder-guest-lukas.png"); }
 .cafe-pilot-asset--christa-standing { background-image: url("../../assets/sprites/guests/placeholder-guest-christa.png"); }
-.cafe-pilot-asset--kemal-standing   { background-image: url("../../assets/sprites/guests/placeholder-guest-kemal.png"); }
+.cafe-pilot-asset--kemal-standing   { background-image: url("../../assets/sprites/guests/placeholder-guest-kemal-v02-approved-style.png"); }
+.cafe-pilot-asset--paula-standing   { background-image: url("../../assets/sprites/guests/placeholder-guest-paula-v02-approved-style.png"); }
 .cafe-pilot-asset--fatou-standing   { background-image: url("../../assets/sprites/guests/placeholder-guest-fatou.png"); }
+.cafe-pilot-asset--bohn-standing    { background-image: url("../../assets/sprites/guests/placeholder-guest-bohn.png"); }
 .cafe-pilot-asset--grau-standing    { background-image: url("../../assets/sprites/guests/placeholder-guest-grau.png"); }
-
-.cafe-pilot-asset--nele-standing { background-image: url("../../assets/sprites/guests/placeholder-guest-nele.png"); }
-.cafe-pilot-asset--strange-standing { background-image: url("../../assets/sprites/guests/placeholder-guest-grau.png"); }
-.cafe-pilot-asset--meda-standing { background-image: url("../../assets/sprites/guests/placeholder-guest-meda.png"); }
-.cafe-pilot-asset--roterRegenschirm-standing { background-image: url("../../assets/sprites/guests/placeholder-guest-roter-regenschirm.png"); }
+.cafe-pilot-asset--nele-standing    { background-image: url("../../assets/sprites/guests/placeholder-guest-nele.png"); }
+.cafe-pilot-asset--roter-regenschirm-standing { background-image: url("../../assets/sprites/guests/placeholder-guest-roter-regenschirm.png"); }
+.cafe-pilot-asset--meda-standing    { background-image: url("../../assets/sprites/guests/placeholder-guest-meda.png"); }
 
 /* Seated guests slide up on first appearance (one-shot on DOM mount). */
 @keyframes guest-seat-in {
@@ -1516,13 +2046,22 @@ button.cafe-table {
   }
 }
 
-/* Sitzplätze/Positionen aller Gäste: scene.ts (GUEST_SPOTS). Hier bleiben
-   nur noch Farb-/Sichtbarkeits-Stile der Klassen. */
 .placeholder-guest-normal-02 {
+  right: 2%;
+  bottom: 6%;
   opacity: 0;
 }
 
+/* Seated at the LEFT table (back chair) — follows the lower landscape slot. */
+.placeholder-guest-normal-03 {
+  left: 22%;
+  bottom: 14.5%;
+}
+
+/* Seated at the RIGHT table (back chair) — follows the middle landscape slot. */
 .placeholder-guest-normal-04 {
+  right: 37.35%;
+  bottom: 18.84%;
   background: #4a6e8a;
 }
 
@@ -1530,9 +2069,34 @@ button.cafe-table {
   background: #d9a47d;
 }
 
+/* Lukas — seated at the LEFT table (front/side chair) */
+.placeholder-guest-normal-05 {
+  left: 17%;
+  bottom: 9.5%;
+}
+
+/* Christa — seated at the RIGHT table (front/side chair, day 2+) */
+.placeholder-guest-normal-06 {
+  right: 31.35%;
+  bottom: 13.84%;
+}
+
+/* Herr Bohn — standing, coffee in hand, left of the back table (no table
+   of his own; nudged clear of the back table's guests; day 3+) */
+.placeholder-guest-normal-07 {
+  left: 34%;
+  bottom: 38%;
+}
+
 .placeholder-guest-strange-01,
 .placeholder-guest-strange-02 {
   background: #5d3b78;
+}
+
+/* Strange guest — positioned when conditionally rendered */
+.placeholder-guest-strange-01 {
+  left: 60%;
+  bottom: 43%;
 }
 
 .placeholder-guest-strange-01::before {
@@ -1554,10 +2118,33 @@ button.cafe-table {
   filter: saturate(0.12) sepia(0.24) brightness(0.87) contrast(1.05);
 }
 
+.placeholder-guest-strange-02 {
+  right: 28%;
+  bottom: 31%;
+}
+
+/* Nele — seated at the smaller front table (left chair). */
+.placeholder-guest-normal-08 {
+  left: 50%;
+  bottom: 13%;
+}
+
 /* Meda — Ecke hinten rechts, ab Tag 5 */
 .placeholder-guest-strange-02 .cafe-pilot-asset--meda,
 .placeholder-guest-strange-02 .cafe-pilot-asset--guest {
   filter: saturate(0.8) brightness(0.92);
+}
+
+/* Frau mit rotem Regenschirm — linke Mitte, Tag 7 */
+.placeholder-guest-strange-03 {
+  left: 30%;
+  bottom: 52%;
+}
+
+/* Fatou — seated at the smaller front table (right chair, day 2+). */
+.placeholder-guest-normal-09 {
+  left: 46%;
+  bottom: 9%;
 }
 
 /*
@@ -1565,13 +2152,24 @@ button.cafe-table {
  * diorama image, not .cafe-floor, so save-injected tier changes stay anchored to
  * the painted empty floor corner.
  */
-/* Décor-Sprites — Slot-Positionen in scene.ts (DECOR_SPOTS), hier nur noch
-   Sprite, Größe und Tier-Varianten. */
+/* Décor sprite overlays — positioned absolute within .cafe-world */
+.cafe-decor-plant,
+.cafe-decor-clock,
+.cafe-decor-lamp,
+.cafe-decor-cups {
+  display: block;
+  position: absolute;
+}
+
 .cafe-decor-plant {
-  width: 68px;
-  height: 80px;
-  background: url("../../assets/sprites/props/placeholder-cafe-plant.png") center bottom / contain no-repeat;
-  image-rendering: pixelated;
+  left: 19.5%;
+  top: 56%;
+  z-index: 5;
+  width: 6%;
+  height: auto;
+  aspect-ratio: 995 / 1024;
+  background: url("../../assets/sprites/props/placeholder-cafe-plant-v05-simple.png") center bottom / contain no-repeat;
+  image-rendering: auto;
 }
 
 /* Hidden: replaced by the sprite above. Kept as fallback if the image is absent. */
@@ -1595,22 +2193,19 @@ button.cafe-table {
 
 .cafe-decor-plant.cafe-decor--tier-2 {
   opacity: 1;
-  background-image: url("../../assets/sprites/props/placeholder-cafe-plant-t2.png");
+  background-image: url("../../assets/sprites/props/placeholder-cafe-plant-v04-hd.png");
+  filter: saturate(1.04) brightness(1.02);
 }
 
 .cafe-decor-plant.cafe-decor--tier-3 {
   opacity: 1;
-  background-image: url("../../assets/sprites/props/placeholder-cafe-plant-t3.png");
-  width: 60px;
-  height: 80px;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-plant-v04-hd.png");
+  filter: saturate(1.12) brightness(1.06) drop-shadow(0 3px 4px rgba(75, 48, 30, 0.18));
 }
 
 /* Counter pot plant (plant2) — small herb/succulent sitting on the counter surface. */
 .cafe-decor-plant2 {
-  width: 32px;
-  height: 40px;
-  background: url("../../assets/sprites/props/placeholder-cafe-plant.png") center bottom / contain no-repeat;
-  image-rendering: pixelated;
+  display: none;
 }
 
 .cafe-decor-plant2.cafe-decor--tier-1 {
@@ -1628,16 +2223,88 @@ button.cafe-table {
   background-image: url("../../assets/sprites/props/placeholder-cafe-plant-t3.png");
 }
 
+.cafe-furniture-shelf {
+  position: absolute;
+  top: 26%;
+  left: 76%;
+  z-index: 5;
+  width: 16%;
+  height: auto;
+  aspect-ratio: 1024 / 683;
+  background: url("../../assets/sprites/props/placeholder-cafe-shelf-v06-simple.png") center / contain no-repeat;
+  image-rendering: auto;
+}
+
+.cafe-furniture-shelf.cafe-decor--tier-1 {
+  opacity: 1;
+}
+
+/*
+ * Fantasy pets (#73 world-building). Cozy set-dressing with a faint twist —
+ * absolutely positioned in .cafe-world like the décor props. Static poses;
+ * idle animation can layer on later via the *-idle-sheet.png assets.
+ */
+.cafe-pet {
+  position: absolute;
+  z-index: 6;
+  image-rendering: pixelated;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+/* Box sizes mirror each sprite's own aspect ratio and are scaled against a
+   standing guest (108px ≈ an adult), so a cat reads at roughly knee height. */
+.cafe-pet-cat {
+  left: 25.5%;
+  top: 67%;
+  width: 16px;
+  height: 28px;
+  background-image: url("../../assets/sprites/guests/placeholder-pet-cat.png");
+}
+/* Curled on the counter ledge (top edge sits at 65.9%) like a stray croissant. */
+.cafe-pet-dragon {
+  left: 70%;
+  top: 62.5%;
+  width: 14px;
+  height: 26px;
+  background-image: url("../../assets/sprites/guests/placeholder-pet-dragon.png");
+}
+/* Beside plant2 (78–81.7%), clear of the counter box (starts at 58%/65.9%). */
+.cafe-pet-fluff {
+  left: 79%;
+  top: 58%;
+  width: 16px;
+  height: 20px;
+  background-image: url("../../assets/sprites/guests/placeholder-pet-fluff.png");
+}
+
+/* The little café gains its stranger residents gradually instead of looking
+   fully dressed on day one. */
+.cafe-diorama--growth-day-1 .cafe-pet-dragon,
+.cafe-diorama--growth-day-1 .cafe-pet-fluff,
+.cafe-diorama--growth-day-2 .cafe-pet-fluff {
+  display: none;
+}
+
 /*
  * Wall clock (Pixellab shabby tier-1). Hangs on the back wall between the
  * window and menu board. The weirdness-hint .cafe-clock CSS below is separate
  * and untouched — that's the overlay omen; this is the real décor prop.
  */
+/* ── Décor props: children of .cafe-world (zoom 1.35× around center/58%) ─
+   CSS % = .cafe-world box (873×625). Visual position after zoom differs from
+   CSS position — use inverse: css = (vis_px − ox)/1.35 + ox, ox=(W/2,0.58H).
+   ── */
 .cafe-decor-clock {
-  width: 56px;
-  height: 56px;
-  background: url("../../assets/sprites/props/placeholder-cafe-clock.png") center / contain no-repeat;
-  image-rendering: pixelated;
+  position: absolute;
+  left: 14.5%;
+  top: 31.5%;
+  z-index: 8;
+  width: 9%;
+  height: auto;
+  aspect-ratio: 1024 / 683;
+  background: url("../../assets/sprites/props/placeholder-cafe-clock-v05-simple.png") center / contain no-repeat;
+  image-rendering: auto;
 }
 
 .cafe-decor-clock.cafe-decor--tier-1 {
@@ -1646,29 +2313,33 @@ button.cafe-table {
 
 .cafe-decor-clock.cafe-decor--tier-2 {
   opacity: 1;
-  background-image: url("../../assets/sprites/props/placeholder-cafe-clock-t2.png");
+  background-image: url("../../assets/sprites/props/placeholder-cafe-clock-v05-simple.png");
+  filter: saturate(1.05) brightness(1.03);
 }
 
 .cafe-decor-clock.cafe-decor--tier-3 {
   opacity: 1;
-  background-image: url("../../assets/sprites/props/placeholder-cafe-clock-t3.png");
-  width: 56px;
-  height: 72px;
+  width: 9%;
+  height: auto;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-clock-v04-hd.png");
+  filter: saturate(1.12) brightness(1.06);
 }
 
 /*
  * Floor lamp. Stands between the two back-wall windows (right side).
  * Base anchored to the CSS bottom edge (center bottom / contain) so
  * the pole base sits on the floor regardless of tier size change.
- * 65 % + top floated it inside the right window (glass starts at 65.4 %);
- * now the sprite centers on 59.5 % via translateX and its base is pinned
- * to the v04 wall/floor line (~63 % height) via bottom, at every viewport.
  */
 .cafe-decor-lamp {
-  width: 40px;
-  height: 64px;
-  background: url("../../assets/sprites/props/placeholder-cafe-lamp.png") center bottom / contain no-repeat;
-  image-rendering: pixelated;
+  position: absolute;
+  left: 52%;
+  top: 38%;
+  z-index: 4;
+  width: 7%;
+  height: auto;
+  aspect-ratio: 2 / 3;
+  background: url("../../assets/sprites/props/placeholder-cafe-lamp-v05-simple.png") center bottom / contain no-repeat;
+  image-rendering: auto;
 }
 
 .cafe-decor-lamp.cafe-decor--tier-1 {
@@ -1677,16 +2348,18 @@ button.cafe-table {
 
 .cafe-decor-lamp.cafe-decor--tier-2 {
   opacity: 1;
-  background-image: url("../../assets/sprites/props/placeholder-cafe-lamp-t2.png");
-  width: 46px;
-  height: 72px;
+  width: 7%;
+  height: auto;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-lamp-v04-hd.png");
+  filter: saturate(1.04) brightness(1.04);
 }
 
 .cafe-decor-lamp.cafe-decor--tier-3 {
   opacity: 1;
-  background-image: url("../../assets/sprites/props/placeholder-cafe-lamp-t3.png");
-  width: 42px;
-  height: 64px;
+  width: 7%;
+  height: auto;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-lamp-v04-hd.png");
+  filter: saturate(1.1) brightness(1.08) drop-shadow(0 0 8px rgba(244, 192, 105, 0.22));
 }
 
 /*
@@ -1695,10 +2368,15 @@ button.cafe-table {
  * surface (was 62%/40%, which floated them over the right window).
  */
 .cafe-decor-cups {
-  width: 32px;
-  height: 27px;
-  background: url("../../assets/sprites/props/placeholder-cafe-cups.png") center / contain no-repeat;
-  image-rendering: pixelated;
+  position: absolute;
+  left: 67%;
+  top: 48.5%;
+  z-index: 6;
+  width: 5.5%;
+  height: auto;
+  aspect-ratio: 1024 / 683;
+  background: url("../../assets/sprites/props/placeholder-cafe-cups-v05-simple.png") center / contain no-repeat;
+  image-rendering: auto;
 }
 
 .cafe-decor-cups.cafe-decor--tier-1 {
@@ -1707,16 +2385,18 @@ button.cafe-table {
 
 .cafe-decor-cups.cafe-decor--tier-2 {
   opacity: 1;
-  background-image: url("../../assets/sprites/props/placeholder-cafe-cups-t2.png");
-  width: 35px;
-  height: 29px;
+  width: 7%;
+  height: auto;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-cups-v04-hd.png");
+  filter: saturate(1.04) brightness(1.03);
 }
 
 .cafe-decor-cups.cafe-decor--tier-3 {
   opacity: 1;
-  background-image: url("../../assets/sprites/props/placeholder-cafe-cups-t3.png");
-  width: 29px;
-  height: 35px;
+  width: 7%;
+  height: auto;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-cups-v04-hd.png");
+  filter: saturate(1.1) brightness(1.06);
 }
 
 /* cafe-decor-shelf removed — diorama background already has painted shelves */
@@ -1736,6 +2416,11 @@ button.cafe-table {
 }
 
 .cafe-weirdness-hint {
+  top: 18%;
+  right: 13%;
+  z-index: 7;
+  width: 20%;
+  height: 32%;
   opacity: 0.24;
 }
 
@@ -1825,10 +2510,20 @@ button.cafe-table {
   transform: translate(10px, 6px) rotate(18deg);
 }
 
+.cafe-diorama--messy .cafe-chair--front {
+  transform: rotate(12deg);
+}
+
 .cafe-diorama--strained {
   background:
     radial-gradient(circle at 20% 18%, rgba(255, 237, 192, 0.48), transparent 29%),
     linear-gradient(135deg, #dfad7f 0 52%, #b98072 52% 100%);
+}
+
+.cafe-diorama--day-seven .cafe-window {
+  background:
+    linear-gradient(90deg, transparent 47%, rgba(90, 57, 45, 0.9) 47% 53%, transparent 53%),
+    linear-gradient(180deg, #e7a85f 0 52%, #6c939d 52% 100%);
 }
 
 .action-panel {
@@ -2119,7 +2814,7 @@ button.cafe-table {
   }
 }
 
-/* ── Serve-menu (product list in ActionPanel sidebar) ─────────────────────── */
+/* ── Counter order menu ──────────────────────────────────────────────────── */
 .serve-menu {
   margin-bottom: 10px;
   padding: 8px 10px 6px;
@@ -3007,7 +3702,7 @@ button.cafe-table {
   }
 
   .cafe-diorama {
-    min-height: 570px;
+    min-height: 0;
   }
 }
 
@@ -3439,15 +4134,7 @@ button.cafe-table {
     #fbeddc;
   box-shadow: 0 6px 18px rgba(140, 88, 48, 0.28);
   pointer-events: none;
-  animation: day-transition-in 2.2s ease-out both;
-}
-
-.day-transition-banner__eyebrow {
-  color: #16606c;
-  font-size: 0.68rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  animation: day-transition-in 1.4s ease-out both;
 }
 
 .day-transition-banner__title {
@@ -3620,76 +4307,6 @@ button.cafe-table {
 /* .placeholder-guest is already position:absolute (line ~573), which creates
    a positioning context for the .guest-status child — no override needed. */
 
-/* ── Guest thought bubble ─────────────────────────────────────────────────
-   Floats above the standing queue guest and shows what they want to order.
-   Fades in when the guest reaches idle stance (paulaPhase === "idle").
-   The ::before/::after pair draws a speech-bubble tail pointing downward.   */
-
-@keyframes cafe-thought-bubble-in {
-  from { opacity: 0; transform: translateX(-50%) translateY(4px) scale(0.92); }
-  to   { opacity: 1; transform: translateX(-50%) translateY(0)    scale(1);   }
-}
-
-.cafe-guest-thought-bubble {
-  /* Sit ~14 px above the sprite's top edge; parent is .placeholder-guest-normal-01
-     which has position:absolute and acts as the positioning context. */
-  position: absolute;
-  bottom: calc(100% + 14px);
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 12;
-
-  /* Creamy off-white card with a warm subtle border */
-  background: #fdf6ec;
-  border: 1.5px solid rgba(160, 100, 45, 0.35);
-  border-radius: 8px;
-  box-shadow: 0 3px 10px rgba(40, 20, 5, 0.18);
-
-  /* Typography */
-  font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  color: #3b2010;
-  white-space: nowrap;
-  padding: 3px 7px;
-  pointer-events: none;
-  line-height: 1.5;
-
-  /* Fade-and-rise when the guest settles into idle */
-  animation: cafe-thought-bubble-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-/* Tail border layer — drawn slightly larger, sits behind the fill layer */
-.cafe-guest-thought-bubble::before {
-  content: "";
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 6px solid transparent;
-  border-top-color: rgba(160, 100, 45, 0.35);
-  pointer-events: none;
-}
-
-/* Tail fill layer — sits on top, matches bubble background */
-.cafe-guest-thought-bubble::after {
-  content: "";
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  margin-top: -1px; /* pull up so fill overlaps the border triangle's base */
-  border: 5px solid transparent;
-  border-top-color: #fdf6ec;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .cafe-guest-thought-bubble {
-    animation: none;
-  }
-}
-
 /* ── PHASE 4: Coin tick + stress consequence visuals ─────────────────────── */
 
 @keyframes cafe-coin-float {
@@ -3850,13 +4467,53 @@ button.cafe-table {
 @media (prefers-reduced-motion: reduce) {
   .cafe-kassandra-aside { animation: none; }
 }
-/* Das Stage-PNG ist die einzige Raumdarstellung — nie ausblenden. */
-.cafe-stage-base { display: block !important; }
-
-/* Regal-Slot: noch kein echtes Décor-Sprite; das Stage-PNG malt bereits
-   Regale. Der DOM-Knoten bleibt (Tier-Klassen/Tests), bis ein Sprite kommt. */
-.cafe-storage {
+.cafe-back-wall,
+.cafe-side-wall,
+.cafe-window,
+.cafe-window__light,
+.cafe-menu-board,
+.cafe-storage,
+.cafe-door,
+.cafe-floor__tiles,
+.cafe-room-shadow {
   display: none !important;
+}
+.cafe-floor,
+.cafe-counter {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* === CSS-Diorama dauerhaft deaktiviert — Floor- und Shell-PNG bilden den Raum ===
+   Die Struktur-Container bleiben als ungeclippte Möbel-Ebene erhalten, damit
+   Maschine, Kasse, Tische und Gäste unabhängig vom Boden-Reveal ankern. */
+.cafe-stage-base { display: block !important; }
+.cafe-back-wall,
+.cafe-side-wall,
+.cafe-window,
+.cafe-window__light,
+.cafe-menu-board,
+.cafe-storage,
+.cafe-door,
+.cafe-floor__tiles,
+.cafe-room-shadow {
+  display: none !important;
+}
+.cafe-floor,
+.cafe-counter {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Furniture is independent from the growing room shell. */
+.cafe-counter {
+  background: url("../../assets/sprites/props/placeholder-cafe-counter-v06-simple.png") center / contain no-repeat !important;
+}
+.cafe-counter__front,
+.cafe-counter__ledge {
+  display: none;
 }
 
 /* ── B1: Ambient event overlay — floor events shown during service ─────────── */
@@ -4160,4 +4817,605 @@ html.cafe-colorblind-mode .options-menu__tag--respected {
 html.cafe-colorblind-mode .options-menu__tag--coming-soon {
   background: #fff5e6;
   color: #664400;
+}
+
+/* === Café v07 precomposited stage ==========================================
+   Each day uses one complete room PNG. Wall and floor edges are never scaled
+   as separate browser layers, eliminating alpha seams and registration drift. */
+.cafe-floor-growth {
+  display: none !important;
+}
+
+.cafe-stage-base {
+  image-rendering: auto;
+}
+
+.cafe-counter {
+  top: 15.38%;
+  left: 58.43%;
+  z-index: 4;
+  width: 26.97%;
+  height: auto;
+  aspect-ratio: 1181 / 769;
+  background: url("../../assets/sprites/props/placeholder-cafe-counter-v07-redesign.png") center bottom / contain no-repeat !important;
+  image-rendering: auto;
+}
+
+.cafe-coffee-machine {
+  top: 0;
+  left: 10%;
+  width: 28%;
+  height: auto;
+  aspect-ratio: 987 / 1001;
+}
+
+.cafe-register {
+  top: 14%;
+  right: auto;
+  left: 75%;
+  width: 16%;
+  height: auto;
+  aspect-ratio: 855 / 928;
+}
+
+.cafe-register__screen {
+  display: none;
+}
+
+.cafe-register--awake .cafe-pilot-asset--kassandra-register {
+  filter: brightness(1.06) drop-shadow(0 0 4px rgba(22, 96, 108, 0.48));
+}
+
+.cafe-counter .cafe-decor-cups {
+  top: 17%;
+  left: 46%;
+  z-index: 7;
+  width: 15%;
+  height: auto;
+  aspect-ratio: 782 / 873;
+  background: url("../../assets/sprites/props/placeholder-cafe-cups-v06-redesign.png") center bottom / contain no-repeat;
+  image-rendering: auto;
+}
+
+.cafe-counter .cafe-decor-cups.cafe-decor--tier-1,
+.cafe-counter .cafe-decor-cups.cafe-decor--tier-2,
+.cafe-counter .cafe-decor-cups.cafe-decor--tier-3 {
+  width: 15%;
+  opacity: 1;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-cups-v06-redesign.png");
+}
+
+.cafe-table {
+  aspect-ratio: 1161 / 742;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-table-v06-redesign.png");
+  image-rendering: auto;
+}
+
+.cafe-table--left {
+  top: 35.38%;
+  left: 22.47%;
+  width: 12.36%;
+  aspect-ratio: 1161 / 742;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-table-v06-redesign.png");
+}
+
+.cafe-table--right {
+  top: 32.31%;
+  left: 43.82%;
+  width: 12.36%;
+  aspect-ratio: 1161 / 742;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-table-v06-redesign.png");
+}
+
+.cafe-table--back {
+  top: 49.23%;
+  left: 32.58%;
+  width: 10.67%;
+  aspect-ratio: 1161 / 742;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-table-v06-redesign.png");
+}
+
+.cafe-table--tier-3::after {
+  display: none;
+}
+
+.cafe-decor-plant {
+  top: 51%;
+  left: 15%;
+  z-index: 5;
+  width: 5.8%;
+  height: auto;
+  aspect-ratio: 790 / 1100;
+  background: url("../../assets/sprites/props/placeholder-cafe-plant-v06-redesign.png") center bottom / contain no-repeat;
+  image-rendering: auto;
+}
+
+.cafe-decor-plant.cafe-decor--tier-1,
+.cafe-decor-plant.cafe-decor--tier-2,
+.cafe-decor-plant.cafe-decor--tier-3 {
+  width: 5.8%;
+  opacity: 1;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-plant-v06-redesign.png");
+}
+
+.cafe-furniture-shelf {
+  top: 27%;
+  left: 77%;
+  z-index: 5;
+  width: 14%;
+  height: auto;
+  aspect-ratio: 1069 / 781;
+  background: url("../../assets/sprites/props/placeholder-cafe-shelf-v07-redesign.png") center / contain no-repeat;
+  image-rendering: auto;
+}
+
+.cafe-decor-clock {
+  top: 23%;
+  left: 18.5%;
+  z-index: 6;
+  width: 5.5%;
+  height: auto;
+  aspect-ratio: 701 / 719;
+  background: url("../../assets/sprites/props/placeholder-cafe-clock-v06-redesign.png") center / contain no-repeat;
+  image-rendering: auto;
+}
+
+.cafe-decor-clock.cafe-decor--tier-1,
+.cafe-decor-clock.cafe-decor--tier-2,
+.cafe-decor-clock.cafe-decor--tier-3 {
+  width: 5.5%;
+  opacity: 1;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-clock-v06-redesign.png");
+}
+
+.cafe-decor-lamp {
+  top: 31.5%;
+  left: 48.3%;
+  z-index: 4;
+  width: 4.2%;
+  height: auto;
+  aspect-ratio: 467 / 1438;
+  background: url("../../assets/sprites/props/placeholder-cafe-lamp-v06-redesign.png") center bottom / contain no-repeat;
+  image-rendering: auto;
+}
+
+.cafe-decor-lamp.cafe-decor--tier-1,
+.cafe-decor-lamp.cafe-decor--tier-2,
+.cafe-decor-lamp.cafe-decor--tier-3 {
+  width: 4.2%;
+  opacity: 1;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-lamp-v06-redesign.png");
+}
+
+/* The v07 room is shallower than the former shell. Seat anchors therefore use
+   the actual table geometry instead of the old low floor slots. Back-seat
+   guests sit behind a table (z4), front-seat guests in front (z6). */
+.placeholder-guest-seated .cafe-pilot-asset--guest {
+  bottom: -4px;
+  width: 76px;
+  height: 76px;
+}
+
+.placeholder-guest-seated::after,
+.placeholder-guest-seated .guest-status {
+  display: none;
+}
+
+.placeholder-guest-normal-03 {
+  top: 29%;
+  bottom: auto;
+  left: 24.6%;
+  z-index: 4;
+}
+
+.placeholder-guest-normal-05 {
+  top: 43.9%;
+  bottom: auto;
+  left: 29.1%;
+  z-index: 6;
+}
+
+.placeholder-guest-normal-04 {
+  top: 25.9%;
+  right: auto;
+  bottom: auto;
+  left: 49.1%;
+  z-index: 4;
+}
+
+.placeholder-guest-normal-06 {
+  top: 41.5%;
+  right: auto;
+  bottom: auto;
+  left: 52.9%;
+  z-index: 6;
+}
+
+.placeholder-guest-normal-08 {
+  top: 42.3%;
+  bottom: auto;
+  left: 33.1%;
+  z-index: 4;
+}
+
+.placeholder-guest-normal-09 {
+  top: 52.4%;
+  bottom: auto;
+  left: 39.3%;
+  z-index: 6;
+}
+
+.placeholder-guest-normal-07 {
+  top: 38%;
+  bottom: auto;
+  left: 15%;
+  z-index: 6;
+}
+
+.placeholder-guest-strange-01 {
+  top: 30%;
+  bottom: auto;
+  left: 62%;
+  z-index: 6;
+}
+
+.placeholder-guest-strange-02 {
+  top: 49%;
+  right: auto;
+  bottom: auto;
+  left: 68%;
+  z-index: 6;
+}
+
+.placeholder-guest-strange-03 {
+  top: 33%;
+  bottom: auto;
+  left: 7%;
+  z-index: 6;
+}
+
+/* The redesigned door moved right; Paula now starts centered in its opening. */
+.placeholder-guest-normal-01.placeholder-guest--at-door {
+  left: -118%;
+}
+
+/* === Approved isometric Day-1 scene =======================================
+   The approval canvas uses the diorama's native 16:9 coordinate system.
+   Runtime children remain inside .cafe-floor, so the anchors below are the
+   documented diorama positions converted to that container's coordinates. */
+.cafe-diorama--approved-day-one .cafe-stage-base {
+  object-fit: fill;
+}
+
+.cafe-diorama--approved-day-one .cafe-approved-wall-shelf {
+  position: absolute;
+  top: 9.43%;
+  left: 55.75%;
+  z-index: 9;
+  width: 18%;
+  height: auto;
+  object-fit: contain;
+  image-rendering: auto;
+  pointer-events: none;
+  user-select: none;
+}
+
+.cafe-diorama--approved-day-one .cafe-approved-wall-clock {
+  position: absolute;
+  top: 11.5%;
+  left: 74.2%;
+  z-index: 9;
+  width: 10.4%;
+  height: auto;
+  object-fit: contain;
+  image-rendering: auto;
+  pointer-events: none;
+}
+
+.cafe-diorama--approved-day-one .cafe-approved-floor-plant {
+  position: absolute;
+  top: 11.6%;
+  left: 45.5%;
+  z-index: 9;
+  width: 15.8%;
+  height: auto;
+  object-fit: contain;
+  image-rendering: auto;
+  pointer-events: none;
+  user-select: none;
+}
+
+.cafe-diorama--approved-day-one .cafe-dust,
+.cafe-diorama--approved-day-one .cafe-decor-clock,
+.cafe-diorama--approved-day-one .cafe-decor-lamp,
+.cafe-diorama--approved-day-one .cafe-decor-plant,
+.cafe-diorama--approved-day-one .cafe-decor-plant2,
+.cafe-diorama--approved-day-one .cafe-furniture-shelf,
+.cafe-diorama--approved-day-one .cafe-pet {
+  display: none;
+}
+
+.cafe-diorama--approved-day-one .cafe-counter {
+  top: -12.923%;
+  left: 53.865%;
+  width: 43.213%;
+  height: 74.538%;
+  aspect-ratio: auto;
+  background: url("../../assets/sprites/props/placeholder-cafe-counter-body-v02-target-reference.png") center / 100% 100% no-repeat !important;
+}
+
+.cafe-diorama--approved-day-one .cafe-counter__front,
+.cafe-diorama--approved-day-one .cafe-counter__ledge,
+.cafe-diorama--approved-day-one .cafe-counter .cafe-decor-cups {
+  display: none;
+}
+
+.cafe-diorama--approved-day-one .cafe-coffee-machine {
+  top: -2.477%;
+  left: 41.498%;
+  width: 31.721%;
+  aspect-ratio: 1448 / 1086;
+}
+
+.cafe-diorama--approved-day-one .cafe-register {
+  top: 34.262%;
+  left: 48.778%;
+  width: 21.581%;
+  aspect-ratio: 1402 / 1122;
+}
+
+.cafe-diorama--approved-day-one .cafe-register__screen,
+.cafe-diorama--approved-day-one .cafe-register__receipt {
+  display: none;
+}
+
+.cafe-approved-counter-prop {
+  display: none;
+  position: absolute;
+  height: auto;
+  object-fit: contain;
+  image-rendering: auto;
+  pointer-events: none;
+  user-select: none;
+}
+
+.cafe-diorama--approved-day-one .cafe-approved-counter-prop {
+  display: block;
+}
+
+.cafe-diorama--approved-day-one .cafe-approved-counter-prop--grinder {
+  top: 9.082%;
+  left: 64.899%;
+  z-index: 12;
+  width: 19.761%;
+}
+
+.cafe-diorama--approved-day-one .cafe-approved-counter-prop--lamp {
+  top: 2.456%;
+  left: 9.724%;
+  z-index: 14;
+  width: 24.831%;
+}
+
+.cafe-diorama--approved-day-one .cafe-approved-counter-prop--cup {
+  top: -2.142%;
+  left: 51.914%;
+  z-index: 15;
+  width: 10.119%;
+}
+
+.cafe-diorama--approved-day-one .cafe-table {
+  width: 18.775%;
+  aspect-ratio: 1;
+  overflow: visible;
+  background: none;
+  image-rendering: auto;
+}
+
+.cafe-diorama--approved-day-one .cafe-table--left {
+  top: 46.462%;
+  left: 15.843%;
+}
+
+.cafe-diorama--approved-day-one .cafe-table--right {
+  top: 21.846%;
+  left: 38.034%;
+}
+
+.cafe-diorama--approved-day-one .cafe-table--back {
+  top: 57.692%;
+  left: 65.978%;
+}
+
+/* Cem's pelvis (43,70 in the 96px source) attaches to the left back chair
+   (620,520 in its 1254px source), with the tabletop in front of his lap. */
+.cafe-diorama--approved-day-one .cafe-cem-table-group > .cafe-table {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 3;
+}
+
+.cafe-diorama--approved-day-one .cafe-cem-seat {
+  top: 32.177687%;
+  left: 24.731356%;
+  right: auto;
+  bottom: auto;
+  width: 90%; /* Approved size C; the proportional hip offset keeps the seat anchor fixed. */
+  height: auto;
+  aspect-ratio: 1;
+  border: 0;
+  z-index: 2;
+  transform: translate(-44.791667%, -72.916667%);
+  animation: none;
+  pointer-events: none;
+}
+
+.cafe-diorama--approved-day-one .cafe-cem-seat > .cafe-pilot-asset--guest {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: none;
+  animation: none;
+  object-fit: contain;
+}
+
+/* Fatou-only transfer from the approved compact reference. The neutral group
+   retains the table anchor; purchase/cleaning filters do not tint her body. */
+.cafe-diorama--approved-day-one .cafe-fatou-table-group > .cafe-table {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+}
+
+.cafe-diorama--approved-day-one .cafe-fatou-seat {
+  top: 57.535040%;
+  left: 83.706794%;
+  right: auto;
+  bottom: auto;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  border: 0;
+  z-index: 4;
+  transform: translate(-60.606061%, -65.629984%);
+  animation: none;
+  pointer-events: none;
+}
+
+.cafe-diorama--approved-day-one .cafe-fatou-seat > .cafe-pilot-asset--guest {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: none;
+  animation: none;
+  object-fit: contain;
+}
+
+.cafe-diorama--approved-day-one .cafe-fatou-table-group > .cafe-chair--front {
+  z-index: 5;
+}
+
+.cafe-diorama--approved-day-one .cafe-table__top,
+.cafe-diorama--approved-day-one .cafe-chair,
+.cafe-diorama--approved-day-one .cafe-table-plant {
+  display: block;
+  position: absolute;
+  border: 0;
+  background-color: transparent;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  box-shadow: none;
+  pointer-events: none;
+}
+
+.cafe-diorama--approved-day-one .cafe-table__top {
+  inset: 0;
+  z-index: 2;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-table-round-v09-target-reference.png");
+}
+
+.cafe-diorama--approved-day-one .cafe-chair--side {
+  top: -0.37%;
+  left: -14.12%;
+  z-index: 1;
+  width: 78.58%;
+  height: 78.49%;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-chair-back-left-v01-target-reference.png");
+}
+
+.cafe-diorama--approved-day-one .cafe-chair--front {
+  top: 29.11%;
+  right: auto;
+  bottom: auto;
+  left: 41.83%;
+  z-index: 3;
+  width: 80.79%;
+  height: 71.29%;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-chair-front-right-v01-target-reference.png");
+}
+
+.cafe-diorama--approved-day-one .cafe-table-plant {
+  top: 9.02%;
+  left: 34.59%;
+  z-index: 4;
+  width: 31.12%;
+  height: 34.89%;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-table-plant-v01-target-reference.png");
+}
+
+.cafe-diorama--approved-day-one .cafe-table::before,
+.cafe-diorama--approved-day-one .cafe-table::after {
+  display: none;
+}
+
+.cafe-staff-nino {
+  --nino-walk-duration: 960ms;
+  width: 108px;
+  height: 108px;
+  pointer-events: none;
+}
+
+.cafe-staff-nino > span {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+}
+
+.cafe-staff-nino__stand {
+  /* Match the visible height of the walk pose and align the feet. */
+  bottom: -11px;
+  width: 128px;
+  height: 128px;
+  background: url("../../assets/sprites/guests/placeholder-staff-nino.png") no-repeat center / contain;
+}
+
+.cafe-staff-nino__walk {
+  visibility: hidden;
+  bottom: -6px;
+  width: 108px;
+  height: 108px;
+  background-image: url("../../assets/sprites/guests/placeholder-staff-nino-walk-sheet.png");
+  background-size: 864px 108px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cafe-staff-nino {
+    animation: cafe-nino-arrive var(--nino-walk-duration) linear;
+  }
+
+  .cafe-staff-nino__stand {
+    animation: cafe-nino-stand var(--nino-walk-duration) step-end both;
+  }
+
+  .cafe-staff-nino__walk {
+    animation:
+      cafe-nino-walk var(--nino-walk-duration) steps(8) both,
+      cafe-nino-hide-walk var(--nino-walk-duration) step-end both;
+  }
+}
+
+@keyframes cafe-nino-arrive {
+  from { left: 50%; }
+}
+
+@keyframes cafe-nino-stand {
+  from { visibility: hidden; }
+  to { visibility: visible; }
+}
+
+@keyframes cafe-nino-walk {
+  from { background-position-x: 0; }
+  to { background-position-x: -864px; }
+}
+
+@keyframes cafe-nino-hide-walk {
+  from { visibility: visible; }
+  to { visibility: hidden; }
 }

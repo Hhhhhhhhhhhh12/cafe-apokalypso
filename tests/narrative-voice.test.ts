@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  getDioramaGuestVisibility,
   getManagementHudLabels,
   getNarrativeEventCards,
   getNextGuestPreview,
+  getGuestForCustomer,
   getServeLineForCustomer,
   getVisibleDaySevenLetter
 } from "../src/game/engine/selectors";
@@ -19,6 +19,18 @@ function stateForDay(day: DayNumber, overrides: Partial<GameState> = {}): GameSt
 }
 
 describe("guest serve lines", () => {
+  it("does not select Nele before Day 3, then includes her in the normal pool", () => {
+    for (const day of [1, 2] as const) {
+      for (let index = 0; index < 12; index += 1) {
+        expect(getGuestForCustomer(stateForDay(day), index)?.id).not.toBe("freelancerin-nele");
+      }
+    }
+    const dayThreeGuests = Array.from({ length: 8 }, (_, index) =>
+      getGuestForCustomer(stateForDay(3), index)?.id
+    );
+    expect(dayThreeGuests).toContain("freelancerin-nele");
+  });
+
   it("returns the served guest's narrative serve line, not developer copy", () => {
     const line = getServeLineForCustomer(stateForDay(1), 0);
     const kemal = weekOneGuests.find((guest) => guest.id === "pendler-kemal");
@@ -59,26 +71,21 @@ describe("guest serve lines", () => {
     expect(getServeLineForCustomer(dayFour, 3)).toBe(herrGrau?.serveLine);
   });
 
-  it("keeps Nele out of Day 1 and introduces her from Day 2", () => {
+  it("serves Kemal, Paula and Fatou as distinct Day-1 guests", () => {
     const dayOne = stateForDay(1);
     const kemal = weekOneGuests.find((guest) => guest.id === "pendler-kemal");
+    const fatou = weekOneGuests.find((guest) => guest.id === "pendlerin-fatou");
+    const paula = weekOneGuests.find((guest) => guest.id === "pendlerin-paula");
+    const nele = weekOneGuests.find((guest) => guest.id === "freelancerin-nele");
 
-    // Day 1 has one guest in its normal pool, so the two-customer opening
-    // repeats Kemal until another Day 1 guest is approved.
     expect(getServeLineForCustomer(dayOne, 0)).toBe(kemal?.serveLine);
-    expect(getServeLineForCustomer(dayOne, 1)).toBe(kemal?.serveLine);
-    expect(getServeLineForCustomer(dayOne, 5)).toBe(kemal?.serveLine);
-
-    const initial = createInitialGameState();
-    const seatedState = (day: DayNumber): GameState => ({
-      ...initial,
-      day,
-      equipment: { ...initial.equipment, seating: 1 },
-      dayManagement: { ...initial.dayManagement, customersServed: 1, servedGuestIds: ["freelancerin-nele"] }
-    });
-
-    expect(getDioramaGuestVisibility(seatedState(1)).nele).toBe(false);
-    expect(getDioramaGuestVisibility(seatedState(2)).nele).toBe(true);
+    expect(getServeLineForCustomer(dayOne, 1)).toBe(paula?.serveLine);
+    expect(getServeLineForCustomer(dayOne, 2)).toBe(fatou?.serveLine);
+    expect(getServeLineForCustomer(dayOne, 0)).not.toBe(
+      getServeLineForCustomer(dayOne, 1)
+    );
+    expect(getServeLineForCustomer(dayOne, 5)).toBe(fatou?.serveLine);
+    expect(getServeLineForCustomer(dayOne, 5)).not.toBe(nele?.serveLine);
   });
 });
 
@@ -99,25 +106,6 @@ describe("day openers and unlock messages", () => {
     for (const day of weekOneDays) {
       expect(day.dayOpener.trim().length).toBeGreaterThan(0);
     }
-  });
-
-  it("introduces Day 2 newcomers without inventing multiple returning Day 1 guests", () => {
-    const [dayOne, dayTwo] = weekOneDays;
-    const dayOneGuestIds = new Set<string>(dayOne.guestIds);
-    const returningGuests = dayTwo.guestIds.filter((id) => dayOneGuestIds.has(id));
-
-    expect(dayOne.guestIds).toEqual(["pendler-kemal"]);
-    expect(returningGuests).toEqual(["pendler-kemal"]);
-    expect(dayTwo.guestIds).toContain("freelancerin-nele");
-    expect(dayTwo.dayOpener).toMatch(/yesterday, Kemal/i);
-    expect(dayTwo.dayOpener).toMatch(/new faces/i);
-    expect(dayTwo.dayOpener).not.toMatch(/faces from yesterday have returned/i);
-
-    // Christa is new on Day 2; her first order cannot reference a prior visit.
-    const christa = weekOneGuests.find((guest) => guest.id === "cappuccino-christa");
-    expect(christa?.firstDay).toBe(2);
-    expect(christa?.orderLine ?? "").not.toMatch(/yesterday/i);
-    expect(christa?.sampleLines.join(" ") ?? "").not.toMatch(/yesterday/i);
   });
 
   it("provides unlock messages for days 3-6 only", () => {

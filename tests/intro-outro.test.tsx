@@ -25,14 +25,16 @@ describe("Diegetic cinematic intro (IntroSequence)", () => {
     const markup = renderToStaticMarkup(<IntroSequence onComplete={() => {}} />);
 
     expect(markup).toContain("intro-cinema");
-    expect(visibleText(markup)).toContain("Skip");
+    expect(markup).toContain('aria-label="Intro überspringen"');
+    expect(visibleText(markup)).toBe("");
   });
 
-  it("opens fully dark — veil starts at opacity 1", () => {
+  it("starts in the dark phase with the doorway closed", () => {
     const markup = renderToStaticMarkup(<IntroSequence onComplete={() => {}} />);
 
-    // The veil div gets an inline opacity:1 on the first beat (full black).
-    expect(markup).toContain("opacity:1");
+    expect(markup).toContain('data-phase="dark"');
+    expect(markup).toMatch(/class="arcana-world\s*"/);
+    expect(markup).toContain('class="arcana-door-lit-room"');
   });
 });
 
@@ -50,7 +52,11 @@ describe("App intro/outro screens", () => {
     const markup = renderAppWith(createMemoryStorage());
 
     expect(markup).toContain("intro-cinema");
-    expect(visibleText(markup)).toContain("Skip");
+    expect(markup).toContain('aria-label="Intro überspringen"');
+    // Gameplay must not be reachable behind the intro while the room is revealed.
+    expect(markup).not.toContain("workspace-grid");
+    expect(markup).toContain("intro-cinema__scene");
+    expect(markup).toContain("inert");
   });
 
   it("keeps a fresh run playable when browser storage is unavailable", () => {

@@ -52,7 +52,7 @@ function baseState(): GameState {
   return {
     ...createInitialGameState(),
     dayPhase: "open",
-    equipment: { machine: 2, seating: 2, register: 1 },
+    equipment: { machine: 2, grinder: 1, clock: 1, seating: 2, register: 1 },
     dayManagement: {
       ...createInitialGameState().dayManagement,
       customersServed: 5,
