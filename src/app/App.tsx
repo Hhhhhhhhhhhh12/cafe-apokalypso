@@ -41,6 +41,7 @@ function readBootAck(storage: StorageLike | null): boolean {
 
 export function App() {
   const storage = useMemo(() => getBrowserStorage(), []);
+  const [optionsPanel, setOptionsPanel] = useState<HTMLDivElement | null>(null);
   const [initialSave] = useState(() => storage ? readGameSave(storage) : null);
   const [storageStatus, setStorageStatus] = useState<StorageStatusKind | null>(() => {
     if (!initialSave) return "unavailable";
@@ -175,7 +176,7 @@ export function App() {
           </p>
         </div>
         <div className="hero-bar__aside">
-          <OptionsMenu />
+          <OptionsMenu panelRef={setOptionsPanel} />
           <div className="day-card" aria-label={`Current status: Day ${gameState.day}`}>
             <span className="day-card__label">Current day</span>
             <strong>Day {gameState.day}</strong>
@@ -231,6 +232,8 @@ export function App() {
         <ResourceHud gameState={gameState} />
         <CafeScene
           gameState={gameState}
+          bohnStorage={storage}
+          bohnOccluder={optionsPanel}
           onCleanTables={() => dispatch({ type: "clean_tables" })}
         />
         <ActionPanel

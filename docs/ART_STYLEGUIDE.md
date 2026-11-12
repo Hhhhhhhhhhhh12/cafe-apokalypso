@@ -22,6 +22,7 @@ Small, dense, cozy-absurd pixel café in a light 3/4 diorama perspective.
 - pixel-art inspired
 - readable at small sizes
 - limited detail density per object
+- Match face detail and pixel scale to the other figures at their in-game size.
 - no glossy AI-render look
 - no pseudo-realistic illustration
 - no generic mobile-game asset look

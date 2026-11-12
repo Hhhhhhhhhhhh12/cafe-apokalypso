@@ -3,8 +3,10 @@ import { weekOneEvents } from "../../game/data/events";
 import { useCallback, useEffect, useRef, useState, type MouseEvent } from "react";
 import type { GameState } from "../../game/types/game";
 import type { GuestId, ProductId } from "../../game/types/content";
+import type { StorageLike } from "../../game/engine/save";
 import { getDioramaGuestVisibility, getGuestForCustomer, getNextGuestPreview, getNarrativeEventCards } from "../../game/engine/selectors";
 import { kassandraMessages } from "../../game/data/kassandra";
+import { useBohnAppearance } from "./bohnAppearance";
 import {
   COUNTER_FRAME,
   DECOR_SPOTS,
@@ -21,7 +23,6 @@ import firstCupAsset from "../../../assets/sprites/props/placeholder-cafe-cup-v0
 import stageBaseAsset from "../../../assets/backgrounds/placeholder-cafe-stage-base-v06-pixellab.png";
 import coffeeMachineAsset from "../../../assets/sprites/props/placeholder-cafe-coffee-machine.png";
 import kassandraRegisterAsset from "../../../assets/sprites/props/placeholder-kassandra-register.png";
-import bohnGuestAsset from "../../../assets/sprites/guests/placeholder-guest-bohn.png";
 import strangeGuestAsset from "../../../assets/sprites/guests/placeholder-guest-strange.png";
 import cemSeatedAsset from "../../../assets/sprites/guests/placeholder-guest-cem-seated.png";
 import miraSeatedAsset from "../../../assets/sprites/guests/placeholder-guest-mira-seated.png";
@@ -53,7 +54,7 @@ const SEATED_GUESTS = [
   { key: "mira", asset: miraSeatedAsset, label: "Mira · Seated" },
   { key: "lukas", asset: lukasSeatedAsset, label: "Lukas · Seated" },
   { key: "christa", asset: christaSeatedAsset, label: "Christa · Seated" },
-  { key: "bohn", asset: bohnGuestAsset, label: "Bohn · Seated" },
+  { key: "bohn", label: "Bohn · Seated" },
   { key: "strange", asset: strangeGuestAsset, label: "Seated" },
   { key: "nele", asset: neleSeatedAsset, label: "Nele · Seated" },
   { key: "meda", asset: medaGuestAsset, label: "Seated" },
@@ -72,6 +73,8 @@ function prefersReducedMotion(): boolean {
 
 interface CafeSceneProps {
   gameState: GameState;
+  bohnStorage?: StorageLike | null;
+  bohnOccluder?: HTMLElement | null;
   onServeProduct?: (productId: ProductId) => void;
   /** Fired when the player clicks a dirty table in the diorama (issue #130). */
   onCleanTables?: () => void;
@@ -83,7 +86,8 @@ interface CafeSceneProps {
  * Ersetzt die verschachtelten Positionierungs-Container (back-wall/side-wall/
  * floor/queue) des alten CafePlaceholder durch eine flache Sprite-Liste.
  */
-export function CafeScene({ gameState, onCleanTables }: CafeSceneProps) {
+export function CafeScene({ gameState, onCleanTables, bohnStorage = null, bohnOccluder = null }: CafeSceneProps) {
+  const bohn = useBohnAppearance(bohnStorage, bohnOccluder);
   // --- Visual state classes ---
   const cleanlinessClass =
     gameState.resources.cleanliness >= 70
@@ -156,6 +160,7 @@ export function CafeScene({ gameState, onCleanTables }: CafeSceneProps) {
     key: queueKey, day: gameState.day, served: customersServed, guest: selectedGuest,
   });
   const queueGuest = queueSnapshot.guest;
+  const isBohnQueued = queueGuest?.id === "herr-bohn";
   const reducedMotion = prefersReducedMotion();
 
   // Keep the departing customer's identity until their exit completes. Resets,
@@ -511,6 +516,8 @@ export function CafeScene({ gameState, onCleanTables }: CafeSceneProps) {
             >
               <span
                 className={`cafe-pilot-asset cafe-pilot-asset--standing cafe-pilot-asset--${queueGuest ? GUEST_SPRITES[queueGuest.id] : ""}-standing`}
+                ref={isBohnQueued ? bohn.spriteRef : undefined}
+                style={isBohnQueued ? { backgroundImage: `url("${bohn.standing}")` } : undefined}
                 aria-hidden="true"
               />
               {guestPhase === "idle" && queueGuest?.id === selectedGuest?.id && nextGuest?.wants && (
@@ -528,7 +535,7 @@ export function CafeScene({ gameState, onCleanTables }: CafeSceneProps) {
           ) : null}
 
           {/* Sitzende Gäste — Sichtbarkeit aus dem Selector, Platz aus scene.ts */}
-          {SEATED_GUESTS.map(({ key, asset, label, ...guest }) =>
+          {SEATED_GUESTS.map(({ key, label, ...guest }) =>
             visibleGuests[key] && !(queueGuest && GUEST_SPRITES[queueGuest.id] === key &&
               (showQueueGuest || guestPhase === "walking-to-counter" || guestPhase === "exiting-east")) ? (
               <span
@@ -539,7 +546,8 @@ export function CafeScene({ gameState, onCleanTables }: CafeSceneProps) {
               >
                 <img
                   className={`cafe-pilot-asset cafe-pilot-asset--guest cafe-pilot-asset--${"spriteClass" in guest ? guest.spriteClass : key}`}
-                  src={asset}
+                  src={"asset" in guest ? guest.asset : bohn.seated}
+                  ref={key === "bohn" ? bohn.spriteRef : undefined}
                   alt=""
                   aria-hidden="true"
                 />
