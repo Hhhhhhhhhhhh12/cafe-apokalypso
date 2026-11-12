@@ -86,11 +86,65 @@ describe("save safety", () => {
     const storage = createMemoryStorage();
     const state = createInitialGameState();
 
-    saveGameState(state, storage);
+    expect(saveGameState(state, storage)).toEqual({ ok: true });
     expect(loadGameState(storage)).toEqual(state);
 
-    resetSavedGameState(storage);
+    expect(resetSavedGameState(storage)).toEqual({ ok: true });
     expect(loadGameState(storage)).toEqual(createFreshRunState());
+  });
+
+  it("reports a rejected write without interrupting the active state", () => {
+    const state = createInitialGameState();
+    const storage: StorageLike = {
+      getItem: () => null,
+      setItem: () => {
+        throw new DOMException("Storage quota exceeded", "QuotaExceededError");
+      },
+      removeItem: () => {}
+    };
+
+    expect(saveGameState(state, storage)).toEqual({
+      ok: false,
+      failedKeys: [SAVE_KEY]
+    });
+    expect(state).toEqual(createInitialGameState());
+  });
+
+  it("attempts every save key when one removal is rejected", () => {
+    const attemptedKeys: string[] = [];
+    const rejectedKey = SAVE_KEY;
+    const initialState = createInitialGameState();
+    const savedState = {
+      ...initialState,
+      resources: {
+        ...initialState.resources,
+        money: 99
+      }
+    };
+    const values = new Map([[SAVE_KEY, JSON.stringify(savedState)]]);
+    const storage: StorageLike = {
+      getItem: (key) => values.get(key) ?? null,
+      setItem: (key, value) => void values.set(key, value),
+      removeItem: (key) => {
+        attemptedKeys.push(key);
+        if (key === rejectedKey) {
+          throw new DOMException("Storage access denied", "SecurityError");
+        }
+        values.delete(key);
+      }
+    };
+
+    expect(resetSavedGameState(storage)).toEqual({
+      ok: false,
+      failedKeys: [rejectedKey]
+    });
+    expect(attemptedKeys).toEqual([
+      SAVE_KEY,
+      "cafe-apokalypso.save.v1",
+      "cafe-apokalypso.save.v2",
+      "cafe-apokalypso.save.v3"
+    ]);
+    expect(loadGameState(storage)).toEqual(savedState);
   });
 
   it("preserves valid progress through reload-style save/load", () => {
@@ -297,5 +351,29 @@ describe("save migration", () => {
     // machine/seating are kept as-is; the register slot (added after these saves
     // were written) is backfilled to the owned baseline tier 1.
     expect(migrated.equipment).toEqual({ machine: 2, seating: 0, register: 1 });
+  });
+});
+
+describe("daily served guest history", () => {
+  it("preserves seated guest identities over a save round trip", () => {
+    const state = createInitialGameState();
+    state.day = 2;
+    state.dayManagement.customersServed = 2;
+    state.dayManagement.servedGuestIds = ["pendler-kemal", "laptop-lukas"];
+    const storage = createMemoryStorage();
+    expect(saveGameState(state, storage).ok).toBe(true);
+    expect(loadGameState(storage).dayManagement.servedGuestIds).toEqual(state.dayManagement.servedGuestIds);
+  });
+
+  it("accepts existing saves without the optional service history", () => {
+    const state = createInitialGameState();
+    delete state.dayManagement.servedGuestIds;
+    expect(loadGameState(createMemoryStorage(JSON.stringify(state)))).toEqual(state);
+  });
+
+  it("rejects malformed service history", () => {
+    const state = createInitialGameState();
+    const raw = { ...state, dayManagement: { ...state.dayManagement, servedGuestIds: "Kemal" } };
+    expect(loadGameState(createMemoryStorage(JSON.stringify(raw)))).toEqual(createFreshRunState());
   });
 });

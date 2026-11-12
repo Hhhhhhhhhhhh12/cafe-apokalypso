@@ -109,7 +109,7 @@ KASSANDRA should become stranger over time, eventually connecting café operatio
 
 ### Nele
 
-Nele is the early tone anchor and a save-state-persistent character. She appears from Day 1 and persists across runs where all other guests are re-initialized. She has been here before — in previous weeks, previous collapses, previous versions of this café. Her dry humor reads as observation; it is actually recognition.
+Nele is the early tone anchor and a save-state-persistent character. Her first appearance is on Day 2; she is absent on Day 1 and persists across runs where all other guests are re-initialized. She has been here before — in previous weeks, previous collapses, previous versions of this café. Her dry humor reads as observation; it is actually recognition.
 
 KASSANDRA does not classify her. Her entry is blank or missing. This is intentional.
 

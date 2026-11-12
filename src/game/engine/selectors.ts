@@ -254,39 +254,36 @@ export interface DioramaGuestVisibility {
   fatou: boolean;
 }
 
+/** Recover only an unambiguous served prefix for pre-history saves. */
+export function getServedGuestIds(state: GameState): readonly GuestId[] {
+  const { customersServed, guestsLost, servedGuestIds } = state.dayManagement;
+  if (servedGuestIds) return servedGuestIds;
+  if (guestsLost > 0) return [];
+  return Array.from({ length: customersServed }, (_, index) => getGuestForCustomer(state, index)?.id)
+    .filter((id): id is GuestId => id !== undefined);
+}
+
 export function getDioramaGuestVisibility(
   state: GameState
 ): DioramaGuestVisibility {
-  const { customersServed } = state.dayManagement;
-
-  // No furniture, no sitting: until seating is bought, guests order at the
-  // counter and stand / take away, so no one is shown seated.
-  if (state.equipment.seating < 1) {
-    return {
-      cem: false,
-      mira: false,
-      lukas: false,
-      christa: false,
-      bohn: false,
-      strange: false,
-      nele: false,
-      meda: false,
-      roterRegenschirm: false,
-      fatou: false
-    };
-  }
+  const servedIds = new Set(getServedGuestIds(state));
+  const eligibleIds = new Set(getAvailableGuests(state)
+    .filter((guest) => guest.firstDay <= state.day)
+    .map((guest) => guest.id));
+  const seated = (id: GuestId) => state.equipment.seating >= 1 &&
+    eligibleIds.has(id) && servedIds.has(id);
 
   return {
-    cem: customersServed >= 1,
-    mira: customersServed >= 2,
-    lukas: customersServed >= 3,
-    christa: state.day >= 2 && customersServed >= 2,
-    bohn: state.day >= 3 && customersServed >= 1,
-    strange: state.day >= 4 && customersServed >= 3,
-    nele: customersServed >= 1,
-    meda: state.day >= 5 && customersServed >= 1,
-    roterRegenschirm: state.day >= 7 && customersServed >= 2,
-    fatou: state.day >= 2 && customersServed >= 1
+    cem: seated("lieferfahrer-cem"),
+    mira: seated("nachbarin-mira"),
+    lukas: seated("laptop-lukas"),
+    christa: seated("cappuccino-christa"),
+    bohn: seated("herr-bohn"),
+    strange: seated("herr-grau"),
+    nele: seated("freelancerin-nele"),
+    meda: seated("meda"),
+    roterRegenschirm: seated("frau-roter-regenschirm"),
+    fatou: seated("pendlerin-fatou")
   };
 }
 
@@ -378,7 +375,7 @@ export function getDayCoachHint(state: GameState): DayCoachHint | null {
 
   if (state.day === 2) {
     if (served === 0) {
-      return { text: "The regulars are back. Serve the morning crowd and keep an eye on stress.", target: "serve" };
+      return { text: "Kemal is back, and the morning crowd has grown. Serve them and keep an eye on stress.", target: "serve" };
     }
     if (!roomCared && served >= 2) {
       return { text: "A quick clean now keeps the room calm and stress down.", target: "clean" };

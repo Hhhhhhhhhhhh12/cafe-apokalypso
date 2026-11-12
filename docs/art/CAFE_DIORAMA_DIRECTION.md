@@ -345,7 +345,7 @@ No neon, no high-saturation web colors.
 
 ### Raw AI-generated sheets
 
-Raw AI-generated image sheets (Google AI Studio, Gemini, Nano Banana, ImageGen outputs) **must not enter the repository**.
+Raw generated image sheets **must not enter the repository**.
 
 They live outside the repo in the designated moodboard workspace:
 ```

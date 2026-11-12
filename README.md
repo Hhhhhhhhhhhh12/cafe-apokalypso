@@ -4,21 +4,26 @@ A cozy-absurd café management soft-roguelite about running a small pixel café 
 
 ## Demo
 
-Playable browser demo: _coming soon_
+[Play Café Apokalypso in your browser](https://hhhhhhhhhhhh12.github.io/cafe-apokalypso/)
 
-Target URL after GitHub Pages setup:
+The deployed vertical slice covers the complete first café week from Day 1 through the Day 7 cliffhanger. It runs as a static browser app: no install, backend, account, or real AI API is required. Progress is saved locally in the browser.
 
-```text
-https://hhhhhhhhhhhh12.github.io/cafe-apokalypso/
-```
+The demo is still in active development. Final art, presentation polish, and balancing are not complete, and approved screenshots or GIFs will be added only after the current graphics review.
 
-The MVP runs as a static browser app: no backend, no accounts, no real AI API, local save only.
+## What You Can Try
+
+- play through all seven days and reach the end-of-week letter
+- serve a changing mix of regular and increasingly strange guests
+- manage money, supplies, cleanliness, stress, reputation, and limited daily actions
+- adjust prices and daily offers, run advertising, and assign temporary help as systems unlock
+- consult KASSANDRA, encounter scripted events, and unlock local achievements
+- leave and resume via the local browser save, or reset the week for another run
 
 ## Current Status
 
-Early concept / pre-production.
+Playable seven-day browser demo / vertical slice, in active development.
 
-Current goal: a portfolio-ready seven-day vertical slice that communicates the core identity of the game without pretending to be the full long-term version.
+The complete first-week loop is implemented and publicly deployed. It communicates the core identity and progression of the game without pretending to be the full long-term version or a final production MVP.
 
 ## Core Idea
 
@@ -77,7 +82,7 @@ Every day should unlock or reveal something meaningful.
 
 ## Technical Direction
 
-Planned MVP stack:
+Current demo stack:
 
 - Vite
 - React
@@ -93,8 +98,15 @@ The code should clearly separate game engine logic, structured game data, and Re
 Install dependencies:
 
 ```bash
-npm install
+npm ci
 ```
+
+The compiler and lint tooling temporarily use separate TypeScript packages:
+
+- `@typescript/native` is an npm alias for TypeScript 7; it provides `tsc` for `npm run typecheck`.
+- `typescript` is an npm alias for `@typescript/typescript6`; it provides the TypeScript 6 compiler API required by typescript-eslint and the separate `tsc6` command.
+
+This follows [Microsoft's side-by-side setup](https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/#running-side-by-side-with-typescript-6.0). Keep both aliases until typescript-eslint supports the native compiler API; bypassing peer checks with `--force` or `--legacy-peer-deps` is not required.
 
 Start the local browser app:
 
@@ -105,17 +117,21 @@ npm run dev
 Run the required checks:
 
 ```bash
+npm run lint
 npm run typecheck
 npm run test
 npm run build
 ```
 
-The current app is an early placeholder shell. It includes a day-one state, resource HUD, placeholder 3/4 café area, action panel, and defensive localStorage reset flow.
+The current app includes setup, open-café, and closing phases across Days 1–7; progressive management and story unlocks; local save and reset flows; and a clear end-of-week handoff. Visual presentation and game balance remain in development.
 
 ## Documentation
 
+New here? Start with [`docs/ONBOARDING.md`](docs/ONBOARDING.md) — a 15-minute overview to get playing and developing.
+
 Detailed project docs live in `docs/`:
 
+- `ONBOARDING.md` — **new-contributor overview**: what the game is, how to run it, where to read next
 - `PROJECT_CANON.md` — **first source of truth**: all agents and contributors read this first
 - `DECISIONS.md` — binding design and technical decisions
 - `GAME_DESIGN.md` — gameplay systems and player experience

@@ -61,7 +61,7 @@ If a task would violate a requirement here, stop and explain the conflict instea
 - Major UI screens or visual systems require a UI Sheet in `docs/art/` before final art production.
 - Recurring props, icons, café objects, and event items require an Asset Sheet in `docs/art/` before final art production.
 - Moodboard-driven style decisions and weirdness-escalation changes must be documented before they are implemented as final visuals.
-- Raw AI Studio / Gemini / Nano Banana image sheets must not be committed as production assets.
+- Raw generated image sheets must not be committed as production assets.
 - Only cropped, curated, explicitly approved pilot assets may enter the repository.
 - Generated gibberish text, AI-made typography, unreadable labels, or baked-in UI text must not be used as game UI.
 - UI text, buttons, values, labels, menus, and status information must remain real HTML/CSS/React text.

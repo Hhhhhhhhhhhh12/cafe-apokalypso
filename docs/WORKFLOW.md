@@ -1,3 +1,9 @@
+> **Rollenhinweis (13.10.2026):** Die KI-Rollen und die Handoff-Reihenfolge in
+> diesem Dokument sind historisch. Codex ist inzwischen der primäre Arbeitsbereich
+> für Projektkoordination, Planung, Dokumentation, Reviews und Implementierung.
+> Aktuelle Anleitung: [`CODEX_HANDOFF.md`](CODEX_HANDOFF.md). Die übrigen GitHub-
+> und PR-Prozesshinweise bleiben nutzbar, sofern sie dem Handoff nicht widersprechen.
+
 # Workflow
 
 ## Agent Roles
@@ -47,6 +53,12 @@ Use Pull Requests or commit groups to document reviewable repository changes.
 Use GitHub Actions as soon as code exists.
 
 GitHub is not the place for binding design canon unless the decision is also reflected in the relevant Markdown documentation.
+
+### GitHub Pages deployment
+
+Publishing the playable demo is a separate release step. In GitHub Actions,
+open **Deploy to GitHub Pages**, select **Run workflow**, and choose `main`
+when that revision is approved for publication. Merges continue to run CI.
 
 ### GitHub Issues
 
@@ -281,7 +293,7 @@ Do not overwrite existing notes from other chats without review. Prefer additive
 
 ## Visual Exploration Workflow
 
-Visual exploration with Gemini, Google AI Studio, Nano Banana, image prompts, generated references, and moodboard Markdown files is handled separately from implementation work.
+Visual exploration with approved image tools, prompts, generated references, and moodboard Markdown files is handled separately from implementation work.
 
 Rules:
 
@@ -291,13 +303,13 @@ Rules:
 - A visual decision becomes binding only when it is transferred into `docs/ART_STYLEGUIDE.md`, `docs/ART_PIPELINE.md`, or another relevant canonical document.
 - Codex implementation prompts must treat moodboards as reference material only, not as direct implementation instructions.
 - Claude Code may summarize moodboards and propose canonical art-rule updates, but must mark them as proposals until the user approves them.
-- Codex must not convert Gemini, Google AI Studio, or Nano Banana outputs into final assets.
+- Codex needs explicit approval before turning generated references into production assets.
 
 Recommended visual exploration branches:
 
 - `art/moodboard-cafe-interior-001`
 - `art/day1-day7-visual-progression`
-- `art/google-ai-studio-gemini-references`
+- `art/visual-references`
 
 ## Art Review and Approval Requirement
 

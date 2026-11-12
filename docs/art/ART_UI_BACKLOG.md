@@ -33,8 +33,8 @@ session. Newest decisions on top of each list. Status: ✅ done · 🔄 in progr
    classes (sprite per tier) in `global.css`. Keep the shared TSX edits minimal.
 2. **Plant in the empty corner** — fill the bare floor; simplest first integration.
 3. **3 missing normal guests** (Lukas grey / Christa camel+burgundy / Bohn navy) —
-   AI Studio prompts ready in `asset-inbox/PROMPTS-guests-batch5.md`; needs owner's
-   download step. Then extract + wire like Mira.
+   Existing prompts in `asset-inbox/PROMPTS-guests-batch5.md` are reference
+   material. Select and approve candidates before extraction and integration.
 4. **Stage Base v04** (front-3/4 empty room) — the *root* fix for prop float; replaces
    the corner-isometric v03. Brief in `PILOT_ASSET_INTAKE.md`. Biggest single win.
 5. **Pitch hero screenshot** — clean capture at a chosen day/state (e.g. Day 7, full

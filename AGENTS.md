@@ -3,13 +3,17 @@
 Cozy-Management-Spiel (React + Vite + TypeScript), 7 Tage, langsam kippende Stimmung.
 KRITISCHE Regel: Immer auf gescheite Diversität der Figuren achten (Hauttöne, Körperformen, Hintergründe).
 
-> Diese Datei spiegelt `CLAUDE.md` (gleiches Projektwissen, tool-neutral). Bei
-> Widerspruch gilt der Code; danach `CLAUDE.md`/`AGENTS.md` synchron halten.
+> Aktuelle Übergabe und Rollen: [`docs/CODEX_HANDOFF.md`](docs/CODEX_HANDOFF.md).
+> Codex ist der primäre Arbeitsbereich. Gemeinsames Projektwissen mit `CLAUDE.md`
+> synchron halten; werkzeugspezifische Befehle dürfen abweichen.
+> Code beschreibt das implementierte Verhalten; `docs/PROJECT_CANON.md` und
+> `docs/DECISIONS.md` beschreiben die freigegebene Spielabsicht. Widersprüche
+> melden, nicht stillschweigend durch eine Änderung des Kanons auflösen.
 
 ## Befehle
 
 - Dev-Server: `npm run dev` (Vite, Port 5173). Für Preview-Setup siehe `.claude/launch.json`.
-- Tests: `npx vitest run` (322 Tests, müssen grün bleiben)
+- Tests: `npm run test` (vollständige Suite muss grün sein; aktuelle Testzahl aus dem Prüflauf)
 - Typecheck: `npx tsc --noEmit`
 
 ## Token-Arbeitsregeln
@@ -47,7 +51,7 @@ KRITISCHE Regel: Immer auf gescheite Diversität der Figuren achten (Hauttöne, 
 
 - Key: `cafe-apokalypso.save.v4` (siehe `src/game/engine/save.ts`)
 - Testzustand injizieren: Save lesen, Felder patchen (`day`, `dayPhase:'open'`, `decor:{clock:3,lamp:2,cups:2,plant:3,shelf:3}`, `dayManagement.customersServed`, `resources.cleanliness`), zurückschreiben, `location.reload()`. Danach mit `localStorage.removeItem(key)` aufräumen.
-- Gast-Sichtbarkeit: Cem ≥1 served, Mira ≥2, Lukas ≥3, Christa Day ≥2 & ≥2 served, Bohn Day ≥3 & ≥1 served, Herr Grau (Strange) Day ≥4 & ≥3 served.
+- Gast-Sichtbarkeit: Warteschlange aus `getGuestForCustomer(customersServed + guestsLost)`. Sitzplätze nur für heute tatsächlich bediente `servedGuestIds`, mit Seating, Tages-Roster und `firstDay` als Gates; kein gleichzeitiges Sitz-/Queue-Duplikat. Tag 1 nur Kemal; Nele ab Tag 2. Alte Saves ohne Service-Historie: nur ohne Walkouts ist der bediente Präfix rekonstruierbar.
 
 ## Pixellab
 

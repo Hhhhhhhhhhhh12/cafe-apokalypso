@@ -38,7 +38,7 @@ Check for:
 - whether Nele and Meda are consistently represented as separate characters
 - whether Nele stays mostly normal and acts as an early tone anchor
 - whether Meda carries the first clearer Medusa-like mythological hint
-- whether image tools such as OpenAI ImageGen, Nano Banana / Gemini image tools, and Google AI Studio are clearly treated as art-direction tools, not coding agents
+- whether approved image tools such as OpenAI ImageGen are clearly treated as art-direction tools, not coding agents
 - whether Antigravity is treated only as a possible later coding/review tool, not as an art pipeline replacement
 
 Important fixed decisions:
@@ -773,7 +773,7 @@ Constraints:
 - No accounts
 - No tracking
 - No external asset dependency
-- Do not commit raw AI Studio / Gemini / Nano Banana image batches
+- Do not commit raw generated image batches
 - Do not use images that contain generated gibberish text as UI
 - Do not introduce readable text inside art assets unless explicitly approved
 - Do not change the main 3/4 café view

@@ -34,5 +34,12 @@ export default tseslint.config(
     languageOptions: {
       globals: { ...globals.node }
     }
+  },
+  {
+    // Repository tools are Node scripts, not browser code.
+    files: ["tools/**/*.mjs"],
+    languageOptions: {
+      globals: { ...globals.node }
+    }
   }
 );

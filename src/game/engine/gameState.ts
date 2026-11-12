@@ -211,6 +211,9 @@ function isValidDayManagement(value: unknown): value is DayManagementState {
     typeof management.actionPointsRemaining === "number" &&
     typeof management.actionPointsSpent === "number" &&
     typeof management.customersServed === "number" &&
+    (management.servedGuestIds === undefined ||
+      (Array.isArray(management.servedGuestIds) &&
+        management.servedGuestIds.every((id) => typeof id === "string"))) &&
     typeof management.moneyEarned === "number" &&
     typeof management.moneySpent === "number" &&
     isValidSupplies(management.suppliesUsed) &&

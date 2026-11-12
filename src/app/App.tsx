@@ -3,8 +3,9 @@ import { gameReducer } from "../game/engine/reducer";
 import { createFreshRunState } from "../game/engine/gameState";
 import {
   getBrowserStorage,
-  loadGameState,
+  readGameSave,
   resetSavedGameState,
+  SAVE_KEY,
   saveGameState,
   type StorageLike
 } from "../game/engine/save";
@@ -15,6 +16,12 @@ import { ActionPanel } from "../ui/components/ActionPanel";
 import { CafeScene } from "../ui/cafe/CafeScene";
 import { IntroSequence } from "../ui/components/IntroSequence";
 import { OptionsMenu } from "../ui/components/OptionsMenu";
+import { StorageStatusMessage } from "../ui/components/StorageStatusMessage";
+import {
+  type PendingResetStorageStatus,
+  resolveStorageStatusAfterSave,
+  type StorageStatusKind
+} from "../ui/components/storageStatus";
 import { DayProgressPanel } from "../ui/panels/DayProgressPanel";
 import { ResourceHud } from "../ui/panels/ResourceHud";
 
@@ -34,18 +41,30 @@ function readBootAck(storage: StorageLike | null): boolean {
 
 export function App() {
   const storage = useMemo(() => getBrowserStorage(), []);
-  const [gameState, dispatch] = useReducer(
-    gameReducer,
-    storage,
-    (availableStorage) =>
-      availableStorage ? loadGameState(availableStorage) : createFreshRunState()
+  const [initialSave] = useState(() => storage ? readGameSave(storage) : null);
+  const [storageStatus, setStorageStatus] = useState<StorageStatusKind | null>(() => {
+    if (!initialSave) return "unavailable";
+    return initialSave.status === "load-failed" ? "load-failed" : null;
+  });
+  const [gameState, dispatch] = useReducer(gameReducer, initialSave, (save) =>
+    save?.status === "loaded" ? save.state : createFreshRunState()
   );
+  const pendingResetStorageRef = useRef<PendingResetStorageStatus | null>(null);
+
+  const canAutoSave = storageStatus !== "load-failed";
 
   useEffect(() => {
-    if (storage) {
-      saveGameState(gameState, storage);
+    if (storage && canAutoSave) {
+      const result = saveGameState(gameState, storage);
+      const pendingReset = pendingResetStorageRef.current;
+      if (result.ok && pendingReset) {
+        pendingResetStorageRef.current = null;
+      }
+      setStorageStatus((currentStatus) =>
+        resolveStorageStatusAfterSave(currentStatus, result.ok, pendingReset)
+      );
     }
-  }, [gameState, storage]);
+  }, [gameState, storage, canAutoSave]);
 
   // Achievement toast queue — detect newly unlocked achievements each render
   const seenAchievementsRef = useRef<readonly string[]>(gameState.unlockedAchievements);
@@ -70,7 +89,7 @@ export function App() {
   }, [gameState.cafeClosed, gameState.demoComplete]);
 
   // Boot splash: show before Day 1 of a fresh run, once per browser run. The
-  // ack flag is cleared on reset so a new café week re-shows it (roguelite tone).
+  // ack flag is cleared on reset so a replay re-shows it (roguelite tone).
   const isFreshDayOne =
     gameState.day === 1 &&
     !gameState.demoComplete &&
@@ -92,12 +111,29 @@ export function App() {
 
   function handleReset() {
     if (storage) {
-      resetSavedGameState(storage);
+      const resetResult = resetSavedGameState(storage);
+      const currentSaveRemovalFailed =
+        !resetResult.ok && resetResult.failedKeys.includes(SAVE_KEY);
+      let cleanupFailed =
+        !resetResult.ok && resetResult.failedKeys.some((key) => key !== SAVE_KEY);
       try {
         storage.removeItem(BOOT_ACK_KEY);
       } catch {
-        // ignore
+        cleanupFailed = true;
       }
+      pendingResetStorageRef.current = currentSaveRemovalFailed || cleanupFailed
+        ? { currentSaveRemovalFailed, cleanupFailed }
+        : null;
+      setStorageStatus(
+        currentSaveRemovalFailed
+          ? "reset-failed"
+          : cleanupFailed
+            ? "cleanup-failed"
+            : null
+      );
+    } else {
+      pendingResetStorageRef.current = null;
+      setStorageStatus("unavailable");
     }
     setBootAcknowledged(false);
     setAchievementQueue([]);
@@ -137,6 +173,8 @@ export function App() {
         </div>
       </header>
 
+      <StorageStatusMessage status={storageStatus} />
+
       {gameState.cafeClosed ? (
         <section className="cafe-closed-banner" role="alert" aria-labelledby="cafe-closed-title">
           <p className="eyebrow">Café closed</p>
@@ -162,22 +200,18 @@ export function App() {
           role="alert"
           aria-labelledby="demo-complete-title"
         >
-          <p className="eyebrow">End of week one</p>
+          <p className="eyebrow">Week one complete</p>
           <h2 id="demo-complete-title" ref={closureHeadingRef} tabIndex={-1}>
-            The first café week is over
+            7 of 7 days served
           </h2>
           <p>
-            Seven days served. The official letter has arrived, the register has
-            opinions it did not have on Monday, and the guestbook is still
-            quietly editing the line about previous runs. Something is wrong with
-            this café — and you want to know what happens on Day 8.
+            The letter is open. The register is talking. The guestbook remembers.
           </p>
           <p className="demo-complete-banner__teaser">
-            Week two is where the weirdness stops being deniable. That café week
-            is not built yet. For now, the loop begins again.
+            Next unlock: Day 8, week two. Not built yet. Replay from Day 1.
           </p>
           <button type="button" onClick={handleReset}>
-            Start the next café week
+            Replay week one
           </button>
         </section>
       ) : null}

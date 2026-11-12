@@ -112,11 +112,21 @@ describe("initial game state", () => {
     expect(resetState).toEqual(createFreshRunState());
   });
 
-  it("records soft-run memory fragments without ending the week", () => {
-    const state = closeCurrentDay(createInitialGameState());
+  it("records the preference ledger only after learning from a second guest", () => {
+    let state = closeCurrentDay(createInitialGameState());
 
     expect(state.day).toBe(2);
     expect(state.run.memoryFragments).toContain("day-1-objective-completed");
+    // Both opening-day orders belong to Kemal, so only one preference is known.
+    expect(state.run.memoryFragments).not.toContain("guest-preference-ledger");
+    expect(Object.keys(state.guestMemory)).toEqual(["pendler-kemal"]);
+
+    state = gameReducer(state, { type: "open_day" });
+    state = gameReducer(state, { type: "serve_product", productId: "filterkaffee" });
+    state = gameReducer(state, { type: "serve_product", productId: "filterkaffee" });
+    expect(state.guestMemory["laptop-lukas"]?.knownPreferenceId).toBe("filterkaffee");
+
+    state = gameReducer(state, { type: "complete_day" });
     expect(state.run.memoryFragments).toContain("guest-preference-ledger");
     expect(state.demoComplete).toBe(false);
   });

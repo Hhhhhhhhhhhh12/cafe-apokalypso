@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { createFreshRunState, createInitialGameState } from "../src/game/engine/gameState";
 import { gameReducer } from "../src/game/engine/reducer";
 import { getDioramaGuestVisibility, getEquipmentShopOptions } from "../src/game/engine/selectors";
+import type { GuestId } from "../src/game/types/content";
 import { getEquipmentDailyBonuses } from "../src/game/data/equipment";
 
 describe("createFreshRunState", () => {
@@ -120,12 +121,14 @@ describe("getDioramaGuestVisibility seating gate", () => {
   });
 
   it("allows seated guests once seating >= 1", () => {
-    // Use createInitialGameState which has seating 1 and serve enough customers
+    const base = createInitialGameState();
     const state = {
-      ...createInitialGameState(),
+      ...base,
+      day: 2 as const,
       dayManagement: {
-        ...createInitialGameState().dayManagement,
-        customersServed: 3
+        ...base.dayManagement,
+        customersServed: 3,
+        servedGuestIds: ["lieferfahrer-cem", "nachbarin-mira", "laptop-lukas"] as GuestId[]
       }
     };
     const vis = getDioramaGuestVisibility(state);

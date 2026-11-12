@@ -60,6 +60,8 @@ export interface DayManagementState {
   actionPointsRemaining: number;
   actionPointsSpent: number;
   customersServed: number;
+  /** Guests served today, including helper orders. Optional for older saves. */
+  servedGuestIds?: GuestId[];
   moneyEarned: number;
   moneySpent: number;
   suppliesUsed: SupplyState;

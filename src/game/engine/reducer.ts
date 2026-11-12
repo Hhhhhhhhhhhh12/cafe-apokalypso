@@ -16,6 +16,7 @@ import {
   getCurrentDayDefinition,
   getCurrentDayModifier,
   getGuestForCustomer,
+  getServedGuestIds,
   getKassandraConsultLine,
   getServeLineForCustomer
 } from "./selectors";
@@ -344,6 +345,9 @@ function applySuccessfulServe(
     management = {
       ...management,
       customersServed: management.customersServed + 1,
+      servedGuestIds: servedGuest
+        ? [...getServedGuestIds({ ...workingState, dayManagement: management }), servedGuest.id]
+        : management.servedGuestIds,
       moneyEarned: clampResource(management.moneyEarned + earned),
       suppliesUsed: addSupplies(management.suppliesUsed, suppliesUsed)
     };
