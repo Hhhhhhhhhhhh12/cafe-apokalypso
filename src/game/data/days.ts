@@ -16,7 +16,7 @@ export const weekOneDays = [
     },
     unlocks: ["take order", "prepare coffee", "accept payment", "clean tables"],
     guestIds: ["pendler-kemal"],
-    eventIds: ["day-1-opening-rhythm", "day-1-coffee-machine-flicker"]
+    eventIds: ["day-1-opening-rhythm", "day-1-first-cup", "day-1-coffee-machine-flicker"]
   },
   {
     day: 2,

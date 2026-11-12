@@ -1,0 +1,97 @@
+.cafe-first-cup-announcement {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.cafe-first-cup {
+  position: absolute;
+  aspect-ratio: 558 / 496;
+  pointer-events: none;
+  animation: cafe-first-cup-clear 2.4s steps(1, end) both;
+}
+
+.cafe-first-cup img {
+  position: absolute;
+  /* Align the visible sprite bounds within its transparent source canvas. */
+  width: 259.5%;
+  max-width: none;
+  left: -87.8%;
+  top: -58.1%;
+  filter: drop-shadow(0 1px 1px #42260980);
+}
+
+.cafe-first-cup__coffee {
+  position: absolute;
+  left: 9%;
+  top: 16%;
+  width: 59%;
+  height: 23%;
+  overflow: hidden;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 43% 45%, #a76635 5%, #6e391c 63%, #4f291b);
+}
+
+.cafe-first-cup__coffee span {
+  position: absolute;
+  inset: 13% 18%;
+  border-radius: 50%;
+  border-bottom: 1px solid #d7a26d;
+  animation: cafe-first-cup-crema 1.8s both;
+}
+
+.cafe-first-cup__steam {
+  position: absolute;
+  inset: -155% 20% 85% 0;
+}
+
+.cafe-first-cup__steam span {
+  position: absolute;
+  bottom: 0;
+  left: 40%;
+  width: 36%;
+  height: 60%;
+  border-left: 1.5px solid #ffedcb;
+  border-radius: 50%;
+  filter: drop-shadow(0 0 1px #73472780);
+  animation: cafe-first-cup-rewind 1.8s both;
+}
+
+.cafe-first-cup__steam span:nth-child(2) {
+  left: 24%;
+  animation-delay: 120ms;
+}
+
+.cafe-first-cup__steam span:nth-child(3) {
+  left: 53%;
+  animation-delay: 250ms;
+}
+
+@keyframes cafe-first-cup-clear {
+  from { visibility: visible; }
+  to { visibility: hidden; }
+}
+
+@keyframes cafe-first-cup-rewind {
+  0% { opacity: 0; transform: translateY(55%) scale(.45); }
+  43%, 53% { opacity: .95; transform: translate(-58%, -95%) scale(1.18); }
+  77% { opacity: .9; }
+  92%, 100% { opacity: 0; transform: translateY(75%) scale(.26); }
+}
+
+@keyframes cafe-first-cup-crema {
+  0%, 68%, 100% { transform: rotate(-12deg); }
+  84% { transform: rotate(-12deg) scale(.32); border-color: #f6cb92; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cafe-first-cup__steam { display: none; }
+  .cafe-first-cup__coffee span {
+    animation: none;
+    transform: scale(.38);
+    border-color: #f6cb92;
+  }
+}

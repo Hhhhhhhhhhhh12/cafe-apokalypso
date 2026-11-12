@@ -112,6 +112,8 @@ export function getNarrativeEventCards(
 
   return getCurrentDayEvents(state).filter((event) => {
     if (event.tone === "normal") return false;
+    // The first cup plays in the diorama when the coffee is served.
+    if (event.id === "day-1-first-cup") return false;
     if (event.kicker === "Closing" && !isClosing) return false;
     if (event.relatedGuestIds && event.relatedGuestIds.length > 0 && !anyGuestServed) return false;
     return true;

@@ -94,6 +94,22 @@ describe("pendingEvents: open_day", () => {
 // ---------------------------------------------------------------------------
 
 describe("pendingEvents: serve_product (positional)", () => {
+  it("reveals the first cup once, after a coffee is served on Day 1", () => {
+    let state = openDayFrom(dayStartState());
+    expect(state.pendingEvents).not.toContain("day-1-first-cup");
+
+    state = gameReducer(state, { type: "serve_product", productId: "croissant" });
+    expect(state.dayManagement.customersServed).toBe(1);
+    expect(state.pendingEvents).not.toContain("day-1-first-cup");
+
+    state = gameReducer(state, { type: "serve_product", productId: "filterkaffee" });
+    expect(getTriggeredEvents(state).map((event) => event.id)).toContain("day-1-first-cup");
+    expect(state.pendingEvents).not.toContain("day-1-coffee-machine-flicker");
+
+    state = gameReducer(state, { type: "serve_product", productId: "espresso" });
+    expect(state.pendingEvents.filter((id) => id === "day-1-first-cup")).toHaveLength(1);
+  });
+
   it("enqueues Day 3 position-1 event when customersServed reaches 1", () => {
     // Day 3 events: [day-3-cash-register-suggestion, day-3-supply-tally, day-3-guest-checks-in]
     // position 1 = day-3-supply-tally, fires when customersServed >= 1
