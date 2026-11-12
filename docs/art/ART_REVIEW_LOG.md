@@ -148,3 +148,32 @@ Per-frame visible bounds in cell-local coordinates, with right and bottom exclus
 | 8 | `(34, 20, 68, 88)` | 956 |
 
 Verification covers the asset export. The PNG and preview file checks took about 0.06 seconds. No app test, build, or gameplay check was run for this entry.
+
+## Nino — walk sprite sheet v02
+
+The project owner approved Nino's updated style, the lower right-leg swing in pose 7, and the exact PNG export shown in the animated preview on light and dark backgrounds.
+
+- Asset: [placeholder-staff-nino-walk-sheet.png](../../assets/sprites/guests/placeholder-staff-nino-walk-sheet.png).
+- The sequence has eight right-facing poses in one row at 120 ms per frame in the preview. Pose 7 contains the approved ImageGen correction. The other seven frames are pixel-identical to export v01. The original nine-frame sheet is available at commit `c55c3420ed6268bfda667f2af8e011c4a6d10c9b`.
+
+| Check | Result |
+| --- | --- |
+| PNG integrity and layout | Valid 3456×432 RGBA PNG with eight 432×432 cells |
+| Transparency and pixel edges | Alpha values 0 and 255 only, no opaque pixels on cell borders |
+| Connectivity | One 8-connected opaque component per frame |
+| Alignment | Common floor at zero-based row 407 in each cell |
+| Preview | Eight frames at 120 ms each, generated from this exact export |
+| SHA-256 | `d26c0bcf3ca7dd325fa1e7bd99486cd3079196a8b5bc31e1892b758deb9e1a7b` |
+
+| Frame | Visible bounds, right and bottom exclusive | Opaque pixels |
+| --- | --- | --- |
+| 1 | `(136, 41, 306, 408)` | 27154 |
+| 2 | `(146, 41, 278, 408)` | 25579 |
+| 3 | `(174, 41, 279, 408)` | 22932 |
+| 4 | `(152, 41, 319, 408)` | 23739 |
+| 5 | `(134, 46, 323, 408)` | 25630 |
+| 6 | `(137, 47, 278, 408)` | 24264 |
+| 7 | `(160, 46, 271, 408)` | 23449 |
+| 8 | `(142, 46, 321, 408)` | 26325 |
+
+The PNG and preview file checks took 0.611 seconds. This entry records file and visual approval for the walk asset.

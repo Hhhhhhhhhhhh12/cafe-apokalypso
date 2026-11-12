@@ -12,7 +12,7 @@ bottom-center, Randspalten sauber). Noch **nicht** ins Diorama verdrahtet
 - `guests/placeholder-staff-nino.png` — 96×96, statisch; am 27.10.2026 durch den visuell abgenommenen Export ersetzt — [Nino-Abnahme und PNG-Prüfnachweis](../../docs/art/ART_REVIEW_LOG.md#nino--static-sprite-2026-10-27). Gilt nur für das Standbild, nicht für das Walk-Sheet.
 - `guests/placeholder-staff-nele.png` — 96×96, statisch (aus Nele-Gast abgeleitet, mit Schürze); am 27.10.2026 durch den visuell abgenommenen Export ersetzt — [Nele-Abnahme und PNG-Prüfnachweis](../../docs/art/ART_REVIEW_LOG.md#nele--static-sprite-2026-10-27). Gilt nur für das Staff-Standbild, nicht für Gastgrafiken oder Walk-Sheet.
 - `guests/placeholder-staff-jana-walk-sheet.png` — 768×96, 8 Frames à 96×96, Lauf nach rechts; Export visuell abgenommen — [Jana-Laufanimation und PNG-Prüfnachweis](../../docs/art/ART_REVIEW_LOG.md#jana--walk-sprite-sheet-v03).
-- `guests/placeholder-staff-nino-walk-sheet.png` — 612×68, 9 Frames
+- `guests/placeholder-staff-nino-walk-sheet.png` — 3456×432, 8 Frames à 432×432, Lauf nach rechts, korrigierter Export visuell abgenommen — [Nino-Laufanimation und PNG-Prüfnachweis](../../docs/art/ART_REVIEW_LOG.md#nino--walk-sprite-sheet-v02).
 - `guests/placeholder-staff-nele-walk-sheet.png` — 612×68, 9 Frames
 
 ### Fantasy-Haustiere (Woche-1-Ton, cozy mit leichtem Twist)
