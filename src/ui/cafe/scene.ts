@@ -109,6 +109,14 @@ export const PAULA_PATH = {
   z: 6,
 } as const;
 
+/** Nino enters along the open aisle beside the service area. */
+export const NINO_ARRIVAL = {
+  left: 56,
+  bottom: 17,
+  z: 6,
+  centered: true,
+} satisfies StageSpot;
+
 /* ── Möbel & Theke ─────────────────────────────────────────────────── */
 export const TABLE_BASE = { w: round((22 * FLOOR.width) / 100), h: round((26 * FLOOR.height) / 100) };
 
