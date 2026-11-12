@@ -3,7 +3,7 @@ import { createFreshRunState, createInitialGameState } from "../src/game/engine/
 import { gameReducer } from "../src/game/engine/reducer";
 import { getDioramaGuestVisibility, getEquipmentShopOptions } from "../src/game/engine/selectors";
 import type { GuestId } from "../src/game/types/content";
-import { getEquipmentDailyBonuses } from "../src/game/data/equipment";
+import { getEquipmentDailyBonuses, INITIAL_GRINDER_COST } from "../src/game/data/equipment";
 
 describe("createFreshRunState", () => {
   it("starts in setup phase with no machine/seating but the basic till already on the counter", () => {
@@ -15,9 +15,9 @@ describe("createFreshRunState", () => {
     expect(state.equipment.register).toBe(1);
   });
 
-  it("has the same starting money as createInitialGameState", () => {
+  it("covers the mandatory grinder without reducing the previous opening budget", () => {
     expect(createFreshRunState().resources.money).toBe(
-      createInitialGameState().resources.money
+      createInitialGameState().resources.money + INITIAL_GRINDER_COST
     );
   });
 });
@@ -31,10 +31,11 @@ describe("finish_setup action", () => {
     expect(next.statusMessage).toMatch(/coffee machine/i);
   });
 
-  it("transitions to open after buying a machine", () => {
+  it("transitions to open after buying a machine and grinder", () => {
     let state = createFreshRunState();
     state = gameReducer(state, { type: "buy_equipment", slot: "machine" });
     expect(state.equipment.machine).toBe(1);
+    state = gameReducer(state, { type: "buy_equipment", slot: "grinder" });
     state = gameReducer(state, { type: "finish_setup" });
     expect(state.dayPhase).toBe("open");
   });
@@ -42,6 +43,7 @@ describe("finish_setup action", () => {
   it("opens without seating and mentions standing room only", () => {
     let state = createFreshRunState();
     state = gameReducer(state, { type: "buy_equipment", slot: "machine" });
+    state = gameReducer(state, { type: "buy_equipment", slot: "grinder" });
     state = gameReducer(state, { type: "finish_setup" });
     expect(state.dayPhase).toBe("open");
     expect(state.statusMessage).toMatch(/standing room/i);
@@ -51,6 +53,7 @@ describe("finish_setup action", () => {
     let state = createFreshRunState();
     state = gameReducer(state, { type: "buy_equipment", slot: "machine" });
     state = gameReducer(state, { type: "buy_equipment", slot: "seating" });
+    state = gameReducer(state, { type: "buy_equipment", slot: "grinder" });
     state = gameReducer(state, { type: "finish_setup" });
     expect(state.dayPhase).toBe("open");
     expect(state.statusMessage).toMatch(/doors open/i);
@@ -97,7 +100,7 @@ describe("buy_equipment action", () => {
     const state = {
       ...createInitialGameState(),
       dayPhase: "day_end" as const,
-      equipment: { machine: 3, seating: 1, register: 1 }
+      equipment: { machine: 3, grinder: 1, clock: 1, seating: 1, register: 1 }
     };
     const next = gameReducer(state, { type: "buy_equipment", slot: "machine" });
     expect(next.equipment.machine).toBe(3);
@@ -157,7 +160,7 @@ describe("getEquipmentShopOptions", () => {
   it("shows null next when at max tier", () => {
     const state = {
       ...createInitialGameState(),
-      equipment: { machine: 3, seating: 3, register: 3 }
+      equipment: { machine: 3, grinder: 1, clock: 1, seating: 3, register: 3 }
     };
     const options = getEquipmentShopOptions(state);
     expect(options.every((o) => o.next === null)).toBe(true);
@@ -197,8 +200,32 @@ describe("register equipment upgrades", () => {
   });
 
   it("feeds the register's daily reputation bonus into the morning open", () => {
-    const bonuses = getEquipmentDailyBonuses({ machine: 1, seating: 1, register: 3 });
+    const bonuses = getEquipmentDailyBonuses({ machine: 1, grinder: 1, clock: 1, seating: 1, register: 3 });
     // Pro POS (tier 3) gives dailyRepBonus 2; machine/seating tier 1 give 0.
     expect(bonuses.reputation).toBe(2);
+  });
+});
+
+describe("separate replacements after the arcana intro", () => {
+  it("requires the grinder even if the replacement machine has been bought", () => {
+    const bought = gameReducer(createFreshRunState(), { type: "buy_equipment", slot: "machine" });
+    const next = gameReducer(bought, { type: "finish_setup" });
+    expect(next.dayPhase).toBe("setup");
+    expect(next.statusMessage).toMatch(/grinder/i);
+  });
+
+  it("keeps KASSANDRA and charges each replacement independently", () => {
+    let state = createFreshRunState();
+    const money = state.resources.money;
+    expect(state.equipment.grinder).toBe(0);
+    expect(state.equipment.clock).toBe(0);
+    state = gameReducer(state, { type: "buy_equipment", slot: "machine" });
+    expect(state.equipment.grinder).toBe(0);
+    state = gameReducer(state, { type: "buy_equipment", slot: "grinder" });
+    expect(state.equipment.clock).toBe(0);
+    expect(state.resources.money).toBe(money - 26);
+    state = gameReducer(state, { type: "buy_equipment", slot: "clock" });
+    expect(state.resources.money).toBe(money - 36);
+    expect(state.equipment.register).toBe(1);
   });
 });

@@ -6,6 +6,7 @@
  */
 import { describe, expect, it } from "vitest";
 import {
+  createFreshRunState,
   createInitialGameState
 } from "../src/game/engine/gameState";
 import { gameReducer } from "../src/game/engine/reducer";
@@ -430,7 +431,7 @@ describe("helper autonomy state machine", () => {
     expect(state.dayManagement.helperAutonomousActions).toBe(0);
   });
 
-  it("learning/autonomous-level helper accrues autonomous actions on idle (non-serve) actions", () => {
+  it("learning/autonomous-level Jana clears a dirty table on eligible idle actions", () => {
     let learningState = createDayStartState(3);
     learningState = gameReducer(learningState, {
       type: "select_helper",
@@ -440,10 +441,13 @@ describe("helper autonomy state machine", () => {
     learningState = gameReducer(learningState, { type: "open_day" });
     expect(learningState.helperAssignment?.autonomyLevel).toBe("learning");
 
+    learningState = gameReducer(learningState, { type: "serve_product", productId: "filterkaffee" });
+    expect(learningState.dayManagement.dirtyTableIds).toEqual(["left"]);
     for (let i = 0; i < 4; i++) {
       learningState = gameReducer(learningState, { type: "check_supplies" });
     }
     expect(learningState.dayManagement.helperAutonomousActions).toBeGreaterThan(0);
+    expect(learningState.dayManagement.dirtyTableIds).toEqual([]);
 
     let autonomousState = createDayStartState(5);
     autonomousState = gameReducer(autonomousState, {
@@ -454,8 +458,30 @@ describe("helper autonomy state machine", () => {
     autonomousState = gameReducer(autonomousState, { type: "open_day" });
     expect(autonomousState.helperAssignment?.autonomyLevel).toBe("autonomous");
 
+    autonomousState = gameReducer(autonomousState, { type: "serve_product", productId: "filterkaffee" });
+    expect(autonomousState.dayManagement.dirtyTableIds).toEqual(["left"]);
     autonomousState = gameReducer(autonomousState, { type: "check_supplies" });
     expect(autonomousState.dayManagement.helperAutonomousActions).toBe(1);
+    expect(autonomousState.dayManagement.dirtyTableIds).toEqual([]);
+  });
+
+  it.each([
+    ["Jana on service", "jana", "service"],
+    ["Nino on barista", "nino", "barista"],
+    ["Nino on counter", "nino", "counter"],
+    ["Nele on marketing", "nele", "marketing"],
+    ["Nele on counter", "nele", "counter"]
+  ] as const)("does not turn %s into an unassigned cleaning action", (_label, helperId, taskId) => {
+    let state = createDayStartState(5);
+    state = gameReducer(state, { type: "select_helper", helperId, taskId });
+    state = gameReducer(state, { type: "open_day" });
+    state = gameReducer(state, { type: "serve_product", productId: "filterkaffee" });
+    const dirtyTableIds = state.dayManagement.dirtyTableIds;
+
+    state = gameReducer(state, { type: "check_supplies" });
+
+    expect(state.dayManagement.dirtyTableIds).toEqual(dirtyTableIds);
+    expect(state.dayManagement.helperAutonomousActions).toBe(0);
   });
 
   it("Nino (barista) gives reputation bonus for espresso (baristaReputationBonus increments)", () => {
@@ -616,10 +642,41 @@ interface StrategyRun {
 }
 
 const helperDailyCosts: Record<StaffOptionId, number> = {
-  jana: 18,
+  jana: 14,
   nino: 22,
   nele: 20
 };
+
+describe("balancing: fresh setup reaches Day-4 autonomy", () => {
+  it("lets a table-first café afford Jana's cleaning shift on Day 4", () => {
+    let state = createFreshRunState();
+    state = gameReducer(state, { type: "buy_equipment", slot: "machine" });
+    state = gameReducer(state, { type: "buy_equipment", slot: "seating" });
+    state = gameReducer(state, { type: "finish_setup" });
+
+    state = playFreshCappuccinoDay(state, 3);
+    state = startTomorrowWithMilk(state, 3);
+    state = playFreshCappuccinoDay(state, 4);
+    state = startTomorrowWithMilk(state, 3);
+    state = playFreshCappuccinoDay(state, 4);
+    state = startTomorrowWithMilk(state, 0);
+
+    expect(state.day).toBe(4);
+    expect(state.dayPhase).toBe("day_start");
+
+    const jana = createHelperAssignment("jana", "cleaning", 4)!;
+    expect(state.resources.money).toBeGreaterThanOrEqual(jana.dailyCost);
+
+    state = gameReducer(state, { type: "select_helper", helperId: "jana", taskId: "cleaning" });
+    expect(state.statusMessage).toContain("selected for today");
+
+    state = gameReducer(state, { type: "open_day" });
+    expect(state.helperAssignment?.helperId).toBe("jana");
+    expect(state.helperAssignment?.taskId).toBe("cleaning");
+    expect(state.helperAssignment?.autonomyLevel).toBe("autonomous");
+    expect(state.resources.money).toBeGreaterThan(0);
+  });
+});
 
 const restockTargets: Record<StrategyName, SupplyState> = {
   conservative: { coffee: 12, milk: 8, pastries: 6 },
@@ -734,6 +791,37 @@ function simulateStrategy(strategy: StrategyName): StrategyRun {
       )
     }
   };
+}
+
+function playFreshCappuccinoDay(state: GameState, serves: number): GameState {
+  let workingState =
+    state.dayPhase === "day_start"
+      ? gameReducer(state, { type: "open_day" })
+      : state;
+  for (let index = 0; index < serves; index += 1) {
+    workingState = gameReducer(workingState, { type: "serve_product", productId: "cappuccino" });
+  }
+  const closed = gameReducer(workingState, { type: "complete_day" });
+  expect(closed.dayPhase).toBe("day_end");
+  return closed;
+}
+
+function startTomorrowWithMilk(state: GameState, milk: number): GameState {
+  let workingState = state;
+  for (const [ingredient, quantity] of [
+    ["coffee", 0],
+    ["milk", milk],
+    ["pastries", 0]
+  ] as const) {
+    workingState = gameReducer(workingState, {
+      type: "set_supply_purchase",
+      ingredient,
+      quantity
+    });
+  }
+  workingState = gameReducer(workingState, { type: "confirm_supply_purchase" });
+  expect(workingState.statusMessage).not.toContain("Not enough money");
+  return workingState;
 }
 
 function playStrategyDay(

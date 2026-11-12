@@ -6,7 +6,7 @@ export const weekOneStaffOptions = [
     name: "Jana",
     role: "service_cleaning",
     unlockDay: 3,
-    dailyCost: 18,
+    dailyCost: 14,
     effects: ["Improves table turnover", "Reduces cleaning pressure"],
     flavorLine: "I can help with service. The wet table was already wet."
   },

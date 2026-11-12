@@ -6,6 +6,7 @@ export const weekOneUpgrades = [
     name: "Small Offer Board",
     unlockDay: 3,
     cost: 16,
+    purchasable: false,
     effects: ["Supports daily offers"],
     summary: "Makes the first simple offer choices visible."
   },
@@ -14,6 +15,7 @@ export const weekOneUpgrades = [
     name: "Extra Storage Shelf",
     unlockDay: 3,
     cost: 24,
+    purchasable: false,
     effects: ["Supports ingredient purchasing"],
     summary: "A grounded operational upgrade for early supplies."
   },
@@ -22,30 +24,34 @@ export const weekOneUpgrades = [
     name: "Better Beans",
     unlockDay: 3,
     cost: 20,
+    purchasable: true,
     effects: ["Supports quality-sensitive guests"],
-    summary: "Helps quality expectations without changing the product list."
+    summary: "Serving a guest with quality expectations grants +1 reputation."
   },
   {
     id: "second-table",
     name: "Second Small Table",
     unlockDay: 4,
     cost: 28,
+    purchasable: true,
     effects: ["Supports higher guest traffic"],
-    summary: "A modest café-capacity upgrade."
+    summary: "+1 action each day from the next café opening."
   },
   {
     id: "cleaning-kit",
     name: "Cleaning Kit",
     unlockDay: 5,
     cost: 14,
+    purchasable: true,
     effects: ["Supports table cleaning"],
-    summary: "Keeps early stress and cleanliness manageable."
+    summary: "Each served customer costs 1 cleanliness instead of 2."
   },
   {
     id: "cash-register-update",
     name: "Register Update KASSANDRA",
     unlockDay: 6,
     cost: 0,
+    purchasable: false,
     effects: ["Unlocks simulated demand prediction"],
     summary: "Introduces KASSANDRA as a cash register update, not a real AI."
   },
@@ -54,6 +60,7 @@ export const weekOneUpgrades = [
     name: "Umbrella Stand",
     unlockDay: 7,
     cost: 10,
+    purchasable: false,
     effects: ["Supports the red-umbrella day beat"],
     summary: "A mundane prop for a late-week anomaly."
   }

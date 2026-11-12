@@ -14,7 +14,7 @@ describe("initial game state", () => {
   it("starts as a serializable day-one café state", () => {
     const state = createInitialGameState();
 
-    expect(state.version).toBe(17);
+    expect(state.version).toBe(18);
     expect(state.decor).toEqual({ plant: 1, plant2: 1, shelf: 1, clock: 1, lamp: 1, cups: 1 });
     expect(state.run.runNumber).toBe(1);
     expect(state.run.modifierIds).toHaveLength(7);
@@ -112,21 +112,19 @@ describe("initial game state", () => {
     expect(resetState).toEqual(createFreshRunState());
   });
 
-  it("records the preference ledger only after learning from a second guest", () => {
-    let state = closeCurrentDay(createInitialGameState());
+  it("records soft-run memory fragments without ending the week", () => {
+    let state = createInitialGameState();
+    // The current Day-1 cast is Kemal then Paula; both ask for filter coffee.
+    state = gameReducer(state, { type: "serve_product", productId: "filterkaffee" });
+    state = gameReducer(state, { type: "serve_product", productId: "filterkaffee" });
+    expect(state.guestMemory["pendler-kemal"]?.knownPreferenceId).toBe("filterkaffee");
+    expect(state.guestMemory["pendlerin-paula"]?.knownPreferenceId).toBe("filterkaffee");
+    state = gameReducer(state, { type: "clean_tables" });
+    state = gameReducer(state, { type: "complete_day" });
+    state = gameReducer(state, { type: "confirm_supply_purchase" });
 
     expect(state.day).toBe(2);
     expect(state.run.memoryFragments).toContain("day-1-objective-completed");
-    // Both opening-day orders belong to Kemal, so only one preference is known.
-    expect(state.run.memoryFragments).not.toContain("guest-preference-ledger");
-    expect(Object.keys(state.guestMemory)).toEqual(["pendler-kemal"]);
-
-    state = gameReducer(state, { type: "open_day" });
-    state = gameReducer(state, { type: "serve_product", productId: "filterkaffee" });
-    state = gameReducer(state, { type: "serve_product", productId: "filterkaffee" });
-    expect(state.guestMemory["laptop-lukas"]?.knownPreferenceId).toBe("filterkaffee");
-
-    state = gameReducer(state, { type: "complete_day" });
     expect(state.run.memoryFragments).toContain("guest-preference-ledger");
     expect(state.demoComplete).toBe(false);
   });

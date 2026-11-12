@@ -14,7 +14,7 @@ import { weekOneAchievements } from "../game/data/achievements";
 import type { AchievementDefinition } from "../game/types/content";
 import { AchievementToast } from "../ui/components/AchievementToast";
 import { ActionPanel } from "../ui/components/ActionPanel";
-import { CafeScene } from "../ui/cafe/CafeScene";
+import { CafePlaceholder } from "../ui/cafe/CafePlaceholder";
 import { IntroSequence } from "../ui/components/IntroSequence";
 import { OptionsMenu } from "../ui/components/OptionsMenu";
 import { StorageStatusMessage } from "../ui/components/StorageStatusMessage";
@@ -40,7 +40,9 @@ function readBootAck(storage: StorageLike | null): boolean {
 }
 
 export function App() {
-  const storage = useMemo(() => getBrowserStorage(), []);
+  const isArcanaPreview = typeof window !== "undefined" &&
+    new URLSearchParams(window.location?.search).get("intro") === "arcana";
+  const storage = useMemo(() => isArcanaPreview ? null : getBrowserStorage(), [isArcanaPreview]);
   const [optionsPanel, setOptionsPanel] = useState<HTMLDivElement | null>(null);
   const [initialSave] = useState(() => storage ? readGameSave(storage) : null);
   const [storageStatus, setStorageStatus] = useState<StorageStatusKind | null>(() => {
@@ -105,6 +107,7 @@ export function App() {
   // ack flag is cleared on reset so a replay re-shows it (roguelite tone).
   const isFreshDayOne =
     gameState.day === 1 &&
+    gameState.dayPhase === "setup" &&
     !gameState.demoComplete &&
     !gameState.cafeClosed &&
     gameState.dayManagement.customersServed === 0;
@@ -155,13 +158,23 @@ export function App() {
 
   const dayDataAttr = gameState.day >= 6 ? String(gameState.day) : undefined;
 
-  return (
-    <main className="app-shell" data-day={dayDataAttr}>
-      {showBoot ? (
+  if (showBoot && (storageStatus === null || storageStatus === "unavailable")) {
+    return (
+      <main className="app-shell">
         <IntroSequence
           onComplete={dismissBoot}
-        />
-      ) : null}
+          notice={!isArcanaPreview && storageStatus
+            ? <StorageStatusMessage status={storageStatus} />
+            : undefined}
+        >
+          <CafePlaceholder gameState={gameState} introActive />
+        </IntroSequence>
+      </main>
+    );
+  }
+
+  return (
+    <main className="app-shell" data-day={dayDataAttr}>
       <AchievementToast
         queue={achievementQueue}
         onDequeue={() => setAchievementQueue(q => q.slice(1))}
@@ -228,42 +241,24 @@ export function App() {
         </section>
       ) : null}
 
-      <section className="workspace-grid" aria-label="Game shell workspace">
-        <ResourceHud gameState={gameState} />
-        <CafeScene
+      <section className="workspace-grid workspace-grid--cafe" aria-label="Game shell workspace">
+        <CafePlaceholder
           gameState={gameState}
+          onAction={dispatch}
           bohnStorage={storage}
           bohnOccluder={optionsPanel}
-          onCleanTables={() => dispatch({ type: "clean_tables" })}
         />
+        <ResourceHud gameState={gameState} />
+        <DayProgressPanel gameState={gameState} />
         <ActionPanel
           gameState={gameState}
           statusMessage={gameState.statusMessage}
-          onServeProduct={(productId) => dispatch({ type: "serve_product", productId })}
-          onTakeOrder={() => dispatch({ type: "take_order" })}
-          onPrepareDrink={() => dispatch({ type: "prepare_drink" })}
-          onCheckSupplies={() => dispatch({ type: "check_supplies" })}
-          onCleanTables={() => dispatch({ type: "clean_tables" })}
-          onAdjustOffer={() => dispatch({ type: "adjust_offer" })}
-          onRunAdvertising={() => dispatch({ type: "run_advertising", adType: "flyer" })}
-          onRunSocialAd={() => dispatch({ type: "run_advertising", adType: "social" })}
           onConsultKassandra={() => dispatch({ type: "consult_kassandra" })}
-          onSelectHelper={(helperId, taskId) =>
-            dispatch({ type: "select_helper", helperId, taskId })
-          }
-          onOpenDay={() => dispatch({ type: "open_day" })}
-          onCompleteDay={() => dispatch({ type: "complete_day" })}
-          onSetSupplyPurchase={(ingredient, quantity) =>
-            dispatch({ type: "set_supply_purchase", ingredient, quantity })
-          }
-          onConfirmSupplyPurchase={() => dispatch({ type: "confirm_supply_purchase" })}
           onUpgradeDecor={(slot) => dispatch({ type: "upgrade_decor", slot })}
           onBuyEquipment={(slot) => dispatch({ type: "buy_equipment", slot })}
           onBuyUpgrade={(upgradeId) => dispatch({ type: "buy_upgrade", upgradeId })}
-          onFinishSetup={() => dispatch({ type: "finish_setup" })}
           onResetGame={handleReset}
         />
-        <DayProgressPanel gameState={gameState} />
       </section>
 
       <footer className="app-footer">
@@ -277,12 +272,7 @@ export function App() {
   );
 }
 
-/**
- * A brief, non-blocking "moment" when the shift opens or the day closes, so the
- * transition reads as an event rather than a silent panel swap (#PHASE3). Purely
- * presentational: it watches the phase prop and auto-dismisses. No banner fires
- * on first mount (the previous phase starts equal to the current one).
- */
+/** Announce the new day on a day change or on the first opening. */
 function DayTransitionBanner({
   day,
   dayPhase
@@ -290,38 +280,23 @@ function DayTransitionBanner({
   day: number;
   dayPhase: "setup" | "day_start" | "open" | "day_end";
 }) {
-  const previousPhase = useRef(dayPhase);
-  const tickRef = useRef(0);
-  const [banner, setBanner] = useState<{
-    key: number;
-    eyebrow: string;
-    title: string;
-  } | null>(null);
+  const [previous, setPrevious] = useState({ day, dayPhase });
+  const [banner, setBanner] = useState<number | null>(null);
 
-  useEffect(() => {
-    if (previousPhase.current === dayPhase) {
-      return;
+  if (previous.day !== day || previous.dayPhase !== dayPhase) {
+    setPrevious({ day, dayPhase });
+    if (previous.day !== day || (previous.dayPhase === "setup" && dayPhase === "open")) {
+      setBanner(day);
+    } else if (dayPhase === "day_end" || dayPhase === "setup") {
+      setBanner(null);
     }
-    previousPhase.current = dayPhase;
-
-    const next =
-      dayPhase === "open"
-        ? { eyebrow: `Day ${day}`, title: "The café is open" }
-        : dayPhase === "day_end"
-          ? { eyebrow: `Day ${day}`, title: "Day closed" }
-          : null;
-
-    if (next) {
-      tickRef.current += 1;
-      setBanner({ key: tickRef.current, ...next });
-    }
-  }, [dayPhase, day]);
+  }
 
   useEffect(() => {
     if (!banner) {
       return;
     }
-    const timer = setTimeout(() => setBanner(null), 2200);
+    const timer = setTimeout(() => setBanner(null), 1400);
     return () => clearTimeout(timer);
   }, [banner]);
 
@@ -331,13 +306,12 @@ function DayTransitionBanner({
 
   return (
     <div
-      key={banner.key}
+      key={banner}
       className="day-transition-banner"
       role="status"
       aria-live="polite"
     >
-      <span className="day-transition-banner__eyebrow">{banner.eyebrow}</span>
-      <strong className="day-transition-banner__title">{banner.title}</strong>
+      <strong className="day-transition-banner__title">Day {banner}</strong>
     </div>
   );
 }

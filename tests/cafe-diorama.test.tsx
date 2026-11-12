@@ -1,5 +1,5 @@
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { App } from "../src/app/App";
 import { createInitialGameState } from "../src/game/engine/gameState";
@@ -21,7 +21,15 @@ function visibleText(markup: string) {
 
 describe("café diorama view", () => {
   it("renders the main screen as stage, HUD, actions, and today regions", () => {
-    const markup = renderToStaticMarkup(<App />);
+    vi.stubGlobal("window", {
+      localStorage: { getItem: (key: string) => key === "cafe-apokalypso.booted.v1" ? "1" : null }
+    });
+    let markup: string;
+    try {
+      markup = renderToStaticMarkup(<App />);
+    } finally {
+      vi.unstubAllGlobals();
+    }
     const text = visibleText(markup);
 
     expect(markup).toContain("workspace-grid");
@@ -117,7 +125,7 @@ describe("café diorama view", () => {
   });
 
   it("seats only served Day 2 guests and never the current queue guest", () => {
-    const base = cafeStateFor(2, 3);
+    const base = cafeStateFor(2, 4);
     const markup = renderCafe({ ...base, dayManagement: {
       ...base.dayManagement,
       servedGuestIds: ["pendler-kemal", "laptop-lukas", "lieferfahrer-cem"]

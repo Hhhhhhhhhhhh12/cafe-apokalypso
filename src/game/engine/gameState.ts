@@ -1,3 +1,4 @@
+import { INITIAL_GRINDER_COST } from "../data/equipment";
 import { weekOneDayModifiers } from "../data/dayModifiers";
 import type { AchievementId, DayModifierId, EventId, GuestId } from "../types/content";
 import type {
@@ -9,16 +10,18 @@ import type {
   GameState,
   GuestMemoryEntry,
   HelperAssignment,
+  HelperTaskId,
   IngredientKey,
   ResourceState,
   RunState,
   SupplyPurchaseState,
   SupplyState,
+  TableId,
   UnlockState
 } from "../types/game";
 import { createInitialDayManagement, STARTING_REPUTATION, SUPPLY_CAPS } from "./management";
 
-export const CURRENT_GAME_STATE_VERSION = 17;
+export const CURRENT_GAME_STATE_VERSION = 19;
 export const CURRENT_CONTENT_CATALOG_VERSION = "week-one-v1";
 
 const initialResources: ResourceState = {
@@ -77,9 +80,10 @@ export function createInitialGameState(): GameState {
     demoComplete: false,
     cafeClosed: false,
     closureReason: null,
+    moneyZeroStreak: 0,
     reputationZeroStreak: 0,
     decor: { plant: 1, plant2: 1, shelf: 1, clock: 1, lamp: 1, cups: 1 },
-    equipment: { machine: 1, seating: 1, register: 1 },
+    equipment: { machine: 1, grinder: 1, clock: 1, seating: 1, register: 1 },
     run: { ...initialRun, modifierIds: [...initialRun.modifierIds], memoryFragments: [] },
     guestMemory: {},
     completedActions: [],
@@ -107,9 +111,10 @@ export function createFreshRunState(): GameState {
     ...createInitialGameState(),
     dayPhase: "setup",
     phaseLabel: "Before opening",
-    equipment: { machine: 0, seating: 0, register: 1 },
+    resources: { ...initialResources, money: initialResources.money + INITIAL_GRINDER_COST },
+    equipment: { machine: 0, grinder: 0, clock: 0, seating: 0, register: 1 },
     statusMessage:
-      "An empty room and a small till. Buy a coffee machine and some furniture, then open the doors."
+      "An empty room and a small till. Buy a coffee machine and grinder to open the doors. Seating and a replacement clock are optional."
   };
 }
 
@@ -130,7 +135,7 @@ export function isValidGameState(value: unknown): value is GameState {
     isValidDayPhase(candidate.dayPhase) &&
     typeof candidate.phaseLabel === "string" &&
     typeof candidate.statusMessage === "string" &&
-    typeof candidate.hiddenWeirdness === "number" &&
+    isNonNegativeNumber(candidate.hiddenWeirdness) &&
     typeof candidate.weirdnessVisible === "boolean" &&
     typeof candidate.kassandraInstalled === "boolean" &&
     typeof candidate.demoComplete === "boolean" &&
@@ -138,7 +143,11 @@ export function isValidGameState(value: unknown): value is GameState {
     (candidate.closureReason === null ||
       candidate.closureReason === "money" ||
       candidate.closureReason === "reputation") &&
-    typeof candidate.reputationZeroStreak === "number" &&
+    typeof candidate.moneyZeroStreak === "number" &&
+    Number.isInteger(candidate.moneyZeroStreak) &&
+    candidate.moneyZeroStreak >= 0 &&
+    candidate.moneyZeroStreak <= 2 &&
+    isCounter(candidate.reputationZeroStreak) &&
     isValidDecor(candidate.decor) &&
     isValidEquipment(candidate.equipment) &&
     isValidRun(candidate.run) &&
@@ -162,6 +171,22 @@ export function isValidGameState(value: unknown): value is GameState {
   );
 }
 
+function isFiniteNumber(value: unknown): value is number {
+  return typeof value === "number" && Number.isFinite(value);
+}
+
+function isNonNegativeNumber(value: unknown): value is number {
+  return isFiniteNumber(value) && value >= 0;
+}
+
+function isCounter(value: unknown): value is number {
+  return isNonNegativeNumber(value) && Number.isInteger(value);
+}
+
+function isMeter(value: unknown): value is number {
+  return isNonNegativeNumber(value) && value <= 100;
+}
+
 function isValidResources(value: unknown): value is ResourceState {
   if (!value || typeof value !== "object") {
     return false;
@@ -171,10 +196,10 @@ function isValidResources(value: unknown): value is ResourceState {
   const validMoodValues: ResourceState["mood"][] = ["calm", "busy", "strained"];
 
   return (
-    typeof resources.money === "number" &&
-    typeof resources.reputation === "number" &&
-    typeof resources.cleanliness === "number" &&
-    typeof resources.stress === "number" &&
+    isNonNegativeNumber(resources.money) &&
+    isMeter(resources.reputation) &&
+    isMeter(resources.cleanliness) &&
+    isMeter(resources.stress) &&
     typeof resources.mood === "string" &&
     validMoodValues.includes(resources.mood)
   );
@@ -200,44 +225,80 @@ function isValidSupplyPurchase(value: unknown): value is SupplyPurchaseState {
   return isValidSupplies(value);
 }
 
+/** Consumption is a cumulative total, not stock limited by shelf capacity. */
+function isValidSupplyUsage(value: unknown): value is SupplyState {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return false;
+  }
+  const supplies = value as Partial<SupplyState>;
+  return (Object.keys(SUPPLY_CAPS) as IngredientKey[]).every(
+    (ingredient) => isNonNegativeNumber(supplies[ingredient])
+  );
+}
+
 function isValidDayManagement(value: unknown): value is DayManagementState {
   if (!value || typeof value !== "object") {
     return false;
   }
 
   const management = value as Partial<DayManagementState>;
+  const impact = management.dayFiveHelperImpact;
+  const observations = management.dayThreeObservations;
 
   return (
-    typeof management.actionPointsRemaining === "number" &&
-    typeof management.actionPointsSpent === "number" &&
-    typeof management.customersServed === "number" &&
+    isCounter(management.actionPointsRemaining) &&
+    isCounter(management.actionPointsSpent) &&
+    isCounter(management.customersServed) &&
+    isNonNegativeNumber(management.moneyEarned) &&
+    isNonNegativeNumber(management.moneySpent) &&
+    isValidSupplyUsage(management.suppliesUsed) &&
+    isCounter(management.cleaningActions) &&
+    isValidTableIdArray(management.dirtyTableIds) &&
     (management.servedGuestIds === undefined ||
       (Array.isArray(management.servedGuestIds) &&
         management.servedGuestIds.every((id) => typeof id === "string"))) &&
-    typeof management.moneyEarned === "number" &&
-    typeof management.moneySpent === "number" &&
-    isValidSupplies(management.suppliesUsed) &&
-    typeof management.cleaningActions === "number" &&
     typeof management.offerReviewed === "boolean" &&
     typeof management.advertisingRun === "boolean" &&
     typeof management.socialAdRun === "boolean" &&
     typeof management.kassandraConsulted === "boolean" &&
     typeof management.helperDecisionMade === "boolean" &&
-    typeof management.reputationAtStart === "number" &&
+    isMeter(management.reputationAtStart) &&
     typeof management.cleanlinessStressApplied === "boolean" &&
     typeof management.noCleaningStressApplied === "boolean" &&
     isIngredientArray(management.emptySupplyStressIngredients) &&
     typeof management.slowCleaningStressReductionUsed === "boolean" &&
-    typeof management.baristaReputationBonus === "number" &&
-    typeof management.helperExtraOrdersRemaining === "number" &&
-    typeof management.extraAdvertisingActions === "number" &&
-    typeof management.appreciationBonusesGiven === "number" &&
-    typeof management.decorBonusesGiven === "number" &&
-    typeof management.currentGuestPatience === "number" &&
-    typeof management.currentGuestPatienceMax === "number" &&
-    typeof management.guestsLost === "number" &&
-    typeof management.serveStreak === "number" &&
-    typeof management.bestServeStreak === "number"
+    isCounter(management.baristaReputationBonus) &&
+    isCounter(management.helperExtraOrdersRemaining) &&
+    isCounter(management.extraAdvertisingActions) &&
+    isCounter(management.appreciationBonusesGiven) &&
+    isCounter(management.decorBonusesGiven) &&
+    isMeter(management.currentGuestPatience) &&
+    isMeter(management.currentGuestPatienceMax) &&
+    management.currentGuestPatience <= management.currentGuestPatienceMax &&
+    isCounter(management.guestsLost) &&
+    isCounter(management.serveStreak) &&
+    isCounter(management.bestServeStreak) &&
+    isCounter(management.actionsWithoutServing) &&
+    isCounter(management.helperAutonomousActions) &&
+    (observations === undefined ||
+      (observations !== null && typeof observations === "object" && !Array.isArray(observations) &&
+        typeof observations.janaServed === "boolean" &&
+        isIngredientArray(observations.missingIngredients))) &&
+    (impact === undefined ||
+      (impact !== null && typeof impact === "object" && !Array.isArray(impact) &&
+        isMeter(impact.openingStressReduction) &&
+        isCounter(impact.extraOrders) &&
+        isNonNegativeNumber(impact.cleanlinessRestored) &&
+        isNonNegativeNumber(impact.reputationGained) &&
+        isCounter(impact.milkSaved)))
+  );
+}
+
+function isValidTableIdArray(value: unknown): value is TableId[] {
+  return (
+    Array.isArray(value) &&
+    value.every((tableId) => typeof tableId === "string" && ["left", "right", "back"].includes(tableId)) &&
+    new Set(value).size === value.length
   );
 }
 
@@ -254,14 +315,30 @@ function isValidHelperAssignment(value: unknown): value is HelperAssignment | nu
 
   return (
     typeof assignment.helperId === "string" &&
-    ["jana", "nino", "nele"].includes(assignment.helperId) &&
     typeof assignment.taskId === "string" &&
-    ["cleaning", "service", "barista", "counter", "marketing"].includes(
-      assignment.taskId
-    ) &&
+    isValidHelperTaskPair(assignment.helperId, assignment.taskId) &&
     typeof assignment.locked === "boolean" &&
-    typeof assignment.dailyCost === "number" &&
-    typeof assignment.flavorLine === "string"
+    isNonNegativeNumber(assignment.dailyCost) &&
+    typeof assignment.flavorLine === "string" &&
+    typeof assignment.autonomyLevel === "string" &&
+    ["micromanagement", "learning", "autonomous"].includes(assignment.autonomyLevel)
+  );
+}
+
+function isValidHelperTaskPair(helperId: unknown, taskId: unknown): boolean {
+  if (typeof helperId !== "string" || typeof taskId !== "string") {
+    return false;
+  }
+
+  const validTasks: Record<HelperAssignment["helperId"], readonly HelperTaskId[]> = {
+    jana: ["cleaning", "service"],
+    nino: ["barista", "counter"],
+    nele: ["marketing", "counter"]
+  };
+
+  return (
+    Object.prototype.hasOwnProperty.call(validTasks, helperId) &&
+    validTasks[helperId as HelperAssignment["helperId"]].includes(taskId as HelperTaskId)
   );
 }
 
@@ -277,21 +354,25 @@ function isValidDaySummary(value: unknown): value is DaySummary | null {
   const summary = value as Partial<DaySummary>;
 
   return (
-    typeof summary.day === "number" &&
+    isCounter(summary.day) && summary.day >= 1 && summary.day <= 7 &&
     typeof summary.rating === "string" &&
-    typeof summary.moneyEarned === "number" &&
-    typeof summary.moneySpent === "number" &&
-    typeof summary.customersServed === "number" &&
-    isValidSupplies(summary.suppliesUsed) &&
+    isNonNegativeNumber(summary.moneyEarned) &&
+    isNonNegativeNumber(summary.moneySpent) &&
+    isCounter(summary.customersServed) &&
+    isCounter(summary.guestsLost) &&
+    isCounter(summary.bestServeStreak) &&
+    isValidSupplyUsage(summary.suppliesUsed) &&
     isValidSupplies(summary.suppliesRestocked) &&
     isValidSupplies(summary.suppliesRemaining) &&
     typeof summary.cleanlinessLabel === "string" &&
     typeof summary.stressLabel === "string" &&
-    typeof summary.reputationDelta === "number" &&
+    isFiniteNumber(summary.reputationDelta) &&
     typeof summary.objectiveTitle === "string" &&
     typeof summary.objectiveCompleted === "boolean" &&
-    typeof summary.dailyOverhead === "number" &&
+    isNonNegativeNumber(summary.dailyOverhead) &&
     (summary.helperRecap === null || typeof summary.helperRecap === "string") &&
+    (summary.helperAutonomyRecap === undefined ||
+      summary.helperAutonomyRecap === null || typeof summary.helperAutonomyRecap === "string") &&
     (summary.stressEvent === null || typeof summary.stressEvent === "string") &&
     isStringArray(summary.flavorLines)
   );
@@ -328,7 +409,7 @@ function isValidDayPhase(value: unknown): value is DayPhase {
 }
 
 /** All equipment slot keys that must exist in a valid save (tier >= 0). */
-const EQUIPMENT_SLOT_KEYS = ["machine", "seating", "register"] as const;
+const EQUIPMENT_SLOT_KEYS = ["machine", "grinder", "clock", "seating", "register"] as const;
 
 function isValidEquipment(
   value: unknown
@@ -417,6 +498,7 @@ const PRODUCT_IDS = [
 
 const GUEST_IDS = [
   "pendler-kemal",
+  "pendlerin-paula",
   "pendlerin-fatou",
   "laptop-lukas",
   "lieferfahrer-cem",
@@ -481,6 +563,8 @@ function isValidGuestMemory(value: unknown): value is Partial<Record<GuestId, Gu
  * v13 -> v14: `purchasedUpgrades` array added (defaults to []).
  * v16 -> v17: `helperAssignment.autonomyLevel` and `dayManagement.helperAutonomousActions`
  *   added (helper autonomy state machine, #132). Default to "micromanagement" / 0.
+ * v18 -> v19: `moneyZeroStreak` added for the rescue shift. An open café already
+ *   at a 0 Asche day-end starts at 1; other missing counters start at 0. Closures stay closed.
  * Older versions may also lack décor slots added after the save was written
  * (clock/lamp/cups).
  */
@@ -507,7 +591,11 @@ export function migrateRawSave(raw: unknown): unknown {
     if (assignment && typeof assignment === "object" && !Array.isArray(assignment)) {
       const a = assignment as Record<string, unknown>;
       if (a.helperId === "mira") {
-        obj.helperAssignment = { ...a, helperId: "nele" };
+        obj.helperAssignment = {
+          ...a,
+          helperId: "nele",
+          taskId: isValidHelperTaskPair("nele", a.taskId) ? a.taskId : "counter"
+        };
       }
     }
   }
@@ -658,6 +746,34 @@ export function migrateRawSave(raw: unknown): unknown {
     }
   }
 
+  if (obj.version === 17) {
+    obj.version = 18;
+    patched = true;
+
+    if (obj.dayManagement && typeof obj.dayManagement === "object" && !Array.isArray(obj.dayManagement)) {
+      const dm = obj.dayManagement as Record<string, unknown>;
+      if (!Array.isArray(dm.dirtyTableIds)) {
+        obj.dayManagement = { ...dm, dirtyTableIds: [] };
+      }
+    }
+  }
+
+  if (obj.version === 18) {
+    obj.version = 19;
+    patched = true;
+
+    if (obj.moneyZeroStreak === undefined) {
+      const resources = obj.resources;
+      const hasZeroBalance =
+        resources !== null &&
+        typeof resources === "object" &&
+        !Array.isArray(resources) &&
+        (resources as Record<string, unknown>).money === 0;
+      obj.moneyZeroStreak =
+        obj.cafeClosed === false && obj.dayPhase === "day_end" && hasZeroBalance ? 1 : 0;
+    }
+  }
+
   if (obj.decor && typeof obj.decor === "object" && !Array.isArray(obj.decor)) {
     const decor = { ...(obj.decor as Record<string, unknown>) };
     for (const slot of DECOR_SLOT_KEYS) {
@@ -671,9 +787,19 @@ export function migrateRawSave(raw: unknown): unknown {
 
   if (obj.equipment && typeof obj.equipment === "object" && !Array.isArray(obj.equipment)) {
     const equipment = { ...(obj.equipment as Record<string, unknown>) };
+    // A pre-Arcana setup without a machine still needs the new grinder.
+    // Preserve its spending power once, as part of the equipment migration.
+    if (obj.dayPhase === "setup" && equipment.machine === 0 &&
+        typeof equipment.grinder !== "number" && obj.resources && typeof obj.resources === "object") {
+      const resources = obj.resources as Record<string, unknown>;
+      if (typeof resources.money === "number") {
+        obj.resources = { ...resources, money: resources.money + INITIAL_GRINDER_COST };
+      }
+    }
+
     for (const slot of EQUIPMENT_SLOT_KEYS) {
       if (typeof equipment[slot] !== "number") {
-        equipment[slot] = 1;
+        equipment[slot] = slot === "grinder" && equipment.machine === 0 ? 0 : 1;
         patched = true;
       }
     }

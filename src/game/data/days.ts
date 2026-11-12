@@ -1,5 +1,9 @@
 import type { DayDefinition } from "../types/content";
 
+export const DAY_ONE_FATOU_SERVED_FRAGMENT = "day-1-fatou-served";
+const dayTwoMorning = "Several new customers seem to have different ideas about what coffee is for. The morning is developing something like a rhythm.";
+export const dayTwoOpenerWithFatou = `Kemal and Fatou are back, with very different ideas about being on time. ${dayTwoMorning}`;
+
 export const weekOneDays = [
   {
     day: 1,
@@ -11,20 +15,19 @@ export const weekOneDays = [
       id: "day-1-first-shift",
       day: 1,
       title: "Close the first shift",
-      description: "Serve the first two customers and leave the tables clean enough to lock up.",
-      completionHint: "Serve 2 customers and clean the tables before closing."
+      description: "Get the café running on your first shift. Fatou, the third guest, is optional.",
+      completionHint: "Serve at least 2 customers and clean the café before closing."
     },
     unlocks: ["take order", "prepare coffee", "accept payment", "clean tables"],
-    guestIds: ["pendler-kemal"],
+    guestIds: ["pendler-kemal", "pendlerin-paula", "pendlerin-fatou"],
     eventIds: ["day-1-opening-rhythm", "day-1-first-cup", "day-1-coffee-machine-flicker"]
   },
   {
     day: 2,
     title: "Regulars Begin to Form",
     milestone:
-      "Guest behavior differences: patience, spend, seat time, and quality expectations.",
-    dayOpener:
-      "Yesterday, Kemal made up the entire customer base. Today he is back, along with several new faces, each with a different idea about what coffee is for. The morning is developing something like a rhythm.",
+      "Regular guests, order preferences, and the cost of keeping the café calm.",
+    dayOpener: `Kemal is back. ${dayTwoMorning}`,
     objective: {
       id: "day-2-regular-rhythm",
       day: 2,
@@ -35,11 +38,11 @@ export const weekOneDays = [
     unlocks: ["guest behavior differences"],
     guestIds: [
       "pendler-kemal",
+      "pendlerin-paula",
       "laptop-lukas",
       "lieferfahrer-cem",
       "cappuccino-christa",
       "herr-bohn",
-      "freelancerin-nele",
       "pendlerin-fatou",
       "nachbarin-mira"
     ],
@@ -47,25 +50,26 @@ export const weekOneDays = [
   },
   {
     day: 3,
-    title: "Prices and Supplies",
-    milestone: "Ingredient purchasing, price adjustment, and daily offers.",
+    title: "Keep the Café Moving",
+    milestone: "Choose where Jana can help and buy what the café needs for tomorrow.",
     dayOpener:
-      "The offer board now has a slot for a daily suggestion. Supplies are being purchased in quantities that require actual accounting. The register has an opinion about prices, for what that is worth.",
+      "Nele walks in as though she already knows where everything is. Jana is here for a trial shift. There's time to count the stock before you turn the sign.",
     unlockMessage:
-      "The offer board is active. Before opening, you can also hire one helper or keep the money for supplies.",
+      "Check the stock, then put Jana on service or clearing tables. You can also open alone and keep the Asche for supplies.",
     objective: {
-      id: "day-3-offer-board",
+      id: "day-3-keep-the-cafe-moving",
       day: 3,
-      title: "Try the offer board",
-      description: "Review the daily offer and still keep the counter moving.",
-      completionHint: "Review the offer board and serve 2 customers."
+      title: "Keep the café moving",
+      description: "Serve two guests and see where the shift needs help.",
+      completionHint: "Serve 2 customers, then close and review tomorrow's supplies."
     },
     unlocks: ["ingredient purchasing", "price adjustment", "daily offers"],
     guestIds: [
       "pendler-kemal",
+      "pendlerin-paula",
+      "cappuccino-christa",
       "laptop-lukas",
       "lieferfahrer-cem",
-      "cappuccino-christa",
       "herr-bohn",
       "freelancerin-nele",
       "pendlerin-fatou",
@@ -75,22 +79,23 @@ export const weekOneDays = [
   },
   {
     day: 4,
-    title: "Advertising",
-    milestone: "Small ads begin influencing demand and guest types.",
+    title: "A Little Breathing Room",
+    milestone: "A short breather to try local advertising and prepare for busier days.",
     dayOpener:
-      "A small stack of flyers is sitting on the counter. You printed them last night. The neighborhood has not heard from you yet.",
+      "A small stack of flyers is sitting on the counter. Today's modest goal leaves room to clean up, check the supplies, and prepare before the café gets busier again.",
     unlockMessage:
-      "A small advertising option is now open — the neighborhood has not heard from you yet.",
+      "Small local ads are now available. Try one today and use the remaining time to catch up.",
     objective: {
       id: "day-4-local-ad",
       day: 4,
       title: "Test a small ad",
-      description: "Spend time and a little money on a local ad, then handle the extra attention.",
-      completionHint: "Run one local ad and serve 3 customers."
+      description: "Try a small local ad and serve two customers, leaving room for cleaning or preparation.",
+      completionHint: "Run one local ad and serve 2 customers."
     },
     unlocks: ["flyers", "student discount", "social media post"],
     guestIds: [
       "pendler-kemal",
+      "pendlerin-paula",
       "laptop-lukas",
       "lieferfahrer-cem",
       "cappuccino-christa",
@@ -100,7 +105,7 @@ export const weekOneDays = [
       "nachbarin-mira",
       "herr-grau"
     ],
-    eventIds: ["day-4-herr-grau-coin", "day-4-poster-before-printed", "day-4-flyer-wrong-address", "day-4-bohn-recognizes-coin"]
+    eventIds: ["day-4-herr-grau-coin", "day-4-bohn-recognizes-coin"]
   },
   {
     day: 5,
@@ -120,6 +125,7 @@ export const weekOneDays = [
     unlocks: ["stronger delegation pressure", "staff-flavored narrative beat"],
     guestIds: [
       "pendler-kemal",
+      "pendlerin-paula",
       "laptop-lukas",
       "lieferfahrer-cem",
       "cappuccino-christa",
@@ -135,7 +141,7 @@ export const weekOneDays = [
   {
     day: 6,
     title: "KASSANDRA",
-    milestone: "Cash register update unlocks simulated demand prediction.",
+    milestone: "Read KASSANDRA's register messages and consult its daily analysis.",
     dayOpener:
       "The register update installed overnight without asking. It has issued its first customer analysis. The results are calm, confident, and slightly wrong.",
     unlockMessage:
@@ -150,6 +156,7 @@ export const weekOneDays = [
     unlocks: ["KASSANDRA update", "automatic audience targeting"],
     guestIds: [
       "pendler-kemal",
+      "pendlerin-paula",
       "laptop-lukas",
       "lieferfahrer-cem",
       "cappuccino-christa",
@@ -173,12 +180,13 @@ export const weekOneDays = [
       id: "day-7-the-letter",
       day: 7,
       title: "Survive the inspection day",
-      description: "Push through the busiest demo day and close cleanly enough to receive the letter.",
+      description: "Keep up with the busiest shift of the week and leave the café in good order for the inspection.",
       completionHint: "Serve 4 customers, clean the café, and close Day 7."
     },
     unlocks: ["visible weirdness after hook", "apocalypse operations foreshadowing"],
     guestIds: [
       "pendler-kemal",
+      "pendlerin-paula",
       "laptop-lukas",
       "lieferfahrer-cem",
       "cappuccino-christa",

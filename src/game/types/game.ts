@@ -9,7 +9,7 @@ import type {
 } from "./content";
 import type { DayNumber } from "./content";
 
-export type GameStateVersion = 17;
+export type GameStateVersion = 19;
 
 export type ContentCatalogVersion = "week-one-v1";
 
@@ -21,9 +21,11 @@ export type DayPhase = "setup" | "day_start" | "open" | "day_end";
 export type HelperAutonomyLevel = "micromanagement" | "learning" | "autonomous";
 export type ClosureReason = "money" | "reputation";
 export type DecorSlotId = "plant" | "plant2" | "shelf" | "clock" | "lamp" | "cups";
-export type EquipmentSlotId = "machine" | "seating" | "register";
+export type EquipmentSlotId = "machine" | "grinder" | "clock" | "seating" | "register";
 export type HelperTaskId = "cleaning" | "service" | "barista" | "counter" | "marketing";
 export type EmployeeLevel = 1 | 2 | 3;
+/** Tables in the café that can be directly selected for cleaning. */
+export type TableId = "left" | "right" | "back";
 
 export type DayActionId =
   | "take_order"
@@ -60,12 +62,13 @@ export interface DayManagementState {
   actionPointsRemaining: number;
   actionPointsSpent: number;
   customersServed: number;
-  /** Guests served today, including helper orders. Optional for older saves. */
   servedGuestIds?: GuestId[];
   moneyEarned: number;
   moneySpent: number;
   suppliesUsed: SupplyState;
   cleaningActions: number;
+  /** Tables currently needing attention. A player can select one directly in the diorama. */
+  dirtyTableIds: TableId[];
   offerReviewed: boolean;
   advertisingRun: boolean;
   socialAdRun: boolean;
@@ -102,6 +105,16 @@ export interface DayManagementState {
   actionsWithoutServing: number;
   /** Count of autonomous helper actions today (learning/autonomous autonomyLevel only). Surfaced in the day-end recap. */
   helperAutonomousActions: number;
+  /** Recorded for the Day 3 shift report. Absent on older saves. */
+  dayThreeObservations?: { janaServed: boolean; missingIngredients: IngredientKey[] };
+  /** Measured from opening on Day 5. Older in-progress saves have no record. */
+  dayFiveHelperImpact?: {
+    openingStressReduction: number;
+    extraOrders: number;
+    cleanlinessRestored: number;
+    reputationGained: number;
+    milkSaved: number;
+  };
 }
 
 export interface GuestMemoryEntry {
@@ -193,6 +206,8 @@ export interface GameState {
   cafeClosed: boolean;
   /** Why the café closed, or null if still open. */
   closureReason: ClosureReason | null;
+  /** Consecutive day-ends at 0 Asche: the first grants a rescue shift, the second closes. */
+  moneyZeroStreak: number;
   /** Consecutive day-ends with reputation at 0 (drives the 2-day grace period). */
   reputationZeroStreak: number;
   /** Current owned tier per décor slot (1 = shabby default). See #57. */
@@ -224,6 +239,7 @@ export type GameAction =
   | { type: "prepare_counter" }
   | { type: "check_supplies" }
   | { type: "clean_tables" }
+  | { type: "clean_table"; tableId: TableId }
   | { type: "adjust_offer" }
   | { type: "run_advertising"; adType?: "flyer" | "social" }
   | { type: "consult_kassandra" }
@@ -232,10 +248,11 @@ export type GameAction =
       helperId: StaffOptionId;
       taskId: HelperTaskId;
     }
+  | { type: "clear_helper" }
   | { type: "open_day" }
   | { type: "complete_day" }
   | { type: "set_supply_purchase"; ingredient: IngredientKey; quantity: number }
-  | { type: "confirm_supply_purchase" }
+  | { type: "confirm_supply_purchase"; withoutRestocking?: boolean }
   | { type: "upgrade_decor"; slot: DecorSlotId }
   | { type: "buy_equipment"; slot: EquipmentSlotId }
   | { type: "buy_upgrade"; upgradeId: UpgradeId }

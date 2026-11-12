@@ -260,6 +260,7 @@ Day 4: Advertising
 - student discount
 - social media post
 - first appearance of Herr Grau
+- planned opening of the [espresso machine expansion](DECISIONS.md#decision-espresso-machine-expansion-starts-on-day-4)
 
 Day 5: Delegation Pressure
 

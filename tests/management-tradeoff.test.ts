@@ -2,11 +2,13 @@ import { describe, expect, it } from "vitest";
 import { createFreshRunState, createInitialGameState } from "../src/game/engine/gameState";
 import { gameReducer } from "../src/game/engine/reducer";
 import {
+  canCompleteCurrentDay,
   getCurrentDayModifier,
   getDayEndRecapLine,
   getDecorUpgradeOptions,
   getGuestForCustomer,
   getKassandraConsultLine,
+  getMoneyRecoveryWarning,
   getNextGuestPreview,
   getObjectiveStatus,
   getVisibleDaySevenLetter,
@@ -15,6 +17,7 @@ import {
 } from "../src/game/engine/selectors";
 import { weekOneDays } from "../src/game/data";
 import {
+  createInitialDayManagement,
   getEarnedPrice,
   getReputationIncomeFactor,
   MUNDANE_STRESS_EVENT_LINES
@@ -57,8 +60,8 @@ describe("management tradeoff system", () => {
     expect(nextState.supplies.coffee).toBe(state.supplies.coffee - 1);
     expect(nextState.supplies.milk).toBe(state.supplies.milk - 1);
     // Income scales with reputation: at the starting reputation (25) the factor
-    // is 0.7, so a €3.40 cappuccino earns €2.38.
-    expect(nextState.resources.money).toBe(state.resources.money + 2.38);
+    // is 0.7, so a 3.4 Asche cappuccino earns 2.4 Asche.
+    expect(nextState.resources.money).toBe(state.resources.money + 2.4);
   });
 
   it("substitutes or blocks unavailable products with a reputation penalty", () => {
@@ -144,6 +147,24 @@ describe("management tradeoff system", () => {
     expect(cleanedState.resources.cleanliness).toBe(90);
   });
 
+  it("tracks and cleans individual tables", () => {
+    let state = createInitialGameState();
+    state = gameReducer(state, { type: "serve_product", productId: "filterkaffee" });
+    state = gameReducer(state, { type: "serve_product", productId: "filterkaffee" });
+
+    expect(state.dayManagement.dirtyTableIds).toEqual(["left", "right"]);
+
+    const cleanedRight = gameReducer(state, { type: "clean_table", tableId: "right" });
+    expect(cleanedRight.dayManagement.dirtyTableIds).toEqual(["left"]);
+    expect(cleanedRight.resources.cleanliness).toBe(state.resources.cleanliness + 12);
+
+    const alreadyTidy = gameReducer(cleanedRight, { type: "clean_table", tableId: "back" });
+    expect(alreadyTidy).toEqual({
+      ...cleanedRight,
+      statusMessage: "The back table is already tidy."
+    });
+  });
+
   it("applies cleanliness reputation effects at day end", () => {
     const messyState = completePreparedDay({
       ...createInitialGameState(),
@@ -193,7 +214,7 @@ describe("management tradeoff system", () => {
       dayManagement: {
         ...createInitialGameState().dayManagement,
         actionPointsRemaining: 5,
-        customersServed: 2
+        customersServed: 3
       }
     };
 
@@ -218,6 +239,7 @@ describe("management tradeoff system", () => {
     state = gameReducer(state, { type: "serve_product", productId: "filterkaffee" });
     state = gameReducer(state, { type: "clean_tables" });
     state = gameReducer(state, { type: "check_supplies" });
+    state = gameReducer(state, { type: "serve_product", productId: "filterkaffee" });
 
     expect(state.dayManagement.actionPointsRemaining).toBe(0);
 
@@ -227,7 +249,7 @@ describe("management tradeoff system", () => {
     });
 
     expect(blockedState.dayManagement.actionPointsRemaining).toBe(0);
-    expect(blockedState.dayManagement.actionPointsSpent).toBe(3);
+    expect(blockedState.dayManagement.actionPointsSpent).toBe(4);
     expect(blockedState.statusMessage).toContain("No action capacity");
   });
 
@@ -384,18 +406,53 @@ describe("management tradeoff system", () => {
     expect(soloDayFive.unlockedAchievements).not.toContain("first-helper");
   });
 
-  it("makes the Day-4 poster echo stronger but more stressful", () => {
-    const dayFour: GameState = {
-      ...createDayStartState(4),
-      dayPhase: "open"
-    };
+  it("keeps the Day-4 poster echo's cost and reputation gain without extra stress", () => {
+    const dayFour = gameReducer(
+      {
+        ...createDayStartState(4),
+        resources: { ...createInitialGameState().resources, stress: 12 },
+        dayManagement: createInitialDayManagement(25, 4)
+      },
+      { type: "open_day" }
+    );
     const advertised = gameReducer(dayFour, { type: "run_advertising" });
 
     expect(advertised.resources.money).toBe(40);
     expect(advertised.resources.reputation).toBe(27);
-    expect(advertised.resources.stress).toBe(2);
+    expect(advertised.resources.stress).toBe(12);
+    expect(advertised.dayManagement.moneySpent).toBe(2);
+    expect(advertised.dayManagement.actionPointsRemaining).toBe(4);
+    expect(advertised.dayManagement.actionPointsSpent).toBe(1);
+    expect(advertised.dayManagement.actionsWithoutServing).toBe(1);
     expect(advertised.statusMessage).toContain("Rep +2");
-    expect(advertised.statusMessage).toContain("Stress +2");
+    expect(advertised.statusMessage).not.toContain("Stress +2");
+    expect(advertised.statusMessage).not.toContain("foot traffic");
+  });
+
+  it("completes the Day-4 objective at exactly two guests only after advertising", () => {
+    const twoGuestsWithAd: GameState = {
+      ...createDayStartState(4),
+      dayPhase: "open",
+      dayManagement: {
+        ...createInitialDayManagement(25, 4),
+        customersServed: 2,
+        advertisingRun: true
+      }
+    };
+
+    expect(getObjectiveStatus(twoGuestsWithAd).completed).toBe(true);
+    expect(
+      getObjectiveStatus({
+        ...twoGuestsWithAd,
+        dayManagement: { ...twoGuestsWithAd.dayManagement, customersServed: 1 }
+      }).completed
+    ).toBe(false);
+    expect(
+      getObjectiveStatus({
+        ...twoGuestsWithAd,
+        dayManagement: { ...twoGuestsWithAd.dayManagement, advertisingRun: false }
+      }).completed
+    ).toBe(false);
   });
 
   it("unlocks KASSANDRA and letter achievements from actual late-week state", () => {
@@ -451,14 +508,30 @@ describe("management tradeoff system", () => {
       taskId: "counter"
     });
 
-    expect(openedState.resources.money).toBe(24);
+    expect(openedState.resources.money).toBe(
+      dayFiveState.resources.money - selectedState.helperAssignment!.dailyCost
+    );
     expect(openedState.helperAssignment?.locked).toBe(true);
     expect(changedState.helperAssignment?.helperId).toBe("jana");
   });
 
+  it.each([[3, 2], [4, 14]] as const)("charges Jana's Day %i opening fee of %i Asche", (day, fee) => {
+    const before = createDayStartState(day);
+    const selected = gameReducer(before, { type: "select_helper", helperId: "jana", taskId: "service" });
+    expect(selected.helperAssignment?.dailyCost).toBe(fee);
+    // An older save can already have selected Jana at the regular price.
+    const opened = gameReducer({
+      ...selected, helperAssignment: { ...selected.helperAssignment!, dailyCost: 14 }
+    }, { type: "open_day" });
+    expect(opened.helperAssignment?.dailyCost).toBe(fee);
+    expect(opened.resources.money).toBe(before.resources.money - fee);
+    expect(opened.dayManagement.moneySpent).toBe(fee);
+  });
+
   it("makes Day-3 helper and Day-6 KASSANDRA unlocks visible at the right time", () => {
     expect(getVisibleStaffOptions(createDayStartState(2))).toHaveLength(0);
-    expect(getVisibleStaffOptions(createDayStartState(3))).toHaveLength(3);
+    expect(getVisibleStaffOptions(createDayStartState(3)).map((staff) => staff.id)).toEqual(["jana"]);
+    expect(getVisibleStaffOptions(createDayStartState(4))).toHaveLength(3);
 
     expect(getVisibleKassandraMessages(createDayStartState(5))).toHaveLength(0);
     const daySixState: GameState = {
@@ -466,6 +539,179 @@ describe("management tradeoff system", () => {
       kassandraInstalled: true
     };
     expect(getVisibleKassandraMessages(daySixState).length).toBeGreaterThan(0);
+  });
+
+  it("lets Jana clear one dirty table on Day 3 and reports a shortage even when the guest gets an available drink", () => {
+    const ready = { ...createDayStartState(3), supplies: { coffee: 5, milk: 0, pastries: 1 } };
+    const assigned = gameReducer(ready, { type: "select_helper", helperId: "jana", taskId: "cleaning" });
+    let state = gameReducer(assigned, { type: "open_day" });
+    state = gameReducer(state, { type: "serve_product", productId: "filterkaffee" });
+    const dirty = state.dayManagement.dirtyTableIds[0]!;
+    expect(dirty).toBeDefined();
+    const actions = state.dayManagement.actionPointsRemaining;
+    state = gameReducer(state, { type: "clean_table", tableId: dirty });
+    expect(state.dayManagement.dirtyTableIds).not.toContain(dirty);
+    expect(state.dayManagement.actionPointsRemaining).toBe(actions);
+
+    for (let i = 0; i < 2; i++) {
+      state = gameReducer(state, { type: "serve_product", productId: "filterkaffee" });
+    }
+    const nextDirty = state.dayManagement.dirtyTableIds[0]!;
+    const beforeCleaning = state.dayManagement.actionPointsRemaining;
+    state = gameReducer(state, { type: "clean_table", tableId: nextDirty });
+    expect(state.dayManagement.actionPointsRemaining).toBe(beforeCleaning - 1);
+    expect(state.dayManagement.emptySupplyStressIngredients).toEqual([]);
+
+    const storage = createMemoryStorage();
+    expect(saveGameState(state, storage).ok).toBe(true);
+    const closed = gameReducer(loadGameState(storage), { type: "complete_day" });
+    expect(closed.daySummary?.objectiveCompleted).toBe(true);
+    expect(closed.daySummary?.helperAutonomyRecap).toBe("Jana cleared a table without using one of your actions.");
+    expect(closed.daySummary?.flavorLines).toContain("Missing at the counter: Milk.");
+    expect(closed.daySummary?.flavorLines).toContain("1 table still needed clearing at closing.");
+  });
+
+  it.each([1, 2])("reports whether Jana served an extra guest on Day 3 with %i coffee", (coffee) => {
+    const ready = { ...createDayStartState(3), supplies: { coffee, milk: 0, pastries: 0 } };
+    const assigned = gameReducer(ready, { type: "select_helper", helperId: "jana", taskId: "service" });
+    const opened = gameReducer(assigned, { type: "open_day" });
+    const served = gameReducer(opened, { type: "serve_product", productId: "filterkaffee" });
+    const report = gameReducer(served, { type: "complete_day" }).daySummary;
+    expect(report?.customersServed).toBe(coffee);
+    expect(report?.objectiveCompleted).toBe(coffee === 2);
+    expect(report?.helperAutonomyRecap).toBe(coffee === 2
+      ? "Jana served one extra guest without using another action."
+      : "Jana was assigned to service. No extra guest was served.");
+  });
+
+  it("lets an unaffordable selected helper be cleared before opening without a fee or action", () => {
+    const selected = gameReducer(createDayStartState(3), {
+      type: "select_helper", helperId: "jana", taskId: "service"
+    });
+    const poor = { ...selected, resources: { ...selected.resources, money: 1 } };
+    const blocked = gameReducer(poor, { type: "open_day" });
+    expect(blocked.dayPhase).toBe("day_start");
+
+    const cleared = gameReducer(blocked, { type: "clear_helper" });
+    expect(cleared.helperAssignment).toBeNull();
+    expect(cleared.resources).toEqual(blocked.resources);
+    expect(cleared.dayManagement).toEqual(blocked.dayManagement);
+    expect(cleared.staffXp).toEqual(blocked.staffXp);
+    expect(cleared.completedActions).toEqual(blocked.completedActions);
+
+    const opened = gameReducer(cleared, { type: "open_day" });
+    expect(opened.dayPhase).toBe("open");
+    expect(opened.helperAssignment).toBeNull();
+    expect(opened.resources.money).toBe(1);
+    expect(opened.dayManagement.moneySpent).toBe(cleared.dayManagement.moneySpent);
+    expect(opened.dayManagement.actionPointsSpent).toBe(cleared.dayManagement.actionPointsSpent);
+  });
+
+  it("preserves solo opening penalties instead of retaining the cleared helper's bonuses", () => {
+    const base = { ...createDayStartState(5), staffXp: { jana: 5 } };
+    const selected = gameReducer(base, { type: "select_helper", helperId: "jana", taskId: "service" });
+    const cleared = gameReducer(selected, { type: "clear_helper" });
+    const opened = gameReducer(cleared, { type: "open_day" });
+    const openedAlone = gameReducer(base, { type: "open_day" });
+    expect(opened.dayManagement).toEqual(openedAlone.dayManagement);
+    expect(opened.resources).toEqual(openedAlone.resources);
+    expect(opened.dayManagement.helperExtraOrdersRemaining).toBe(0);
+
+    const closed = gameReducer(gameReducer(opened, { type: "take_order" }), { type: "complete_day" });
+    const closedAlone = gameReducer(gameReducer(openedAlone, { type: "take_order" }), { type: "complete_day" });
+    expect(closed.resources).toEqual(closedAlone.resources);
+    expect(closed.staffXp).toEqual(base.staffXp);
+  });
+
+  it("locks helper removal after opening and leaves the paid assignment intact", () => {
+    const selected = gameReducer(createDayStartState(5), {
+      type: "select_helper", helperId: "nino", taskId: "counter"
+    });
+    const opened = gameReducer(selected, { type: "open_day" });
+    for (const dayPhase of ["open", "day_end"] as const) {
+      const state = { ...opened, dayPhase };
+      const attempted = gameReducer(state, { type: "clear_helper" });
+      expect({ ...attempted, statusMessage: state.statusMessage }).toEqual(state);
+      expect(attempted.statusMessage).toContain("final once the day has opened");
+    }
+    const inconsistent = { ...opened, dayPhase: "day_start" as const };
+    const attempted = gameReducer(inconsistent, { type: "clear_helper" });
+    expect(attempted.helperAssignment).toEqual(inconsistent.helperAssignment);
+  });
+
+  it("saves the cleared assignment and allows a fresh selection after reloading", () => {
+    const selected = gameReducer(createDayStartState(3), {
+      type: "select_helper", helperId: "jana", taskId: "cleaning"
+    });
+    const cleared = gameReducer(selected, { type: "clear_helper" });
+    const storage = createMemoryStorage();
+    expect(saveGameState(cleared, storage)).toEqual({ ok: true });
+    const restored = loadGameState(storage);
+    expect(restored).toEqual(cleared);
+    const reselected = gameReducer(restored, { type: "select_helper", helperId: "jana", taskId: "service" });
+    expect(reselected.helperAssignment?.taskId).toBe("service");
+    expect(reselected.resources).toEqual(restored.resources);
+  });
+
+  it("allows only one offer review per day, including after saving", () => {
+    const opened = gameReducer(createDayStartState(3), { type: "open_day" });
+    const reviewed = gameReducer(opened, { type: "adjust_offer" });
+    expect(reviewed.dayManagement.offerReviewed).toBe(true);
+    expect(reviewed.resources.reputation).toBe(opened.resources.reputation + 1);
+    expect(reviewed.statusMessage).toContain("Remaining orders earn 10 % more today");
+    const storage = createMemoryStorage();
+    expect(saveGameState(reviewed, storage)).toEqual({ ok: true });
+    const restored = loadGameState(storage);
+    expect(restored).toEqual(reviewed);
+    const duplicate = gameReducer(restored, { type: "adjust_offer" });
+    expect({ ...duplicate, statusMessage: restored.statusMessage }).toEqual(restored);
+    expect(duplicate.statusMessage).toContain("already been reviewed today");
+
+    const served = gameReducer(duplicate, { type: "take_order" });
+    const closed = gameReducer(served, { type: "complete_day" });
+    const nextDay = gameReducer(closed, { type: "confirm_supply_purchase" });
+    expect(nextDay.day).toBe(4);
+    expect(nextDay.dayManagement.offerReviewed).toBe(false);
+    const nextOpen = gameReducer(nextDay, { type: "open_day" });
+    const nextReview = gameReducer(nextOpen, { type: "adjust_offer" });
+    expect(nextReview.dayManagement.offerReviewed).toBe(true);
+    expect(nextReview.dayManagement.actionPointsRemaining).toBe(nextOpen.dayManagement.actionPointsRemaining - 1);
+  });
+
+  it.each(["setup", "day_start", "open"] as const)("keeps upgrades unavailable during %s without spending cash", (dayPhase) => {
+    const state = { ...createDayStartState(5), dayPhase };
+    const attempted = gameReducer(state, { type: "buy_upgrade", upgradeId: "cleaning-kit" });
+    expect({ ...attempted, statusMessage: state.statusMessage }).toEqual(state);
+    expect(attempted.statusMessage).toContain("after closing, before the next day starts");
+  });
+
+  it("buys upgrades after closing, while retaining unlock, affordability and one-time limits", () => {
+    const state = { ...createDayStartState(5), dayPhase: "day_end" as const };
+    const early = { ...state, day: 4 as const };
+    const locked = gameReducer(early, { type: "buy_upgrade", upgradeId: "cleaning-kit" });
+    expect({ ...locked, statusMessage: early.statusMessage }).toEqual(early);
+    const poor = { ...state, resources: { ...state.resources, money: 1 } };
+    const unaffordable = gameReducer(poor, { type: "buy_upgrade", upgradeId: "cleaning-kit" });
+    expect({ ...unaffordable, statusMessage: poor.statusMessage }).toEqual(poor);
+    const bought = gameReducer(state, { type: "buy_upgrade", upgradeId: "cleaning-kit" });
+    expect(bought.purchasedUpgrades).toContain("cleaning-kit");
+    expect(bought.resources.money).toBe(state.resources.money - 14);
+    expect(bought.dayManagement.moneySpent).toBe(state.dayManagement.moneySpent + 14);
+    expect(bought.dayManagement.actionPointsRemaining).toBe(state.dayManagement.actionPointsRemaining);
+    const duplicate = gameReducer(bought, { type: "buy_upgrade", upgradeId: "cleaning-kit" });
+    expect({ ...duplicate, statusMessage: bought.statusMessage }).toEqual(bought);
+  });
+
+  it.each([
+    { upgradeId: "menu-board", day: 3 },
+    { upgradeId: "storage-shelf", day: 3 },
+    { upgradeId: "weatherproof-umbrella-stand", day: 7 },
+    { upgradeId: "cash-register-update", day: 6 }
+  ] as const)("does not charge for an unsupported or automatic upgrade ($upgradeId)", ({ upgradeId, day }) => {
+    const state = { ...createDayStartState(day), dayPhase: "day_end" as const };
+    const attempted = gameReducer(state, { type: "buy_upgrade", upgradeId });
+    expect({ ...attempted, statusMessage: state.statusMessage }).toEqual(state);
+    expect(attempted.statusMessage).toContain("not available to buy in this demo");
   });
 
   it("blocks helper hiring when money is insufficient", () => {
@@ -580,7 +826,7 @@ describe("management tradeoff system", () => {
 
     expect(progressedState.day).toBe(1);
     expect(progressedState.objectiveResults).toEqual([]);
-    expect(progressedState.dayManagement.actionPointsRemaining).toBe(3);
+    expect(progressedState.dayManagement.actionPointsRemaining).toBe(4);
     expect(progressedState.dayManagement.actionPointsSpent).toBe(0);
     expect(getObjectiveStatus(progressedState).status).toBe("active");
   });
@@ -591,10 +837,10 @@ describe("fail-state and reputation-scaled income", () => {
     expect(getReputationIncomeFactor(0)).toBeCloseTo(0.6);
     expect(getReputationIncomeFactor(100)).toBeCloseTo(1.0);
     expect(getReputationIncomeFactor(25)).toBeCloseTo(0.7);
-    expect(getEarnedPrice(3.4, 25)).toBe(2.38);
+    expect(getEarnedPrice(3.4, 25)).toBe(2.4);
   });
 
-  it("closes the café immediately when the till hits zero", () => {
+  it("keeps serving possible when restocking spends the last money", () => {
     const dayEndState: GameState = {
       ...createInitialGameState(),
       dayPhase: "day_end",
@@ -604,8 +850,174 @@ describe("fail-state and reputation-scaled income", () => {
     const nextState = gameReducer(dayEndState, { type: "confirm_supply_purchase" });
 
     expect(nextState.resources.money).toBe(0);
-    expect(nextState.cafeClosed).toBe(true);
-    expect(nextState.closureReason).toBe("money");
+    expect(nextState.cafeClosed).toBe(false);
+    expect(nextState.closureReason).toBeNull();
+    expect(nextState.moneyZeroStreak).toBe(1);
+    expect(nextState.statusMessage).toContain("rescue shift");
+
+    const served = gameReducer(nextState, {
+      type: "serve_product",
+      productId: "cappuccino"
+    });
+    expect(served.resources.money).toBeGreaterThan(0);
+    expect(served.dayManagement.customersServed).toBe(1);
+    expect(served.moneyZeroStreak).toBe(1);
+    expect(served.cafeClosed).toBe(false);
+    expect(getMoneyRecoveryWarning(served)).toContain("This is your rescue shift");
+    expect(served.statusMessage).toContain("This is your rescue shift");
+    expect(served.statusMessage).not.toContain("The till is empty.");
+  });
+
+  it("allows empty-stock shifts to close at zero and grants exactly one rescue shift", () => {
+    const emptyShift: GameState = {
+      ...createInitialGameState(),
+      resources: { ...createInitialGameState().resources, money: 0 },
+      supplies: { coffee: 0, milk: 0, pastries: 0 }
+    };
+    expect(canCompleteCurrentDay(emptyShift)).toBe(true);
+    expect(canCompleteCurrentDay({
+      ...emptyShift,
+      resources: { ...emptyShift.resources, money: 1 }
+    })).toBe(false);
+
+    const firstClose = gameReducer(emptyShift, { type: "complete_day" });
+    expect(firstClose.dayPhase).toBe("day_end");
+    expect(firstClose.dayManagement.customersServed).toBe(0);
+    expect(firstClose.moneyZeroStreak).toBe(1);
+    expect(firstClose.cafeClosed).toBe(false);
+    expect(firstClose.statusMessage).toContain("Tomorrow is your rescue shift");
+    expect(gameReducer(firstClose, { type: "complete_day" }).moneyZeroStreak).toBe(1);
+
+    const rescueShift = gameReducer(firstClose, { type: "confirm_supply_purchase" });
+    expect(rescueShift.day).toBe(2);
+    expect(rescueShift.dayManagement.actionPointsRemaining).toBe(4);
+    expect(rescueShift.moneyZeroStreak).toBe(1);
+    expect(rescueShift.supplies).toEqual(emptyShift.supplies);
+    expect(canCompleteCurrentDay(rescueShift)).toBe(true);
+
+    const secondClose = gameReducer(rescueShift, { type: "complete_day" });
+    expect(secondClose.moneyZeroStreak).toBe(2);
+    expect(secondClose.cafeClosed).toBe(true);
+    expect(secondClose.closureReason).toBe("money");
+    expect(canCompleteCurrentDay(secondClose)).toBe(false);
+    expect(getMoneyRecoveryWarning(secondClose)).toBeNull();
+  });
+
+  it("resets the money streak only when the rescue shift closes with money after costs", () => {
+    const initial = createInitialGameState();
+    const rescueShift: GameState = {
+      ...initial,
+      day: 2,
+      resources: { ...initial.resources, money: 0 },
+      moneyZeroStreak: 1,
+      dayManagement: createInitialDayManagement(initial.resources.reputation, 2)
+    };
+    let served = gameReducer(rescueShift, {
+      type: "serve_product",
+      productId: "cappuccino"
+    });
+    expect(served.resources.money).toBeGreaterThan(0);
+    expect(served.moneyZeroStreak).toBe(1);
+    expect(getMoneyRecoveryWarning(served)).toContain("This is your rescue shift");
+    expect(getMoneyRecoveryWarning(served)).not.toContain("The till is empty.");
+    expect(getMoneyRecoveryWarning({ ...served, day: 7 })).not.toMatch(/tomorrow/i);
+
+    const insufficientClose = gameReducer(served, { type: "complete_day" });
+    expect(insufficientClose.resources.money).toBe(0);
+    expect(insufficientClose.cafeClosed).toBe(true);
+
+    served = gameReducer(served, { type: "serve_product", productId: "cappuccino" });
+    served = gameReducer(served, { type: "serve_product", productId: "cappuccino" });
+    const recovered = gameReducer(served, { type: "complete_day" });
+    expect(recovered.resources.money).toBeGreaterThan(0);
+    expect(recovered.moneyZeroStreak).toBe(0);
+    expect(recovered.cafeClosed).toBe(false);
+    expect(recovered.closureReason).toBeNull();
+    expect(getMoneyRecoveryWarning(recovered)).toBeNull();
+    expect(recovered.statusMessage).not.toContain("rescue shift");
+  });
+
+  it("does not grant another extra shift when a day-end upgrade empties the till", () => {
+    const initial = createInitialGameState();
+    const dayEnd: GameState = {
+      ...initial,
+      dayPhase: "day_end",
+      resources: { ...initial.resources, money: 12 }
+    };
+    const spent = gameReducer(dayEnd, { type: "upgrade_decor", slot: "plant" });
+    expect(spent.resources.money).toBe(0);
+    expect(spent.moneyZeroStreak).toBe(1);
+    expect(spent.cafeClosed).toBe(false);
+    const purchasePlan = gameReducer(spent, {
+      type: "set_supply_purchase",
+      ingredient: "coffee",
+      quantity: 0
+    });
+    expect(purchasePlan.statusMessage).toBe(spent.statusMessage);
+    expect(purchasePlan.statusMessage.split("The till is empty.")).toHaveLength(2);
+
+    const rescueShift = gameReducer(purchasePlan, { type: "confirm_supply_purchase" });
+    expect(rescueShift.moneyZeroStreak).toBe(1);
+    expect(rescueShift.statusMessage).not.toContain("Tomorrow is your rescue shift");
+    expect(rescueShift.statusMessage.split("The till is empty.")).toHaveLength(2);
+    const failedRescue = gameReducer(rescueShift, { type: "complete_day" });
+    expect(failedRescue.cafeClosed).toBe(true);
+    expect(failedRescue.closureReason).toBe("money");
+  });
+
+  it("preserves affordability failures without repeating the empty-till warning", () => {
+    const initial = createDayStartState(4);
+    const emptyTill: GameState = {
+      ...initial,
+      dayPhase: "open",
+      resources: { ...initial.resources, money: 0 },
+      dayManagement: createInitialDayManagement(initial.resources.reputation, 4)
+    };
+    const blocked = gameReducer(emptyTill, { type: "run_advertising" });
+    const repeated = gameReducer(blocked, { type: "run_advertising" });
+
+    expect(repeated.statusMessage).toContain("cannot afford a flyer");
+    expect(repeated.statusMessage).toBe(blocked.statusMessage);
+    expect(repeated.statusMessage.split("The till is empty.")).toHaveLength(2);
+    expect(repeated.dayManagement.actionPointsRemaining).toBe(5);
+    expect(repeated.moneyZeroStreak).toBe(0);
+  });
+
+  it("prioritizes money closure while recording both zero streaks", () => {
+    const initial = createInitialGameState();
+    const closed = gameReducer({
+      ...initial,
+      moneyZeroStreak: 1,
+      reputationZeroStreak: 1,
+      resources: { ...initial.resources, money: 0, reputation: 1, cleanliness: 20 }
+    }, { type: "complete_day" });
+
+    expect(closed.moneyZeroStreak).toBe(2);
+    expect(closed.reputationZeroStreak).toBe(2);
+    expect(closed.cafeClosed).toBe(true);
+    expect(closed.closureReason).toBe("money");
+  });
+
+  it.each([0, 1, 2])("ends Day 7 with its letter at zero money (prior streak %i)", (moneyZeroStreak) => {
+    const initial = createDayStartState(7);
+    const closed = gameReducer({
+      ...initial,
+      dayPhase: "open",
+      moneyZeroStreak,
+      resources: { ...initial.resources, money: 0 }
+    }, { type: "complete_day" });
+
+    expect(closed.day).toBe(7);
+    expect(closed.demoComplete).toBe(true);
+    expect(getVisibleDaySevenLetter(closed)).toBeTruthy();
+    expect(closed.moneyZeroStreak).toBe(Math.min(2, moneyZeroStreak + 1));
+    expect(closed.cafeClosed).toBe(moneyZeroStreak > 0);
+    expect(closed.closureReason).toBe(moneyZeroStreak > 0 ? "money" : null);
+    expect(closed.statusMessage).toContain("An official letter has arrived");
+    expect(closed.statusMessage).not.toMatch(/tomorrow|next shift|Day 8/i);
+    expect(getMoneyRecoveryWarning(closed)).toBeNull();
+    expect(canCompleteCurrentDay(closed)).toBe(false);
+    expect(gameReducer(closed, { type: "confirm_supply_purchase" }).day).toBe(7);
   });
 
   it("blocks all further actions once the café is closed", () => {
@@ -818,6 +1230,47 @@ describe("fail-state and reputation-scaled income", () => {
     );
   });
 
+  it.each([6, 7] as const)("rejects duplicate KASSANDRA consultations without consuming actions or patience on Day %i", (day) => {
+    const opened = gameReducer({ ...createDayStartState(day), kassandraInstalled: true }, { type: "open_day" });
+    for (const customersServed of [0, 1]) {
+      const before = { ...opened, dayManagement: { ...opened.dayManagement, customersServed } };
+      const first = gameReducer(before, { type: "consult_kassandra" });
+      expect(first.dayManagement.kassandraConsulted).toBe(true);
+      const duplicate = gameReducer(first, { type: "consult_kassandra" });
+      expect({ ...duplicate, statusMessage: first.statusMessage }).toEqual(first);
+      expect(duplicate.statusMessage).toContain("already been consulted today");
+    }
+  });
+
+  it("keeps the KASSANDRA daily lock after saving, even with no actions remaining", () => {
+    const opened = gameReducer({ ...createDayStartState(6), kassandraInstalled: true }, { type: "open_day" });
+    const consulted = gameReducer(opened, { type: "consult_kassandra" });
+    const noActions = { ...consulted, dayManagement: { ...consulted.dayManagement, actionPointsRemaining: 0 } };
+    const storage = createMemoryStorage();
+    expect(saveGameState(noActions, storage)).toEqual({ ok: true });
+    const restored = loadGameState(storage);
+    expect(restored).toEqual(noActions);
+    const duplicate = gameReducer(restored, { type: "consult_kassandra" });
+    expect({ ...duplicate, statusMessage: restored.statusMessage }).toEqual(restored);
+    expect(duplicate.statusMessage).toContain("already been consulted today");
+  });
+
+  it("resets KASSANDRA availability when the next café day actually starts", () => {
+    const opened = gameReducer({ ...createDayStartState(6), kassandraInstalled: true }, { type: "open_day" });
+    const consulted = gameReducer(opened, { type: "consult_kassandra" });
+    const served = gameReducer(consulted, { type: "serve_product", productId: "filterkaffee" });
+    const closed = gameReducer(served, { type: "complete_day" });
+    expect(closed.dayPhase).toBe("day_end");
+    const nextDay = gameReducer(closed, { type: "confirm_supply_purchase" });
+    expect(nextDay.day).toBe(7);
+    expect(nextDay.dayManagement.kassandraConsulted).toBe(false);
+    const nextOpen = gameReducer(nextDay, { type: "open_day" });
+    const nextConsultation = gameReducer(nextOpen, { type: "consult_kassandra" });
+    expect(nextConsultation.dayManagement.kassandraConsulted).toBe(true);
+    expect(nextConsultation.statusMessage).toContain("KASSANDRA:");
+    expect(nextConsultation.dayManagement.actionPointsRemaining).toBe(nextOpen.dayManagement.actionPointsRemaining - 1);
+  });
+
   it("upgrades décor at day end: cost, tier, one-time reputation, and caps", () => {
     const dayEnd: GameState = {
       ...createInitialGameState(),
@@ -830,6 +1283,12 @@ describe("fail-state and reputation-scaled income", () => {
     expect(upgraded.decor.plant).toBe(2);
     expect(upgraded.resources.money).toBe(30);
     expect(upgraded.resources.reputation).toBe(26);
+
+    // The second plant is its own purchasable counter slot, with its own price.
+    const counterPlant = gameReducer(dayEnd, { type: "upgrade_decor", slot: "plant2" });
+    expect(counterPlant.decor.plant2).toBe(2);
+    expect(counterPlant.resources.money).toBe(32);
+    expect(counterPlant.resources.reputation).toBe(26);
 
     // Not enough money is blocked.
     const broke: GameState = {
@@ -854,16 +1313,27 @@ describe("fail-state and reputation-scaled income", () => {
     expect(plantOption?.next).toBeNull();
   });
 
-  it("adds a solo-floor stress penalty from Day 4 without a helper", () => {
-    const soloDayFour = completePreparedDay({
+  it("adds the solo-floor stress penalty from Day 5, leaving Day 4 free of it", () => {
+    const soloDayFour: GameState = {
       ...createInitialGameState(),
       day: 4,
-      helperAssignment: null
-    });
+      helperAssignment: null,
+      resources: { ...createInitialGameState().resources, stress: 25 },
+      dayManagement: {
+        ...createInitialDayManagement(25, 4),
+        customersServed: 4,
+        cleaningActions: 1
+      }
+    };
+    const closedDayFour = completePreparedDay(soloDayFour);
+    const closedDayFive = completePreparedDay({ ...soloDayFour, day: 5 });
 
+    expect(closedDayFour.resources.stress).toBe(25);
     expect(
-      soloDayFour.daySummary?.flavorLines.some((line) => line.includes("alone"))
-    ).toBe(true);
+      closedDayFour.daySummary?.flavorLines.some((line) => line.includes("Stress +10"))
+    ).toBe(false);
+    expect(closedDayFive.resources.stress).toBe(35);
+    expect(closedDayFive.daySummary?.helperAutonomyRecap).toContain("+10 stress at closing");
   });
 
   it("makes Day-7 inspection pressure reward clean closing and punish messy closing", () => {

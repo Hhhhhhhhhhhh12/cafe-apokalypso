@@ -51,7 +51,7 @@ function remountApp() {
 
 function clickButton(label: string) {
   const button = Array.from(container.querySelectorAll("button"))
-    .find((item) => item.textContent?.trim() === label);
+    .find((item) => item.textContent?.trim() === label || item.getAttribute("aria-label") === label);
   if (!button || button.disabled) throw new Error(`Missing or disabled button: ${label}`);
   act(() => button.click());
 }
@@ -93,11 +93,12 @@ describe("protecting a save that failed to load", () => {
     readSpy.mockRestore();
     expect(container.textContent).toContain("could not be loaded");
 
-    const purchase = container.querySelector<HTMLButtonElement>(".equipment-shop button");
+    clickButton("Set up counter");
+    const purchase = container.querySelector<HTMLButtonElement>(".opening-equipment button");
     if (!purchase) throw new Error("Missing equipment purchase button");
     act(() => purchase.click());
 
-    expect(container.textContent).toContain("Open with standing room only");
+    expect(container.textContent).toContain("Machine ready");
     expect(localStorage.getItem(SAVE_KEY)).toBe(originalSave);
   });
 
@@ -113,15 +114,17 @@ describe("restarting a week safely", () => {
     { label: "Reset / New Game", action: null, state: createFreshRunState() },
     {
       label: "Start a new café",
-      action: "Check supplies",
-      state: { ...createInitialGameState(), resources: { ...createInitialGameState().resources, money: 0 } }
+      action: null,
+      state: { ...createInitialGameState(), cafeClosed: true, closureReason: "money" } satisfies GameState
     },
     {
       label: "Replay week one",
-      action: "Finish Day 7",
+      action: null,
       state: {
         ...createInitialGameState(),
         day: 7,
+        dayPhase: "day_end",
+        demoComplete: true,
         completedActions: ["take_order"],
         dayManagement: { ...createInitialGameState().dayManagement, customersServed: 1 }
       } satisfies GameState
@@ -129,7 +132,7 @@ describe("restarting a week safely", () => {
   ])("protects the save until $label is confirmed and stored", ({ label, action, state }) => {
     localStorage.setItem(SAVE_KEY, "{broken json");
     localStorage.setItem(LEGACY_KEY, "old save");
-    // Start close to each terminal state, then reach the banner through the real UI and reducer.
+    // Mount each restart entry point with an unreadable save.
     const freshState = vi.spyOn(gameState, "createFreshRunState").mockReturnValue(state);
     renderApp();
     freshState.mockRestore();
@@ -163,7 +166,7 @@ describe("restarting a week safely", () => {
     expect(JSON.parse(localStorage.getItem(SAVE_KEY)!)).toEqual(createFreshRunState());
 
     remountApp();
-    expect(container.textContent).toContain("Before opening");
+    expect(container.querySelector('[aria-label="Intro überspringen"]')).not.toBeNull();
     expect(container.textContent).not.toContain("could not be loaded");
   });
 
@@ -187,10 +190,11 @@ describe("restarting a week safely", () => {
     expect(localStorage.getItem(LEGACY_KEY)).toBe("old save");
     expect(localStorage.getItem(BOOT_KEY)).toBe("1");
 
-    const purchase = container.querySelector<HTMLButtonElement>(".equipment-shop button");
+    clickButton("Set up counter");
+    const purchase = container.querySelector<HTMLButtonElement>(".opening-equipment button");
     if (!purchase) throw new Error("Missing equipment purchase button");
     act(() => purchase.click());
-    expect(container.textContent).toContain("Open with standing room only");
+    expect(container.textContent).toContain("Machine ready");
     expect(setItem).toHaveBeenCalledTimes(1);
     expect(localStorage.getItem(SAVE_KEY)).toBe(raw);
 
@@ -222,14 +226,16 @@ describe("restarting a week safely", () => {
     renderApp();
     const confirm = vi.spyOn(window, "confirm").mockReturnValue(true);
     const setItem = vi.spyOn(Storage.prototype, "setItem");
-    const purchase = container.querySelector<HTMLButtonElement>(".equipment-shop button");
+    clickButton("Intro überspringen");
+    clickButton("Set up counter");
+    const purchase = container.querySelector<HTMLButtonElement>(".opening-equipment button");
     if (!purchase) throw new Error("Missing equipment purchase button");
     act(() => purchase.click());
-    expect(container.textContent).toContain("Open with standing room only");
+    expect(container.textContent).toContain("Machine ready");
 
     clickButton("Reset / New Game");
     expect(confirm).toHaveBeenCalledWith(expect.stringContaining("Browser storage is unavailable"));
-    expect(container.textContent).toContain("Buy a coffee machine to open");
+    expect(container.querySelector('[aria-label="Intro überspringen"]')).not.toBeNull();
     expect(container.textContent).toContain("Browser storage is unavailable");
     expect(setItem).not.toHaveBeenCalled();
   });
@@ -300,7 +306,8 @@ describe("reopening with an existing save", () => {
     await act(async () => { root.render(<StrictMode><App /></StrictMode>); });
     vi.restoreAllMocks();
     expect(container.textContent).toContain("An older tab may still overwrite the original save");
-    const purchase = container.querySelector<HTMLButtonElement>(".equipment-shop button");
+    clickButton("Set up counter");
+    const purchase = container.querySelector<HTMLButtonElement>(".opening-equipment button");
     if (!purchase) throw new Error("Missing equipment purchase button");
     act(() => purchase.click());
     expect(localStorage.getItem(SAVE_KEY)).toBeNull();

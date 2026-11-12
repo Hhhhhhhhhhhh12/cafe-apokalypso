@@ -21,7 +21,7 @@ export const weekOneGuests = [
     id: "pendlerin-fatou",
     name: "Pendlerin Fatou",
     category: "normal",
-    firstDay: 2,
+    firstDay: 1,
     behaviorTags: ["steady", "practical", "patient"],
     summary: "Calm commuter who comes in without fuss and leaves without lingering.",
     sampleLines: ["Filter coffee, and maybe something to read if you have it."],
@@ -31,6 +31,22 @@ export const weekOneGuests = [
     serveLine: "She thanks you, takes the cup with both hands, and finds a table without checking if one is free.",
     matchedPreferenceLine: "Filter coffee. The right call. She settles in without comment.",
     missedPreferenceLine: "She accepts it without complaint, which somehow makes it harder to forget."
+  },
+  {
+    id: "pendlerin-paula",
+    name: "Pendlerin Paula",
+    category: "normal",
+    firstDay: 1,
+    behaviorTags: ["practical", "regular", "low-seat-time"],
+    summary: "A tired commuter in a yellow jacket who returns for a quiet coffee to go.",
+    sampleLines: ["A large filter coffee to go. Please make it the easy part of today."],
+    orderLine: "Filter coffee to go, please. No extra decisions this morning.",
+    learningCue: "Paula keeps her yellow jacket on and one hand on her bag strap. She will take the coffee with her.",
+    preferredProductId: "filterkaffee",
+    serveLine: "Paula takes the cup, settles her bag on her shoulder and heads back out. 'See you tomorrow.'",
+    matchedPreferenceLine: "Filter coffee to go. One familiar thing before the rest of the day.",
+    missedPreferenceLine: "She accepts it with a tired smile. Tomorrow she will ask for filter coffee again.",
+    visualNotes: "Approved simplified pixel style: brown bun, mustard jacket, pale shirt, dark trousers and brown shoulder bag. Adult proportions, simple face and restrained shading. Standing only."
   },
   {
     id: "nachbarin-mira",
@@ -90,8 +106,8 @@ export const weekOneGuests = [
     firstDay: 2,
     behaviorTags: ["quality-expectations", "higher-spend", "foam-precision"],
     summary: "Pays better and has precise expectations for cappuccino foam.",
-    sampleLines: ["I have standards about cappuccino foam. Today I am open to evidence."],
-    orderLine: "Cappuccino, please. I have standards about foam. Today I am open to evidence.",
+    sampleLines: ["The foam was good yesterday. Today I am open to evidence."],
+    orderLine: "Cappuccino, please. The foam was good yesterday. Today I am open to evidence.",
     learningCue: "Christa studies the cup before she studies the price.",
     preferredProductId: "cappuccino",
     serveLine:
@@ -125,10 +141,10 @@ export const weekOneGuests = [
     id: "freelancerin-nele",
     name: "Freelancerin Nele",
     category: "normal",
-    firstDay: 2,
+    firstDay: 3,
     behaviorTags: ["dry-humor", "observant", "freelancer", "persistent"],
     summary:
-      "Dry, observant recurring guest and early tone anchor. Persists across runs. She is not Meda. KASSANDRA does not classify her.",
+      "Dry, observant recurring guest from Day 3. Remembers earlier runs in the story only; gameplay memory resets with a new run. She is not Meda. KASSANDRA does not classify her.",
     sampleLines: [
       "The café is authentic. I am not sure whether that is good.",
       "The light is good. Slightly existential, but good."

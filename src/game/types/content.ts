@@ -13,6 +13,7 @@ export type DayModifierId =
 
 export type GuestId =
   | "pendler-kemal"
+  | "pendlerin-paula"
   | "pendlerin-fatou"
   | "laptop-lukas"
   | "lieferfahrer-cem"
@@ -92,6 +93,7 @@ export type DayObjectiveId =
   | "day-1-first-shift"
   | "day-2-regular-rhythm"
   | "day-3-offer-board"
+  | "day-3-keep-the-cafe-moving"
   | "day-4-local-ad"
   | "day-5-helper-choice"
   | "day-6-kassandra-check"
@@ -180,6 +182,8 @@ export interface UpgradeDefinition {
   name: string;
   unlockDay: DayNumber;
   cost: number;
+  /** Supported shop purchase; planned or automatically installed upgrades are false. */
+  purchasable: boolean;
   effects: readonly string[];
   summary: string;
 }

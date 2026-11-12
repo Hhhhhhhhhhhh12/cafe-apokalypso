@@ -42,9 +42,9 @@ export function isObjectiveCompleted(state: GameState): boolean {
     case 2:
       return management.customersServed >= 3 && state.resources.stress <= 60;
     case 3:
-      return management.offerReviewed && management.customersServed >= 2;
+      return management.customersServed >= 2;
     case 4:
-      return management.advertisingRun && management.customersServed >= 3;
+      return management.advertisingRun && management.customersServed >= 2;
     case 5:
       return management.helperDecisionMade && management.customersServed >= 3;
     case 6:

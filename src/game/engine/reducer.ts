@@ -6,6 +6,7 @@ import {
   createFreshRunState
 } from "./gameState";
 import { weekOneAchievements, weekOneDays, weekOneEvents, weekOneUpgrades } from "../data";
+import { DAY_ONE_FATOU_SERVED_FRAGMENT } from "../data/days";
 import { getDecorDailyBonuses, getDecorTier, getMaxDecorTier } from "../data/decor";
 import {
   getEquipmentDailyBonuses,
@@ -13,17 +14,23 @@ import {
   getMaxEquipmentTier
 } from "../data/equipment";
 import {
+  getAvailableProducts,
   getCurrentDayDefinition,
   getCurrentDayModifier,
   getGuestForCustomer,
-  getServedGuestIds,
+  getGuestWantedProductId,
+  getIngredientLabel,
   getKassandraConsultLine,
+  getMoneyRecoveryWarning,
   getServeLineForCustomer
 } from "./selectors";
 import { getObjectiveStatus } from "./objectives";
+import { formatAsche, roundAscheEarnings } from "./currency";
 import {
+  getDayFiveHelperRecap,
   getHelperAutonomyRecapLine,
   applyProductConsumption,
+  canJanaClearTable,
   clampMeter,
   clampResource,
   clampSupply,
@@ -31,6 +38,8 @@ import {
   createHelperAssignment,
   createInitialDayManagement,
   DAILY_FIXED_COST,
+  FLYER_COST,
+  SOCIAL_AD_COST,
   findSubstituteProduct,
   getDayShiftRating,
   getEmployeeLevel,
@@ -40,6 +49,7 @@ import {
   getDefaultProductForState,
   getEarnedPrice,
   getHelperLabel,
+  getHelperDailyCost,
   getGuestPatienceMax,
   getMissingIngredients,
   getProductById,
@@ -72,11 +82,10 @@ import type {
   HelperTaskId,
   IngredientKey,
   ResourceState,
-  SupplyState
+  SupplyState,
+  TableId
 } from "../types/game";
 
-const FLYER_COST = 2;
-const SOCIAL_AD_COST = 5;
 
 /** Max guest-appreciation reputation points awarded per day (keeps it a light nudge). */
 const APPRECIATION_DAILY_CAP = 4;
@@ -98,13 +107,13 @@ function getFlowLine(streak: number, tip: number): string {
     return "Three orders, no missteps — your hands find the rhythm before your head does.";
   }
   if (streak === 5) {
-    return `Five in a row. Cup, machine, timing — one motion now. A regular slides a coin across the counter. Tip +€${tip.toFixed(0)}.`;
+    return `Five in a row. Cup, machine, timing — one motion now. A regular slides a coin across the counter. Tip +${formatAsche(tip)}.`;
   }
   if (streak === 7) {
-    return `Seven straight. For a moment the café runs itself and you are just part of it. Tip +€${tip.toFixed(0)}.`;
+    return `Seven straight. For a moment the café runs itself and you are just part of it. Tip +${formatAsche(tip)}.`;
   }
   if (tip > 0) {
-    return `${streak} in flow. The counter hums and the tips keep landing. Tip +€${tip.toFixed(0)}.`;
+    return `${streak} in flow. The counter hums and the tips keep landing. Tip +${formatAsche(tip)}.`;
   }
   return `${streak} in flow. The morning has a current and you are riding it.`;
 }
@@ -117,37 +126,65 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     };
   }
 
-  const nextState = applyAction(state, action);
+  const nextState = appendActionFeedback(state, applyAction(state, action), action);
 
   if (action.type === "reset_game") {
     return nextState;
   }
 
-  // Immediate fail-state: an empty till means the café can no longer operate.
-  return applyImmediateClosure(nextState);
+  // Spending the last money after closing uses that closed day as the warning
+  // day, including restock confirmation that immediately starts the next shift.
+  const recoveryState =
+    (state.dayPhase === "day_end" || nextState.dayPhase === "day_end") &&
+    nextState.resources.money <= 0 &&
+    nextState.moneyZeroStreak === 0 &&
+    !nextState.cafeClosed &&
+    !nextState.demoComplete
+      ? { ...nextState, moneyZeroStreak: 1 }
+      : nextState;
+
+  const previousWarning = getMoneyRecoveryWarning(state);
+  const warning = getMoneyRecoveryWarning(recoveryState);
+  const statusMessage = previousWarning
+    ? recoveryState.statusMessage.replace(previousWarning, "").trim()
+    : recoveryState.statusMessage;
+
+  return {
+    ...recoveryState,
+    statusMessage: warning && !statusMessage.includes(warning)
+      ? [statusMessage, warning].filter(Boolean).join(" ")
+      : statusMessage
+  };
 }
 
-/**
- * Immediate (per-action) fail-state check. Money is clamped at 0, so "<= 0"
- * means the till has hit zero. Reputation uses a 2-day grace period handled at
- * day end (see completeCurrentDay), not here.
- */
-function applyImmediateClosure(state: GameState): GameState {
-  if (state.cafeClosed) {
-    return state;
+/** Describe actual totals, including caps, helper effects and substitutions. */
+function appendActionFeedback(before: GameState, after: GameState, action: GameAction): GameState {
+  const showsFeedback = action.type === "serve_product" || action.type === "take_order" ||
+    action.type === "prepare_drink" || action.type === "clean_tables" || action.type === "clean_table";
+  const actionsSpent = after.dayManagement.actionPointsSpent - before.dayManagement.actionPointsSpent;
+  if (!showsFeedback || before.dayPhase !== "open" || actionsSpent <= 0) {
+    return after;
   }
 
-  if (state.resources.money <= 0) {
-    return {
-      ...state,
-      cafeClosed: true,
-      closureReason: "money",
-      statusMessage:
-        "The till is empty. With no money to operate, the café closes its doors."
-    };
+  const changes: string[] = [];
+  const moneyDelta = Math.round((after.resources.money - before.resources.money) * 100) / 100;
+  if (moneyDelta !== 0) {
+    changes.push(`${moneyDelta > 0 ? "+" : "−"}${formatAsche(Math.abs(moneyDelta))}`);
   }
-
-  return state;
+  for (const [key, label] of [
+    ["cleanliness", "Cleanliness"], ["stress", "Stress"], ["reputation", "Rep"]
+  ] as const) {
+    const delta = after.resources[key] - before.resources[key];
+    if (delta !== 0) changes.push(`${label} ${delta > 0 ? "+" : "−"}${Math.abs(delta)}`);
+  }
+  for (const [key, label] of [
+    ["coffee", "Coffee"], ["milk", "Milk"], ["pastries", "Pastries"]
+  ] as const) {
+    const delta = after.supplies[key] - before.supplies[key];
+    if (delta !== 0) changes.push(`${label} ${delta > 0 ? "+" : "−"}${Math.abs(delta)}`);
+  }
+  changes.push(`Actions −${actionsSpent}`);
+  return { ...after, statusMessage: `${after.statusMessage} This action: ${changes.join(" · ")}.` };
 }
 
 function applyAction(state: GameState, action: GameAction): GameState {
@@ -176,6 +213,9 @@ function applyAction(state: GameState, action: GameAction): GameState {
     case "clean_tables":
       return cleanTables(state);
 
+    case "clean_table":
+      return cleanTable(state, action.tableId);
+
     case "adjust_offer":
       return adjustOffer(state);
 
@@ -188,6 +228,9 @@ function applyAction(state: GameState, action: GameAction): GameState {
     case "select_helper":
       return selectHelper(state, action.helperId, action.taskId);
 
+    case "clear_helper":
+      return clearHelper(state);
+
     case "open_day":
       return openDay(state);
 
@@ -198,7 +241,7 @@ function applyAction(state: GameState, action: GameAction): GameState {
       return setSupplyPurchase(state, action.ingredient, action.quantity);
 
     case "confirm_supply_purchase":
-      return confirmSupplyPurchase(state);
+      return confirmSupplyPurchase(state, action.withoutRestocking);
 
     case "upgrade_decor":
       return upgradeDecor(state, action.slot);
@@ -296,6 +339,7 @@ function applySuccessfulServe(
   let management = { ...state.dayManagement };
   let guestMemory = { ...state.guestMemory };
   const flavorLines: string[] = [];
+  const helperImpact = management.dayFiveHelperImpact && { ...management.dayFiveHelperImpact };
 
   for (let index = 0; index < servedWithHelper; index += 1) {
     const servedGuest = getGuestForCustomer(workingState, management.customersServed + management.guestsLost);
@@ -320,8 +364,25 @@ function applySuccessfulServe(
       break;
     }
 
+    if (management.dayThreeObservations) {
+      const wanted = servedGuest && getGuestWantedProductId(workingState, servedGuest);
+      const wantedProduct = wanted && getAvailableProducts(workingState).find((entry) => entry.id === wanted);
+      const unavailable = wantedProduct
+        ? getMissingIngredients(wantedProduct, supplies, workingState.helperAssignment)
+        : [];
+      management.dayThreeObservations = {
+        janaServed: management.dayThreeObservations.janaServed ||
+          (index > 0 && workingState.helperAssignment?.helperId === "jana"),
+        missingIngredients: [...new Set([...management.dayThreeObservations.missingIngredients, ...unavailable])]
+      };
+    }
+
     supplies = applyProductConsumption(product, supplies, workingState.helperAssignment);
     const suppliesUsed = getSuppliesUsedForProduct(product, workingState.helperAssignment);
+    if (helperImpact) {
+      if (index > 0) helperImpact.extraOrders += 1;
+      helperImpact.milkSaved += getIngredientRequirement(product, "milk", null) - suppliesUsed.milk;
+    }
     // Income scales with reputation; offer review adds a 10 % daily boost.
     const offerMultiplier = workingState.dayManagement.offerReviewed ? 1.1 : 1;
     const earned = getEarnedPrice(product.basePrice * offerMultiplier, resources.reputation);
@@ -339,6 +400,7 @@ function applySuccessfulServe(
       workingState.helperAssignment.taskId === "cleaning" &&
       resources.cleanliness < 45
     ) {
+      if (helperImpact) helperImpact.cleanlinessRestored += 45 - resources.cleanliness;
       resources = { ...resources, cleanliness: 45 };
     }
 
@@ -346,11 +408,19 @@ function applySuccessfulServe(
       ...management,
       customersServed: management.customersServed + 1,
       servedGuestIds: servedGuest
-        ? [...getServedGuestIds({ ...workingState, dayManagement: management }), servedGuest.id]
+        ? [...(management.servedGuestIds ?? []), servedGuest.id]
         : management.servedGuestIds,
       moneyEarned: clampResource(management.moneyEarned + earned),
       suppliesUsed: addSupplies(management.suppliesUsed, suppliesUsed)
     };
+
+    const tableToClear = getTableForServedCustomer(workingState, management.customersServed);
+    if (tableToClear && !management.dirtyTableIds.includes(tableToClear)) {
+      management = {
+        ...management,
+        dirtyTableIds: [...management.dirtyTableIds, tableToClear]
+      };
+    }
 
     if (resources.cleanliness < 40 && !management.cleanlinessStressApplied) {
       resources = { ...resources, stress: clampMeter(resources.stress + 5) };
@@ -364,9 +434,11 @@ function applySuccessfulServe(
       management.baristaReputationBonus < 3;
 
     if (baristaBonusApplies) {
+      const reputation = clampMeter(resources.reputation + 1);
+      if (helperImpact) helperImpact.reputationGained += reputation - resources.reputation;
       resources = {
         ...resources,
-        reputation: clampMeter(resources.reputation + 1)
+        reputation
       };
       management = {
         ...management,
@@ -522,17 +594,13 @@ function applySuccessfulServe(
       mood: resources.stress >= 61 ? "strained" : resources.stress >= 41 ? "busy" : "calm"
     },
     guestMemory,
-    dayManagement: management,
+    dayManagement: helperImpact ? { ...management, dayFiveHelperImpact: helperImpact } : management,
     completedActions: addUniqueDayAction(workingState.completedActions, "take_order"),
     statusMessage: statusParts.join(" ")
   };
 
   // Enqueue any mid-day or guest-related events now that customersServed has advanced.
-  const serveEventIds = getEventsToQueue(
-    servedStateBase,
-    "serve_product",
-    (product.ingredients.coffee ?? 0) > 0
-  );
+  const serveEventIds = getEventsToQueue(servedStateBase, "serve_product", (product.ingredients.coffee ?? 0) > 0);
   const servedState: GameState = {
     ...servedStateBase,
     pendingEvents: serveEventIds.reduce(
@@ -619,10 +687,35 @@ function rememberServedGuest(
 }
 
 function cleanTables(state: GameState): GameState {
+  return cleanTable(state, state.dayManagement.dirtyTableIds[0]);
+}
+
+function cleanTable(state: GameState, tableId: TableId | undefined): GameState {
   if (state.dayPhase !== "open") {
     return {
       ...state,
       statusMessage: "Cleaning belongs to the open café day."
+    };
+  }
+
+  if (tableId && !state.dayManagement.dirtyTableIds.includes(tableId)) {
+    return {
+      ...state,
+      statusMessage: `The ${tableId} table is already tidy.`
+    };
+  }
+
+  if (tableId && canJanaClearTable(state)) {
+    return {
+      ...state,
+      completedActions: addUniqueDayAction(state.completedActions, "clean_tables"),
+      resources: { ...state.resources, cleanliness: clampMeter(state.resources.cleanliness + 1) },
+      dayManagement: {
+        ...state.dayManagement,
+        dirtyTableIds: state.dayManagement.dirtyTableIds.filter((dirtyTableId) => dirtyTableId !== tableId),
+        helperAutonomousActions: 1
+      },
+      statusMessage: `Jana cleared the ${tableId} table. No action spent.`
     };
   }
 
@@ -641,8 +734,8 @@ function cleanTables(state: GameState): GameState {
 
   const cleanMessage =
     slowWindowReduction > 0
-      ? "Tables cleaned during a quiet window. Cleanliness rises and stress drops slightly."
-      : "Tables cleaned. Cleanliness rises.";
+      ? `The ${tableId ?? "next"} table is cleaned during a quiet window. Cleanliness rises and stress drops slightly.`
+      : `The ${tableId ?? "next"} table is cleaned. Cleanliness rises.`;
 
   return {
     ...tickedState,
@@ -656,11 +749,23 @@ function cleanTables(state: GameState): GameState {
     dayManagement: {
       ...tickedState.dayManagement,
       cleaningActions: tickedState.dayManagement.cleaningActions + 1,
+      dirtyTableIds: tableId
+        ? tickedState.dayManagement.dirtyTableIds.filter((dirtyTableId) => dirtyTableId !== tableId)
+        : tickedState.dayManagement.dirtyTableIds,
       slowCleaningStressReductionUsed:
         tickedState.dayManagement.slowCleaningStressReductionUsed || slowWindowReduction > 0
     },
     statusMessage: [cleanMessage, walkoutLine].filter(Boolean).join(" ")
   };
+}
+
+function getTableForServedCustomer(state: GameState, customersServed: number): TableId | null {
+  if (state.equipment.seating < 1) {
+    return null;
+  }
+
+  const tables: readonly TableId[] = ["left", "right", "back"];
+  return tables[(customersServed - 1) % tables.length];
 }
 
 function checkSupplies(state: GameState): GameState {
@@ -717,6 +822,13 @@ function adjustOffer(state: GameState): GameState {
     };
   }
 
+  if (state.dayManagement.offerReviewed) {
+    return {
+      ...state,
+      statusMessage: "The offer board has already been reviewed today."
+    };
+  }
+
   const actionState = spendActionPoint(state, "review the offer board");
   if (!actionState) {
     return noActionCapacityState(state);
@@ -736,7 +848,7 @@ function adjustOffer(state: GameState): GameState {
       offerReviewed: true
     },
     statusMessage: [
-      "Offer board reviewed. All orders today earn 10 % more than base price. Rep +1.",
+      "Offer board reviewed. Remaining orders earn 10 % more today. Rep +1.",
       walkoutLine
     ].filter(Boolean).join(" ")
   };
@@ -770,7 +882,7 @@ function runAdvertising(state: GameState, adType: "flyer" | "social"): GameState
       ...state,
       statusMessage:
         adType === "social"
-          ? `Not enough money for a social post (€${SOCIAL_AD_COST}).`
+          ? `Not enough money for a social post (${formatAsche(SOCIAL_AD_COST)}).`
           : "The café cannot afford a flyer today."
     };
   }
@@ -802,15 +914,14 @@ function runAdvertising(state: GameState, adType: "flyer" | "social"): GameState
 
   const baseRepGain = adType === "social" ? 3 : 1;
   const reputationGain = posterEchoApplies ? baseRepGain + 1 : baseRepGain;
-  const stressGain = posterEchoApplies ? 2 : 0;
-  const newStress = clampMeter(tickedState.resources.stress + stressGain);
+  const newStress = clampMeter(tickedState.resources.stress);
 
   const adMessage =
     adType === "social"
-      ? `Social post out. €${SOCIAL_AD_COST} spent — wider reach, stronger signal. Rep +3. Guests who find you this way may linger longer.`
+      ? `Social post out. ${formatAsche(SOCIAL_AD_COST)} spent. Rep +3.`
       : posterEchoApplies
-        ? `Flyer out, and today's modifier makes it land harder than usual. €${FLYER_COST} spent. Rep +2. The extra attention adds a little pressure. Stress +2.`
-        : `Flyer out in the neighbourhood. €${FLYER_COST} spent. Rep +1. Expect a modest uptick in foot traffic.`;
+        ? `Flyer out in the neighbourhood. ${formatAsche(FLYER_COST)} spent. Rep +2.`
+        : `Flyer out in the neighbourhood. ${formatAsche(FLYER_COST)} spent. Rep +1.`;
 
   return {
     ...tickedState,
@@ -844,6 +955,13 @@ function consultKassandra(state: GameState): GameState {
     return {
       ...state,
       statusMessage: "KASSANDRA updates are reviewed during the open café day."
+    };
+  }
+
+  if (state.dayManagement.kassandraConsulted) {
+    return {
+      ...state,
+      statusMessage: "KASSANDRA has already been consulted today."
     };
   }
 
@@ -899,6 +1017,10 @@ function selectHelper(
     };
   }
 
+  if (state.day === 3 && helperId !== "jana" && helperId !== state.helperAssignment?.helperId) {
+    return { ...state, statusMessage: "Jana is the only helper available for the Day 3 trial." };
+  }
+
   const assignment = createHelperAssignment(helperId, taskId, state.day);
 
   if (!assignment) {
@@ -920,6 +1042,28 @@ function selectHelper(
     ...state,
     helperAssignment: assignment,
     statusMessage: `${getHelperLabel(assignment)} selected for today. Confirm opening to make it final.`
+  };
+}
+
+function clearHelper(state: GameState): GameState {
+  if (state.day < 3 || !state.unlocks.staff) {
+    return {
+      ...state,
+      statusMessage: "Temporary help starts on Day 3."
+    };
+  }
+
+  if (state.dayPhase !== "day_start" || state.helperAssignment?.locked) {
+    return {
+      ...state,
+      statusMessage: "Helper assignment is final once the day has opened."
+    };
+  }
+
+  return {
+    ...state,
+    helperAssignment: null,
+    statusMessage: "No helper selected. Open alone or choose help before opening."
   };
 }
 
@@ -945,7 +1089,9 @@ function openDay(state: GameState): GameState {
     };
   }
 
-  if (state.helperAssignment && state.resources.money < state.helperAssignment.dailyCost) {
+  const assignment = state.helperAssignment;
+  const helperFee = assignment ? getHelperDailyCost(assignment.helperId, assignment.dailyCost, state.day) : 0;
+  if (assignment && state.resources.money < helperFee) {
     return {
       ...state,
       statusMessage: "Not enough money to hire that helper. Open without help or choose another option."
@@ -960,9 +1106,9 @@ function openDay(state: GameState): GameState {
   const levelBonuses = state.helperAssignment ? getEmployeeLevelBonuses(helperLevel) : { extraAP: 0, tipBonus: 0 };
   const modifier = getCurrentDayModifier(state);
   const shortStaffedPenalty = modifier.id === "short-staffed" && !state.helperAssignment ? 1 : 0;
-  const management = {
+  const management: GameState["dayManagement"] = {
     ...state.dayManagement,
-    moneySpent: state.dayManagement.moneySpent + (state.helperAssignment?.dailyCost ?? 0),
+    moneySpent: clampResource(state.dayManagement.moneySpent + helperFee),
     helperExtraOrdersRemaining: getHelperExtraOrders(state),
     extraAdvertisingActions:
       state.helperAssignment?.helperId === "nele" &&
@@ -981,7 +1127,7 @@ function openDay(state: GameState): GameState {
   if (state.helperAssignment) {
     resources = {
       ...resources,
-      money: clampResource(resources.money - state.helperAssignment.dailyCost)
+      money: clampResource(resources.money - helperFee)
     };
 
     if (state.helperAssignment.helperId === "nino" && state.helperAssignment.taskId === "counter") {
@@ -990,6 +1136,19 @@ function openDay(state: GameState): GameState {
     if (state.helperAssignment.helperId === "nele" && state.helperAssignment.taskId === "counter") {
       resources = { ...resources, stress: clampMeter(resources.stress - 5) };
     }
+    if (state.day === 5) {
+      management.dayFiveHelperImpact = {
+        openingStressReduction: state.resources.stress - resources.stress,
+        extraOrders: 0,
+        cleanlinessRestored: 0,
+        reputationGained: 0,
+        milkSaved: 0
+      };
+    }
+  }
+
+  if (state.day === 3) {
+    management.dayThreeObservations = { janaServed: false, missingIngredients: [] };
   }
 
   resources = applyMorningBonuses(resources, state);
@@ -998,14 +1157,15 @@ function openDay(state: GameState): GameState {
     ...state,
     dayPhase: "open",
     resources,
-    helperAssignment: state.helperAssignment
-      ? { ...state.helperAssignment, locked: true }
+    helperAssignment: assignment
+      ? { ...assignment, dailyCost: helperFee, locked: true }
       : null,
     dayManagement: management,
-    pendingEvents: [],
     statusMessage: [
       state.helperAssignment
-        ? `Day opened with ${getHelperLabel(state.helperAssignment)}. ${state.helperAssignment.flavorLine}`
+        ? state.day === 3
+          ? `Day opened with ${getHelperLabel(state.helperAssignment)}.`
+          : `Day opened with ${getHelperLabel(state.helperAssignment)}. ${state.helperAssignment.flavorLine}`
         : shortStaffedPenalty > 0
           ? "Day 5 opens short-staffed — one fewer action point today."
           : "Day opened without temporary help.",
@@ -1013,16 +1173,7 @@ function openDay(state: GameState): GameState {
     ].join(" ")
   };
 
-  // Enqueue the opening event (position 0) for this day.
-  const openingEventIds = getEventsToQueue(openedStateBase, "open_day");
-  const openedState: GameState = {
-    ...openedStateBase,
-    pendingEvents: openingEventIds.reduce(
-      (acc, id) => enqueuePendingEvent(acc, id),
-      openedStateBase.pendingEvents
-    )
-  };
-  return setNextGuestPatience(openedState);
+  return setNextGuestPatience(queueOpeningEvents(openedStateBase));
 }
 
 function completeCurrentDay(state: GameState): GameState {
@@ -1067,19 +1218,33 @@ function completeCurrentDay(state: GameState): GameState {
   } as const;
   const memoryFragments = getRunMemoryFragments(closedState, objectiveResult.status);
 
+  // Only a positive balance at closing completes a financial recovery.
+  const moneyAtZero = closedState.resources.money <= 0;
+  const moneyZeroStreak = moneyAtZero ? Math.min(2, state.moneyZeroStreak + 1) : 0;
+  const closeForMoney = moneyZeroStreak >= 2;
+
   // Reputation fail-state with a 2-day grace period: one day at zero is a
   // warning; a second consecutive day at zero closes the café.
   const reputationAtZero = closedState.resources.reputation <= 0;
   const reputationZeroStreak = reputationAtZero ? state.reputationZeroStreak + 1 : 0;
   const closeForReputation = reputationZeroStreak >= 2;
 
-  const closingMessage = closeForReputation
-    ? "A second day with no standing left in the neighbourhood. The café quietly closes."
-    : daySevenClose
-      ? "Day 7 closed. An official letter has arrived. Something is wrong with this café."
-      : reputationAtZero
-        ? `Day ${state.day} closed. Reputation has bottomed out — one more day like this and the café closes.`
-        : `Day ${state.day} closed. Review the summary, then buy supplies for tomorrow.`;
+  const daySevenMessage = "Day 7 closed. An official letter has arrived. Something is wrong with this café.";
+  const closingMessage = [
+    closeForMoney
+      ? "A second consecutive day closed with an empty till. The rescue shift could not cover costs; the café closes."
+      : closeForReputation
+        ? "A second day with no standing left in the neighbourhood. The café quietly closes."
+        : daySevenClose
+          ? daySevenMessage
+          : reputationAtZero
+            ? `Day ${state.day} closed. Reputation has bottomed out — one more day like this and the café closes.`
+            : moneyAtZero
+              ? `Day ${state.day} closed. Review the summary before the next shift.`
+              : `Day ${state.day} closed. Review the summary, then buy supplies for tomorrow.`,
+    daySevenClose && (closeForMoney || closeForReputation) ? daySevenMessage : null,
+    daySevenClose && moneyAtZero && !closeForMoney ? "The week ends with an empty till." : null
+  ].filter(Boolean).join(" ");
 
   const closedPhaseLabel = daySevenClose
     ? "End of week"
@@ -1118,8 +1283,13 @@ function completeCurrentDay(state: GameState): GameState {
       ? { ...closedState.unlocks, apocalypseOperations: true }
       : closedState.unlocks,
     reputationZeroStreak,
-    cafeClosed: closeForReputation,
-    closureReason: closeForReputation ? "reputation" : closedState.closureReason,
+    moneyZeroStreak,
+    cafeClosed: closeForMoney || closeForReputation,
+    closureReason: closeForMoney
+      ? "money"
+      : closeForReputation
+        ? "reputation"
+        : closedState.closureReason,
     hiddenWeirdness: daySevenClose
       ? closedState.hiddenWeirdness + 7
       : closedState.hiddenWeirdness + closedState.day,
@@ -1131,6 +1301,7 @@ function applyDayEndConsequences(state: GameState): GameState {
   let resources = { ...state.resources };
   let management = { ...state.dayManagement };
   const flavorLines: string[] = [];
+  let soloStressRecap: string | undefined;
 
   const janaMaintainsCleaning =
     state.helperAssignment?.helperId === "jana" &&
@@ -1145,12 +1316,20 @@ function applyDayEndConsequences(state: GameState): GameState {
     management = { ...management, noCleaningStressApplied: true };
   }
 
-  // From Day 4, running the floor without a hired helper is noticeably harder.
+  // From Day 5, running the floor without a hired helper is noticeably harder.
   // Helpers can be hired from Day 3 (and cost money) — skipping them trades
   // money saved for a steeper end-of-day stress hit.
-  if (state.day >= 4 && !state.helperAssignment) {
-    resources = { ...resources, stress: clampMeter(resources.stress + 10) };
-    flavorLines.push("You ran the whole floor alone again. Helpers unlock Day 3 — hiring one trades daily cost for less end-of-day strain. Stress +10.");
+  if (state.day >= 5 && !state.helperAssignment) {
+    const stress = clampMeter(resources.stress + 10);
+    if (state.day === 5) {
+      const added = Number((stress - resources.stress).toFixed(2));
+      soloStressRecap = added === 10
+        ? "Solo shift: +10 stress at closing, before other closing effects."
+        : `Solo shift: +${added} stress at closing (limited by the stress cap).`;
+    } else {
+      flavorLines.push("You ran the whole floor alone again. Helpers unlock Day 3 — hiring one trades daily cost for less end-of-day strain. Stress +10.");
+    }
+    resources = { ...resources, stress };
   }
 
   if (resources.cleanliness >= 70) {
@@ -1179,14 +1358,16 @@ function applyDayEndConsequences(state: GameState): GameState {
     flavorLines.push("Quiet day — fewer than four customers. The slower pace kept stress down. Stress -10.");
   }
 
-  if (
-    state.helperAssignment?.helperId === "jana" &&
-    state.helperAssignment.taskId === "cleaning" &&
-    resources.cleanliness < 45
-  ) {
+  if (janaMaintainsCleaning && resources.cleanliness < 45) {
+    if (management.dayFiveHelperImpact) {
+      management.dayFiveHelperImpact = {
+        ...management.dayFiveHelperImpact,
+        cleanlinessRestored: management.dayFiveHelperImpact.cleanlinessRestored + 45 - resources.cleanliness
+      };
+    }
     resources = { ...resources, cleanliness: 45 };
-    flavorLines.push(state.helperAssignment.flavorLine);
-  } else if (state.helperAssignment) {
+  }
+  if (state.helperAssignment && state.day !== 3 && state.day !== 5) {
     flavorLines.push(state.helperAssignment.flavorLine);
   }
 
@@ -1213,16 +1394,16 @@ function applyDayEndConsequences(state: GameState): GameState {
 
     const tipBonusRate = getEmployeeLevelBonuses(getEmployeeLevel(prevXp)).tipBonus;
     if (tipBonusRate > 0) {
-      const tipBonus = clampResource(management.moneyEarned * tipBonusRate);
+      const tipBonus = roundAscheEarnings(management.moneyEarned * tipBonusRate);
       resources = { ...resources, money: clampResource(resources.money + tipBonus) };
       management = { ...management, moneyEarned: clampResource(management.moneyEarned + tipBonus) };
-      flavorLines.push(`Tip bonus (Level 3, 5 % of earnings): +€${tipBonus.toFixed(2)}.`);
+      flavorLines.push(`Tip bonus (Level 3, 5 % of earnings): +${formatAsche(tipBonus)}.`);
     }
   }
 
   // Fixed daily overhead — rent, utilities, baseline costs every café day.
   resources = { ...resources, money: clampResource(resources.money - DAILY_FIXED_COST) };
-  flavorLines.push(`Daily costs (rent, utilities): −€${DAILY_FIXED_COST}.`);
+  flavorLines.push(`Daily costs (rent, utilities): −${formatAsche(DAILY_FIXED_COST)}.`);
 
   if (management.bestServeStreak >= 5) {
     flavorLines.push(
@@ -1242,6 +1423,20 @@ function applyDayEndConsequences(state: GameState): GameState {
   }
 
   const dailyOverhead = DAILY_FIXED_COST;
+  if (state.day === 3) {
+    const missing = [...new Set([
+      ...management.emptySupplyStressIngredients,
+      ...(management.dayThreeObservations?.missingIngredients ?? [])
+    ])];
+    if (missing.length > 0) {
+      flavorLines.push(`Missing at the counter: ${missing.map(getIngredientLabel).join(", ")}.`);
+    }
+    const dirtyTables = management.dirtyTableIds.length;
+    if (dirtyTables > 0) {
+      flavorLines.push(`${dirtyTables} ${dirtyTables === 1 ? "table still needed" : "tables still needed"} clearing at closing.`);
+    }
+  }
+
 
   const suggestedRestock = {
     coffee: Math.min(management.suppliesUsed.coffee, SUPPLY_CAPS.coffee - state.supplies.coffee),
@@ -1276,10 +1471,11 @@ function applyDayEndConsequences(state: GameState): GameState {
       objectiveTitle: getObjectiveStatus(state).objective.title,
       objectiveCompleted: false,
       helperRecap: state.helperAssignment ? getHelperLabel(state.helperAssignment) : null,
-      helperAutonomyRecap: getHelperAutonomyRecapLine(
-        state.helperAssignment,
-        management.helperAutonomousActions
-      ),
+      helperAutonomyRecap: state.day === 3
+        ? getDayThreeHelperRecap(state, management)
+        : state.day === 5 && state.helperAssignment
+          ? getDayFiveHelperRecap(state.helperAssignment, management)
+          : soloStressRecap ?? getHelperAutonomyRecapLine(state.helperAssignment, management.helperAutonomousActions),
       stressEvent,
       flavorLines
     },
@@ -1287,6 +1483,22 @@ function applyDayEndConsequences(state: GameState): GameState {
       ? [...state.stressEventLog, stressEvent]
       : [...state.stressEventLog]
   };
+}
+
+function getDayThreeHelperRecap(state: GameState, management: GameState["dayManagement"]): string | null {
+  if (!state.helperAssignment) return "You opened alone and paid no helper fee.";
+  if (state.helperAssignment.helperId !== "jana") {
+    return getHelperAutonomyRecapLine(state.helperAssignment, management.helperAutonomousActions);
+  }
+  if (state.helperAssignment.taskId === "cleaning") {
+    return management.helperAutonomousActions > 0
+      ? "Jana cleared a table without using one of your actions."
+      : "Jana was assigned to clearing. She did not clear a table this shift.";
+  }
+  if (!management.dayThreeObservations) return null;
+  return management.dayThreeObservations.janaServed
+    ? "Jana served one extra guest without using another action."
+    : "Jana was assigned to service. No extra guest was served.";
 }
 
 function setSupplyPurchase(
@@ -1312,7 +1524,7 @@ function setSupplyPurchase(
   };
 }
 
-function confirmSupplyPurchase(state: GameState): GameState {
+function confirmSupplyPurchase(state: GameState, withoutRestocking = false): GameState {
   if (state.dayPhase !== "day_end") {
     return {
       ...state,
@@ -1324,7 +1536,7 @@ function confirmSupplyPurchase(state: GameState): GameState {
     return state;
   }
 
-  const purchaseCost = getPurchaseCost(state.pendingSupplyPurchase);
+  const purchaseCost = withoutRestocking ? 0 : getPurchaseCost(state.pendingSupplyPurchase);
 
   if (purchaseCost > state.resources.money) {
     return {
@@ -1335,7 +1547,7 @@ function confirmSupplyPurchase(state: GameState): GameState {
 
   const nextDay = (state.day + 1) as DayNumber;
   const nextDayDefinition = getCurrentDayDefinition({ ...state, day: nextDay });
-  const supplies = applySupplyPurchase(state.supplies, state.pendingSupplyPurchase);
+  const supplies = withoutRestocking ? state.supplies : applySupplyPurchase(state.supplies, state.pendingSupplyPurchase);
   const restedStress = clampMeter(state.resources.stress - 20);
   const nextResources = {
     ...state.resources,
@@ -1354,21 +1566,39 @@ function confirmSupplyPurchase(state: GameState): GameState {
     pendingSupplyPurchase: { coffee: 0, milk: 0, pastries: 0 },
     helperAssignment: null,
     dayManagement: createInitialDayManagement(nextResources.reputation, nextDay),
+    pendingEvents: [],
     daySummary: null,
+    run: nextDay === 2 && (state.guestMemory["pendlerin-fatou"]?.visits ?? 0) > 0
+      ? { ...state.run, memoryFragments: addUniqueStrings(state.run.memoryFragments, [DAY_ONE_FATOU_SERVED_FRAGMENT]) }
+      : state.run,
     kassandraInstalled: nextDay >= 6,
     unlocks: getUnlocksForDay(nextDay),
     resources: nextResources,
-    statusMessage:
-      nextDay >= 3
+    statusMessage: withoutRestocking
+      ? `Day ${nextDay} begins without a supply purchase.`
+      : nextDay >= 3
         ? `Restock confirmed. Day ${nextDay} begins with helper choices available.`
         : nextDay === 2
-          ? `Restock confirmed. Day 2 begins: ${nextDayDefinition.milestone} Daily overhead (€${DAILY_FIXED_COST}) deducts at closing.`
+          ? `Restock confirmed. Day 2 begins: ${nextDayDefinition.milestone} Daily overhead (${formatAsche(DAILY_FIXED_COST)}) deducts at closing.`
           : `Restock confirmed. Day ${nextDay} begins: ${nextDayDefinition.milestone}`
   };
-  return nextDay < 3 ? setNextGuestPatience(nextDayState) : nextDayState;
+  if (nextDay >= 3) {
+    return nextDayState;
+  }
+
+  // Day 2 opens automatically, but owned upgrades still grant their morning bonuses.
+  const openedDayState: GameState = {
+    ...nextDayState,
+    resources: applyMorningBonuses(nextResources, nextDayState)
+  };
+  return setNextGuestPatience(queueOpeningEvents(openedDayState));
 }
 
 function upgradeDecor(state: GameState, slot: DecorSlotId): GameState {
+  if (slot === "clock" && state.equipment.clock < 1) {
+    return { ...state, statusMessage: "Buy a replacement wall clock in Equipment first." };
+  }
+
   if (state.demoComplete) {
     return state;
   }
@@ -1393,7 +1623,7 @@ function upgradeDecor(state: GameState, slot: DecorSlotId): GameState {
   if (tierDefinition.cost > state.resources.money) {
     return {
       ...state,
-      statusMessage: `Not enough money for ${tierDefinition.name} (€${tierDefinition.cost}).`
+      statusMessage: `Not enough money for ${tierDefinition.name} (${formatAsche(tierDefinition.cost)}).`
     };
   }
 
@@ -1454,7 +1684,7 @@ function buyEquipment(state: GameState, slot: EquipmentSlotId): GameState {
   if (tierDefinition.cost > state.resources.money) {
     return {
       ...state,
-      statusMessage: `Not enough money for ${tierDefinition.name} (€${tierDefinition.cost}).`
+      statusMessage: `Not enough money for ${tierDefinition.name} (${formatAsche(tierDefinition.cost)}).`
     };
   }
 
@@ -1489,9 +1719,20 @@ function buyUpgrade(state: GameState, upgradeId: UpgradeId): GameState {
     return state;
   }
 
+  if (state.dayPhase !== "day_end") {
+    return {
+      ...state,
+      statusMessage: "Café upgrades are bought after closing, before the next day starts."
+    };
+  }
+
   const upgrade = weekOneUpgrades.find((u) => u.id === upgradeId);
   if (!upgrade) {
     return state;
+  }
+
+  if (!upgrade.purchasable) {
+    return { ...state, statusMessage: "That upgrade is not available to buy in this demo." };
   }
 
   if (state.purchasedUpgrades.includes(upgradeId)) {
@@ -1505,7 +1746,7 @@ function buyUpgrade(state: GameState, upgradeId: UpgradeId): GameState {
   if (upgrade.cost > state.resources.money) {
     return {
       ...state,
-      statusMessage: `Not enough money (€${upgrade.cost} needed).`
+      statusMessage: `Not enough money (${formatAsche(upgrade.cost)} needed).`
     };
   }
 
@@ -1545,21 +1786,25 @@ function finishSetup(state: GameState): GameState {
     };
   }
 
+  if (state.equipment.grinder < 1) {
+    return { ...state, statusMessage: "You need a coffee grinder before you can open." };
+  }
+
   const resources = applyMorningBonuses({ ...state.resources }, state);
 
   const openedState: GameState = {
     ...state,
     dayPhase: "open",
-    phaseLabel: "Opening setup",
+    phaseLabel: "First shift open",
     resources,
     statusMessage: [
       state.equipment.seating >= 1
-        ? `Doors open. The room is bare but the machine hisses and the first guest is already at the counter. Daily overhead (€${DAILY_FIXED_COST}) will be deducted at closing.`
-        : `Doors open with standing room only — guests order at the counter and take their coffee to go. Daily overhead (€${DAILY_FIXED_COST}) will be deducted at closing.`,
+        ? `Doors open. The room is bare but the machine hisses and the first guest is already at the counter. Daily overhead (${formatAsche(DAILY_FIXED_COST)}) will be deducted at closing.`
+        : `Doors open with standing room only — guests order at the counter and take their coffee to go. Daily overhead (${formatAsche(DAILY_FIXED_COST)}) will be deducted at closing.`,
       getCurrentDayModifier(state).learningHint
     ].join(" ")
   };
-  return setNextGuestPatience(openedState);
+  return setNextGuestPatience(queueOpeningEvents(openedState));
 }
 
 function applyEmptySupplyStress(
@@ -1591,7 +1836,8 @@ function applyEmptySupplyStress(
 function hasRequiredActions(state: GameState): boolean {
   // When all action points are spent, the day can always be closed — prevents soft-locks
   // (depleted supplies, no cleaning, etc.). Missing tasks apply penalties at day end.
-  if (state.dayManagement.actionPointsRemaining <= 0) {
+  // No stock and no cash must still allow the rescue shift to end.
+  if (state.dayManagement.actionPointsRemaining <= 0 || state.resources.money <= 0) {
     return true;
   }
   // While actions remain, require at least one served customer.
@@ -1796,6 +2042,15 @@ function enqueuePendingEvent(pending: readonly EventId[], id: EventId): EventId[
   return [...pending, id];
 }
 
+/** Start today's event log for every opening route, including Days 1 and 2. */
+function queueOpeningEvents(state: GameState): GameState {
+  const openedState: GameState = { ...state, pendingEvents: [] };
+  return {
+    ...openedState,
+    pendingEvents: getEventsToQueue(openedState, "open_day")
+  };
+}
+
 /**
  * Determine which events for the current day should fire given the current
  * game state and an action context ("open_day", "serve_product", "complete_day").
@@ -1805,7 +2060,6 @@ function enqueuePendingEvent(pending: readonly EventId[], id: EventId): EventId[
  * - Events with kicker === "Closing" → fire on "complete_day" (regardless of position)
  * - Events with relatedGuestIds → fire on "serve_product" if any id appears in
  *   state.guestHistory (cross-day memory) or state.dayManagement.customersServed > 0
- * - The Day 1 first-cup event requires a successfully served coffee product.
  * - Middle positions 1..N-2 (not first, not Closing) → fire on "serve_product"
  *   when customersServed >= position
  *
@@ -1921,19 +2175,37 @@ function setNextGuestPatience(state: GameState): GameState {
 }
 
 /**
- * Applies one autonomous helper action (ambient tidying) if the current
- * helper's autonomyLevel allows it: "micromanagement" never acts,
- * "learning" acts on every other idle action, "autonomous" acts on every one.
- * Tracked in dayManagement.helperAutonomousActions for the day-end recap (#131).
+ * Applies one autonomous helper action when the assigned task can actually
+ * perform one. In the current slice, only Jana on cleaning has an ambient
+ * floor task: she clears one specific dirty table. Service, barista, counter,
+ * and marketing keep their explicit serve/open-day effects instead of being
+ * misreported as table cleaning.
+ *
+ * "micromanagement" never acts, "learning" acts on every other idle action,
+ * and "autonomous" acts on every one. The counter only tracks work that was
+ * actually completed, so the day-end recap stays truthful.
  */
 function applyHelperAutonomy(state: GameState, actionsWithoutServing: number): GameState {
-  const level = state.helperAssignment?.autonomyLevel;
+  const assignment = state.helperAssignment;
+  const level = assignment?.autonomyLevel;
 
-  if (!level || level === "micromanagement") {
+  if (
+    state.day === 3 ||
+    !assignment ||
+    assignment.helperId !== "jana" ||
+    assignment.taskId !== "cleaning" ||
+    !level ||
+    level === "micromanagement"
+  ) {
     return state;
   }
 
   if (level === "learning" && actionsWithoutServing % 2 !== 0) {
+    return state;
+  }
+
+  const [tableId, ...remainingDirtyTableIds] = state.dayManagement.dirtyTableIds;
+  if (!tableId) {
     return state;
   }
 
@@ -1945,6 +2217,7 @@ function applyHelperAutonomy(state: GameState, actionsWithoutServing: number): G
     },
     dayManagement: {
       ...state.dayManagement,
+      dirtyTableIds: remainingDirtyTableIds,
       helperAutonomousActions: state.dayManagement.helperAutonomousActions + 1
     }
   };
