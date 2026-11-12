@@ -12,14 +12,14 @@ describe("storage status message", () => {
     expect(markup).not.toContain("status-message");
   });
 
-  it("explains that reset only cleared the in-memory run after a removal failure", () => {
+  it("explains that a failed reset leaves the current week running", () => {
     const markup = renderToStaticMarkup(
       <StorageStatusMessage status="reset-failed" />
     );
 
     expect(markup).toContain('role="status"');
-    expect(markup).toContain("A fresh week started in this session");
-    expect(markup).toContain("an old save may return after reload");
+    expect(markup).toContain("The new week could not be saved");
+    expect(markup).toContain("keep playing the current week");
   });
 
   it("distinguishes a legacy cleanup failure from a current-save failure", () => {
@@ -28,35 +28,19 @@ describe("storage status message", () => {
     );
 
     expect(markup).toContain("some older browser data could not be cleared");
-    expect(markup).not.toContain("an old save may return");
   });
 });
 
 describe("storage status transitions", () => {
-  it("clears the reset warning after the fresh state is saved", () => {
-    expect(
-      resolveStorageStatusAfterSave("reset-failed", true, {
-        currentSaveRemovalFailed: true,
-        cleanupFailed: false
-      })
-    ).toBeNull();
+  it("clears an autosave warning after saving succeeds", () => {
+    expect(resolveStorageStatusAfterSave("save-failed", true)).toBeNull();
   });
 
-  it("keeps only the cleanup warning after a successful fresh save", () => {
-    expect(
-      resolveStorageStatusAfterSave("reset-failed", true, {
-        currentSaveRemovalFailed: true,
-        cleanupFailed: true
-      })
-    ).toBe("cleanup-failed");
+  it("keeps the cleanup warning after saving succeeds", () => {
+    expect(resolveStorageStatusAfterSave("cleanup-failed", true)).toBe("cleanup-failed");
   });
 
-  it("keeps the reset warning while rewriting the fresh state still fails", () => {
-    expect(
-      resolveStorageStatusAfterSave("reset-failed", false, {
-        currentSaveRemovalFailed: true,
-        cleanupFailed: false
-      })
-    ).toBe("reset-failed");
+  it("reports a failed autosave", () => {
+    expect(resolveStorageStatusAfterSave(null, false)).toBe("save-failed");
   });
 });

@@ -2,13 +2,13 @@ import { useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { gameReducer } from "../game/engine/reducer";
 import { createFreshRunState } from "../game/engine/gameState";
 import {
+  clearLegacySaves,
   getBrowserStorage,
   readGameSave,
-  resetSavedGameState,
-  SAVE_KEY,
   saveGameState,
   type StorageLike
 } from "../game/engine/save";
+import type { GameState } from "../game/types/game";
 import { weekOneAchievements } from "../game/data/achievements";
 import type { AchievementDefinition } from "../game/types/content";
 import { AchievementToast } from "../ui/components/AchievementToast";
@@ -18,7 +18,6 @@ import { IntroSequence } from "../ui/components/IntroSequence";
 import { OptionsMenu } from "../ui/components/OptionsMenu";
 import { StorageStatusMessage } from "../ui/components/StorageStatusMessage";
 import {
-  type PendingResetStorageStatus,
   resolveStorageStatusAfterSave,
   type StorageStatusKind
 } from "../ui/components/storageStatus";
@@ -49,20 +48,16 @@ export function App() {
   const [gameState, dispatch] = useReducer(gameReducer, initialSave, (save) =>
     save?.status === "loaded" ? save.state : createFreshRunState()
   );
-  const pendingResetStorageRef = useRef<PendingResetStorageStatus | null>(null);
+  // A confirmed reset saves this exact state before dispatching it.
+  const savedResetStateRef = useRef<GameState | null>(null);
 
-  const canAutoSave = storageStatus !== "load-failed";
+  const canAutoSave = storageStatus !== "load-failed" && storageStatus !== "protected-reset-failed";
 
   useEffect(() => {
-    if (storage && canAutoSave) {
+    if (storage && canAutoSave && gameState !== savedResetStateRef.current) {
+      savedResetStateRef.current = null;
       const result = saveGameState(gameState, storage);
-      const pendingReset = pendingResetStorageRef.current;
-      if (result.ok && pendingReset) {
-        pendingResetStorageRef.current = null;
-      }
-      setStorageStatus((currentStatus) =>
-        resolveStorageStatusAfterSave(currentStatus, result.ok, pendingReset)
-      );
+      setStorageStatus((currentStatus) => resolveStorageStatusAfterSave(currentStatus, result.ok));
     }
   }, [gameState, storage, canAutoSave]);
 
@@ -110,35 +105,34 @@ export function App() {
   }
 
   function handleReset() {
+    const prompt = storage
+      ? "Start over from Day 1? This replaces any existing browser save."
+      : "Start over from Day 1? Browser storage is unavailable. The new week will only last until you reload or close the game.";
+    if (!window.confirm(prompt)) {
+      return;
+    }
+
+    const freshState = createFreshRunState();
     if (storage) {
-      const resetResult = resetSavedGameState(storage);
-      const currentSaveRemovalFailed =
-        !resetResult.ok && resetResult.failedKeys.includes(SAVE_KEY);
-      let cleanupFailed =
-        !resetResult.ok && resetResult.failedKeys.some((key) => key !== SAVE_KEY);
+      if (!saveGameState(freshState, storage).ok) {
+        setStorageStatus(canAutoSave ? "reset-failed" : "protected-reset-failed");
+        return;
+      }
+      savedResetStateRef.current = freshState;
+
+      let cleanupFailed = !clearLegacySaves(storage).ok;
       try {
         storage.removeItem(BOOT_ACK_KEY);
       } catch {
         cleanupFailed = true;
       }
-      pendingResetStorageRef.current = currentSaveRemovalFailed || cleanupFailed
-        ? { currentSaveRemovalFailed, cleanupFailed }
-        : null;
-      setStorageStatus(
-        currentSaveRemovalFailed
-          ? "reset-failed"
-          : cleanupFailed
-            ? "cleanup-failed"
-            : null
-      );
-    } else {
-      pendingResetStorageRef.current = null;
-      setStorageStatus("unavailable");
+      setStorageStatus(cleanupFailed ? "cleanup-failed" : null);
     }
+
     setBootAcknowledged(false);
     setAchievementQueue([]);
     seenAchievementsRef.current = [];
-    dispatch({ type: "reset_game" });
+    dispatch({ type: "reset_game", freshState });
   }
 
   const dayDataAttr = gameState.day >= 6 ? String(gameState.day) : undefined;

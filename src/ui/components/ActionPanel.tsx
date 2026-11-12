@@ -165,11 +165,7 @@ export function ActionPanel({
       <button
         type="button"
         className="secondary-button"
-        onClick={() => {
-          if (window.confirm("Start over from Day 1? This week's progress won't be saved.")) {
-            onResetGame();
-          }
-        }}
+        onClick={onResetGame}
       >
         Reset / New Game
       </button>

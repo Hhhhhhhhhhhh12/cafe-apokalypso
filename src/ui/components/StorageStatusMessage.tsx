@@ -10,7 +10,9 @@ const STORAGE_STATUS_MESSAGES: Record<StorageStatusKind, string> = {
   "cleanup-failed":
     "A fresh week started, but some older browser data could not be cleared.",
   "reset-failed":
-    "A fresh week started in this session, but browser data could not be fully cleared. If storage stays unavailable, an old save may return after reload."
+    "The new week could not be saved. You can keep playing the current week or try the reset again.",
+  "protected-reset-failed":
+    "The new week could not be saved. The unreadable save was left untouched and autosave is still paused. You can try the reset again."
 };
 
 export function StorageStatusMessage({

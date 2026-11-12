@@ -68,9 +68,17 @@ export function saveGameState(
 }
 
 export function resetSavedGameState(storage: StorageLike): StorageMutationResult {
+  return removeSaveKeys(storage, [SAVE_KEY, ...LEGACY_SAVE_KEYS]);
+}
+
+export function clearLegacySaves(storage: StorageLike): StorageMutationResult {
+  return removeSaveKeys(storage, LEGACY_SAVE_KEYS);
+}
+
+function removeSaveKeys(storage: StorageLike, keys: readonly string[]): StorageMutationResult {
   const failedKeys: string[] = [];
 
-  for (const key of [SAVE_KEY, ...LEGACY_SAVE_KEYS]) {
+  for (const key of keys) {
     try {
       storage.removeItem(key);
     } catch {
