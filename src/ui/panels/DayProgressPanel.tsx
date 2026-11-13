@@ -18,6 +18,7 @@ interface DayProgressPanelProps {
 
 export function DayProgressPanel({ gameState }: DayProgressPanelProps) {
   const currentDay = getCurrentDayDefinition(gameState);
+  const isDayFive = gameState.day === 5;
   const eventCards = getNarrativeEventCards(gameState);
   const staffOptions = getVisibleStaffOptions(gameState);
   const kassandraMessages = getVisibleKassandraMessages(gameState);
@@ -56,16 +57,16 @@ export function DayProgressPanel({ gameState }: DayProgressPanelProps) {
           <p className="eyebrow">Daily objective</p>
           <h3 id="daily-objective-title">{objectiveStatus.objective.title}</h3>
         </div>
-        <p>{objectiveStatus.objective.description}</p>
+        {!isDayFive && <p>{objectiveStatus.objective.description}</p>}
         <p className="action-hint">{objectiveStatus.objective.completionHint}</p>
         <strong className={`objective-state objective-state--${objectiveStatus.status}`}>
           {formatObjectiveStatus(objectiveStatus.status)}
         </strong>
       </section>
 
-      <p className="day-milestone">{currentDay.milestone}</p>
+      {!isDayFive && <p className="day-milestone">{currentDay.milestone}</p>}
 
-      {currentDay.unlockMessage ? (
+      {!isDayFive && currentDay.unlockMessage ? (
         <p className="unlock-message">{currentDay.unlockMessage}</p>
       ) : null}
 
@@ -91,13 +92,13 @@ export function DayProgressPanel({ gameState }: DayProgressPanelProps) {
       {staffOptions.length > 0 ? (
         <section className="inline-callout" aria-labelledby="staff-options-title">
           <h3 id="staff-options-title">Temporary help</h3>
-          <p>
+          {!isDayFive && <p>
             {gameState.helperAssignment
               ? `${gameState.helperAssignment.flavorLine}`
               : `Choose one day helper or keep the money. Available: ${staffOptions
                   .map((staffOption) => staffOption.name)
                   .join(", ")}.`}
-          </p>
+          </p>}
           <ul className="staff-xp-list">
             {staffOptions.map((staffOption) => {
               const xp = gameState.staffXp[staffOption.id] ?? 0;

@@ -265,6 +265,7 @@ Day 4: Advertising
 Day 5: Delegation Pressure
 
 - helper choice becomes more consequential as the café gets busier
+- the selected helper appears at their station, with a short cue driven by completed work or the remaining bonus
 - solo days start to feel more visibly strained
 - strange wet-table event if Jana works
 - first possible appearance of Meda

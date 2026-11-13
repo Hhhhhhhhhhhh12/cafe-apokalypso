@@ -419,7 +419,7 @@ export function getIngredientRequirement(
 }
 
 export function canJanaClearTable(state: GameState): boolean {
-  return state.day === 3 &&
+  return (state.day === 3 || state.day === 5) &&
     state.dayPhase === "open" &&
     state.helperAssignment?.helperId === "jana" &&
     state.helperAssignment.taskId === "cleaning" &&
@@ -518,7 +518,7 @@ export function getDayFiveHelperRecap(assignment: HelperAssignment, management: 
   const name = weekOneStaffOptions.find((option) => option.id === assignment.helperId)?.name ?? assignment.helperId;
   const impact = management.dayFiveHelperImpact;
   const tables = management.helperAutonomousActions;
-  const tableRecap = `${tables} ${tables === 1 ? "table" : "tables"} cleared independently.`;
+  const tableRecap = `${tables} ${tables === 1 ? "table" : "tables"} cleared without using an action.`;
   const flyerRecap = management.advertisingRun
     ? "Bonus flyer used without spending a daily action."
     : "Bonus flyer unused.";

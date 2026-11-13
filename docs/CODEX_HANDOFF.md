@@ -43,6 +43,9 @@ current task, not the whole documentation archive.
 - Main view: `App` mounts `src/ui/cafe/CafePlaceholder.tsx` and uses
   `src/ui/cafe/cafe-scene.css` for scene interactions. `CafeScene.tsx` and
   `scene.ts` still serve the lookbook.
+- Day 5 staffing is shown at the assigned station in the live diorama.
+  Hiring costs are visible before opening and at Day 4 restock. Shift work
+  cues read the same counters as the closing recap.
 - Paula is the owner/player character. Nele's approved first appearance is
   Day 2, not Day 1; this timing is no longer an unresolved design question.
 - Use `npm run test` to establish the current test count and result. Old test

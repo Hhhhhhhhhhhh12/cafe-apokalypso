@@ -114,6 +114,7 @@ export function CafeInteraction({
                   ) : null}
                 </>
               ) : null}
+              {gameState.day === 5 && summary.helperAutonomyRecap ? <p>{summary.helperAutonomyRecap}</p> : null}
               <details>
                 <summary>Shift details</summary>
                 <p>{getDayEndRecapLine(gameState)}</p>
