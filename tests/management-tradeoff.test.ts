@@ -484,7 +484,9 @@ describe("management tradeoff system", () => {
     expect(daySixWithKassandra.unlockedAchievements).toContain(
       "kassandra-installed"
     );
-    expect(daySevenClosed.unlockedAchievements).toContain("week-one-letter");
+    expect(daySevenClosed.unlockedAchievements).not.toContain("week-one-letter");
+    expect(gameReducer(daySevenClosed, { type: "open_day_seven_letter" }).unlockedAchievements)
+      .toContain("week-one-letter");
   });
 
   it("keeps helpers unavailable before Day 3 and locks the day-start assignment", () => {
@@ -785,7 +787,8 @@ describe("management tradeoff system", () => {
     state = closePlayableDay(state);
     expect(state.demoComplete).toBe(true);
     expect(state.weirdnessVisible).toBe(true);
-    expect(getVisibleDaySevenLetter(state)).toContain("apocalyptically relevant");
+    expect(getVisibleDaySevenLetter(gameReducer(state, { type: "open_day_seven_letter" })))
+      .toContain("apocalyptically relevant");
   });
 
   it("falls back from malformed saves and persists new management fields", () => {
@@ -1009,11 +1012,10 @@ describe("fail-state and reputation-scaled income", () => {
 
     expect(closed.day).toBe(7);
     expect(closed.demoComplete).toBe(true);
-    expect(getVisibleDaySevenLetter(closed)).toBeTruthy();
+    expect(getVisibleDaySevenLetter(gameReducer(closed, { type: "open_day_seven_letter" }))).toBeTruthy();
     expect(closed.moneyZeroStreak).toBe(Math.min(2, moneyZeroStreak + 1));
     expect(closed.cafeClosed).toBe(moneyZeroStreak > 0);
     expect(closed.closureReason).toBe(moneyZeroStreak > 0 ? "money" : null);
-    expect(closed.statusMessage).toContain("An official letter has arrived");
     expect(closed.statusMessage).not.toMatch(/tomorrow|next shift|Day 8/i);
     expect(getMoneyRecoveryWarning(closed)).toBeNull();
     expect(canCompleteCurrentDay(closed)).toBe(false);

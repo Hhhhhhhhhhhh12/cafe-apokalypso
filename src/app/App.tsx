@@ -94,11 +94,10 @@ export function App() {
     }
   }, [gameState.unlockedAchievements]);
 
-  // Move focus to the closure banner when the café closes, so keyboard and
-  // screen-reader users are not stranded on a now-disabled control.
+  // Day 7 keeps focus in the café through its report and letter.
   const closureHeadingRef = useRef<HTMLHeadingElement>(null);
   useEffect(() => {
-    if (gameState.cafeClosed || gameState.demoComplete) {
+    if (gameState.cafeClosed && !gameState.demoComplete) {
       closureHeadingRef.current?.focus();
     }
   }, [gameState.cafeClosed, gameState.demoComplete]);
@@ -219,28 +218,6 @@ export function App() {
         </section>
       ) : null}
 
-      {gameState.demoComplete ? (
-        <section
-          className="demo-complete-banner"
-          role="alert"
-          aria-labelledby="demo-complete-title"
-        >
-          <p className="eyebrow">Week one complete</p>
-          <h2 id="demo-complete-title" ref={closureHeadingRef} tabIndex={-1}>
-            7 of 7 days served
-          </h2>
-          <p>
-            The letter is open. The register is talking. The guestbook remembers.
-          </p>
-          <p className="demo-complete-banner__teaser">
-            Next unlock: Day 8, week two. Not built yet. Replay from Day 1.
-          </p>
-          <button type="button" onClick={handleReset}>
-            Replay week one
-          </button>
-        </section>
-      ) : null}
-
       <section className="workspace-grid workspace-grid--cafe" aria-label="Game shell workspace">
         <CafePlaceholder
           gameState={gameState}
@@ -259,6 +236,13 @@ export function App() {
           onResetGame={handleReset}
         />
       </section>
+
+      {gameState.demoComplete && gameState.daySevenLetterOpened && (
+        <section className="demo-complete-banner" aria-labelledby="demo-complete-title">
+          <h2 id="demo-complete-title">Week one complete</h2>
+          <button type="button" onClick={handleReset}>Replay week one</button>
+        </section>
+      )}
 
       <footer className="app-footer">
         <p>

@@ -167,8 +167,10 @@ describe("resource HUD labels", () => {
 describe("day-7 letter", () => {
   it("returns the letter body without the debug weirdness line once revealed", () => {
     const revealed = stateForDay(7, {
+      dayPhase: "day_end",
       demoComplete: true,
-      weirdnessVisible: true
+      weirdnessVisible: true,
+      daySevenLetterOpened: true
     });
     const letter = getVisibleDaySevenLetter(revealed);
 

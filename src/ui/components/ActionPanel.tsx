@@ -70,7 +70,7 @@ export function ActionPanel({
         <OpenDayControls gameState={gameState} />
       ) : null}
 
-      {gameState.dayPhase === "day_end" ? (
+      {gameState.dayPhase === "day_end" && !gameState.demoComplete ? (
         <UpgradePanel
           gameState={gameState}
           onUpgradeDecor={onUpgradeDecor}
@@ -79,7 +79,7 @@ export function ActionPanel({
         />
       ) : null}
 
-      {(gameState.dayPhase === "open" || gameState.dayPhase === "day_end") ? (
+      {gameState.day !== 7 && (gameState.dayPhase === "open" || gameState.dayPhase === "day_end") ? (
         <FloorLog events={resolveFloorLogEvents(gameState)} />
       ) : null}
 

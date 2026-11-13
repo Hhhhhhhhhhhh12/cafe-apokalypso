@@ -28,7 +28,9 @@ import {
   getServedGuestIds,
   getServeLineForCustomer,
   hasSecondBrewGroup,
-  isEarlyKassandraConsult
+  isEarlyKassandraConsult,
+  isDaySevenLetterDelivered,
+  isDaySevenRush
 } from "./selectors";
 import { getObjectiveStatus } from "./objectives";
 import { formatAsche, roundAscheEarnings } from "./currency";
@@ -125,6 +127,16 @@ function getFlowLine(streak: number, tip: number): string {
 }
 
 export function gameReducer(state: GameState, action: GameAction): GameState {
+  if (action.type === "open_day_seven_letter") {
+    return isDaySevenLetterDelivered(state) && !state.daySevenLetterOpened
+      ? {
+          ...state,
+          daySevenLetterOpened: true,
+          unlockedAchievements: addUniqueAchievementIds(state.unlockedAchievements, ["week-one-letter"])
+        }
+      : state;
+  }
+
   if (state.cafeClosed && action.type !== "reset_game") {
     return {
       ...state,
@@ -1270,7 +1282,7 @@ function completeCurrentDay(state: GameState): GameState {
   const reputationZeroStreak = reputationAtZero ? state.reputationZeroStreak + 1 : 0;
   const closeForReputation = reputationZeroStreak >= 2;
 
-  const daySevenMessage = "Day 7 closed. An official letter has arrived. Something is wrong with this café.";
+  const daySevenMessage = "Day 7 closed.";
   const closingMessage = [
     closeForMoney
       ? "A second consecutive day closed with an empty till. The rescue shift could not cover costs; the café closes."
@@ -1283,7 +1295,6 @@ function completeCurrentDay(state: GameState): GameState {
             : moneyAtZero
               ? `Day ${state.day} closed. Review the summary before the next shift.`
               : `Day ${state.day} closed. Review the summary, then buy supplies for tomorrow.`,
-    daySevenClose && (closeForMoney || closeForReputation) ? daySevenMessage : null,
     daySevenClose && moneyAtZero && !closeForMoney ? "The week ends with an empty till." : null
   ].filter(Boolean).join(" ");
 
@@ -2028,8 +2039,6 @@ function isAchievementEarned(id: AchievementId, state: GameState): boolean {
       return Boolean(state.helperAssignment);
     case "kassandra-installed":
       return state.kassandraInstalled || state.unlocks.kassandra;
-    case "week-one-letter":
-      return state.day === 7;
     default:
       return false;
   }
@@ -2207,7 +2216,8 @@ function setNextGuestPatience(state: GameState): GameState {
   // Messy café (cleanliness < 50) costs every arriving guest one patience tick —
   // they're already irritated before they even order.
   const messyPenalty = baseMax > 0 && state.resources.cleanliness < 50 ? PATIENCE_TICK : 0;
-  const max = baseMax > 0 ? Math.max(PATIENCE_TICK, baseMax - messyPenalty) : 0;
+  const rushPenalty = isDaySevenRush(state) ? PATIENCE_TICK : 0;
+  const max = baseMax > 0 ? Math.max(PATIENCE_TICK, baseMax - messyPenalty - rushPenalty) : 0;
   return {
     ...state,
     dayManagement: {

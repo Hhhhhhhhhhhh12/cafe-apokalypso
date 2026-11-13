@@ -48,6 +48,10 @@ current task, not the whole documentation archive.
   cues read the same counters as the closing recap.
 - From Day 6, the register sprite opens KASSANDRA. The terminal previews
   action and patience costs, and the printed forecast stays with the shift save.
+- On Day 7 the red umbrella guest is fourth in line. From that position onward
+  new guests have one fewer patience step. Closing leaves a sealed letter on
+  the counter. Opening it records the achievement and keeps the letter readable
+  after reload, including on saves from before the envelope was interactive.
 - Paula is the owner/player character. Nele's approved first appearance is
   Day 2, not Day 1; this timing is no longer an unresolved design question.
 - Use `npm run test` to establish the current test count and result. Old test

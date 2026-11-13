@@ -104,11 +104,11 @@ export const ACTION_BUDGET_BY_DAY: Record<GameState["day"], number> = {
  *   actionsWithoutServing 4 → Walkout   (guest leaves unserved)
  *
  * The pip bar uses currentGuestPatience / currentGuestPatienceMax, which are
- * kept in sync with actionsWithoutServing (4 fixed pips, one drains per action).
+ * kept in sync with actionsWithoutServing (up to four pips, one drains per action).
  */
 export const PATIENCE_TICK = 25;
 
-/** Total pip slots in the patience bar — always 4, one per state. */
+/** Baseline pip slots before arrival penalties. */
 export const PATIENCE_TICKS_MAX = 4;
 
 /** Walkouts only bite from Day 4 on; Days 1–3 keep the cozy onboarding window —
@@ -142,10 +142,8 @@ export function getGuestPatienceTicks(guest: GuestDefinition): number {
 }
 
 /**
- * Full patience value (0..max) for a guest at the moment they reach the counter.
- * Always PATIENCE_TICKS_MAX * PATIENCE_TICK (100) — uniform across all guests so
- * the 4-pip bar reads cleanly: each pip = one non-serve action of tolerance.
- * The messy-café penalty still deducts one tick on arrival (see setNextGuestPatience).
+ * Baseline patience before the arrival penalties for a messy café or final rush.
+ * Each pip equals one non-serve action of tolerance.
  */
 export function getGuestPatienceMax(): number {
   return PATIENCE_TICKS_MAX * PATIENCE_TICK;

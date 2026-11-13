@@ -12,13 +12,16 @@ import {
   getNarrativeEventCards,
   getNextGuestPreview,
   hasSecondBrewGroup,
+  isDaySevenLetterDelivered,
+  isDaySevenRush,
   isEarlyKassandraConsult
 } from "../../game/engine/selectors";
 import "./firstCup.css";
 import { useBohnAppearance } from "./bohnAppearance";
 import { DayOneVines } from "./DayOneVines";
 import type { StorageLike } from "../../game/engine/save";
-import { canJanaClearTable } from "../../game/engine/management";
+import { canJanaClearTable, PATIENCE_TICK } from "../../game/engine/management";
+import { DAY_SEVEN_SERVE_GOAL, hasShiftCleaning } from "../../game/engine/objectives";
 import { CafeInteraction, type CafeStation } from "./CafeInteraction";
 import { CafeShiftHelper } from "./CafeShiftHelper";
 import stageDay1Asset from "../../../assets/backgrounds/placeholder-cafe-stage-v07-day-1.png";
@@ -153,11 +156,18 @@ export function CafePlaceholder({
   const incomingGuestId = getGuestForCustomer(gameState, queuePosition)?.id ?? "pendler-kemal";
   const isOpen = gameState.dayPhase === "open";
   const isDayEnd = gameState.dayPhase === "day_end";
+  const isFinalShift = gameState.day === 7;
+  const finalRush = isDaySevenRush(gameState);
+  const letterDelivered = isDaySevenLetterDelivered(gameState);
   const usesApprovedDayOneScene = gameState.day === 1;
 
   const shiftOver = gameState.cafeClosed || gameState.demoComplete;
   const showQueueGuest = isOpen && actionPointsRemaining > 0 && !shiftOver;
+  const followingRushGuest = finalRush && showQueueGuest && actionPointsRemaining > 1
+    ? getGuestForCustomer(gameState, queuePosition + 1)
+    : undefined;
   const canInteract = Boolean(onAction) && !shiftOver && !introActive;
+  const canReadLetter = Boolean(onAction) && letterDelivered;
   const machineIsInteractive = canInteract && canAccessBrewGroup(gameState);
   const registerIsInteractive = canInteract && canUseKassandra(gameState);
   const earlyForecastAvailable = isEarlyKassandraConsult(gameState) && actionPointsRemaining > 0;
@@ -178,13 +188,15 @@ export function CafePlaceholder({
   const headingRef = useRef<HTMLHeadingElement>(null);
   const entryRef = useRef<{ button: HTMLButtonElement; phase: GameState["dayPhase"] } | null>(null);
   const doorRef = useRef<HTMLButtonElement>(null);
+  const letterRef = useRef<HTMLButtonElement>(null);
   const backRef = useRef<HTMLButtonElement>(null);
 
   let activeStation: CafeStation | null = null;
-  if (canInteract && selection?.day === gameState.day) {
+  if ((canInteract || canReadLetter) && selection?.day === gameState.day) {
     if (selection.station === "door" && selection.phase === "open" && isDayEnd) {
       activeStation = "stock";
     } else if (
+      (canInteract || selection.station === "letter" || selection.station === "stock") &&
       selection.phase === gameState.dayPhase &&
       (selection.station !== "service" || selection.queuePosition === queuePosition)
     ) {
@@ -199,7 +211,7 @@ export function CafePlaceholder({
     } else if (entryRef.current) {
       const entry = entryRef.current;
       entryRef.current = null;
-      if (shiftOver || introActive) return;
+      if ((shiftOver && !canReadLetter) || introActive) return;
 
       const scene = sceneRef.current;
       const firstGuest = entry.phase === "setup" && isOpen
@@ -207,10 +219,10 @@ export function CafePlaceholder({
         : null;
       const next = firstGuest ?? (entry.button.isConnected
         ? entry.button
-        : scene?.querySelector<HTMLButtonElement>("[data-cafe-entry]") ?? headingRef.current);
+        : letterRef.current ?? scene?.querySelector<HTMLButtonElement>("[data-cafe-entry]") ?? headingRef.current);
       next?.focus();
     }
-  }, [activeStation, introActive, isOpen, shiftOver]);
+  }, [activeStation, canReadLetter, introActive, isOpen, shiftOver]);
 
   function openStation(station: CafeStation, source: HTMLButtonElement) {
     entryRef.current = { button: source, phase: gameState.dayPhase };
@@ -223,13 +235,9 @@ export function CafePlaceholder({
     });
   }
 
-  // Patience signal — add impatient class when guest has < 30 % patience left
-  const { currentGuestPatience, currentGuestPatienceMax } = gameState.dayManagement;
-  const patienceRatio =
-    isOpen && currentGuestPatienceMax > 0
-      ? currentGuestPatience / currentGuestPatienceMax
-      : 1;
-  const guestIsImpatient = isOpen && showQueueGuest && patienceRatio < 0.3;
+  const patience = getGuestPatienceState(gameState);
+  const guestIsImpatient = showQueueGuest && patience &&
+    (patience.critical || patience.patience / patience.max < 0.3);
 
   // Paula entrance phases
   const [paulaPhase, setPaulaPhase] = useState<
@@ -281,7 +289,7 @@ export function CafePlaceholder({
       (paulaPhase === "idle" || paulaPhase === "walking") && !prefersReducedMotion()
     ) {
       setPaulaPhase("walking-to-counter");
-    } else if (gameState.day === 6 && customersServed === prevServed &&
+    } else if (gameState.day >= 6 && customersServed === prevServed &&
       queuePosition > prevQueuePosition && paulaPhase === "idle" && !prefersReducedMotion()) {
       setPaulaPhase("leaving-queue");
     } else if (paulaPhase !== "walking-to-counter" && paulaPhase !== "walking-to-door" && paulaPhase !== "leaving-queue") {
@@ -318,11 +326,11 @@ export function CafePlaceholder({
     if (customersServed > prevServedForFeedback) {
       // A2: serve reaction
       const firstSentence = gameState.statusMessage?.split(/\.\s+/)[0]?.trim() ?? null;
-      if (gameState.day > 3 && gameState.day !== 5 && gameState.day !== 6 && firstSentence) {
+      if (gameState.day === 4 && firstSentence) {
         setServeReaction(prev => ({ text: firstSentence, key: (prev?.key ?? 0) + 1, day: gameState.day }));
       }
       // B1 — every 2nd serve, pick a floor event
-      if (gameState.day > 3 && gameState.day !== 5 && gameState.day !== 6 && customersServed % 2 === 0) {
+      if (gameState.day === 4 && customersServed % 2 === 0) {
         const floorEvents = getNarrativeEventCards(gameState).filter(
           e => e.kicker === "On the floor"
         );
@@ -399,7 +407,6 @@ export function CafePlaceholder({
     paulaPhase === "walking-to-door" || paulaPhase === "leaving-queue" ? queueGuest : null;
   const lukasHasSeat = visibleGuests.lukas && guestInQueue !== "laptop-lukas";
   const nextGuest = getNextGuestPreview(gameState);
-  const patience = getGuestPatienceState(gameState);
   const canTakeOrder =
     canInteract && showQueueGuest && queueGuest === incomingGuestId &&
     paulaPhase === "idle";
@@ -413,14 +420,14 @@ export function CafePlaceholder({
   const showBoard = canInteract && isOpen &&
     ((gameState.day >= 3 && gameState.unlocks.pricing) || (gameState.day >= 4 && gameState.unlocks.advertising));
   const highlightBoard = showBoard && getDayCoachHint(gameState)?.target === "offer";
-  const stockEntry = canInteract && (isOpen || isDayEnd) ? (
+  const stockEntry = (canInteract && (isOpen || isDayEnd)) || canReadLetter ? (
     <button
       type="button"
       className={`cafe-cue cafe-cue--stock${isOpen && emptyStock ? " cafe-cue--empty" : ""}`}
       data-cafe-entry
       onClick={(event) => openStation("stock", event.currentTarget)}
     >
-      {isDayEnd ? "Day result & restock" : emptyStock ? "Supplies · empty" : "Supplies"}
+      {letterDelivered ? "Shift report" : isDayEnd ? "Day result & restock" : emptyStock ? "Supplies · empty" : "Supplies"}
     </button>
   ) : null;
   const stationFeedback = selection?.station === activeStation && selection.initialStatus !== gameState.statusMessage
@@ -442,7 +449,14 @@ export function CafePlaceholder({
       <div className="panel-heading">
         <h2 id="cafe-diorama-title" ref={headingRef} tabIndex={-1}>The Café</h2>
         {isOpen && !shiftOver ? (
-          <span className="cafe-stage__capacity">
+          <span className="cafe-stage__capacity" role={isFinalShift ? "status" : undefined}>
+            {isFinalShift && (
+              <span className="cafe-final-checklist">
+                <span>{Math.min(customersServed, DAY_SEVEN_SERVE_GOAL)}/{DAY_SEVEN_SERVE_GOAL} served</span>
+                <span>{hasShiftCleaning(gameState) ? "✓ Cleaning done" : "Clean up"}</span>
+                {finalRush && <span className="cafe-final-checklist__rush">Rush</span>}
+              </span>
+            )}
             {actionPointsRemaining} {actionPointsRemaining === 1 ? "action" : "actions"} left
           </span>
         ) : null}
@@ -458,7 +472,7 @@ export function CafePlaceholder({
             dayClass,
             growthDayClass,
             earlyV07 ? "cafe-diorama--early-v07" : "",
-            gameState.day <= 3 || gameState.day === 5 || gameState.day === 6 ? "cafe-diorama--short-orders" : "",
+            gameState.day !== 4 ? "cafe-diorama--short-orders" : "",
             kassandraClass,
             weirdnessClass,
             usesApprovedDayOneScene ? "cafe-diorama--approved-day-one" : "",
@@ -585,6 +599,7 @@ export function CafePlaceholder({
                   ) : machineSprite}
                   {secondBrewGroup ? <span className="cafe-coffee-machine__connector" aria-hidden="true" /> : null}
                   <span className="cafe-coffee-machine__screen" />
+                  {finalRush && <span className="cafe-threshold-display" aria-hidden="true">THRESHOLD</span>}
                   {gameState.resources.stress >= 35 && (
                     <span className="cafe-coffee-machine__steam" />
                   )}
@@ -656,10 +671,23 @@ export function CafePlaceholder({
                   <span
                     className={`cafe-register__screen${kassandraAwake ? " cafe-register__screen--active" : ""}`}
                   />
+                  {finalRush && <span className="cafe-threshold-display" aria-hidden="true">THRESHOLD</span>}
                   {(gameState.day >= 7 || gameState.dayManagement.kassandraConsulted) && (
                     <span className="cafe-register__receipt cafe-register__receipt--long" aria-hidden="true" />
                   )}
                 </div>
+
+                {canReadLetter && (
+                  <button type="button" className="cafe-letter" data-cafe-entry ref={letterRef}
+                    data-opened={Boolean(gameState.daySevenLetterOpened)}
+                    aria-label={gameState.daySevenLetterOpened ? "Read the letter again" : "Open the sealed letter"}
+                    onClick={(event) => {
+                      onAction?.({ type: "open_day_seven_letter" });
+                      openStation("letter", event.currentTarget);
+                    }}>
+                    <span className="cafe-letter__paper" aria-hidden="true" />
+                  </button>
+                )}
 
                 <div
                   className={`cafe-decor-cups cafe-decor--tier-${gameState.decor?.cups ?? 1}`}
@@ -827,7 +855,12 @@ export function CafePlaceholder({
                         className="cafe-order-bubble"
                         data-cafe-entry
                         aria-label={`Take order from ${nextGuest.name}`}
-                        aria-description={nextGuest.orderLine || undefined}
+                      aria-description={[
+                        nextGuest.orderLine,
+                        isFinalShift && patience
+                          ? `Patience ${patience.patience / PATIENCE_TICK} of ${patience.max / PATIENCE_TICK}`
+                          : null
+                      ].filter(Boolean).join(". ") || undefined}
                         onClick={(event) => openStation("service", event.currentTarget)}
                       >
                         <span className="cafe-order-bubble__line">
@@ -835,14 +868,27 @@ export function CafePlaceholder({
                         </span>
                         <span className="cafe-order-bubble__short">{nextGuest.wants || "Take order"}</span>
                         <span className="cafe-order-bubble__arrow" aria-hidden="true">→</span>
+                        {isFinalShift && patience && (
+                          <span className="cafe-order-bubble__patience" aria-hidden="true">
+                            {Array.from({ length: patience.max / PATIENCE_TICK }, (_, index) => (
+                              <span key={index} data-filled={index * PATIENCE_TICK < patience.patience} />
+                            ))}
+                          </span>
+                        )}
                         {patience?.critical ? <span className="cafe-order-bubble__warning">About to leave</span> : null}
                       </button>
                     ) : null}
                   </span>
                 ) : null}
-                <span className="placeholder-guest placeholder-guest-normal-02" aria-hidden="true">
-                  <span className="guest-status guest-status--waiting">Waiting</span>
-                </span>
+                {followingRushGuest ? (
+                  <span key={followingRushGuest.id} className="cafe-rush-queue-guest" aria-hidden="true">
+                    <span className={`cafe-pilot-asset cafe-pilot-asset--standing cafe-pilot-asset--${QUEUE_SPRITES[followingRushGuest.id]}-standing`} />
+                  </span>
+                ) : !isFinalShift ? (
+                  <span className="placeholder-guest placeholder-guest-normal-02" aria-hidden="true">
+                    <span className="guest-status guest-status--waiting">Waiting</span>
+                  </span>
+                ) : null}
               </div>
 
               {/* Seated guests */}
@@ -967,7 +1013,7 @@ export function CafePlaceholder({
                 </span>
               )}
 
-              {visibleGuests.roterRegenschirm && (
+              {visibleGuests.roterRegenschirm && guestInQueue !== "frau-roter-regenschirm" && (
                 <span
                   className="placeholder-guest placeholder-guest-seated placeholder-guest-strange-03"
                   aria-hidden="true"
@@ -1001,7 +1047,6 @@ export function CafePlaceholder({
                 <div className="cafe-weirdness-hint" aria-hidden="true">
                   <span className="cafe-clock" />
                   <span className="cafe-shadow-note" />
-                  <span className="cafe-envelope" />
                 </div>
               )}
             </div>

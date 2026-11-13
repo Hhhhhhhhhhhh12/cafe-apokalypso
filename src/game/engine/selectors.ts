@@ -420,12 +420,17 @@ export function getEarlySceneGuestVisibility(
   };
 }
 
-export function getVisibleDaySevenLetter(state: GameState): string | null {
-  if (!state.demoComplete || !state.weirdnessVisible) {
-    return null;
-  }
+export function isDaySevenLetterDelivered(state: GameState): boolean {
+  return state.day === 7 && state.dayPhase === "day_end" && state.demoComplete && state.weirdnessVisible;
+}
 
-  return daySevenHookLetter.body;
+export function getVisibleDaySevenLetter(state: GameState): string | null {
+  return isDaySevenLetterDelivered(state) && state.daySevenLetterOpened ? daySevenHookLetter.body : null;
+}
+
+export function isDaySevenRush(state: GameState): boolean {
+  return state.day === 7 && state.dayPhase === "open" &&
+    state.dayManagement.customersServed + state.dayManagement.guestsLost >= 3;
 }
 
 /** The same empty-till guidance is used after actions and after loading a save. */
@@ -758,8 +763,7 @@ export function getGuestPatienceState(state: GameState): GuestPatienceState | nu
     return null;
   }
   const { currentGuestPatience: patience, currentGuestPatienceMax: max, actionsWithoutServing } = state.dayManagement;
-  // Canonical label path: ticks remaining out of this guest's actual budget
-  // (4 normally, 3 on a messy-café day — see getPatienceLabelFromCounter).
+  // Use the actual arrival budget after any room or rush penalties.
   const totalTicks = max > 0 ? Math.round(max / PATIENCE_TICK) : 0;
   const label = getPatienceLabelFromCounter(actionsWithoutServing, totalTicks);
   const critical = guestsCanWalkOut(state.day) && patience <= PATIENCE_TICK;

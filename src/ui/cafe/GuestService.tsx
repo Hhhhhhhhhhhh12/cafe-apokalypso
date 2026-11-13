@@ -70,7 +70,7 @@ export function GuestService({
               One more action that uses patience and this guest leaves unserved.
             </span>
           ) : null}
-          {nextGuest.learningCue ? (
+          {nextGuest.learningCue && gameState.day !== 7 ? (
             <span className="next-guest__cue">{nextGuest.learningCue}</span>
           ) : null}
         </div>

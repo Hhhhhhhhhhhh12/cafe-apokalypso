@@ -6,6 +6,7 @@ import {
   getIngredientLabel,
   getNextGuestPreview,
   getObjectiveStatus,
+  getVisibleDaySevenLetter,
   hasSecondBrewGroup
 } from "../../game/engine/selectors";
 import { DAILY_FIXED_COST } from "../../game/engine/management";
@@ -15,7 +16,7 @@ import { GuestService } from "./GuestService";
 import { Noticeboard, SupplyShelf } from "./ShiftStations";
 import { KassandraTerminal } from "./KassandraTerminal";
 
-export type CafeStation = "setup" | "service" | "door" | "stock" | "board" | "machine" | "register";
+export type CafeStation = "setup" | "service" | "door" | "stock" | "board" | "machine" | "register" | "letter";
 
 interface CafeInteractionProps {
   station: CafeStation;
@@ -43,6 +44,7 @@ export function CafeInteraction({
     ...(gameState.dayManagement.dayThreeObservations?.missingIngredients ?? [])
   ])];
   const isClosing = gameState.dayPhase === "open";
+  const letter = station === "letter" ? getVisibleDaySevenLetter(gameState) : null;
   const title = {
     setup: "Equip the counter",
     service: guest?.name ?? "At the counter",
@@ -50,7 +52,8 @@ export function CafeInteraction({
     stock: isClosing ? "Supply shelf" : `Day ${gameState.day} closed`,
     board: "Noticeboard",
     machine: "Espresso machine",
-    register: "KASSANDRA"
+    register: "KASSANDRA",
+    letter: "Official notice"
   }[station];
 
   const isEntry = station === "setup" || (station === "door" && gameState.dayPhase === "setup");
@@ -71,6 +74,7 @@ export function CafeInteraction({
       id="cafe-interaction" aria-labelledby="cafe-interaction-title">
       {isEntry ? <header className="cafe-interaction__heading">{heading}{backButton}</header> : <>{backButton}{heading}</>}
       {feedback && station !== "register" ? <p className="cafe-interaction__feedback">{feedback}</p> : null}
+      {letter && <p className="cafe-letter__body">{letter}</p>}
       {station === "setup" ? (
         <OpeningEquipment
           gameState={gameState}

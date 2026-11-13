@@ -77,7 +77,9 @@ describe("initial game state", () => {
     expect(state.day).toBe(7);
     expect(state.demoComplete).toBe(true);
     expect(state.weirdnessVisible).toBe(true);
-    expect(getVisibleDaySevenLetter(state)).toContain(
+    expect(getVisibleDaySevenLetter(state)).toBeNull();
+    const opened = gameReducer(state, { type: "open_day_seven_letter" });
+    expect(getVisibleDaySevenLetter(opened)).toContain(
       "apocalyptically relevant caffeine infrastructure"
     );
 

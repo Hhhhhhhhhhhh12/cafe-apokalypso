@@ -139,6 +139,7 @@ export function isValidGameState(value: unknown): value is GameState {
     typeof candidate.weirdnessVisible === "boolean" &&
     typeof candidate.kassandraInstalled === "boolean" &&
     typeof candidate.demoComplete === "boolean" &&
+    (candidate.daySevenLetterOpened === undefined || typeof candidate.daySevenLetterOpened === "boolean") &&
     typeof candidate.cafeClosed === "boolean" &&
     (candidate.closureReason === null ||
       candidate.closureReason === "money" ||

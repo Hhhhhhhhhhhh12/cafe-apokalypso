@@ -124,7 +124,7 @@ describe("week-one balance simulation", () => {
     const dayThree = checkpoints[2];
     const dayFour = checkpoints[3];
     const daySix = checkpoints[5];
-    const daySeven = checkpoints[6];
+    const daySeven = gameReducer(checkpoints[6], { type: "open_day_seven_letter" });
 
     expect(dayThree.daySummary?.helperRecap).toContain("Jana");
     expect(dayThree.staffXp.jana).toBeGreaterThan(0);

@@ -4,7 +4,6 @@ import {
   getCurrentDayOpener,
   getDayEndRecapLine,
   getNarrativeEventCards,
-  getVisibleDaySevenLetter,
   getVisibleStaffOptions,
   getObjectiveStatus
 } from "../../game/engine/selectors";
@@ -18,9 +17,9 @@ interface DayProgressPanelProps {
 export function DayProgressPanel({ gameState }: DayProgressPanelProps) {
   const currentDay = getCurrentDayDefinition(gameState);
   const isDayFive = gameState.day === 5;
-  const eventCards = getNarrativeEventCards(gameState);
+  const isFinalShift = gameState.day === 7;
+  const eventCards = isFinalShift ? [] : getNarrativeEventCards(gameState);
   const staffOptions = getVisibleStaffOptions(gameState);
-  const daySevenLetter = getVisibleDaySevenLetter(gameState);
   const objectiveStatus = getObjectiveStatus(gameState);
 
   const summary = gameState.daySummary;
@@ -30,17 +29,6 @@ export function DayProgressPanel({ gameState }: DayProgressPanelProps) {
 
   return (
     <section className="panel day-progress-panel" aria-labelledby="day-progress-title">
-      {daySevenLetter ? (
-        <section
-          className="letter-panel letter-panel--prominent"
-          aria-labelledby="day-seven-letter-title"
-        >
-          <p className="eyebrow">Official notice</p>
-          <h3 id="day-seven-letter-title">A letter has arrived</h3>
-          <pre>{daySevenLetter}</pre>
-        </section>
-      ) : null}
-
       <div className="panel-heading">
         <p className="eyebrow">Today</p>
         <h2 id="day-progress-title">
@@ -48,21 +36,21 @@ export function DayProgressPanel({ gameState }: DayProgressPanelProps) {
         </h2>
       </div>
 
-      <p className="day-opener">{getCurrentDayOpener(gameState)}</p>
+      {!isFinalShift && <p className="day-opener">{getCurrentDayOpener(gameState)}</p>}
 
       <section className="objective-card" aria-labelledby="daily-objective-title">
         <div>
           <p className="eyebrow">Daily objective</p>
           <h3 id="daily-objective-title">{objectiveStatus.objective.title}</h3>
         </div>
-        {!isDayFive && <p>{objectiveStatus.objective.description}</p>}
+        {!isDayFive && !isFinalShift && <p>{objectiveStatus.objective.description}</p>}
         <p className="action-hint">{objectiveStatus.objective.completionHint}</p>
         <strong className={`objective-state objective-state--${objectiveStatus.status}`}>
           {formatObjectiveStatus(objectiveStatus.status)}
         </strong>
       </section>
 
-      {!isDayFive && <p className="day-milestone">{currentDay.milestone}</p>}
+      {!isDayFive && !isFinalShift && <p className="day-milestone">{currentDay.milestone}</p>}
 
       {!isDayFive && currentDay.unlockMessage ? (
         <p className="unlock-message">{currentDay.unlockMessage}</p>
@@ -90,7 +78,7 @@ export function DayProgressPanel({ gameState }: DayProgressPanelProps) {
       {staffOptions.length > 0 ? (
         <section className="inline-callout" aria-labelledby="staff-options-title">
           <h3 id="staff-options-title">Temporary help</h3>
-          {!isDayFive && <p>
+          {!isDayFive && !isFinalShift && <p>
             {gameState.helperAssignment
               ? `${gameState.helperAssignment.flavorLine}`
               : `Choose one day helper or keep the money. Available: ${staffOptions
