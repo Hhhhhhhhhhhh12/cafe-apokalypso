@@ -66,6 +66,17 @@ export function ActionPanel({
         <h2 id="actions-title">Actions</h2>
       </div>
 
+      {/* Persistent live region: the <p> stays mounted so screen readers
+          announce every status change (serve lines, KASSANDRA, supply warnings).
+          It leads the panel so the result of an action reads next to the
+          café rather than below the fold. The inner span remounts via key to replay the slide-in animation for
+          sighted users without disturbing the live region. See GitHub #70. */}
+      <p className="status-message" role="status" aria-live="polite" aria-atomic="true">
+        <span key={statusMessage} className="status-message__text">
+          {statusMessage}
+        </span>
+      </p>
+
       {gameState.dayPhase === "open" && !gameState.cafeClosed ? (
         <OpenDayControls gameState={gameState} />
       ) : null}
@@ -91,15 +102,6 @@ export function ActionPanel({
         Reset / New Game
       </button>
 
-      {/* Persistent live region: the <p> stays mounted so screen readers
-          announce every status change (serve lines, KASSANDRA, supply warnings).
-          The inner span remounts via key to replay the slide-in animation for
-          sighted users without disturbing the live region. See GitHub #70. */}
-      <p className="status-message" role="status" aria-live="polite" aria-atomic="true">
-        <span key={statusMessage} className="status-message__text">
-          {statusMessage}
-        </span>
-      </p>
     </section>
   );
 }
