@@ -105,6 +105,7 @@ export interface DayManagementState {
   actionsWithoutServing: number;
   /** Count of autonomous helper actions today (learning/autonomous autonomyLevel only). Surfaced in the day-end recap. */
   helperAutonomousActions: number;
+  doubleEspressoServed?: boolean;
   /** Recorded for the Day 3 shift report. Absent on older saves. */
   dayThreeObservations?: { janaServed: boolean; missingIngredients: IngredientKey[] };
   /** Measured from opening on Day 5. Older in-progress saves have no record. */
@@ -235,6 +236,8 @@ export interface GameState {
 export type GameAction =
   | { type: "take_order" }
   | { type: "serve_product"; productId: ProductId }
+  | { type: "install_second_brew_group" }
+  | { type: "serve_double_espresso" }
   | { type: "prepare_drink" }
   | { type: "prepare_counter" }
   | { type: "check_supplies" }

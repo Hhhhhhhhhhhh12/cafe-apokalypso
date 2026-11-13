@@ -58,7 +58,6 @@ export function Noticeboard({ gameState, onAction }: ShiftStationProps) {
 
   return (
     <>
-      {canAct ? <PatienceWarning gameState={gameState} /> : null}
       {canReview ? (
         <div className="noticeboard-item">
           <h4>Daily offer</h4>
@@ -71,6 +70,7 @@ export function Noticeboard({ gameState, onAction }: ShiftStationProps) {
             {offerReviewed ? "Offer already posted" : "Review offer · 1 action"}
           </button>
           {!canAct && !offerReviewed ? <small>No actions left this shift.</small> : null}
+          {canAct && !offerReviewed ? <PatienceWarning gameState={gameState} /> : null}
         </div>
       ) : null}
       {canAdvertise ? <Campaign gameState={gameState} onAction={onAction} type="flyer" /> : null}
@@ -104,7 +104,6 @@ function Campaign({
       <h4>{flyer ? "Neighbourhood flyer" : "Social post"}</h4>
       <p>
         +{flyer ? posterEcho ? 2 : 1 : 3} reputation
-        {posterEcho ? " · +2 stress" : null}
       </p>
       <button
         type="button"
@@ -115,6 +114,11 @@ function Campaign({
         {label} · {formatAsche(cost)} · {usesBonus ? "bonus slot" : "1 action"}
       </button>
       {unavailable ? <small>{unavailable}</small> : null}
+      {!unavailable && !usesBonus && getGuestPatienceState(gameState)?.critical ? (
+        <p className="cafe-interaction__feedback">
+          {flyer ? "Posting the flyer" : "Publishing the post"} now will make the waiting guest leave.
+        </p>
+      ) : null}
     </div>
   );
 }

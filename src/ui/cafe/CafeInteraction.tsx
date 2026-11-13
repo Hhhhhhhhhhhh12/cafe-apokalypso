@@ -5,7 +5,8 @@ import {
   getDayEndRecapLine,
   getIngredientLabel,
   getNextGuestPreview,
-  getObjectiveStatus
+  getObjectiveStatus,
+  hasSecondBrewGroup
 } from "../../game/engine/selectors";
 import { DAILY_FIXED_COST } from "../../game/engine/management";
 import type { GameAction, GameState } from "../../game/types/game";
@@ -13,7 +14,7 @@ import { HelperStartPanel, OpeningEquipment, RestockControls } from "./CafeManag
 import { GuestService } from "./GuestService";
 import { Noticeboard, SupplyShelf } from "./ShiftStations";
 
-export type CafeStation = "setup" | "service" | "door" | "stock" | "board";
+export type CafeStation = "setup" | "service" | "door" | "stock" | "board" | "machine";
 
 interface CafeInteractionProps {
   station: CafeStation;
@@ -46,7 +47,8 @@ export function CafeInteraction({
     service: guest?.name ?? "At the counter",
     door: isClosing ? "Close the café" : "Open the café",
     stock: isClosing ? "Supply shelf" : `Day ${gameState.day} closed`,
-    board: "Noticeboard"
+    board: "Noticeboard",
+    machine: "Espresso machine"
   }[station];
 
   const isEntry = station === "setup" || (station === "door" && gameState.dayPhase === "setup");
@@ -78,10 +80,20 @@ export function CafeInteraction({
         <GuestService
           gameState={gameState}
           onServeProduct={(productId) => onAction({ type: "serve_product", productId })}
+          onServeDoubleEspresso={() => onAction({ type: "serve_double_espresso" })}
         />
       ) : null}
       {station === "door" ? <DoorControls gameState={gameState} onAction={onAction} /> : null}
       {station === "board" ? <Noticeboard gameState={gameState} onAction={onAction} /> : null}
+      {station === "machine" ? (
+        hasSecondBrewGroup(gameState) ? (
+          <p>Second brew group fitted. Brew two espressos once per shift from the order menu.</p>
+        ) : (
+          <button type="button" onClick={() => onAction({ type: "install_second_brew_group" })}>
+            Fit the second brew group
+          </button>
+        )
+      ) : null}
       {station === "stock" && isClosing ? <SupplyShelf gameState={gameState} onAction={onAction} /> : null}
       {station === "stock" && !isClosing ? (
         <>

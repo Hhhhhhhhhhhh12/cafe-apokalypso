@@ -1,11 +1,13 @@
 import { formatAsche } from "../../game/engine/currency";
 import {
   getAvailableProducts,
+  getDoubleEspressoOption,
   getExpectedProductIncome,
   getGuestPatienceState,
   getIngredientLabel,
   getNextGuestPreview,
-  hasActionCapacity
+  hasActionCapacity,
+  hasSecondBrewGroup
 } from "../../game/engine/selectors";
 import { getMissingIngredients, PATIENCE_TICK } from "../../game/engine/management";
 import type { ProductId } from "../../game/types/content";
@@ -13,15 +15,20 @@ import type { GameState } from "../../game/types/game";
 
 export function GuestService({
   gameState,
-  onServeProduct
+  onServeProduct,
+  onServeDoubleEspresso
 }: {
   gameState: GameState;
   onServeProduct: (productId: ProductId) => void;
+  onServeDoubleEspresso?: () => void;
 }) {
   const nextGuest = getNextGuestPreview(gameState);
   const patienceState = getGuestPatienceState(gameState);
   const canAct = hasActionCapacity(gameState);
   const products = getAvailableProducts(gameState);
+  const doubleEspresso = onServeDoubleEspresso && hasSecondBrewGroup(gameState)
+    ? getDoubleEspressoOption(gameState)
+    : null;
 
   return (
     <>
@@ -96,6 +103,22 @@ export function GuestService({
                 </button>
               );
             })}
+            {doubleEspresso ? (
+              <button
+                type="button"
+                className="serve-menu__item"
+                onClick={onServeDoubleEspresso}
+                disabled={Boolean(doubleEspresso.unavailable)}
+              >
+                <span>
+                  <span className="serve-menu__name">Two espressos · {doubleEspresso.beans} beans</span>
+                  <small>
+                    {doubleEspresso.unavailable ??
+                      `1 action · Next: ${doubleEspresso.followingGuest}${doubleEspresso.followingOrder ? ` wants ${doubleEspresso.followingOrder}` : ""}`}
+                  </small>
+                </span>
+              </button>
+            ) : null}
           </div>
         </div>
       )}

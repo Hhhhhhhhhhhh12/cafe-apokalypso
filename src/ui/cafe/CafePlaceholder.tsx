@@ -3,12 +3,14 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { GameAction, GameState, TableId } from "../../game/types/game";
 import type { GuestId } from "../../game/types/content";
 import {
+  canAccessBrewGroup,
   getDayCoachHint,
   getEarlySceneGuestVisibility,
   getGuestForCustomer,
   getGuestPatienceState,
   getNarrativeEventCards,
-  getNextGuestPreview
+  getNextGuestPreview,
+  hasSecondBrewGroup
 } from "../../game/engine/selectors";
 import "./firstCup.css";
 import { useBohnAppearance } from "./bohnAppearance";
@@ -154,6 +156,15 @@ export function CafePlaceholder({
   const shiftOver = gameState.cafeClosed || gameState.demoComplete;
   const showQueueGuest = isOpen && actionPointsRemaining > 0 && !shiftOver;
   const canInteract = Boolean(onAction) && !shiftOver && !introActive;
+  const machineIsInteractive = canInteract && canAccessBrewGroup(gameState);
+  const secondBrewGroup = hasSecondBrewGroup(gameState);
+  const machineSprite = (
+    <img
+      className="cafe-pilot-asset cafe-pilot-asset--coffee-machine"
+      src={usesApprovedDayOneScene ? approvedCoffeeMachineAsset : coffeeMachineAsset}
+      alt=""
+    />
+  );
   const [selection, setSelection] = useState<StationSelection | null>(null);
   const sceneRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
@@ -566,16 +577,21 @@ export function CafePlaceholder({
                 <div className="cafe-counter__ledge" />
 
                 <div className={`cafe-coffee-machine${gameState.equipment.machine < 1 ? " cafe-coffee-machine--unowned" : ""}`}>
-                  <img
-                    className="cafe-pilot-asset cafe-pilot-asset--coffee-machine"
-                    src={
-                      usesApprovedDayOneScene
-                        ? approvedCoffeeMachineAsset
-                        : coffeeMachineAsset
-                    }
-                    alt=""
-                    aria-hidden="true"
-                  />
+                  {machineIsInteractive ? (
+                    <button
+                      type="button"
+                      className="cafe-coffee-machine__control"
+                      data-cafe-entry
+                      aria-label={secondBrewGroup ? "Espresso machine, second brew group fitted" : "Inspect espresso machine"}
+                      onClick={(event) => openStation("machine", event.currentTarget)}
+                    >
+                      {machineSprite}
+                      <span className="cafe-coffee-machine__label" aria-hidden="true">
+                        {secondBrewGroup ? "Second group ready" : "Inspect"}
+                      </span>
+                    </button>
+                  ) : machineSprite}
+                  {secondBrewGroup ? <span className="cafe-coffee-machine__connector" aria-hidden="true" /> : null}
                   <span className="cafe-coffee-machine__screen" />
                   {gameState.resources.stress >= 35 && (
                     <span className="cafe-coffee-machine__steam" />

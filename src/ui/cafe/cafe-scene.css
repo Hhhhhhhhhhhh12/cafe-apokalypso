@@ -132,6 +132,45 @@
   opacity: 0.35;
 }
 
+.cafe-coffee-machine__control {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.cafe-coffee-machine__label {
+  position: absolute;
+  z-index: 3;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.15rem 0.35rem;
+  border-radius: 0.25rem;
+  background: #fff0cf;
+  color: #442a20;
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.cafe-coffee-machine__connector {
+  position: absolute;
+  z-index: 9;
+  right: 6%;
+  top: 40%;
+  width: 19%;
+  aspect-ratio: 1;
+  border: 2px solid #493a31;
+  border-radius: 50%;
+  background: radial-gradient(circle, #78aaa1 20%, #263833 24% 48%, #b99363 52%);
+  pointer-events: none;
+}
+
 .cafe-cue,
 .cafe-order-bubble {
   position: absolute;
