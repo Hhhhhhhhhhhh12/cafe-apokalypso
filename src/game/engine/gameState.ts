@@ -261,6 +261,7 @@ function isValidDayManagement(value: unknown): value is DayManagementState {
     typeof management.advertisingRun === "boolean" &&
     typeof management.socialAdRun === "boolean" &&
     typeof management.kassandraConsulted === "boolean" &&
+    (management.kassandraReceipt === undefined || isStringArray(management.kassandraReceipt)) &&
     typeof management.helperDecisionMade === "boolean" &&
     isMeter(management.reputationAtStart) &&
     typeof management.cleanlinessStressApplied === "boolean" &&

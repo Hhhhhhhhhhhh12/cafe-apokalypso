@@ -253,7 +253,6 @@ export function App() {
         <ActionPanel
           gameState={gameState}
           statusMessage={gameState.statusMessage}
-          onConsultKassandra={() => dispatch({ type: "consult_kassandra" })}
           onUpgradeDecor={(slot) => dispatch({ type: "upgrade_decor", slot })}
           onBuyEquipment={(slot) => dispatch({ type: "buy_equipment", slot })}
           onBuyUpgrade={(upgradeId) => dispatch({ type: "buy_upgrade", upgradeId })}

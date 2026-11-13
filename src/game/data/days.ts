@@ -143,9 +143,9 @@ export const weekOneDays = [
     title: "KASSANDRA",
     milestone: "Read KASSANDRA's register messages and consult its daily analysis.",
     dayOpener:
-      "The register update installed overnight without asking. It has issued its first customer analysis. The results are calm, confident, and slightly wrong.",
+      "The till installed an update overnight.",
     unlockMessage:
-      "KASSANDRA installed overnight and has completed its first customer assessment.",
+      "Tap the till for a forecast.",
     objective: {
       id: "day-6-kassandra-check",
       day: 6,

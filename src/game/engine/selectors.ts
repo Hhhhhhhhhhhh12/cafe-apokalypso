@@ -13,6 +13,7 @@ import {
   ACTION_BUDGET_BY_DAY,
   getCleanlinessLabel,
   getEarnedPrice,
+  getIngredientRequirement,
   getPatienceLabelFromCounter,
   getHelperLabel,
   getProductById,
@@ -284,6 +285,42 @@ export function getVisibleKassandraMessages(
   }
 
   return kassandraMessages.filter((message) => message.day <= state.day);
+}
+
+export function canUseKassandra(state: GameState): boolean {
+  return state.day >= 6 && state.kassandraInstalled && state.unlocks.kassandra &&
+    state.dayPhase === "open" && !state.cafeClosed && !state.demoComplete;
+}
+
+export function isEarlyKassandraConsult(state: GameState): boolean {
+  return getCurrentDayModifier(state).id === "forecast-static" && state.dayManagement.customersServed === 0;
+}
+
+/** Forecast the next two orders from the current queue and stock. */
+export function getKassandraReceipt(state: GameState): string[] {
+  const { customersServed, guestsLost } = state.dayManagement;
+  const projectedStock = { ...state.supplies };
+  const ingredients = ["coffee", "milk", "pastries"] as const;
+  const shortages = new Set<IngredientKey>();
+  const orders: string[] = [];
+
+  for (let offset = 0; offset < 2; offset += 1) {
+    const guest = getGuestForCustomer(state, customersServed + guestsLost + offset);
+    const preference = guest && getGuestWantedProductId(state, guest);
+    const product = getAvailableProducts(state).find(entry => entry.id === preference);
+    if (!product) continue;
+    orders.push(product.name);
+    for (const ingredient of ingredients) {
+      projectedStock[ingredient] -= getIngredientRequirement(product, ingredient, state.helperAssignment);
+      if (projectedStock[ingredient] < 0) shortages.add(ingredient);
+    }
+  }
+
+  return [
+    orders.length > 0 ? `Next orders: ${orders.join(" → ")}` : "No order forecast.",
+    shortages.size > 0 ? `Short on: ${[...shortages].map(getIngredientLabel).join(", ")}` : "Stock covers these orders.",
+    getKassandraConsultLine(state)
+  ];
 }
 
 export function getVisibleStaffOptions(

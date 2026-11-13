@@ -5,7 +5,6 @@ import {
   getDayEndRecapLine,
   getNarrativeEventCards,
   getVisibleDaySevenLetter,
-  getVisibleKassandraMessages,
   getVisibleStaffOptions,
   getObjectiveStatus
 } from "../../game/engine/selectors";
@@ -21,7 +20,6 @@ export function DayProgressPanel({ gameState }: DayProgressPanelProps) {
   const isDayFive = gameState.day === 5;
   const eventCards = getNarrativeEventCards(gameState);
   const staffOptions = getVisibleStaffOptions(gameState);
-  const kassandraMessages = getVisibleKassandraMessages(gameState);
   const daySevenLetter = getVisibleDaySevenLetter(gameState);
   const objectiveStatus = getObjectiveStatus(gameState);
 
@@ -185,20 +183,6 @@ export function DayProgressPanel({ gameState }: DayProgressPanelProps) {
         </section>
       ) : null}
 
-      {kassandraMessages.length > 0 ? (
-        <section
-          className="inline-callout placeholder-kassandra-ui"
-          aria-labelledby="kassandra-title"
-        >
-          <h3 id="kassandra-title">Day 6 unlock: KASSANDRA update</h3>
-          <p>New register panel online. It is authored, simulated, and slightly too confident.</p>
-          <ul>
-            {kassandraMessages.map((message) => (
-              <li key={message.id}>{message.text}</li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
     </section>
   );
 }

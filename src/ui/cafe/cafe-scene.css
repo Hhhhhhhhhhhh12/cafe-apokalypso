@@ -136,6 +136,44 @@
   --scene-pan-x: -32%;
 }
 
+.cafe-scene-frame[data-station="register"] {
+  --scene-zoom: 1.26;
+  --scene-pan-x: -24%;
+  --scene-pan-y: -8%;
+}
+
+.cafe-register__control:focus-visible {
+  outline: 3px solid #3dada9;
+  outline-offset: 3px;
+}
+
+.cafe-scene-frame .cafe-weirdness-hint {
+  pointer-events: none;
+}
+
+.kassandra-terminal__receipt {
+  margin-block: 0.5rem;
+  padding: 0.65rem 0.8rem;
+  color: #2d342e;
+  background: repeating-linear-gradient(#fff8df 0 22px, #eee2c4 22px 23px);
+  border-block-end: 3px dotted #aa9373;
+}
+
+.kassandra-terminal__receipt p {
+  margin: 0.35rem 0 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .kassandra-terminal__receipt {
+    animation: kassandra-print 420ms ease-out both;
+  }
+}
+
+@keyframes kassandra-print {
+  from { clip-path: inset(0 0 100% 0); }
+  to { clip-path: inset(0); }
+}
+
 .cafe-scene-frame .cafe-world {
   transform-origin: top left;
   transform: translate(var(--scene-pan-x), var(--scene-pan-y)) scale(var(--scene-zoom));
@@ -147,8 +185,7 @@
   .cafe-order-bubble,
   .cafe-coin-tick,
   .cafe-serve-reaction,
-  .cafe-ambient-event,
-  .cafe-kassandra-aside
+  .cafe-ambient-event
 ) {
   visibility: hidden;
 }
@@ -735,6 +772,18 @@ button.cafe-order-bubble:hover {
     transition: none;
     animation: cafe-guest-leave 1.25s linear both;
   }
+
+  .cafe-scene-frame .placeholder-guest--leaving-queue {
+    transition: none;
+    animation: cafe-guest-walkout 1.05s linear both;
+  }
+}
+
+@keyframes cafe-guest-walkout {
+  0% { left: var(--queue-x); bottom: var(--queue-y); }
+  29% { left: var(--front-x); bottom: var(--front-y); }
+  72% { left: var(--aisle-x); bottom: var(--aisle-y); }
+  100% { left: var(--cafe-door-x); bottom: var(--cafe-door-y); opacity: 0; }
 }
 
 @keyframes cafe-guest-enter {

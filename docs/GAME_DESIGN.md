@@ -272,6 +272,9 @@ Day 5: Delegation Pressure
 
 Day 6: KASSANDRA
 
+- open the terminal at the register and read its message without spending an action
+- print a forecast of the next two orders and stock shortages once per shift. Before the first sale on Day 6, the action is refunded. Printing still advances the waiting guest's patience.
+
 - cash register update
 - basic demand prediction
 - automatic audience targeting
