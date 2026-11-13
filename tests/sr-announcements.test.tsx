@@ -20,7 +20,6 @@ function renderActionPanel(state: GameState, statusMessage = "A test status beat
     <ActionPanel
       gameState={state}
       statusMessage={statusMessage}
-      onConsultKassandra={noop}
       onUpgradeDecor={noop}
       onBuyEquipment={noop}
       onBuyUpgrade={noop}

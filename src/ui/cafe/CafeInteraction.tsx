@@ -13,8 +13,9 @@ import type { GameAction, GameState } from "../../game/types/game";
 import { HelperStartPanel, OpeningEquipment, RestockControls } from "./CafeManagement";
 import { GuestService } from "./GuestService";
 import { Noticeboard, SupplyShelf } from "./ShiftStations";
+import { KassandraTerminal } from "./KassandraTerminal";
 
-export type CafeStation = "setup" | "service" | "door" | "stock" | "board" | "machine";
+export type CafeStation = "setup" | "service" | "door" | "stock" | "board" | "machine" | "register";
 
 interface CafeInteractionProps {
   station: CafeStation;
@@ -48,7 +49,8 @@ export function CafeInteraction({
     door: isClosing ? "Close the café" : "Open the café",
     stock: isClosing ? "Supply shelf" : `Day ${gameState.day} closed`,
     board: "Noticeboard",
-    machine: "Espresso machine"
+    machine: "Espresso machine",
+    register: "KASSANDRA"
   }[station];
 
   const isEntry = station === "setup" || (station === "door" && gameState.dayPhase === "setup");
@@ -68,7 +70,7 @@ export function CafeInteraction({
     <section className={`cafe-interaction${isEntry ? " cafe-interaction--entry" : ""}`}
       id="cafe-interaction" aria-labelledby="cafe-interaction-title">
       {isEntry ? <header className="cafe-interaction__heading">{heading}{backButton}</header> : <>{backButton}{heading}</>}
-      {feedback ? <p className="cafe-interaction__feedback">{feedback}</p> : null}
+      {feedback && station !== "register" ? <p className="cafe-interaction__feedback">{feedback}</p> : null}
       {station === "setup" ? (
         <OpeningEquipment
           gameState={gameState}
@@ -85,6 +87,9 @@ export function CafeInteraction({
       ) : null}
       {station === "door" ? <DoorControls gameState={gameState} onAction={onAction} /> : null}
       {station === "board" ? <Noticeboard gameState={gameState} onAction={onAction} /> : null}
+      {station === "register" ? (
+        <KassandraTerminal gameState={gameState} onConsult={() => onAction({ type: "consult_kassandra" })} />
+      ) : null}
       {station === "machine" ? (
         hasSecondBrewGroup(gameState) ? (
           <p>Second brew group fitted. Brew two espressos once per shift from the order menu.</p>

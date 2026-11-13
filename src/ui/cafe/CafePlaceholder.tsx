@@ -4,13 +4,15 @@ import type { GameAction, GameState, TableId } from "../../game/types/game";
 import type { GuestId } from "../../game/types/content";
 import {
   canAccessBrewGroup,
+  canUseKassandra,
   getDayCoachHint,
   getEarlySceneGuestVisibility,
   getGuestForCustomer,
   getGuestPatienceState,
   getNarrativeEventCards,
   getNextGuestPreview,
-  hasSecondBrewGroup
+  hasSecondBrewGroup,
+  isEarlyKassandraConsult
 } from "../../game/engine/selectors";
 import "./firstCup.css";
 import { useBohnAppearance } from "./bohnAppearance";
@@ -19,7 +21,6 @@ import type { StorageLike } from "../../game/engine/save";
 import { canJanaClearTable } from "../../game/engine/management";
 import { CafeInteraction, type CafeStation } from "./CafeInteraction";
 import { CafeShiftHelper } from "./CafeShiftHelper";
-import { kassandraMessages } from "../../game/data/kassandra";
 import stageDay1Asset from "../../../assets/backgrounds/placeholder-cafe-stage-v07-day-1.png";
 import stageDay2Asset from "../../../assets/backgrounds/placeholder-cafe-stage-v07-day-2.png";
 import stageDay3Asset from "../../../assets/backgrounds/placeholder-cafe-stage-v07-day-3.png";
@@ -158,6 +159,12 @@ export function CafePlaceholder({
   const showQueueGuest = isOpen && actionPointsRemaining > 0 && !shiftOver;
   const canInteract = Boolean(onAction) && !shiftOver && !introActive;
   const machineIsInteractive = canInteract && canAccessBrewGroup(gameState);
+  const registerIsInteractive = canInteract && canUseKassandra(gameState);
+  const earlyForecastAvailable = isEarlyKassandraConsult(gameState) && actionPointsRemaining > 0;
+  const registerSprite = (
+    <img className="cafe-pilot-asset cafe-pilot-asset--kassandra-register"
+      src={usesApprovedDayOneScene ? approvedKassandraRegisterAsset : kassandraRegisterAsset} alt="" />
+  );
   const secondBrewGroup = hasSecondBrewGroup(gameState);
   const machineSprite = (
     <img
@@ -226,7 +233,7 @@ export function CafePlaceholder({
 
   // Paula entrance phases
   const [paulaPhase, setPaulaPhase] = useState<
-    "at-door" | "walking" | "idle" | "walking-to-counter" | "walking-to-door"
+    "at-door" | "walking" | "idle" | "walking-to-counter" | "walking-to-door" | "leaving-queue"
   >(() => prefersReducedMotion() ? "idle" : "at-door");
 
   const [queueGuest, setQueueGuest] = useState<GuestId>(incomingGuestId);
@@ -274,9 +281,11 @@ export function CafePlaceholder({
       (paulaPhase === "idle" || paulaPhase === "walking") && !prefersReducedMotion()
     ) {
       setPaulaPhase("walking-to-counter");
-    } else if (paulaPhase !== "walking-to-counter" && paulaPhase !== "walking-to-door") {
-      // Lost guests and reduced-motion serves advance the visible identity
-      // immediately. An exiting guest keeps its sprite until the exit ends.
+    } else if (gameState.day === 6 && customersServed === prevServed &&
+      queuePosition > prevQueuePosition && paulaPhase === "idle" && !prefersReducedMotion()) {
+      setPaulaPhase("leaving-queue");
+    } else if (paulaPhase !== "walking-to-counter" && paulaPhase !== "walking-to-door" && paulaPhase !== "leaving-queue") {
+      // Reduced-motion serves advance immediately. Exiting guests keep their sprite.
       setQueueGuest(incomingGuestId);
     }
   }
@@ -287,7 +296,7 @@ export function CafePlaceholder({
       const timer = setTimeout(() => setPaulaPhase("idle"), 1350);
       return () => clearTimeout(timer);
     }
-    if (paulaPhase !== "walking-to-counter" && paulaPhase !== "walking-to-door") return;
+    if (paulaPhase !== "walking-to-counter" && paulaPhase !== "walking-to-door" && paulaPhase !== "leaving-queue") return;
     const timer = setTimeout(() => {
       setQueueGuest(incomingGuestId);
       setPaulaPhase(prefersReducedMotion() ? "idle" : "at-door");
@@ -297,9 +306,6 @@ export function CafePlaceholder({
 
   // A2: Serve reaction bubble — first sentence of statusMessage, shown 2.5 s
   const [serveReaction, setServeReaction] = useState<SceneLine | null>(null);
-
-  // B2: Kassandra passive aside — every 3rd serve, shown 4 s
-  const [kassandraAside, setKassandraAside] = useState<SceneLine | null>(null);
 
   // B1: Ambient event overlay — "On the floor" events shown every 2nd serve, 3 s
   const [ambientEvent, setAmbientEvent] = useState<SceneLine | null>(null);
@@ -312,16 +318,11 @@ export function CafePlaceholder({
     if (customersServed > prevServedForFeedback) {
       // A2: serve reaction
       const firstSentence = gameState.statusMessage?.split(/\.\s+/)[0]?.trim() ?? null;
-      if (gameState.day > 3 && gameState.day !== 5 && firstSentence) {
+      if (gameState.day > 3 && gameState.day !== 5 && gameState.day !== 6 && firstSentence) {
         setServeReaction(prev => ({ text: firstSentence, key: (prev?.key ?? 0) + 1, day: gameState.day }));
       }
-      // B2 — every 3rd serve
-      if (gameState.kassandraInstalled && customersServed % 3 === 0) {
-        const idx = (Math.floor(customersServed / 3) - 1 + kassandraMessages.length) % kassandraMessages.length;
-        setKassandraAside(prev => ({ text: kassandraMessages[idx].text, key: (prev?.key ?? 0) + 1, day: gameState.day }));
-      }
       // B1 — every 2nd serve, pick a floor event
-      if (gameState.day > 3 && gameState.day !== 5 && customersServed % 2 === 0) {
+      if (gameState.day > 3 && gameState.day !== 5 && gameState.day !== 6 && customersServed % 2 === 0) {
         const floorEvents = getNarrativeEventCards(gameState).filter(
           e => e.kicker === "On the floor"
         );
@@ -341,12 +342,6 @@ export function CafePlaceholder({
     const timer = setTimeout(() => setServeReaction(null), 2500);
     return () => clearTimeout(timer);
   }, [serveReaction]);
-
-  useEffect(() => {
-    if (!kassandraAside) return;
-    const timer = setTimeout(() => setKassandraAside(null), 4000);
-    return () => clearTimeout(timer);
-  }, [kassandraAside]);
 
   useEffect(() => {
     if (!ambientEvent) return;
@@ -401,7 +396,7 @@ export function CafePlaceholder({
   const visibleGuests = getEarlySceneGuestVisibility(gameState);
   const earlyV07 = gameState.day === 2 || gameState.day === 3;
   const guestInQueue = showQueueGuest || paulaPhase === "walking-to-counter" ||
-    paulaPhase === "walking-to-door" ? queueGuest : null;
+    paulaPhase === "walking-to-door" || paulaPhase === "leaving-queue" ? queueGuest : null;
   const lukasHasSeat = visibleGuests.lukas && guestInQueue !== "laptop-lukas";
   const nextGuest = getNextGuestPreview(gameState);
   const patience = getGuestPatienceState(gameState);
@@ -463,7 +458,7 @@ export function CafePlaceholder({
             dayClass,
             growthDayClass,
             earlyV07 ? "cafe-diorama--early-v07" : "",
-            gameState.day <= 3 || gameState.day === 5 ? "cafe-diorama--short-orders" : "",
+            gameState.day <= 3 || gameState.day === 5 || gameState.day === 6 ? "cafe-diorama--short-orders" : "",
             kassandraClass,
             weirdnessClass,
             usesApprovedDayOneScene ? "cafe-diorama--approved-day-one" : "",
@@ -482,11 +477,6 @@ export function CafePlaceholder({
           {isOpen && ambientEvent?.day === gameState.day && (
             <span key={`ambient-${ambientEvent.key}`} className="cafe-ambient-event" aria-hidden="true">
               {ambientEvent.text}
-            </span>
-          )}
-          {isOpen && kassandraAside?.day === gameState.day && (
-            <span key={`kassandra-${kassandraAside.key}`} className="cafe-kassandra-aside" aria-hidden="true">
-              {kassandraAside.text}
             </span>
           )}
           <div role="status" className="cafe-first-cup-announcement">
@@ -652,21 +642,22 @@ export function CafePlaceholder({
                 <div
                   className={`cafe-register placeholder-kassandra-ui${kassandraAwake ? " cafe-register--awake" : ""}`}
                 >
-                  <img
-                    className="cafe-pilot-asset cafe-pilot-asset--kassandra-register"
-                    src={
-                      usesApprovedDayOneScene
-                        ? approvedKassandraRegisterAsset
-                        : kassandraRegisterAsset
-                    }
-                    alt=""
-                    aria-hidden="true"
-                  />
+                  {registerIsInteractive ? (
+                    <button type="button" className="cafe-coffee-machine__control cafe-register__control"
+                      data-cafe-entry aria-label="Open KASSANDRA at the register"
+                      onClick={(event) => openStation("register", event.currentTarget)}>
+                      {registerSprite}
+                      <span className="cafe-coffee-machine__label" aria-hidden="true">
+                        {gameState.dayManagement.kassandraConsulted ? "Forecast printed"
+                          : earlyForecastAvailable ? "Forecast · 0 actions" : "KASSANDRA"}
+                      </span>
+                    </button>
+                  ) : registerSprite}
                   <span
                     className={`cafe-register__screen${kassandraAwake ? " cafe-register__screen--active" : ""}`}
                   />
-                  {gameState.day >= 7 && (
-                    <span className="cafe-register__receipt cafe-register__receipt--long" />
+                  {(gameState.day >= 7 || gameState.dayManagement.kassandraConsulted) && (
+                    <span className="cafe-register__receipt cafe-register__receipt--long" aria-hidden="true" />
                   )}
                 </div>
 
@@ -788,7 +779,7 @@ export function CafePlaceholder({
                 ) : null}
                 {isOpen && !shiftOver && (showQueueGuest ||
                 paulaPhase === "walking-to-counter" ||
-                paulaPhase === "walking-to-door") ? (
+                paulaPhase === "walking-to-door" || paulaPhase === "leaving-queue") ? (
                   <span
                     data-guest-id={queueGuest}
                     className={[
@@ -796,6 +787,7 @@ export function CafePlaceholder({
                       "placeholder-guest-normal-01",
                       paulaPhase === "at-door" ? "placeholder-guest--at-door" : "",
                       paulaPhase === "walking" ? "placeholder-guest--arriving" : "",
+                      paulaPhase === "leaving-queue" ? "placeholder-guest--leaving-queue" : "",
                       paulaPhase === "walking-to-counter"
                         ? "placeholder-guest--walking-to-counter"
                         : paulaPhase === "walking-to-door"
@@ -816,7 +808,8 @@ export function CafePlaceholder({
                       if (e.animationName === "cafe-guest-enter" && paulaPhase === "walking") {
                         setPaulaPhase("idle");
                       }
-                      if (e.animationName === "cafe-guest-leave" && paulaPhase === "walking-to-door") {
+                      if ((e.animationName === "cafe-guest-leave" && paulaPhase === "walking-to-door") ||
+                        (e.animationName === "cafe-guest-walkout" && paulaPhase === "leaving-queue")) {
                         setQueueGuest(incomingGuestId);
                         setPaulaPhase(prefersReducedMotion() ? "idle" : "at-door");
                       }

@@ -22,11 +22,13 @@ import {
   getGuestForCustomer,
   getGuestWantedProductId,
   getIngredientLabel,
+  getKassandraReceipt,
   getKassandraConsultLine,
   getMoneyRecoveryWarning,
   getServedGuestIds,
   getServeLineForCustomer,
-  hasSecondBrewGroup
+  hasSecondBrewGroup,
+  isEarlyKassandraConsult
 } from "./selectors";
 import { getObjectiveStatus } from "./objectives";
 import { formatAsche, roundAscheEarnings } from "./currency";
@@ -1010,10 +1012,7 @@ function consultKassandra(state: GameState): GameState {
 
   const { state: tickedState, walkoutLine } = applyPatienceTick(actionState);
 
-  const earlyForecastRefund =
-    getCurrentDayModifier(tickedState).id === "forecast-static" &&
-    !state.dayManagement.kassandraConsulted &&
-    state.dayManagement.customersServed === 0;
+  const earlyForecastRefund = isEarlyKassandraConsult(state);
 
   const kassandraMessage = `KASSANDRA: ${getKassandraConsultLine(tickedState)}${
     earlyForecastRefund ? " Early forecast logged. Action refunded." : ""
@@ -1030,7 +1029,8 @@ function consultKassandra(state: GameState): GameState {
       actionPointsSpent: earlyForecastRefund
         ? Math.max(0, tickedState.dayManagement.actionPointsSpent - 1)
         : tickedState.dayManagement.actionPointsSpent,
-      kassandraConsulted: true
+      kassandraConsulted: true,
+      kassandraReceipt: getKassandraReceipt(tickedState)
     },
     statusMessage: [kassandraMessage, walkoutLine].filter(Boolean).join(" ")
   };

@@ -73,6 +73,7 @@ export interface DayManagementState {
   advertisingRun: boolean;
   socialAdRun: boolean;
   kassandraConsulted: boolean;
+  kassandraReceipt?: string[];
   helperDecisionMade: boolean;
   reputationAtStart: number;
   cleanlinessStressApplied: boolean;

@@ -17,7 +17,6 @@ import { EquipmentShop } from "../cafe/CafeManagement";
 interface ActionPanelProps {
   gameState: GameState;
   statusMessage: string;
-  onConsultKassandra: () => void;
   onUpgradeDecor: (slot: DecorSlotId) => void;
   onBuyEquipment: (slot: EquipmentSlotId) => void;
   onBuyUpgrade: (upgradeId: UpgradeId) => void;
@@ -55,7 +54,6 @@ function FloorLog({ events }: { events: EventDefinition[] }) {
 export function ActionPanel({
   gameState,
   statusMessage,
-  onConsultKassandra,
   onUpgradeDecor,
   onBuyEquipment,
   onBuyUpgrade,
@@ -69,10 +67,7 @@ export function ActionPanel({
       </div>
 
       {gameState.dayPhase === "open" && !gameState.cafeClosed ? (
-        <OpenDayControls
-          gameState={gameState}
-          onConsultKassandra={onConsultKassandra}
-        />
+        <OpenDayControls gameState={gameState} />
       ) : null}
 
       {gameState.dayPhase === "day_end" ? (
@@ -109,17 +104,8 @@ export function ActionPanel({
   );
 }
 
-function OpenDayControls({
-  gameState,
-  onConsultKassandra,
-}: {
-  gameState: GameState;
-  onConsultKassandra: () => void;
-}) {
+function OpenDayControls({ gameState }: { gameState: GameState }) {
   const canAct = hasActionCapacity(gameState);
-  const actionLockReason = canAct
-    ? undefined
-    : "No actions left today.";
   const coach = getDayCoachHint(gameState);
   return (
     <>
@@ -161,21 +147,6 @@ function OpenDayControls({
         </p>
       ) : null}
 
-      {gameState.unlocks.kassandra ? (
-        <button
-          type="button"
-          className="secondary-button"
-          onClick={onConsultKassandra}
-          disabled={!canAct || gameState.dayManagement.kassandraConsulted}
-          title={
-            gameState.dayManagement.kassandraConsulted
-              ? "KASSANDRA has already been consulted today."
-              : actionLockReason
-          }
-        >
-          Consult KASSANDRA
-        </button>
-      ) : null}
 
       {!canAct ? (
         <p className="action-capacity-warn" role="status">
