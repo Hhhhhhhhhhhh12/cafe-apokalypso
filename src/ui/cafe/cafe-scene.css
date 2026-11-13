@@ -17,6 +17,7 @@
 .hero-bar--game .hero-bar__aside,
 .hero-bar--game .day-card {
   display: flex;
+  flex-direction: row;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.3rem 0.75rem;
@@ -37,6 +38,37 @@
 .workspace-grid--cafe > .cafe-stage {
   grid-column: 1 / -1;
   grid-row: 1;
+}
+
+/* From tablet width up, resources sit as a slim bar above the stage so cash,
+   stock and actions stay in view while playing. Phones keep the stage first:
+   the bar needs four rows there and would push the café off screen. */
+@media (min-width: 721px) {
+  .workspace-grid--cafe > .resource-panel {
+    grid-row: 1;
+    padding: 6px 8px;
+  }
+
+  .workspace-grid--cafe > .resource-panel .resource-list {
+    gap: 6px;
+  }
+
+  .workspace-grid--cafe > .resource-panel .resource-item {
+    min-height: 0;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .workspace-grid--cafe > .cafe-stage {
+    grid-row: 2;
+  }
+}
+
+/* One row of eight while there is room for it (overrides the 4-column
+   fallback global.css applies below 1180px). */
+@media (min-width: 901px) {
+  .workspace-grid--cafe > .resource-panel .resource-list {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+  }
 }
 
 .workspace-grid--cafe > .action-panel,
