@@ -127,6 +127,7 @@ export function getNarrativeEventCards(
 
   return getCurrentDayEvents(state).filter((event) => {
     if (event.tone === "normal" || event.id === "day-1-first-cup") return false;
+    if (event.id === "day-5-wet-table-jana" && !state.pendingEvents.includes(event.id)) return false;
     if (event.kicker === "Closing" && !isClosing) return false;
     if (event.relatedGuestIds && event.relatedGuestIds.length > 0 && !anyGuestServed) return false;
     return true;

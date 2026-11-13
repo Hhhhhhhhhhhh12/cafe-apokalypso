@@ -751,14 +751,8 @@ function cleanTable(state: GameState, tableId: TableId | undefined): GameState {
 
   if (tableId && canJanaClearTable(state)) {
     return {
-      ...state,
+      ...clearTableWithJana(state, tableId),
       completedActions: addUniqueDayAction(state.completedActions, "clean_tables"),
-      resources: { ...state.resources, cleanliness: clampMeter(state.resources.cleanliness + 1) },
-      dayManagement: {
-        ...state.dayManagement,
-        dirtyTableIds: state.dayManagement.dirtyTableIds.filter((dirtyTableId) => dirtyTableId !== tableId),
-        helperAutonomousActions: 1
-      },
       statusMessage: `Jana cleared the ${tableId} table. No action spent.`
     };
   }
@@ -1243,7 +1237,9 @@ function completeCurrentDay(state: GameState): GameState {
   const currentDay = getCurrentDayDefinition(state);
   const nextHistoryState = {
     guestHistory: addUniqueGuestIds(state.guestHistory, currentDay.guestIds),
-    eventHistory: addUniqueEventIds(state.eventHistory, currentDay.eventIds),
+    eventHistory: addUniqueEventIds(state.eventHistory, currentDay.eventIds.filter(
+      id => id !== "day-5-wet-table-jana" || state.pendingEvents.includes(id)
+    )),
     unlockedAchievements: addUniqueAchievementIds(
       state.unlockedAchievements,
       getAchievementIdsForState(state)
@@ -2125,6 +2121,7 @@ function getEventsToQueue(
 
   for (let i = 0; i < N; i++) {
     const id = eventIds[i];
+    if (id === "day-5-wet-table-jana" && state.helperAssignment?.helperId !== "jana") continue;
     if (state.pendingEvents.includes(id)) {
       continue;
     }
@@ -2252,21 +2249,27 @@ function applyHelperAutonomy(state: GameState, actionsWithoutServing: number): G
     return state;
   }
 
-  const [tableId, ...remainingDirtyTableIds] = state.dayManagement.dirtyTableIds;
-  if (!tableId) {
-    return state;
-  }
+  const [tableId] = state.dayManagement.dirtyTableIds;
+  return tableId ? clearTableWithJana(state, tableId) : state;
+}
 
+function clearTableWithJana(state: GameState, tableId: TableId): GameState {
+  const cleanliness = clampMeter(state.resources.cleanliness + 1);
+  const impact = state.dayManagement.dayFiveHelperImpact;
   return {
     ...state,
     resources: {
       ...state.resources,
-      cleanliness: clampMeter(state.resources.cleanliness + 1)
+      cleanliness
     },
     dayManagement: {
       ...state.dayManagement,
-      dirtyTableIds: remainingDirtyTableIds,
-      helperAutonomousActions: state.dayManagement.helperAutonomousActions + 1
+      dirtyTableIds: state.dayManagement.dirtyTableIds.filter(id => id !== tableId),
+      helperAutonomousActions: state.dayManagement.helperAutonomousActions + 1,
+      ...(impact ? { dayFiveHelperImpact: {
+        ...impact,
+        cleanlinessRestored: impact.cleanlinessRestored + cleanliness - state.resources.cleanliness
+      } } : {})
     }
   };
 }

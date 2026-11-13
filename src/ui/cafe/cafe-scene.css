@@ -51,6 +51,57 @@
   font-variant-numeric: tabular-nums;
 }
 
+.helper-picker__portrait {
+  width: 36px;
+  height: 36px;
+  margin-inline-end: 0.35rem;
+  vertical-align: middle;
+  image-rendering: pixelated;
+}
+
+.cafe-shift-helper {
+  position: absolute;
+  z-index: 8;
+  left: 54%;
+  bottom: 22%;
+  width: clamp(54px, 11%, 96px);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.cafe-shift-helper--barista { left: 69%; bottom: 43%; }
+.cafe-shift-helper--counter { left: 79%; bottom: 30%; }
+.cafe-shift-helper--marketing { left: 36%; bottom: 40%; }
+.cafe-shift-helper--service { left: 60%; bottom: 28%; }
+
+.cafe-shift-helper img {
+  display: block;
+  width: 100%;
+  image-rendering: pixelated;
+}
+
+.cafe-shift-helper__work {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -70%);
+  padding: 0.12rem 0.35rem;
+  border-radius: 0.25rem;
+  background: #fff0cf;
+  color: #442a20;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cafe-shift-helper__work { animation: cafe-helper-work 260ms ease-out; }
+}
+
+@keyframes cafe-helper-work {
+  from { transform: translate(-50%, -45%); opacity: 0.4; }
+}
+
 .cafe-scene-frame {
   --scene-zoom: 1;
   --scene-pan-x: 0%;
@@ -615,16 +666,16 @@ button.cafe-order-bubble:hover {
   bottom: calc(var(--cafe-door-y) + 85px);
 }
 
-.cafe-diorama--early-service .cafe-order-bubble {
+.cafe-diorama--short-orders .cafe-order-bubble {
   width: max-content;
   bottom: calc(100% + 44px);
 }
 
-.cafe-diorama--early-service .cafe-order-bubble__line {
+.cafe-diorama--short-orders .cafe-order-bubble__line {
   display: none;
 }
 
-.cafe-diorama--early-service .cafe-order-bubble__short {
+.cafe-diorama--short-orders .cafe-order-bubble__short {
   display: block;
 }
 

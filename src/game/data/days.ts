@@ -112,9 +112,9 @@ export const weekOneDays = [
     title: "Delegation Pressure",
     milestone: "Helper choices start to matter more as the café gets busier.",
     dayOpener:
-      "By now help is no longer a novelty. Each person on the staff board can solve one problem well, which leaves the other problems politely waiting. A table was wet this morning in a way that did not match any spill. You wipe it and move on.",
+      "Three guests to serve. Who takes the work you can't get to?",
     unlockMessage:
-      "Delegation is still narrow: one person, one task, one day at a time.",
+      "One helper for the shift.",
     objective: {
       id: "day-5-helper-choice",
       day: 5,

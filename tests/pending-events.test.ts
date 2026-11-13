@@ -81,12 +81,16 @@ describe("pendingEvents: open_day", () => {
     }
   });
 
-  it("enqueues the first event for every day 1-7", () => {
+  it("enqueues the first event for every day when its conditions are met", () => {
     for (let d = 1; d <= 7; d++) {
       const day = d as DayNumber;
       const state = openDayFrom(dayStartState(day));
       const firstEventId = weekOneDays[day - 1].eventIds[0];
-      expect(state.pendingEvents).toContain(firstEventId);
+      if (day === 5) {
+        expect(state.pendingEvents).not.toContain(firstEventId);
+      } else {
+        expect(state.pendingEvents).toContain(firstEventId);
+      }
     }
   });
 });

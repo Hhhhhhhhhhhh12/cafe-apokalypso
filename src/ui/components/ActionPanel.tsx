@@ -146,7 +146,7 @@ function OpenDayControls({
         </div>
       ) : null}
 
-      {gameState.helperAssignment ? (
+      {gameState.helperAssignment && gameState.day !== 5 ? (
         <div className="helper-slot" aria-label="Current helper assignment">
           {gameState.helperAssignment.flavorLine}
         </div>

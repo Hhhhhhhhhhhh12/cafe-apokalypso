@@ -29,6 +29,11 @@ export function GuestService({
   const doubleEspresso = onServeDoubleEspresso && hasSecondBrewGroup(gameState)
     ? getDoubleEspressoOption(gameState)
     : null;
+  const helper = gameState.day === 5 && gameState.helperAssignment?.locked
+    ? gameState.helperAssignment
+    : null;
+  const extraOrder = Boolean(helper && gameState.dayManagement.helperExtraOrdersRemaining > 0);
+  const baristaBonus = helper?.taskId === "barista" && gameState.dayManagement.baristaReputationBonus < 3;
 
   return (
     <>
@@ -84,6 +89,9 @@ export function GuestService({
               const missingLabel = missing.length > 0
                 ? `Short on ${missing.map(getIngredientLabel).join(", ")}`
                 : null;
+              const helperLabel = baristaBonus && (product.id === "espresso" || product.id === "cappuccino")
+                ? "Nino · +1 reputation"
+                : extraOrder ? "Extra guest if stock allows" : null;
               return (
                 <button
                   key={product.id}
@@ -93,11 +101,12 @@ export function GuestService({
                   disabled={!canAct}
                   title={!canAct ? "No actions left this shift." : priceDetail}
                   aria-label={`${product.name}: estimated income ${formatAsche(Number(income))} per guest`}
-                  aria-description={[missingLabel, priceDetail].filter(Boolean).join(". ")}
+                  aria-description={[missingLabel, helperLabel, priceDetail].filter(Boolean).join(". ")}
                 >
                   <span>
                     <span className="serve-menu__name">{product.name}</span>
                     {missingLabel ? <small className="serve-menu__shortage">{missingLabel}</small> : null}
+                    {!missingLabel && helperLabel ? <small>{helperLabel}</small> : null}
                   </span>
                   <span className="serve-menu__price">Est. {formatAsche(Number(income))}</span>
                 </button>

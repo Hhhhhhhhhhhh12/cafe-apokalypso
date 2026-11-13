@@ -18,6 +18,7 @@ import { DayOneVines } from "./DayOneVines";
 import type { StorageLike } from "../../game/engine/save";
 import { canJanaClearTable } from "../../game/engine/management";
 import { CafeInteraction, type CafeStation } from "./CafeInteraction";
+import { CafeShiftHelper } from "./CafeShiftHelper";
 import { kassandraMessages } from "../../game/data/kassandra";
 import stageDay1Asset from "../../../assets/backgrounds/placeholder-cafe-stage-v07-day-1.png";
 import stageDay2Asset from "../../../assets/backgrounds/placeholder-cafe-stage-v07-day-2.png";
@@ -311,7 +312,7 @@ export function CafePlaceholder({
     if (customersServed > prevServedForFeedback) {
       // A2: serve reaction
       const firstSentence = gameState.statusMessage?.split(/\.\s+/)[0]?.trim() ?? null;
-      if (gameState.day > 3 && firstSentence) {
+      if (gameState.day > 3 && gameState.day !== 5 && firstSentence) {
         setServeReaction(prev => ({ text: firstSentence, key: (prev?.key ?? 0) + 1, day: gameState.day }));
       }
       // B2 — every 3rd serve
@@ -320,7 +321,7 @@ export function CafePlaceholder({
         setKassandraAside(prev => ({ text: kassandraMessages[idx].text, key: (prev?.key ?? 0) + 1, day: gameState.day }));
       }
       // B1 — every 2nd serve, pick a floor event
-      if (gameState.day > 3 && customersServed % 2 === 0) {
+      if (gameState.day > 3 && gameState.day !== 5 && customersServed % 2 === 0) {
         const floorEvents = getNarrativeEventCards(gameState).filter(
           e => e.kicker === "On the floor"
         );
@@ -353,7 +354,7 @@ export function CafePlaceholder({
     return () => clearTimeout(timer);
   }, [ambientEvent]);
 
-  const showNino = isOpen && gameState.day >= 3 && !gameState.cafeClosed && !gameState.demoComplete &&
+  const showNino = isOpen && gameState.day >= 3 && gameState.day !== 5 && !gameState.cafeClosed && !gameState.demoComplete &&
     gameState.helperAssignment?.helperId === "nino" && gameState.helperAssignment.locked;
   const firstCupServed = isOpen && gameState.day === 1 &&
     gameState.pendingEvents.includes("day-1-first-cup");
@@ -462,7 +463,7 @@ export function CafePlaceholder({
             dayClass,
             growthDayClass,
             earlyV07 ? "cafe-diorama--early-v07" : "",
-            gameState.day <= 3 ? "cafe-diorama--early-service" : "",
+            gameState.day <= 3 || gameState.day === 5 ? "cafe-diorama--short-orders" : "",
             kassandraClass,
             weirdnessClass,
             usesApprovedDayOneScene ? "cafe-diorama--approved-day-one" : "",
@@ -511,6 +512,7 @@ export function CafePlaceholder({
                 <span className="cafe-staff-nino__walk" />
               </div>
             )}
+            <CafeShiftHelper gameState={gameState} />
             {playFirstCup && (
               <div className="cafe-first-cup" style={{ left: "42%", bottom: "58%", width: "3.25%", zIndex: 24 }} aria-hidden="true">
                 <div className="cafe-first-cup__steam"><span /><span /><span /></div>

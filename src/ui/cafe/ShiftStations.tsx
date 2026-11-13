@@ -98,6 +98,9 @@ function Campaign({
     : !canAfford ? `${formatAsche(gameState.resources.money)} in the till.`
     : !canAct ? "No actions left this shift." : null;
   const label = flyer ? "Post flyer" : "Publish social post";
+  const actionCost = usesBonus
+    ? gameState.day === 5 ? "0 actions · Nele" : "bonus slot"
+    : "1 action";
 
   return (
     <div className="noticeboard-item">
@@ -111,7 +114,7 @@ function Campaign({
         disabled={Boolean(unavailable)}
         onClick={() => onAction({ type: "run_advertising", adType: type })}
       >
-        {label} · {formatAsche(cost)} · {usesBonus ? "bonus slot" : "1 action"}
+        {label} · {formatAsche(cost)} · {actionCost}
       </button>
       {unavailable ? <small>{unavailable}</small> : null}
       {!unavailable && !usesBonus && getGuestPatienceState(gameState)?.critical ? (
