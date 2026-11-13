@@ -40,9 +40,9 @@ current task, not the whole documentation archive.
   queue, preferences, patience/walkouts, memory, resources, day-end
   ratings/overhead and décor upgrades. **Do not reinvent this loop.**
 - Published demo: https://hhhhhhhhhhhh12.github.io/cafe-apokalypso/
-- Main view: pixel-art 3/4 café diorama. `src/ui/cafe/CafeScene.tsx` and
-  `src/ui/cafe/scene.ts` own scene composition/position data, not the removed
-  `CafePlaceholder.tsx`.
+- Main view: `App` mounts `src/ui/cafe/CafePlaceholder.tsx` and uses
+  `src/ui/cafe/cafe-scene.css` for scene interactions. `CafeScene.tsx` and
+  `scene.ts` still serve the lookbook.
 - Paula is the owner/player character. Nele's approved first appearance is
   Day 2, not Day 1; this timing is no longer an unresolved design question.
 - Use `npm run test` to establish the current test count and result. Old test

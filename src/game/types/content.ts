@@ -61,6 +61,7 @@ export type EventId =
   | "day-3-guest-checks-in"
   | "day-3-supply-tally"
   | "day-4-herr-grau-coin"
+  | "day-4-second-brew-group"
   | "day-4-poster-before-printed"
   | "day-4-flyer-wrong-address"
   | "day-4-bohn-recognizes-coin"

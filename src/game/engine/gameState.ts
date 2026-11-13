@@ -280,6 +280,7 @@ function isValidDayManagement(value: unknown): value is DayManagementState {
     isCounter(management.bestServeStreak) &&
     isCounter(management.actionsWithoutServing) &&
     isCounter(management.helperAutonomousActions) &&
+    (management.doubleEspressoServed === undefined || typeof management.doubleEspressoServed === "boolean") &&
     (observations === undefined ||
       (observations !== null && typeof observations === "object" && !Array.isArray(observations) &&
         typeof observations.janaServed === "boolean" &&

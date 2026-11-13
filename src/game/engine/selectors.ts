@@ -227,6 +227,40 @@ export function getGuestWantedProductId(state: GameState, guest: GuestDefinition
     guest.preferredProductId ?? guest.appreciatedProductIds?.[0];
 }
 
+export function canAccessBrewGroup(state: GameState): boolean {
+  return state.day >= 4 && state.dayPhase === "open" && state.equipment.machine > 0 &&
+    !state.cafeClosed && !state.demoComplete;
+}
+
+export function hasSecondBrewGroup(state: GameState): boolean {
+  return state.eventHistory.includes("day-4-second-brew-group");
+}
+
+export function getDoubleEspressoOption(state: GameState) {
+  const beans = 2 * (getProductById("espresso").ingredients.coffee ?? 0);
+  const nextPosition = state.dayManagement.customersServed + state.dayManagement.guestsLost;
+  const followingGuest = getGuestForCustomer(state, nextPosition + 1);
+  const wanted = followingGuest && getGuestWantedProductId(state, followingGuest);
+  const unavailable = !canAccessBrewGroup(state) || !hasSecondBrewGroup(state)
+    ? "Install the second brew group first."
+    : state.dayManagement.doubleEspressoServed
+      ? "Already used this shift."
+      : state.supplies.coffee < beans
+        ? `Needs ${beans} coffee beans in stock.`
+        : !hasActionCapacity(state)
+          ? "No actions left this shift."
+          : !followingGuest || !getGuestForCustomer(state, nextPosition)
+            ? "Two guests must be waiting."
+            : null;
+
+  return {
+    beans,
+    unavailable,
+    followingGuest: followingGuest?.name,
+    followingOrder: wanted ? getProductById(wanted).name : null
+  };
+}
+
 /**
  * The line KASSANDRA speaks when consulted. Deterministically drawn from the
  * messages unlocked by the current day, varied by how far into the day it is,

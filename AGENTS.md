@@ -24,7 +24,7 @@ KRITISCHE Regel: Immer auf gescheite Diversität der Figuren achten (Hauttöne, 
 
 ## Diorama-Geometrie (nicht neu herleiten!)
 
-**Positionen sind DATEN, kein Magic-Number-CSS mehr.** Seit dem Render-Neustart liegen alle Szenen-Anker in [`src/ui/cafe/scene.ts`](src/ui/cafe/scene.ts) — EIN Koordinatensystem („Stage-%": Prozent der `.cafe-world`-Box, x von links, y von unten). Die Render-Komponente ist [`src/ui/cafe/CafeScene.tsx`](src/ui/cafe/CafeScene.tsx) (flache Sprite-Liste, Positionen inline aus `scene.ts`). `CafePlaceholder.tsx` und das alte Floor-/Queue-/Wall-Container-System sind gelöscht.
+**Aktive Spielfassung:** `App.tsx` verwendet `CafePlaceholder.tsx` und `cafe-scene.css`. Tag 1 nutzt v12, Tag 2–7 v07. Ab Tag 4 liegt die Maschinenaktion direkt auf dem Maschinensprite. Die nachfolgenden v06-Anker in `scene.ts` und die flache `CafeScene.tsx` gehören zum Lookbook.
 
 - **Kalibrieren = Zahl in `scene.ts` ändern.** Kein CSS-Positionsblock mehr suchen. Im Dev-Modus loggt ein Klick in die Szene die Stage-%-Koordinate (`[scene] left: …%, bottom: …%`) → direkt übernehmen.
 - **CSS macht nur noch Aussehen**, nicht Ort: Sprite-Größen, Tier-Varianten, Personality-Animationen (breathe/fidget/lean), Filter/Opacity bleiben in `global.css` (Klassen `cafe-decor-*`, `placeholder-guest-normal-NN`, `cafe-table--tier-N`).

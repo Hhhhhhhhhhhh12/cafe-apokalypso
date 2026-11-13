@@ -136,6 +136,15 @@ export const weekOneEvents = [
     ]
   },
   {
+    id: "day-4-second-brew-group",
+    day: 4,
+    title: "The Second Brew Group",
+    tone: "anomaly",
+    kicker: "At the counter",
+    trigger: "The second brew group is installed.",
+    text: "The second group clicks into place. An extra connector opens. From inside the pipe, someone knocks grounds out of a portafilter."
+  },
+  {
     id: "day-4-herr-grau-coin",
     day: 4,
     title: "Herr Grau's Coin",

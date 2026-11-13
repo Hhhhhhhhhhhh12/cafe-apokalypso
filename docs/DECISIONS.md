@@ -218,8 +218,12 @@ the valve is closed. A manifold can share that reserve across multiple brew
 groups, with priority set before opening. Each branch can take further modules.
 Eventually the small service hatch opens onto an entire machine room.
 
-The exact Day 4 trigger and the unlocks, costs and balance of later modules
-remain open.
+**Playable first step.** From Day 4, inspect the machine during an open shift
+and optionally fit the second group for free. The connector discovery appears
+in the shift log. The group can brew two espressos for two consecutive guests
+in one action once per shift, using the beans for both cups. The Day 4 goal
+remains one neighbourhood flyer and two guests served. Later modules and
+their costs remain open.
 
 ### Decision: Early Pacing Must Not Feel Slow
 

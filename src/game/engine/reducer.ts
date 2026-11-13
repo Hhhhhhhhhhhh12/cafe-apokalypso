@@ -14,16 +14,19 @@ import {
   getMaxEquipmentTier
 } from "../data/equipment";
 import {
+  canAccessBrewGroup,
   getAvailableProducts,
   getCurrentDayDefinition,
   getCurrentDayModifier,
+  getDoubleEspressoOption,
   getGuestForCustomer,
   getGuestWantedProductId,
   getIngredientLabel,
   getKassandraConsultLine,
   getMoneyRecoveryWarning,
   getServedGuestIds,
-  getServeLineForCustomer
+  getServeLineForCustomer,
+  hasSecondBrewGroup
 } from "./selectors";
 import { getObjectiveStatus } from "./objectives";
 import { formatAsche, roundAscheEarnings } from "./currency";
@@ -160,7 +163,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
 /** Describe actual totals, including caps, helper effects and substitutions. */
 function appendActionFeedback(before: GameState, after: GameState, action: GameAction): GameState {
-  const showsFeedback = action.type === "serve_product" || action.type === "take_order" ||
+  const showsFeedback = action.type === "serve_product" || action.type === "serve_double_espresso" || action.type === "take_order" ||
     action.type === "prepare_drink" || action.type === "clean_tables" || action.type === "clean_table";
   const actionsSpent = after.dayManagement.actionPointsSpent - before.dayManagement.actionPointsSpent;
   if (!showsFeedback || before.dayPhase !== "open" || actionsSpent <= 0) {
@@ -203,6 +206,12 @@ function applyAction(state: GameState, action: GameAction): GameState {
 
     case "serve_product":
       return serveProduct(state, action.productId);
+
+    case "install_second_brew_group":
+      return installSecondBrewGroup(state);
+
+    case "serve_double_espresso":
+      return serveDoubleEspresso(state);
 
     case "prepare_drink":
       return serveProduct(state, getDefaultProductForState(state).id);
@@ -262,6 +271,38 @@ function applyAction(state: GameState, action: GameAction): GameState {
     default:
       return state;
   }
+}
+
+function installSecondBrewGroup(state: GameState): GameState {
+  if (!canAccessBrewGroup(state) || hasSecondBrewGroup(state)) return state;
+
+  const id = "day-4-second-brew-group";
+  const event = weekOneEvents.find((entry) => entry.id === id);
+  return {
+    ...state,
+    eventHistory: addUniqueEventIds(state.eventHistory, [id]),
+    pendingEvents: enqueuePendingEvent(state.pendingEvents, id),
+    statusMessage: event?.text ?? "The second brew group is ready."
+  };
+}
+
+function serveDoubleEspresso(state: GameState): GameState {
+  const { unavailable } = getDoubleEspressoOption(state);
+  if (unavailable) return { ...state, statusMessage: unavailable };
+
+  const paid = spendActionPoint(state, "brew two espressos");
+  if (!paid) return noActionCapacityState(state);
+
+  const espresso = getProductById("espresso");
+  // Use the single-guest path twice so each guest has their own preference,
+  // revenue and event accounting. Jana's extra order remains available.
+  const first = applySuccessfulServe(paid, espresso, false);
+  const second = applySuccessfulServe(first, espresso, false);
+  return {
+    ...second,
+    dayManagement: { ...second.dayManagement, doubleEspressoServed: true },
+    statusMessage: `Two espressos served. ${first.statusMessage} ${second.statusMessage}`
+  };
 }
 
 function serveProduct(state: GameState, productId: ProductId): GameState {
@@ -331,9 +372,11 @@ function serveProduct(state: GameState, productId: ProductId): GameState {
 
 function applySuccessfulServe(
   state: GameState,
-  product: ReturnType<typeof getProductById>
+  product: ReturnType<typeof getProductById>,
+  useHelperExtraOrder = true
 ): GameState {
-  const servedWithHelper = state.dayManagement.helperExtraOrdersRemaining > 0 ? 2 : 1;
+  const helperExtraOrder = useHelperExtraOrder && state.dayManagement.helperExtraOrdersRemaining > 0;
+  const orderCount = helperExtraOrder ? 2 : 1;
   let workingState = state;
   let supplies = { ...state.supplies };
   let resources = { ...state.resources };
@@ -342,7 +385,7 @@ function applySuccessfulServe(
   const flavorLines: string[] = [];
   const helperImpact = management.dayFiveHelperImpact && { ...management.dayFiveHelperImpact };
 
-  for (let index = 0; index < servedWithHelper; index += 1) {
+  for (let index = 0; index < orderCount; index += 1) {
     const servedGuest = getGuestForCustomer(workingState, management.customersServed + management.guestsLost);
     const missingIngredients = getMissingIngredients(
       product,
@@ -494,7 +537,7 @@ function applySuccessfulServe(
     }
   }
 
-  if (management.helperExtraOrdersRemaining > 0) {
+  if (helperExtraOrder) {
     management = {
       ...management,
       helperExtraOrdersRemaining: Math.max(0, management.helperExtraOrdersRemaining - 1)
@@ -1109,6 +1152,7 @@ function openDay(state: GameState): GameState {
   const shortStaffedPenalty = modifier.id === "short-staffed" && !state.helperAssignment ? 1 : 0;
   const management: GameState["dayManagement"] = {
     ...state.dayManagement,
+    ...(state.dayManagement.doubleEspressoServed ? { doubleEspressoServed: false } : {}),
     moneySpent: clampResource(state.dayManagement.moneySpent + helperFee),
     helperExtraOrdersRemaining: getHelperExtraOrders(state),
     extraAdvertisingActions:
@@ -1566,7 +1610,10 @@ function confirmSupplyPurchase(state: GameState, withoutRestocking = false): Gam
     supplies,
     pendingSupplyPurchase: { coffee: 0, milk: 0, pastries: 0 },
     helperAssignment: null,
-    dayManagement: createInitialDayManagement(nextResources.reputation, nextDay),
+    dayManagement: {
+      ...createInitialDayManagement(nextResources.reputation, nextDay),
+      ...(nextDay >= 3 && state.dayManagement.doubleEspressoServed ? { doubleEspressoServed: true } : {})
+    },
     pendingEvents: [],
     daySummary: null,
     run: nextDay === 2 && (state.guestMemory["pendlerin-fatou"]?.visits ?? 0) > 0
