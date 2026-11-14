@@ -47,7 +47,7 @@ import christaSeatedAsset from "../../../assets/sprites/guests/placeholder-guest
 import neleSeatedAsset from "../../../assets/sprites/guests/placeholder-guest-nele-seated.png";
 import medaGuestAsset from "../../../assets/sprites/guests/placeholder-guest-meda.png";
 import roterRegenschirmGuestAsset from "../../../assets/sprites/guests/placeholder-guest-roter-regenschirm.png";
-import approvedFatouSeatedAsset from "../../../assets/sprites/guests/placeholder-guest-fatou-seated-v02-front-candidate.png";
+import approvedFatouSeatedAsset from "../../../assets/sprites/guests/placeholder-guest-fatou-seated-v02-approved-style.png";
 import fatouSeatedAsset from "../../../assets/sprites/guests/placeholder-guest-fatou-seated.png";
 
 const QUEUE_SPRITES = {
