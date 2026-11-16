@@ -1,0 +1,402 @@
+/* Approved compact v12 room and chair geometry, snapshot 9d59d10. */
+/* === Compact isometric week candidate =======================================
+   The approval canvas uses the diorama's native 16:9 coordinate system.
+   Runtime children remain inside .cafe-floor, so the anchors below are the
+   documented diorama positions converted to that container's coordinates. */
+.cafe-diorama--compact-week .cafe-stage-base {
+  object-fit: fill;
+}
+
+.cafe-diorama--compact-week .cafe-approved-wall-shelf {
+  position: absolute;
+  top: 9.43%;
+  left: 55.75%;
+  z-index: 9;
+  width: 18%;
+  height: auto;
+  object-fit: contain;
+  image-rendering: auto;
+  pointer-events: none;
+  user-select: none;
+}
+
+.cafe-diorama--compact-week .cafe-approved-wall-clock {
+  position: absolute;
+  top: 11.5%;
+  left: 74.2%;
+  z-index: 9;
+  width: 10.4%;
+  height: auto;
+  object-fit: contain;
+  image-rendering: auto;
+  pointer-events: none;
+}
+
+.cafe-diorama--compact-week .cafe-approved-floor-plant {
+  position: absolute;
+  top: 11.6%;
+  left: 45.5%;
+  z-index: 9;
+  width: 15.8%;
+  height: auto;
+  object-fit: contain;
+  image-rendering: auto;
+  pointer-events: none;
+  user-select: none;
+}
+
+.cafe-diorama--compact-week .cafe-decor-clock,
+.cafe-diorama--compact-week .cafe-decor-lamp,
+.cafe-diorama--compact-week .cafe-decor-plant,
+.cafe-diorama--compact-week .cafe-decor-plant2,
+.cafe-diorama--compact-week .cafe-furniture-shelf,
+.cafe-diorama--compact-week .cafe-pet {
+  display: none;
+}
+
+.cafe-diorama--compact-week .cafe-counter {
+  top: -12.923%;
+  left: 53.865%;
+  width: 43.213%;
+  height: 74.538%;
+  aspect-ratio: auto;
+  background: url("../../assets/sprites/props/placeholder-cafe-counter-body-v02-target-reference.png") center / 100% 100% no-repeat !important;
+}
+
+.cafe-diorama--compact-week .cafe-counter__front,
+.cafe-diorama--compact-week .cafe-counter__ledge,
+.cafe-diorama--compact-week .cafe-counter .cafe-decor-cups {
+  display: none;
+}
+
+.cafe-diorama--compact-week .cafe-coffee-machine {
+  top: -2.477%;
+  left: 41.498%;
+  width: 31.721%;
+  aspect-ratio: 1448 / 1086;
+}
+
+.cafe-diorama--compact-week .cafe-register {
+  top: 34.262%;
+  left: 48.778%;
+  width: 21.581%;
+  aspect-ratio: 1402 / 1122;
+}
+
+.cafe-diorama--compact-week .cafe-register__screen,
+.cafe-diorama--compact-week .cafe-register__receipt {
+  display: none;
+}
+
+.cafe-approved-counter-prop {
+  display: none;
+  position: absolute;
+  height: auto;
+  object-fit: contain;
+  image-rendering: auto;
+  pointer-events: none;
+  user-select: none;
+}
+
+.cafe-diorama--compact-week .cafe-approved-counter-prop {
+  display: block;
+}
+
+.cafe-diorama--compact-week .cafe-approved-counter-prop--grinder {
+  top: 9.082%;
+  left: 64.899%;
+  z-index: 12;
+  width: 19.761%;
+}
+
+.cafe-diorama--compact-week .cafe-approved-counter-prop--lamp {
+  top: 2.456%;
+  left: 9.724%;
+  z-index: 14;
+  width: 24.831%;
+}
+
+.cafe-diorama--compact-week .cafe-approved-counter-prop--cup {
+  top: -2.142%;
+  left: 51.914%;
+  z-index: 15;
+  width: 10.119%;
+}
+
+.cafe-diorama--compact-week .cafe-table-set {
+  position: absolute;
+  width: 18.775%;
+  aspect-ratio: 1;
+  overflow: visible;
+  isolation: isolate;
+}
+
+.cafe-diorama--compact-week .cafe-table-set--left {
+  top: 46.462%;
+  left: 15.843%;
+  z-index: 7;
+}
+
+.cafe-diorama--compact-week .cafe-table-set--right {
+  top: 21.846%;
+  left: 38.034%;
+  z-index: 5;
+}
+
+.cafe-diorama--compact-week .cafe-table-set--back {
+  top: 57.692%;
+  left: 65.978%;
+  z-index: 8;
+}
+
+.cafe-diorama--compact-week .cafe-table-set > .cafe-table {
+  inset: 0;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  background: none;
+  image-rendering: auto;
+}
+
+.cafe-diorama--compact-week .cafe-table__top,
+.cafe-diorama--compact-week .cafe-chair,
+.cafe-diorama--compact-week .cafe-table-plant {
+  display: block;
+  position: absolute;
+  border: 0;
+  background-color: transparent;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  box-shadow: none;
+  pointer-events: none;
+}
+
+.cafe-diorama--compact-week .cafe-table__top {
+  inset: 0;
+  z-index: 2;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-table-round-v09-target-reference.png");
+}
+
+.cafe-diorama--compact-week .cafe-chair--side {
+  top: -0.37%;
+  left: -14.12%;
+  z-index: 1;
+  width: 78.58%;
+  height: 78.49%;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-chair-back-left-v01-target-reference.png");
+}
+
+.cafe-diorama--compact-week .cafe-chair--front {
+  top: 29.11%;
+  right: auto;
+  bottom: auto;
+  left: 41.83%;
+  z-index: 5;
+  width: 80.79%;
+  height: 71.29%;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-chair-front-right-v01-target-reference.png");
+}
+
+.cafe-diorama--compact-week .cafe-table-plant {
+  top: 9.02%;
+  left: 34.59%;
+  z-index: 4;
+  width: 31.12%;
+  height: 34.89%;
+  background-image: url("../../assets/sprites/props/placeholder-cafe-table-plant-v01-target-reference.png");
+}
+
+.cafe-diorama--compact-week .cafe-table::before,
+.cafe-diorama--compact-week .cafe-table::after {
+  display: none;
+}
+
+/* State layers stay separate from the v12 furniture contract. Legacy décor,
+   pets and till overlays await their own isometric mapping; gameplay controls
+   remain in the app. A dirty state may not rotate an approved chair. */
+.cafe-diorama--compact-week .cafe-dust,
+.cafe-diorama--compact-week .cafe-weirdness-hint {
+  display: none;
+}
+.cafe-diorama--compact-week .cafe-chair {
+  transform: none;
+}
+
+/* Seated pelvis points attach near the cushion/backrest junction in the
+   unchanged 1254² chair canvases: back (620,520), front (650,500).
+   The canvas now matches the table-group width; transparent padding must not
+   shrink adults to the old v07 sprite scale. */
+.cafe-diorama--compact-week .cafe-seat-slot {
+  --guest-base-x: 0%;
+  top: 32.177687%;
+  left: 24.731356%;
+  right: auto;
+  bottom: auto;
+  z-index: 2;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  border: 0;
+  transform: translate(calc(-1 * var(--seat-contact-x)), calc(-1 * var(--seat-contact-y)));
+  animation: none;
+  pointer-events: none;
+}
+.cafe-diorama--compact-week .cafe-seat-slot--front {
+  top: 57.535040%;
+  left: 83.706794%;
+  z-index: 4;
+}
+.cafe-diorama--compact-week .cafe-seat-slot .cafe-pilot-asset--guest {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: none;
+  scale: var(--seat-facing-x, 1) 1;
+  object-fit: contain;
+}
+
+
+/* Preserve the accepted static pose, including Meda's translucent treatment. */
+.cafe-diorama--compact-week .cafe-seat-slot .cafe-pilot-asset--guest { animation: none; }
+.cafe-diorama--compact-week [data-seated-guest="meda"] { opacity: 0.82; }
+.cafe-diorama--compact-week [data-seated-guest="meda"] img { filter: saturate(0.8) brightness(0.92); }
+
+/* Existing movement phases now follow the compact room's measured aisle. */
+.cafe-scene-frame .cafe-diorama--compact-week .cafe-queue {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  --cafe-door-x: 8.794238%;
+  --cafe-door-y: 58.050457%;
+  --queue-x: 60.162128%;
+  --queue-y: 46.939692%;
+  --aisle-x: 34.748540%;
+  --aisle-y: 78.945328%;
+  --front-x: 59.621413%;
+  --front-y: 60.869606%;
+  --counter-x: 63.000880%;
+  --counter-y: 50.256338%;
+}
+.cafe-diorama--compact-week .cafe-queue .placeholder-guest-normal-01,
+.cafe-diorama--compact-week .cafe-rush-queue-guest {
+  width: 23.235%;
+  height: auto;
+  aspect-ratio: 1;
+  transform: translate(-50%, 8.333333%);
+}
+.cafe-diorama--compact-week .cafe-queue .cafe-pilot-asset--standing {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: none;
+  background-size: contain;
+  background-position: center bottom;
+}
+/* One order control covers the guest, with a compact, tappable hint beside them. */
+.cafe-scene-frame .cafe-diorama--compact-week .cafe-order-bubble--on-guest {
+  top: 12%;
+  left: 50%;
+  bottom: auto;
+  width: 46%;
+  height: 82%;
+  min-width: 44px;
+  min-height: 44px;
+  max-width: none;
+  padding: 0;
+  display: block;
+  transform: translateX(-50%);
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  box-shadow: none;
+}
+.cafe-scene-frame .cafe-diorama--compact-week .cafe-order-bubble--on-guest::after { display: none; }
+.cafe-order-bubble__card {
+  position: absolute;
+  top: 30%;
+  left: calc(100% + 3px);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  justify-items: center;
+  gap: 3px;
+  width: max-content;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 5px;
+  border: 2px solid var(--cue-edge);
+  border-radius: 8px;
+  background: var(--cue-paper);
+  box-shadow: 0 2px 0 #56351f;
+}
+.cafe-order-bubble__card .serve-menu__icon {
+  grid-area: auto;
+  grid-column: 1 / -1;
+  width: 28px;
+  height: 26px;
+}
+.cafe-order-bubble__card .cafe-order-bubble__patience { justify-self: stretch; }
+.cafe-order-bubble__card .cafe-order-bubble__warning {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  min-width: 18px;
+  height: 18px;
+  margin: 0;
+  border: 1px solid #8c2f27;
+  border-radius: 50%;
+  background: #fff5e2;
+  text-align: center;
+  font-weight: 900;
+}
+.cafe-order-bubble--on-guest:hover .cafe-order-bubble__card { background: #ffe3a8; }
+.cafe-order-bubble--on-guest:focus-visible {
+  outline: 3px solid #0d635c;
+  outline-offset: 2px;
+}
+.cafe-order-bubble--on-guest:focus-visible .cafe-order-bubble__card {
+  outline: 3px solid #0d635c;
+  outline-offset: 2px;
+}
+.cafe-diorama--compact-week .cafe-rush-queue-guest { left: 44%; bottom: 15%; }
+.cafe-diorama--compact-week .cafe-standing-bohn {
+  position: absolute; left: 30.220055%; bottom: 57.552960%;
+  width: 18%; aspect-ratio: 1; z-index: 6; pointer-events: none;
+}
+.cafe-diorama--compact-week .cafe-standing-bohn img {
+  inset: 0; width: 100%; height: 100%; transform: none;
+}
+.cafe-diorama--compact-week .cafe-cue--door { bottom: calc(var(--cafe-door-y) + 25px); }
+.cafe-diorama--compact-week .cafe-cue--board { bottom: calc(var(--cafe-door-y) + 75px); }
+.cafe-diorama--compact-week .cafe-approved-wall-shelf > button { pointer-events: auto; }
+
+/* The approved standing canvas is already centred by its parent. */
+@media (prefers-reduced-motion: no-preference) {
+  .cafe-diorama--compact-week .cafe-queue .cafe-pilot-asset--standing {
+    animation: cafe-compact-breathe 3.4s linear infinite;
+  }
+  .cafe-diorama--compact-week .cafe-guest--impatient .cafe-pilot-asset--standing {
+    animation: cafe-compact-impatient 2.2s ease-in-out infinite;
+  }
+}
+@keyframes cafe-compact-breathe {
+  0%, 54.9% { transform: translateY(0); }
+  55%, 100% { transform: translateY(1px); }
+}
+@keyframes cafe-compact-impatient {
+  0%, 72%, 87%, 100% { transform: translateX(0); }
+  75% { transform: translateX(-3px); }
+  78% { transform: translateX(2px); }
+  81% { transform: translateX(-2px); }
+  84% { transform: translateX(1px); }
+}
+
+/* Arriving guests pass behind the fixed chairs; idle service controls remain above them. */
+.cafe-scene-frame .cafe-diorama--compact-week .cafe-queue--entering { z-index: 4; }
+
+@media (max-width: 760px) {
+  .cafe-order-bubble__card { top: 45%; grid-template-columns: auto auto; }
+  .cafe-order-bubble__card .serve-menu__icon { grid-column: 1; grid-row: 1; }
+  .cafe-order-bubble__card .cafe-order-bubble__hearts { grid-column: 2; grid-row: 1; }
+}

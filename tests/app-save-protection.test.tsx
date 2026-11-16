@@ -125,6 +125,8 @@ describe("restarting a week safely", () => {
         day: 7,
         dayPhase: "day_end",
         demoComplete: true,
+        weirdnessVisible: true,
+        daySevenLetterOpened: true,
         completedActions: ["take_order"],
         dayManagement: { ...createInitialGameState().dayManagement, customersServed: 1 }
       } satisfies GameState

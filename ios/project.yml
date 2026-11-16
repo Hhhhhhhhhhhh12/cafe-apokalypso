@@ -16,6 +16,17 @@ targets:
       - path: Web
         type: folder
         buildPhase: resources
+    preBuildScripts:
+      - name: Verify offline game package
+        basedOnDependencyAnalysis: false
+        script: |
+          [ "$CONFIGURATION" = "Release" ] || exit 0
+          export PATH="$PATH:/opt/homebrew/bin:/usr/local/bin"
+          if ! command -v node >/dev/null 2>&1; then
+            echo "error: Node.js is required to verify the offline game package. See ios/README.md."
+            exit 1
+          fi
+          exec node "$SRCROOT/../tools/pack-ipad.mjs" --check
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.cafeapokalypso.ipadtest
@@ -24,11 +35,16 @@ targets:
         TARGETED_DEVICE_FAMILY: "2"
         CODE_SIGN_STYLE: Automatic
         GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_FILE: Info.plist
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: NO
         INFOPLIST_KEY_CFBundleDisplayName: "Café Apokalypso"
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
         CURRENT_PROJECT_VERSION: 1
         MARKETING_VERSION: "0.1.0"
+      configs:
+        Release:
+          ENABLE_USER_SCRIPT_SANDBOXING: NO
 schemes:
   CafeApokalypso:
     build:

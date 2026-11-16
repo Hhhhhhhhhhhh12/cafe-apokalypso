@@ -22,6 +22,16 @@ function expectRejected(candidate: unknown) {
 }
 
 describe("save validation: management counters", () => {
+  it("keeps recorded Day 2 guests from before Nele's restored arrival", () => {
+    const state = createInitialGameState();
+    state.day = 2;
+    state.dayManagement.customersServed = 2;
+    state.dayManagement.servedGuestIds = ["pendler-kemal", "pendlerin-paula"];
+    const loaded = loadRaw(JSON.stringify(state));
+    expect(loaded.day).toBe(2);
+    expect(loaded.dayManagement.servedGuestIds).toEqual(["pendler-kemal", "pendlerin-paula"]);
+  });
+
   const counterFields = ["actionsWithoutServing", "helperAutonomousActions"] as const;
   const invalidCounters = [undefined, null, "1", -1, 0.5, NaN, Infinity, -Infinity];
 

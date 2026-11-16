@@ -11,12 +11,15 @@ import {
 import { DAY_ONE_FATOU_SERVED_FRAGMENT, dayTwoOpenerWithFatou } from "../data/days";
 import {
   ACTION_BUDGET_BY_DAY,
+  applySupplyPurchase,
   getCleanlinessLabel,
   getEarnedPrice,
   getIngredientRequirement,
+  getMissingIngredients,
   getPatienceLabelFromCounter,
   getHelperLabel,
   getProductById,
+  getServiceTableId,
   getStressLabel,
   guestsCanWalkOut,
   PATIENCE_TICK,
@@ -29,6 +32,7 @@ import { equipmentSlots, getEquipmentTier, getMaxEquipmentTier } from "../data/e
 import { getCurrentObjective, getObjectiveStatus } from "./objectives";
 import type {
   DayDefinition,
+  DayNumber,
   DayModifierDefinition,
   EventDefinition,
   GuestDefinition,
@@ -76,6 +80,16 @@ export function getCurrentDayModifier(state: GameState): DayModifierDefinition {
 
 export function getAvailableProducts(state: GameState): readonly ProductDefinition[] {
   return weekOneProducts.filter((product) => product.firstDay <= state.day);
+}
+
+function getSellableProducts(state: GameState): readonly ProductDefinition[] {
+  return getAvailableProducts(state).filter((product) =>
+    getMissingIngredients(product, state.supplies, state.helperAssignment).length === 0
+  );
+}
+
+export function canServeFromStock(state: GameState): boolean {
+  return getSellableProducts(state).length > 0;
 }
 
 /** Estimate the first sale, using the reputation that applies at payment. */
@@ -192,6 +206,25 @@ export interface NextGuestPreview {
   learningCue: string | null;
   /** Name of a product this guest particularly values, if any (a light hint). */
   wants: string | null;
+  recovery: ReturnType<typeof getGuestRecovery>;
+}
+
+const arrivingHearts: Partial<Record<GuestId, 1 | 2>> = {
+  "laptop-lukas": 1,
+  "lieferfahrer-cem": 2,
+  "nachbarin-mira": 1,
+  "herr-grau": 2,
+  meda: 1,
+  "frau-roter-regenschirm": 1
+};
+
+export function getGuestRecovery(state: GameState, guestId: GuestId) {
+  const current = arrivingHearts[guestId];
+  if (state.day < 2 || current === undefined) return null;
+  const tableId = getServiceTableId(state, state.dayManagement.customersServed, guestId);
+  const cleanSeat = tableId !== null && state.resources.cleanliness >= 50 &&
+    !state.dayManagement.dirtyTableIds.includes(tableId);
+  return { current, restored: Math.min(3 - current, cleanSeat ? 2 : 1), tableId };
 }
 
 /**
@@ -216,11 +249,14 @@ export function getNextGuestPreview(state: GameState): NextGuestPreview | null {
 
   return {
     name: guest.name,
-    orderLine: guest.orderLine ?? guest.sampleLines[0] ?? "",
+    orderLine: state.day === 2 && guest.id === "laptop-lukas"
+      ? "Filter coffee, please. The last checkpoint didn’t save."
+      : guest.orderLine ?? guest.sampleLines[0] ?? "",
     learningCue: knownProductName
       ? `You remember: ${guest.name} tends toward ${knownProductName}.`
       : guest.learningCue ?? getCurrentDayModifier(state).learningHint,
-    wants: wantedProductId ? getProductById(wantedProductId).name : null
+    wants: wantedProductId ? getProductById(wantedProductId).name : null,
+    recovery: getGuestRecovery(state, guest.id)
   };
 }
 
@@ -382,50 +418,17 @@ export function getDioramaGuestVisibility(
   };
 }
 
-export function getEarlySceneGuestVisibility(
-  state: GameState
-): DioramaGuestVisibility {
-  if (state.day >= 4) return getDioramaGuestVisibility(state);
-
-  const { customersServed } = state.dayManagement;
-
-  // No furniture, no sitting: until seating is bought, guests order at the
-  // counter and stand / take away, so no one is shown seated.
-  if (state.equipment.seating < 1) {
-    return {
-      cem: false,
-      mira: false,
-      lukas: false,
-      christa: false,
-      bohn: false,
-      strange: false,
-      nele: false,
-      meda: false,
-      roterRegenschirm: false,
-      fatou: false
-    };
-  }
-
-  return {
-    cem: customersServed >= 1,
-    mira: customersServed >= 2,
-    lukas: customersServed >= 3,
-    christa: state.day >= 2 && customersServed >= 2,
-    bohn: getServedGuestIds(state).includes("herr-bohn"),
-    strange: state.day >= 4 && customersServed >= 3,
-    nele: state.day >= 3 && customersServed >= 1,
-    meda: state.day >= 5 && customersServed >= 1,
-    roterRegenschirm: state.day >= 7 && customersServed >= 2,
-    fatou: customersServed >= 1
-  };
+export function isDaySevenLetterDelivered(state: GameState): boolean {
+  return state.day === 7 && state.dayPhase === "day_end" && state.demoComplete && state.weirdnessVisible;
 }
 
 export function getVisibleDaySevenLetter(state: GameState): string | null {
-  if (!state.demoComplete || !state.weirdnessVisible) {
-    return null;
-  }
+  return isDaySevenLetterDelivered(state) && state.daySevenLetterOpened ? daySevenHookLetter.body : null;
+}
 
-  return daySevenHookLetter.body;
+export function isDaySevenRush(state: GameState): boolean {
+  return state.day === 7 && state.dayPhase === "open" &&
+    state.dayManagement.customersServed + state.dayManagement.guestsLost >= 3;
 }
 
 /** The same empty-till guidance is used after actions and after loading a save. */
@@ -465,7 +468,7 @@ export function canCompleteCurrentDay(state: GameState): boolean {
   // this prevents soft-locks (no supplies, no cleaning, etc.).
   // Any missing tasks (cleaning, serving) apply penalties in applyDayEndConsequences.
   // An empty till also permits closing with no orders or supplies left.
-  if (state.dayManagement.actionPointsRemaining <= 0 || state.resources.money <= 0) {
+  if (state.dayManagement.actionPointsRemaining <= 0 || state.resources.money <= 0 || !canServeFromStock(state)) {
     return true;
   }
 
@@ -694,17 +697,32 @@ export function hasActionCapacity(state: GameState): boolean {
 
 export function getRestockPreview(state: GameState) {
   const totalCost = getSupplyPurchaseCost(state.pendingSupplyPurchase);
+  const nextShift = {
+    ...state,
+    day: Math.min(state.day + 1, 7) as DayNumber,
+    helperAssignment: null
+  };
 
   return {
     totalCost,
     balanceAfter: Math.round((state.resources.money - totalCost) * 100) / 100,
     canAfford: totalCost <= state.resources.money,
+    sellableTomorrow: getSellableProducts({
+      ...nextShift,
+      supplies: applySupplyPurchase(state.supplies, state.pendingSupplyPurchase)
+    }),
+    canServeWithoutRestock: canServeFromStock(nextShift),
     maxPurchase: {
       coffee: SUPPLY_CAPS.coffee - state.supplies.coffee,
       milk: SUPPLY_CAPS.milk - state.supplies.milk,
       pastries: SUPPLY_CAPS.pastries - state.supplies.pastries
     } satisfies SupplyState
   };
+}
+
+export function getShiftActionBudget(state: GameState): number {
+  const { actionPointsRemaining, actionPointsSpent } = state.dayManagement;
+  return actionPointsRemaining + actionPointsSpent;
 }
 
 export function getSupplyPurchaseCost(purchase: SupplyState): number {
@@ -758,8 +776,7 @@ export function getGuestPatienceState(state: GameState): GuestPatienceState | nu
     return null;
   }
   const { currentGuestPatience: patience, currentGuestPatienceMax: max, actionsWithoutServing } = state.dayManagement;
-  // Canonical label path: ticks remaining out of this guest's actual budget
-  // (4 normally, 3 on a messy-café day — see getPatienceLabelFromCounter).
+  // Use the actual arrival budget after any room or rush penalties.
   const totalTicks = max > 0 ? Math.round(max / PATIENCE_TICK) : 0;
   const label = getPatienceLabelFromCounter(actionsWithoutServing, totalTicks);
   const critical = guestsCanWalkOut(state.day) && patience <= PATIENCE_TICK;

@@ -3126,17 +3126,17 @@ button.cafe-table {
   }
 }
 
-/* Achievement toast — fixed overlay, bottom-right */
+/* Keep the right-hand service station clear. */
 .achievement-toast {
   position: fixed;
   bottom: 24px;
-  right: 24px;
+  left: 16px;
   z-index: 200;
   display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  width: min(320px, calc(100vw - 32px));
-  padding: 14px 16px;
+  align-items: center;
+  gap: 8px;
+  max-width: calc(100% - 32px);
+  padding: 6px 10px;
   border: 2px solid #7b5e3a;
   border-left: 4px solid #c88a3a;
   border-radius: 10px;
@@ -3151,7 +3151,6 @@ button.cafe-table {
 .achievement-toast--visible {
   opacity: 1;
   transform: translateY(0);
-  pointer-events: auto;
 }
 
 .achievement-toast__check {
@@ -3173,27 +3172,20 @@ button.cafe-table {
   min-width: 0;
 }
 
-.achievement-toast__label {
-  margin: 0 0 1px;
-  color: #8a5e28;
-  font-size: 0.7rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
 .achievement-toast__name {
-  margin: 0 0 2px;
+  margin: 0;
   color: #2b201b;
   font-size: 0.95rem;
   font-weight: 800;
 }
 
 .achievement-toast__desc {
-  margin: 0;
-  color: #4a3b34;
-  font-size: 0.85rem;
-  line-height: 1.4;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 @media (prefers-reduced-motion: reduce) {

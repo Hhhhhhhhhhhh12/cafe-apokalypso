@@ -30,15 +30,10 @@ export function getObjectiveStatus(state: GameState): ObjectiveStatusView {
 
 export function isObjectiveCompleted(state: GameState): boolean {
   const management = state.dayManagement;
-  const cleaned =
-    management.cleaningActions > 0 ||
-    state.completedActions.includes("clean_tables") ||
-    (state.helperAssignment?.helperId === "jana" &&
-      state.helperAssignment.taskId === "cleaning");
 
   switch (state.day) {
     case 1:
-      return management.customersServed >= 2 && cleaned;
+      return management.customersServed >= 2 && hasShiftCleaning(state);
     case 2:
       return management.customersServed >= 3 && state.resources.stress <= 60;
     case 3:
@@ -50,8 +45,16 @@ export function isObjectiveCompleted(state: GameState): boolean {
     case 6:
       return management.kassandraConsulted && management.customersServed >= 3;
     case 7:
-      return management.customersServed >= 4 && cleaned;
+      return management.customersServed >= DAY_SEVEN_SERVE_GOAL && hasShiftCleaning(state);
     default:
       return false;
   }
+}
+
+export const DAY_SEVEN_SERVE_GOAL = 4;
+
+export function hasShiftCleaning(state: GameState): boolean {
+  return state.dayManagement.cleaningActions > 0 ||
+    state.completedActions.includes("clean_tables") ||
+    (state.helperAssignment?.helperId === "jana" && state.helperAssignment.taskId === "cleaning");
 }

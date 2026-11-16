@@ -47,7 +47,7 @@ export const weekOneAchievements = [
     id: "week-one-letter",
     name: "The Letter",
     unlockDay: 7,
-    requirement: "Receive the official Day-7 hook letter.",
+    requirement: "Open the official letter after the final shift.",
     description: "The café is now administratively harder to ignore."
   }
 ] as const satisfies readonly AchievementDefinition[];
