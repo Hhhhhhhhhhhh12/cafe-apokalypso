@@ -13,6 +13,9 @@ import { ActionPanel } from "../src/ui/components/ActionPanel";
 import { CafePlaceholder } from "../src/ui/cafe/CafePlaceholder";
 import { ResourceHud } from "../src/ui/panels/ResourceHud";
 import { createInitialGameState } from "../src/game/engine/gameState";
+import { getExpectedProductIncome } from "../src/game/engine/selectors";
+import { getProductById } from "../src/game/engine/management";
+import { formatAsche } from "../src/game/engine/currency";
 import type { GameState } from "../src/game/types/game";
 
 const noop = () => {};
@@ -96,6 +99,30 @@ describe("screen-reader announcements (#70)", () => {
     expect(markup).toContain("Est. 1.5 Asche");
     expect(markup).toContain('aria-label="Filter Coffee: estimated income 1.5 Asche per guest"');
     expect(markup).toContain("Menu price 2.2 Asche.");
+  });
+
+  it("previews the actual substitute and reputation penalty before an out-of-stock order", () => {
+    const state = openWithStreak();
+    state.supplies.milk = 0;
+    const markup = renderService(state);
+    const cappuccino = markup.match(/<button[^>]*aria-label="Cappuccino:[\s\S]*?<\/button>/)?.[0] ?? "";
+    const income = getExpectedProductIncome(state, getProductById("espresso"), Math.max(0, state.resources.reputation - 1));
+    expect(cappuccino).toContain(`estimated income ${formatAsche(income)} per guest`);
+    expect(cappuccino).toContain("→ Espresso · −1 reputation");
+    expect(cappuccino).toContain('data-product="espresso"');
+    expect(cappuccino).not.toContain("serve-menu__item--suggested");
+  });
+
+  it("does not promise income when an order has neither stock nor substitute", () => {
+    const state = openWithStreak();
+    state.supplies.coffee = 0;
+    state.supplies.pastries = 2;
+    const markup = renderService(state);
+    const espresso = markup.match(/<button[^>]*aria-label="Espresso:[\s\S]*?<\/button>/)?.[0] ?? "";
+    expect(espresso).toContain('aria-label="Espresso: no sale"');
+    expect(espresso).toContain("No sale · −1 reputation");
+    expect(espresso).toContain("Uses one action without serving a guest.");
+    expect(espresso).not.toContain("Est.");
   });
 
   it("warns only when another patience action can actually cause a walkout", () => {

@@ -71,6 +71,16 @@ merging. Do not repeat that implementation from an old handoff prompt.
 
 ## Current work selection
 
+Service preview follow-up (based on `4d48523`): missing recipes now show the
+actual substitute, its income after the existing reputation penalty, and the
+penalty before committing an action. A recipe with no substitute says “No sale”
+and promises no income. Unavailable preferred recipes are no longer highlighted
+as suggested. Existing substitution and failed-order rules remain unchanged.
+Verification: 92 focused announcement, brew-group and management tests,
+TypeScript and changed-file lint passed (2.0 seconds). An isolated iPad browser
+compared the shown replacement price with the actual shift ledger and checked
+no-sale money/customer/action changes (22.2 seconds). No runtime errors.
+
 Recovery feedback follow-up (2026-11-16, based on `adc9147`): the counter
 briefly shows the actual newly earned heart count, including combined service.
 The header keeps the shift total without a reward animation or a plus sign.
