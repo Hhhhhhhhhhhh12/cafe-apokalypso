@@ -71,6 +71,21 @@ merging. Do not repeat that implementation from an old handoff prompt.
 
 ## Current work selection
 
+The current character direction is [Lukas as a JRPG hero off duty](art/LUKAS_OFF_DUTY.md).
+The separate standing concept has been shown but has not been approved or installed.
+
+
+### Affordable escape from an empty pantry (2026-11-16)
+
+At closing, only when tomorrow has no sellable recipe and the automatic replacement
+basket is unaffordable or still unhelpful, suggest one coffee bean if its regular
+0.8-Asche cost is available after overhead. Affordable useful baskets, manual
+quantities and skipping remain unchanged. No free stock or new prices are added.
+The correction is based on `6d744f4`; 79 focused management tests, TypeScript and
+scoped ESLint passed. An isolated iPad-size browser confirmed the untouched default
+at exactly 0.8 Asche and completed the next sale (2.0 s). Total local checks,
+including a corrected closing-state test fixture, stayed below 10 s.
+
 ### Recovery forecast at the order (2026-11-16)
 
 `RecoveryHearts` shows present hearts and plus-marked forecast hearts in both

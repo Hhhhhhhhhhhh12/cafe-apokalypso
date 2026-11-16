@@ -135,6 +135,42 @@ describe("management tradeoff system", () => {
     expect(blockedState.statusMessage).toContain("Not enough money");
   });
 
+  it.each([0, 2])("suggests one affordable bean after an empty shift with %i beans used", (used) => {
+    const state = createInitialGameState();
+    state.dayPhase = "open";
+    state.resources.money = 6.8;
+    state.resources.stress = 0;
+    state.supplies = { coffee: 0, milk: 0, pastries: 0 };
+    state.dayManagement.suppliesUsed = { coffee: used, milk: 0, pastries: 0 };
+    const closed = gameReducer(state, { type: "complete_day" });
+    expect(closed.resources.money).toBe(0.8);
+    expect(closed.pendingSupplyPurchase).toEqual({ coffee: 1, milk: 0, pastries: 0 });
+    expect(getRestockPreview(closed)).toMatchObject({ canAfford: true, canServeWithoutRestock: false });
+    expect(getRestockPreview(closed).sellableTomorrow.map(product => product.id)).toContain("espresso");
+    const next = gameReducer(closed, { type: "confirm_supply_purchase" });
+    expect(next.resources.money).toBe(0);
+    expect(gameReducer(next, { type: "serve_product", productId: "espresso" }).dayManagement.customersServed).toBe(1);
+    const manual = gameReducer(closed, { type: "set_supply_purchase", ingredient: "coffee", quantity: 2 });
+    expect(manual.pendingSupplyPurchase.coffee).toBe(2);
+    expect(getRestockPreview(manual).canAfford).toBe(false);
+  });
+
+  it("keeps affordable replacement baskets and never invents an unaffordable rescue", () => {
+    const state = createInitialGameState();
+    state.dayPhase = "open";
+    state.dayManagement.actionPointsRemaining = 0;
+    state.resources.stress = 0;
+    state.supplies = { coffee: 0, milk: 0, pastries: 0 };
+    state.dayManagement.suppliesUsed = { coffee: 2, milk: 1, pastries: 1 };
+    state.resources.money = 10;
+    expect(gameReducer(state, { type: "complete_day" }).pendingSupplyPurchase).toEqual(state.dayManagement.suppliesUsed);
+    state.resources.money = 6.4;
+    expect(gameReducer(state, { type: "complete_day" }).pendingSupplyPurchase).toEqual(state.dayManagement.suppliesUsed);
+    state.resources.money = 6.8;
+    state.supplies.pastries = 1;
+    expect(gameReducer(state, { type: "complete_day" }).pendingSupplyPurchase).toEqual(state.dayManagement.suppliesUsed);
+  });
+
   it("applies affordable end-of-day restocking at the start of the next day", () => {
     const dayEndState: GameState = {
       ...createInitialGameState(),

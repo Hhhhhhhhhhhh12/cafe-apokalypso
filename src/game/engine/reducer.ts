@@ -27,6 +27,7 @@ import {
   getKassandraReceipt,
   getKassandraConsultLine,
   getMoneyRecoveryWarning,
+  getRestockPreview,
   getServedGuestIds,
   getServeLineForCustomer,
   hasSecondBrewGroup,
@@ -1490,11 +1491,20 @@ function applyDayEndConsequences(state: GameState): GameState {
   }
 
 
-  const suggestedRestock = {
+  let suggestedRestock = {
     coffee: Math.min(management.suppliesUsed.coffee, SUPPLY_CAPS.coffee - state.supplies.coffee),
     milk: Math.min(management.suppliesUsed.milk, SUPPLY_CAPS.milk - state.supplies.milk),
     pastries: Math.min(management.suppliesUsed.pastries, SUPPLY_CAPS.pastries - state.supplies.pastries),
   };
+
+  // A default basket must not hide an affordable way out of an empty pantry.
+  // Only the automatic suggestion changes; the player can still edit or skip it.
+  const restockPreview = getRestockPreview({ ...state, resources, pendingSupplyPurchase: suggestedRestock });
+  if (state.day < 7 && !restockPreview.canServeWithoutRestock &&
+      (!restockPreview.canAfford || restockPreview.sellableTomorrow.length === 0) &&
+      resources.money >= SUPPLY_UNIT_COSTS.coffee) {
+    suggestedRestock = { coffee: 1, milk: 0, pastries: 0 };
+  }
 
   return {
     ...state,
