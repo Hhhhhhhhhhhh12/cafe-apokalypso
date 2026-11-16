@@ -15,20 +15,25 @@ import {
 } from "../data/equipment";
 import {
   canAccessBrewGroup,
+  canCompleteCurrentDay,
   getAvailableProducts,
   getCurrentDayDefinition,
   getCurrentDayModifier,
   getDoubleEspressoOption,
   getGuestForCustomer,
+  getGuestRecovery,
   getGuestWantedProductId,
   getIngredientLabel,
   getKassandraReceipt,
   getKassandraConsultLine,
   getMoneyRecoveryWarning,
+  getRestockPreview,
   getServedGuestIds,
   getServeLineForCustomer,
   hasSecondBrewGroup,
-  isEarlyKassandraConsult
+  isEarlyKassandraConsult,
+  isDaySevenLetterDelivered,
+  isDaySevenRush
 } from "./selectors";
 import { getObjectiveStatus } from "./objectives";
 import { formatAsche, roundAscheEarnings } from "./currency";
@@ -36,10 +41,10 @@ import {
   getDayFiveHelperRecap,
   getHelperAutonomyRecapLine,
   applyProductConsumption,
+  applySupplyPurchase,
   canJanaClearTable,
   clampMeter,
   clampResource,
-  clampSupply,
   COMFORTABLE_CAPACITY_BY_DAY,
   createHelperAssignment,
   createInitialDayManagement,
@@ -51,6 +56,7 @@ import {
   getEmployeeLevel,
   getEmployeeLevelBonuses,
   getIngredientRequirement,
+  getServiceTableId,
   getCleanlinessLabel,
   getDefaultProductForState,
   getEarnedPrice,
@@ -125,6 +131,16 @@ function getFlowLine(streak: number, tip: number): string {
 }
 
 export function gameReducer(state: GameState, action: GameAction): GameState {
+  if (action.type === "open_day_seven_letter") {
+    return isDaySevenLetterDelivered(state) && !state.daySevenLetterOpened
+      ? {
+          ...state,
+          daySevenLetterOpened: true,
+          unlockedAchievements: addUniqueAchievementIds(state.unlockedAchievements, ["week-one-letter"])
+        }
+      : state;
+  }
+
   if (state.cafeClosed && action.type !== "reset_game") {
     return {
       ...state,
@@ -173,6 +189,8 @@ function appendActionFeedback(before: GameState, after: GameState, action: GameA
   }
 
   const changes: string[] = [];
+  const restoredHearts = (after.dayManagement.heartsRestored ?? 0) - (before.dayManagement.heartsRestored ?? 0);
+  if (restoredHearts > 0) changes.push(`Hearts +${restoredHearts}`);
   const moneyDelta = Math.round((after.resources.money - before.resources.money) * 100) / 100;
   if (moneyDelta !== 0) {
     changes.push(`${moneyDelta > 0 ? "+" : "−"}${formatAsche(Math.abs(moneyDelta))}`);
@@ -423,6 +441,10 @@ function applySuccessfulServe(
       };
     }
 
+    const recovery = servedGuest && getGuestRecovery({ ...workingState, resources, dayManagement: management }, servedGuest.id);
+    if (recovery) {
+      management.heartsRestored = (management.heartsRestored ?? 0) + recovery.restored;
+    }
     supplies = applyProductConsumption(product, supplies, workingState.helperAssignment);
     const suppliesUsed = getSuppliesUsedForProduct(product, workingState.helperAssignment);
     if (helperImpact) {
@@ -460,7 +482,7 @@ function applySuccessfulServe(
       suppliesUsed: addSupplies(management.suppliesUsed, suppliesUsed)
     };
 
-    const tableToClear = getTableForServedCustomer(workingState, management.customersServed);
+    const tableToClear = getServiceTableId(workingState, management.customersServed - 1, servedGuest?.id);
     if (tableToClear && !management.dirtyTableIds.includes(tableToClear)) {
       management = {
         ...management,
@@ -797,15 +819,6 @@ function cleanTable(state: GameState, tableId: TableId | undefined): GameState {
     },
     statusMessage: [cleanMessage, walkoutLine].filter(Boolean).join(" ")
   };
-}
-
-function getTableForServedCustomer(state: GameState, customersServed: number): TableId | null {
-  if (state.equipment.seating < 1) {
-    return null;
-  }
-
-  const tables: readonly TableId[] = ["left", "right", "back"];
-  return tables[(customersServed - 1) % tables.length];
 }
 
 function checkSupplies(state: GameState): GameState {
@@ -1226,7 +1239,7 @@ function completeCurrentDay(state: GameState): GameState {
     };
   }
 
-  if (!hasRequiredActions(state)) {
+  if (!canCompleteCurrentDay(state)) {
     return {
       ...state,
       statusMessage:
@@ -1270,7 +1283,7 @@ function completeCurrentDay(state: GameState): GameState {
   const reputationZeroStreak = reputationAtZero ? state.reputationZeroStreak + 1 : 0;
   const closeForReputation = reputationZeroStreak >= 2;
 
-  const daySevenMessage = "Day 7 closed. An official letter has arrived. Something is wrong with this café.";
+  const daySevenMessage = "Day 7 closed.";
   const closingMessage = [
     closeForMoney
       ? "A second consecutive day closed with an empty till. The rescue shift could not cover costs; the café closes."
@@ -1283,7 +1296,6 @@ function completeCurrentDay(state: GameState): GameState {
             : moneyAtZero
               ? `Day ${state.day} closed. Review the summary before the next shift.`
               : `Day ${state.day} closed. Review the summary, then buy supplies for tomorrow.`,
-    daySevenClose && (closeForMoney || closeForReputation) ? daySevenMessage : null,
     daySevenClose && moneyAtZero && !closeForMoney ? "The week ends with an empty till." : null
   ].filter(Boolean).join(" ");
 
@@ -1479,11 +1491,20 @@ function applyDayEndConsequences(state: GameState): GameState {
   }
 
 
-  const suggestedRestock = {
+  let suggestedRestock = {
     coffee: Math.min(management.suppliesUsed.coffee, SUPPLY_CAPS.coffee - state.supplies.coffee),
     milk: Math.min(management.suppliesUsed.milk, SUPPLY_CAPS.milk - state.supplies.milk),
     pastries: Math.min(management.suppliesUsed.pastries, SUPPLY_CAPS.pastries - state.supplies.pastries),
   };
+
+  // A default basket must not hide an affordable way out of an empty pantry.
+  // Only the automatic suggestion changes; the player can still edit or skip it.
+  const restockPreview = getRestockPreview({ ...state, resources, pendingSupplyPurchase: suggestedRestock });
+  if (state.day < 7 && !restockPreview.canServeWithoutRestock &&
+      (!restockPreview.canAfford || restockPreview.sellableTomorrow.length === 0) &&
+      resources.money >= SUPPLY_UNIT_COSTS.coffee) {
+    suggestedRestock = { coffee: 1, milk: 0, pastries: 0 };
+  }
 
   return {
     ...state,
@@ -1877,20 +1898,6 @@ function applyEmptySupplyStress(
   };
 }
 
-function hasRequiredActions(state: GameState): boolean {
-  // When all action points are spent, the day can always be closed — prevents soft-locks
-  // (depleted supplies, no cleaning, etc.). Missing tasks apply penalties at day end.
-  // No stock and no cash must still allow the rescue shift to end.
-  if (state.dayManagement.actionPointsRemaining <= 0 || state.resources.money <= 0) {
-    return true;
-  }
-  // While actions remain, require at least one served customer.
-  return (
-    state.dayManagement.customersServed > 0 &&
-    state.completedActions.includes("take_order")
-  );
-}
-
 function spendActionPoint(state: GameState, actionLabel: string): GameState | null {
   if (state.dayManagement.actionPointsRemaining <= 0) {
     return null;
@@ -1964,14 +1971,6 @@ function getPurchaseCost(purchase: SupplyState): number {
   );
 }
 
-function applySupplyPurchase(supplies: SupplyState, purchase: SupplyState): SupplyState {
-  return {
-    coffee: clampSupply("coffee", supplies.coffee + purchase.coffee),
-    milk: clampSupply("milk", supplies.milk + purchase.milk),
-    pastries: clampSupply("pastries", supplies.pastries + purchase.pastries)
-  };
-}
-
 function getSuppliesUsedForProduct(
   product: ReturnType<typeof getProductById>,
   assignment: GameState["helperAssignment"]
@@ -2028,8 +2027,6 @@ function isAchievementEarned(id: AchievementId, state: GameState): boolean {
       return Boolean(state.helperAssignment);
     case "kassandra-installed":
       return state.kassandraInstalled || state.unlocks.kassandra;
-    case "week-one-letter":
-      return state.day === 7;
     default:
       return false;
   }
@@ -2207,7 +2204,8 @@ function setNextGuestPatience(state: GameState): GameState {
   // Messy café (cleanliness < 50) costs every arriving guest one patience tick —
   // they're already irritated before they even order.
   const messyPenalty = baseMax > 0 && state.resources.cleanliness < 50 ? PATIENCE_TICK : 0;
-  const max = baseMax > 0 ? Math.max(PATIENCE_TICK, baseMax - messyPenalty) : 0;
+  const rushPenalty = isDaySevenRush(state) ? PATIENCE_TICK : 0;
+  const max = baseMax > 0 ? Math.max(PATIENCE_TICK, baseMax - messyPenalty - rushPenalty) : 0;
   return {
     ...state,
     dayManagement: {

@@ -1,7 +1,9 @@
 import { weekOneProducts, weekOneStaffOptions } from "../data";
+import { approvedSeats, type SeatedGuestId } from "../data/approvedSeats";
 import { roundAscheEarnings } from "./currency";
 import type {
   GuestDefinition,
+  GuestId,
   ProductDefinition,
   ProductId,
   StaffOptionId
@@ -17,8 +19,16 @@ import type {
   HelperTaskId,
   IngredientKey,
   StressStateLabel,
-  SupplyState
+  SupplyState,
+  TableId
 } from "../types/game";
+
+export function getServiceTableId(state: GameState, customerIndex: number, guestId?: GuestId): TableId | null {
+  if (state.equipment.seating < 1) return null;
+  if (guestId && guestId in approvedSeats) return approvedSeats[guestId as SeatedGuestId].table;
+  const tables = ["left", "right", "back"] as const;
+  return tables[customerIndex % tables.length];
+}
 
 /** Starting reputation for a new game. Higher than the old value (1) so a
  *  fresh café has a small buffer before the reputation fail-state. */
@@ -104,11 +114,11 @@ export const ACTION_BUDGET_BY_DAY: Record<GameState["day"], number> = {
  *   actionsWithoutServing 4 → Walkout   (guest leaves unserved)
  *
  * The pip bar uses currentGuestPatience / currentGuestPatienceMax, which are
- * kept in sync with actionsWithoutServing (4 fixed pips, one drains per action).
+ * kept in sync with actionsWithoutServing (up to four pips, one drains per action).
  */
 export const PATIENCE_TICK = 25;
 
-/** Total pip slots in the patience bar — always 4, one per state. */
+/** Baseline pip slots before arrival penalties. */
 export const PATIENCE_TICKS_MAX = 4;
 
 /** Walkouts only bite from Day 4 on; Days 1–3 keep the cozy onboarding window —
@@ -142,10 +152,8 @@ export function getGuestPatienceTicks(guest: GuestDefinition): number {
 }
 
 /**
- * Full patience value (0..max) for a guest at the moment they reach the counter.
- * Always PATIENCE_TICKS_MAX * PATIENCE_TICK (100) — uniform across all guests so
- * the 4-pip bar reads cleanly: each pip = one non-serve action of tolerance.
- * The messy-café penalty still deducts one tick on arrival (see setNextGuestPatience).
+ * Baseline patience before the arrival penalties for a messy café or final rush.
+ * Each pip equals one non-serve action of tolerance.
  */
 export function getGuestPatienceMax(): number {
   return PATIENCE_TICKS_MAX * PATIENCE_TICK;
@@ -313,6 +321,14 @@ export function getDayShiftRating(state: GameState): DayShiftRating {
 
 export function clampSupply(ingredient: IngredientKey, value: number): number {
   return clamp(Math.floor(value), 0, SUPPLY_CAPS[ingredient]);
+}
+
+export function applySupplyPurchase(supplies: SupplyState, purchase: SupplyState): SupplyState {
+  return {
+    coffee: clampSupply("coffee", supplies.coffee + purchase.coffee),
+    milk: clampSupply("milk", supplies.milk + purchase.milk),
+    pastries: clampSupply("pastries", supplies.pastries + purchase.pastries)
+  };
 }
 
 export function clampResource(value: number): number {

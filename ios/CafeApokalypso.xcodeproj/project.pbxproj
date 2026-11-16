@@ -13,6 +13,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		CAFE00000000000000000003 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = SOURCE_ROOT; };
 		CAFE00000000000000000002 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = SOURCE_ROOT; };
 		052F23BC0E64BB13AA79A805 /* CafeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CafeApp.swift; sourceTree = "<group>"; };
 		45E1BC3F69D130A275C5F3CA /* CafeApokalypso.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = CafeApokalypso.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -24,6 +25,7 @@
 			isa = PBXGroup;
 			children = (
 				CAFE00000000000000000002 /* Assets.xcassets */,
+				CAFE00000000000000000003 /* Info.plist */,
 				7C9B4E0A6BD86DD0CE7EA01D /* Web */,
 				42A5C8F9A358C9B3CBC82D7A /* Native */,
 				71A4755AD8D9C4689D65D5C6 /* Products */,
@@ -53,6 +55,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 7D6BD38AA8B6A74A934199E2 /* Build configuration list for PBXNativeTarget "CafeApokalypso" */;
 			buildPhases = (
+				74AD4B192701116B604C97B5 /* Verify offline game package */,
 				1D00D2AAD501C503942BF596 /* Sources */,
 				2CB7D82B01030A665F15DA97 /* Resources */,
 			);
@@ -111,6 +114,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		74AD4B192701116B604C97B5 /* Verify offline game package */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Verify offline game package";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "[ \"$CONFIGURATION\" = \"Release\" ] || exit 0\nexport PATH=\"$PATH:/opt/homebrew/bin:/usr/local/bin\"\nif ! command -v node >/dev/null 2>&1; then\n  echo \"error: Node.js is required to verify the offline game package. See ios/README.md.\"\n  exit 1\nfi\nexec node \"$SRCROOT/../tools/pack-ipad.mjs\" --check\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		1D00D2AAD501C503942BF596 /* Sources */ = {
@@ -188,7 +213,10 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = NO;
 				INFOPLIST_KEY_CFBundleDisplayName = "Café Apokalypso";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -276,6 +304,8 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = NO;
 				INFOPLIST_KEY_CFBundleDisplayName = "Café Apokalypso";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";

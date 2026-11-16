@@ -7,10 +7,12 @@ import {
   getDayEndRecapLine,
   getDecorUpgradeOptions,
   getGuestForCustomer,
+  getGuestRecovery,
   getKassandraConsultLine,
   getMoneyRecoveryWarning,
   getNextGuestPreview,
   getObjectiveStatus,
+  getRestockPreview,
   getVisibleDaySevenLetter,
   getVisibleKassandraMessages,
   getVisibleStaffOptions
@@ -32,6 +34,30 @@ import type { DayNumber } from "../src/game/types/content";
 import type { GameState } from "../src/game/types/game";
 
 describe("management tradeoff system", () => {
+  it("lets Lukas recover from Day 2 service and rewards a clean table", () => {
+    let dayTwo = gameReducer(createDayStartState(2), { type: "open_day" });
+    dayTwo = { ...dayTwo, equipment: { ...dayTwo.equipment, seating: 1 } };
+    dayTwo = gameReducer(dayTwo, { type: "take_order" });
+    dayTwo = gameReducer(dayTwo, { type: "take_order" });
+    expect(getGuestRecovery({ ...dayTwo, day: 1 }, "laptop-lukas")).toBeNull();
+    expect(getNextGuestPreview(dayTwo)?.recovery?.restored).toBe(1);
+    dayTwo = gameReducer(dayTwo, { type: "clean_table", tableId: "left" });
+    expect(getNextGuestPreview(dayTwo)?.recovery).toEqual({ current: 1, restored: 2, tableId: "left" });
+    const stocked = gameReducer(dayTwo, { type: "serve_product", productId: "filterkaffee" });
+    expect(stocked.dayManagement.heartsRestored).toBe(2);
+    expect(stocked.dayManagement.actionPointsRemaining).toBe(0);
+    expect(stocked.dayManagement.dirtyTableIds).toContain("left");
+    expect(gameReducer(stocked, { type: "complete_day" }).daySummary?.objectiveCompleted).toBe(true);
+    expect(stocked.statusMessage).toContain("Hearts +2");
+    const dirty: GameState = { ...dayTwo, dayManagement: { ...dayTwo.dayManagement, dirtyTableIds: ["left"] } };
+    expect(gameReducer(dirty, { type: "take_order" }).dayManagement.heartsRestored).toBe(1);
+    const failed = gameReducer({ ...dayTwo, supplies: { coffee: 0, milk: 0, pastries: 0 } }, { type: "take_order" });
+    expect(failed.dayManagement.heartsRestored).toBeUndefined();
+    const storage = createMemoryStorage();
+    saveGameState(stocked, storage);
+    expect(loadGameState(storage)?.dayManagement.heartsRestored).toBe(2);
+  });
+
   it("defines one visible objective for each week-one day", () => {
     expect(weekOneDays).toHaveLength(7);
 
@@ -109,6 +135,42 @@ describe("management tradeoff system", () => {
     expect(blockedState.statusMessage).toContain("Not enough money");
   });
 
+  it.each([0, 2])("suggests one affordable bean after an empty shift with %i beans used", (used) => {
+    const state = createInitialGameState();
+    state.dayPhase = "open";
+    state.resources.money = 6.8;
+    state.resources.stress = 0;
+    state.supplies = { coffee: 0, milk: 0, pastries: 0 };
+    state.dayManagement.suppliesUsed = { coffee: used, milk: 0, pastries: 0 };
+    const closed = gameReducer(state, { type: "complete_day" });
+    expect(closed.resources.money).toBe(0.8);
+    expect(closed.pendingSupplyPurchase).toEqual({ coffee: 1, milk: 0, pastries: 0 });
+    expect(getRestockPreview(closed)).toMatchObject({ canAfford: true, canServeWithoutRestock: false });
+    expect(getRestockPreview(closed).sellableTomorrow.map(product => product.id)).toContain("espresso");
+    const next = gameReducer(closed, { type: "confirm_supply_purchase" });
+    expect(next.resources.money).toBe(0);
+    expect(gameReducer(next, { type: "serve_product", productId: "espresso" }).dayManagement.customersServed).toBe(1);
+    const manual = gameReducer(closed, { type: "set_supply_purchase", ingredient: "coffee", quantity: 2 });
+    expect(manual.pendingSupplyPurchase.coffee).toBe(2);
+    expect(getRestockPreview(manual).canAfford).toBe(false);
+  });
+
+  it("keeps affordable replacement baskets and never invents an unaffordable rescue", () => {
+    const state = createInitialGameState();
+    state.dayPhase = "open";
+    state.dayManagement.actionPointsRemaining = 0;
+    state.resources.stress = 0;
+    state.supplies = { coffee: 0, milk: 0, pastries: 0 };
+    state.dayManagement.suppliesUsed = { coffee: 2, milk: 1, pastries: 1 };
+    state.resources.money = 10;
+    expect(gameReducer(state, { type: "complete_day" }).pendingSupplyPurchase).toEqual(state.dayManagement.suppliesUsed);
+    state.resources.money = 6.4;
+    expect(gameReducer(state, { type: "complete_day" }).pendingSupplyPurchase).toEqual(state.dayManagement.suppliesUsed);
+    state.resources.money = 6.8;
+    state.supplies.pastries = 1;
+    expect(gameReducer(state, { type: "complete_day" }).pendingSupplyPurchase).toEqual(state.dayManagement.suppliesUsed);
+  });
+
   it("applies affordable end-of-day restocking at the start of the next day", () => {
     const dayEndState: GameState = {
       ...createInitialGameState(),
@@ -123,6 +185,25 @@ describe("management tradeoff system", () => {
     expect(nextState.day).toBe(2);
     expect(nextState.supplies).toEqual({ coffee: 12, milk: 11, pastries: 11 });
     expect(nextState.resources.money).toBe(38.8);
+  });
+
+  it("allows a stockless shift to close with an unspent budget and previews the next menu", () => {
+    const open: GameState = {
+      ...createInitialGameState(),
+      dayPhase: "open",
+      supplies: { coffee: 0, milk: 1, pastries: 0 }
+    };
+    expect(canCompleteCurrentDay(open)).toBe(true);
+    expect(canCompleteCurrentDay({ ...open, supplies: { ...open.supplies, coffee: 1 } })).toBe(false);
+    const closed = gameReducer(open, { type: "complete_day" });
+    expect(closed.dayPhase).toBe("day_end");
+    expect(closed.daySummary?.customersServed).toBe(0);
+    expect(closed.dayManagement.actionPointsRemaining).toBe(open.dayManagement.actionPointsRemaining);
+    const restock = gameReducer(closed, { type: "set_supply_purchase", ingredient: "coffee", quantity: 1 });
+    const preview = getRestockPreview(restock);
+    expect(preview.canServeWithoutRestock).toBe(false);
+    expect(preview.sellableTomorrow.map(product => product.id)).toContain("espresso");
+    expect(gameReducer(restock, { type: "confirm_supply_purchase" }).supplies.coffee).toBe(1);
   });
 
   it("rewards the Day-3 inventory audit when supplies are checked before anything is empty", () => {
@@ -484,7 +565,9 @@ describe("management tradeoff system", () => {
     expect(daySixWithKassandra.unlockedAchievements).toContain(
       "kassandra-installed"
     );
-    expect(daySevenClosed.unlockedAchievements).toContain("week-one-letter");
+    expect(daySevenClosed.unlockedAchievements).not.toContain("week-one-letter");
+    expect(gameReducer(daySevenClosed, { type: "open_day_seven_letter" }).unlockedAchievements)
+      .toContain("week-one-letter");
   });
 
   it("keeps helpers unavailable before Day 3 and locks the day-start assignment", () => {
@@ -568,7 +651,8 @@ describe("management tradeoff system", () => {
     expect(closed.daySummary?.objectiveCompleted).toBe(true);
     expect(closed.daySummary?.helperAutonomyRecap).toBe("Jana cleared a table without using one of your actions.");
     expect(closed.daySummary?.flavorLines).toContain("Missing at the counter: Milk.");
-    expect(closed.daySummary?.flavorLines).toContain("1 table still needed clearing at closing.");
+    expect(closed.dayManagement.dirtyTableIds).toEqual([]);
+    expect(closed.daySummary?.flavorLines.join(" ")).not.toContain("still needed clearing");
   });
 
   it.each([1, 2])("reports whether Jana served an extra guest on Day 3 with %i coffee", (coffee) => {
@@ -785,7 +869,8 @@ describe("management tradeoff system", () => {
     state = closePlayableDay(state);
     expect(state.demoComplete).toBe(true);
     expect(state.weirdnessVisible).toBe(true);
-    expect(getVisibleDaySevenLetter(state)).toContain("apocalyptically relevant");
+    expect(getVisibleDaySevenLetter(gameReducer(state, { type: "open_day_seven_letter" })))
+      .toContain("apocalyptically relevant");
   });
 
   it("falls back from malformed saves and persists new management fields", () => {
@@ -877,7 +962,8 @@ describe("fail-state and reputation-scaled income", () => {
     expect(canCompleteCurrentDay(emptyShift)).toBe(true);
     expect(canCompleteCurrentDay({
       ...emptyShift,
-      resources: { ...emptyShift.resources, money: 1 }
+      resources: { ...emptyShift.resources, money: 1 },
+      supplies: { ...emptyShift.supplies, coffee: 1 }
     })).toBe(false);
 
     const firstClose = gameReducer(emptyShift, { type: "complete_day" });
@@ -1009,11 +1095,10 @@ describe("fail-state and reputation-scaled income", () => {
 
     expect(closed.day).toBe(7);
     expect(closed.demoComplete).toBe(true);
-    expect(getVisibleDaySevenLetter(closed)).toBeTruthy();
+    expect(getVisibleDaySevenLetter(gameReducer(closed, { type: "open_day_seven_letter" }))).toBeTruthy();
     expect(closed.moneyZeroStreak).toBe(Math.min(2, moneyZeroStreak + 1));
     expect(closed.cafeClosed).toBe(moneyZeroStreak > 0);
     expect(closed.closureReason).toBe(moneyZeroStreak > 0 ? "money" : null);
-    expect(closed.statusMessage).toContain("An official letter has arrived");
     expect(closed.statusMessage).not.toMatch(/tomorrow|next shift|Day 8/i);
     expect(getMoneyRecoveryWarning(closed)).toBeNull();
     expect(canCompleteCurrentDay(closed)).toBe(false);

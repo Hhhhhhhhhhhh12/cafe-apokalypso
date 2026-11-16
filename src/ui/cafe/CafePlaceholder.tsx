@@ -1,3 +1,4 @@
+import { RecoveryHearts } from "./RecoveryHearts";
 import { formatAsche } from "../../game/engine/currency";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { GameAction, GameState, TableId } from "../../game/types/game";
@@ -6,31 +7,30 @@ import {
   canAccessBrewGroup,
   canUseKassandra,
   getDayCoachHint,
-  getEarlySceneGuestVisibility,
+  getAvailableProducts,
+  getDioramaGuestVisibility,
   getGuestForCustomer,
   getGuestPatienceState,
   getNarrativeEventCards,
   getNextGuestPreview,
+  getShiftActionBudget,
   hasSecondBrewGroup,
+  isDaySevenLetterDelivered,
+  isDaySevenRush,
   isEarlyKassandraConsult
 } from "../../game/engine/selectors";
 import "./firstCup.css";
 import { useBohnAppearance } from "./bohnAppearance";
 import { DayOneVines } from "./DayOneVines";
 import type { StorageLike } from "../../game/engine/save";
-import { canJanaClearTable } from "../../game/engine/management";
+import { canJanaClearTable, PATIENCE_TICK } from "../../game/engine/management";
+import { DAY_SEVEN_SERVE_GOAL, hasShiftCleaning } from "../../game/engine/objectives";
 import { CafeInteraction, type CafeStation } from "./CafeInteraction";
-import { CafeShiftHelper } from "./CafeShiftHelper";
-import stageDay1Asset from "../../../assets/backgrounds/placeholder-cafe-stage-v07-day-1.png";
-import stageDay2Asset from "../../../assets/backgrounds/placeholder-cafe-stage-v07-day-2.png";
-import stageDay3Asset from "../../../assets/backgrounds/placeholder-cafe-stage-v07-day-3.png";
-import stageDay4Asset from "../../../assets/backgrounds/placeholder-cafe-stage-v07-day-4.png";
-import stageDay5Asset from "../../../assets/backgrounds/placeholder-cafe-stage-v07-day-5.png";
-import stageDay6Asset from "../../../assets/backgrounds/placeholder-cafe-stage-v07-day-6.png";
-import stageDay7Asset from "../../../assets/backgrounds/placeholder-cafe-stage-v07-day-7.png";
+import { CafeShiftHelper, StaffPortrait } from "./CafeShiftHelper";
+import { RecoveryFeedback } from "./RecoveryFeedback";
+import { CafeTableGuest } from "./CafeTableGuest";
+import { approvedSeats, type SeatedGuestId } from "../../game/data/approvedSeats";
 import approvedDay1StageAsset from "../../../assets/backgrounds/placeholder-cafe-background-v12-isometric-day1-windows.png";
-import coffeeMachineAsset from "../../../assets/sprites/props/placeholder-cafe-coffee-machine-v06-redesign.png";
-import kassandraRegisterAsset from "../../../assets/sprites/props/placeholder-kassandra-register-v06-redesign.png";
 import approvedCoffeeMachineAsset from "../../../assets/sprites/props/placeholder-cafe-espresso-machine-v01-target-reference.png";
 import approvedCoffeeGrinderAsset from "../../../assets/sprites/props/placeholder-cafe-coffee-grinder-v01-target-reference.png";
 import approvedKassandraRegisterAsset from "../../../assets/sprites/props/placeholder-cafe-cash-register-v01-target-reference.png";
@@ -39,16 +39,6 @@ import approvedCupAsset from "../../../assets/sprites/props/placeholder-cafe-cup
 import approvedWallShelfAsset from "../../../assets/sprites/props/placeholder-cafe-wall-shelf-v01-target-reference.png";
 import approvedWallClockAsset from "../../../assets/sprites/props/placeholder-cafe-wall-clock-v01-target-reference.png";
 import approvedFloorPlantAsset from "../../../assets/sprites/props/placeholder-cafe-floor-plant-v02-target-reference.png";
-import strangeGuestAsset from "../../../assets/sprites/guests/placeholder-guest-strange.png";
-import cemSeatedAsset from "../../../assets/sprites/guests/placeholder-guest-cem-seated.png";
-import miraSeatedAsset from "../../../assets/sprites/guests/placeholder-guest-mira-seated.png";
-import lukasSeatedAsset from "../../../assets/sprites/guests/placeholder-guest-lukas-seated.png";
-import christaSeatedAsset from "../../../assets/sprites/guests/placeholder-guest-christa-seated.png";
-import neleSeatedAsset from "../../../assets/sprites/guests/placeholder-guest-nele-seated.png";
-import medaGuestAsset from "../../../assets/sprites/guests/placeholder-guest-meda.png";
-import roterRegenschirmGuestAsset from "../../../assets/sprites/guests/placeholder-guest-roter-regenschirm.png";
-import approvedFatouSeatedAsset from "../../../assets/sprites/guests/placeholder-guest-fatou-seated-v02-front-candidate.png";
-import fatouSeatedAsset from "../../../assets/sprites/guests/placeholder-guest-fatou-seated.png";
 
 const QUEUE_SPRITES = {
   "pendler-kemal": "kemal",
@@ -64,16 +54,6 @@ const QUEUE_SPRITES = {
   "frau-roter-regenschirm": "roter-regenschirm",
   "meda": "meda",
 } as const satisfies Record<GuestId, string>;
-const DAILY_STAGE_ASSETS = [
-  stageDay1Asset,
-  stageDay2Asset,
-  stageDay3Asset,
-  stageDay4Asset,
-  stageDay5Asset,
-  stageDay6Asset,
-  stageDay7Asset,
-] as const;
-
 /** Window-safe reduced-motion check, callable during render. */
 function prefersReducedMotion(): boolean {
   return (
@@ -114,7 +94,7 @@ export function CafePlaceholder({
   bohnStorage = null,
   bohnOccluder = null
 }: CafePlaceholderProps) {
-  const { standing: bohnStanding, seated: bohnSeated, spriteRef: bohnRef } = useBohnAppearance(bohnStorage, bohnOccluder);
+  const { standing: bohnStanding, spriteRef: bohnRef } = useBohnAppearance(bohnStorage, bohnOccluder);
   // --- Visual state classes ---
   const cleanlinessClass =
     gameState.resources.cleanliness >= 70
@@ -153,23 +133,29 @@ export function CafePlaceholder({
   const incomingGuestId = getGuestForCustomer(gameState, queuePosition)?.id ?? "pendler-kemal";
   const isOpen = gameState.dayPhase === "open";
   const isDayEnd = gameState.dayPhase === "day_end";
-  const usesApprovedDayOneScene = gameState.day === 1;
+  const isFinalShift = gameState.day === 7;
+  const finalRush = isDaySevenRush(gameState);
+  const letterDelivered = isDaySevenLetterDelivered(gameState);
 
   const shiftOver = gameState.cafeClosed || gameState.demoComplete;
   const showQueueGuest = isOpen && actionPointsRemaining > 0 && !shiftOver;
+  const followingGuest = (finalRush || (gameState.day >= 4 && !isFinalShift)) && showQueueGuest && actionPointsRemaining > 1
+    ? getGuestForCustomer(gameState, queuePosition + 1)
+    : undefined;
   const canInteract = Boolean(onAction) && !shiftOver && !introActive;
+  const canReadLetter = Boolean(onAction) && letterDelivered;
   const machineIsInteractive = canInteract && canAccessBrewGroup(gameState);
   const registerIsInteractive = canInteract && canUseKassandra(gameState);
   const earlyForecastAvailable = isEarlyKassandraConsult(gameState) && actionPointsRemaining > 0;
   const registerSprite = (
     <img className="cafe-pilot-asset cafe-pilot-asset--kassandra-register"
-      src={usesApprovedDayOneScene ? approvedKassandraRegisterAsset : kassandraRegisterAsset} alt="" />
+      src={approvedKassandraRegisterAsset} alt="" />
   );
   const secondBrewGroup = hasSecondBrewGroup(gameState);
   const machineSprite = (
     <img
       className="cafe-pilot-asset cafe-pilot-asset--coffee-machine"
-      src={usesApprovedDayOneScene ? approvedCoffeeMachineAsset : coffeeMachineAsset}
+      src={approvedCoffeeMachineAsset}
       alt=""
     />
   );
@@ -178,13 +164,15 @@ export function CafePlaceholder({
   const headingRef = useRef<HTMLHeadingElement>(null);
   const entryRef = useRef<{ button: HTMLButtonElement; phase: GameState["dayPhase"] } | null>(null);
   const doorRef = useRef<HTMLButtonElement>(null);
+  const letterRef = useRef<HTMLButtonElement>(null);
   const backRef = useRef<HTMLButtonElement>(null);
 
   let activeStation: CafeStation | null = null;
-  if (canInteract && selection?.day === gameState.day) {
+  if ((canInteract || canReadLetter) && selection?.day === gameState.day) {
     if (selection.station === "door" && selection.phase === "open" && isDayEnd) {
       activeStation = "stock";
     } else if (
+      (canInteract || selection.station === "letter" || selection.station === "stock") &&
       selection.phase === gameState.dayPhase &&
       (selection.station !== "service" || selection.queuePosition === queuePosition)
     ) {
@@ -194,12 +182,13 @@ export function CafePlaceholder({
   if (selection && !activeStation) setSelection(null);
 
   useLayoutEffect(() => {
+    const preventScroll = window.innerWidth > 760;
     if (activeStation) {
-      backRef.current?.focus();
+      backRef.current?.focus({ preventScroll });
     } else if (entryRef.current) {
       const entry = entryRef.current;
       entryRef.current = null;
-      if (shiftOver || introActive) return;
+      if ((shiftOver && !canReadLetter) || introActive) return;
 
       const scene = sceneRef.current;
       const firstGuest = entry.phase === "setup" && isOpen
@@ -207,10 +196,10 @@ export function CafePlaceholder({
         : null;
       const next = firstGuest ?? (entry.button.isConnected
         ? entry.button
-        : scene?.querySelector<HTMLButtonElement>("[data-cafe-entry]") ?? headingRef.current);
-      next?.focus();
+        : letterRef.current ?? scene?.querySelector<HTMLButtonElement>("[data-cafe-entry]") ?? headingRef.current);
+      next?.focus({ preventScroll });
     }
-  }, [activeStation, introActive, isOpen, shiftOver]);
+  }, [activeStation, canReadLetter, introActive, isOpen, shiftOver]);
 
   function openStation(station: CafeStation, source: HTMLButtonElement) {
     entryRef.current = { button: source, phase: gameState.dayPhase };
@@ -223,13 +212,9 @@ export function CafePlaceholder({
     });
   }
 
-  // Patience signal — add impatient class when guest has < 30 % patience left
-  const { currentGuestPatience, currentGuestPatienceMax } = gameState.dayManagement;
-  const patienceRatio =
-    isOpen && currentGuestPatienceMax > 0
-      ? currentGuestPatience / currentGuestPatienceMax
-      : 1;
-  const guestIsImpatient = isOpen && showQueueGuest && patienceRatio < 0.3;
+  const patience = getGuestPatienceState(gameState);
+  const guestIsImpatient = showQueueGuest && patience &&
+    (patience.critical || patience.patience / patience.max < 0.3);
 
   // Paula entrance phases
   const [paulaPhase, setPaulaPhase] = useState<
@@ -281,7 +266,7 @@ export function CafePlaceholder({
       (paulaPhase === "idle" || paulaPhase === "walking") && !prefersReducedMotion()
     ) {
       setPaulaPhase("walking-to-counter");
-    } else if (gameState.day === 6 && customersServed === prevServed &&
+    } else if (gameState.day >= 4 && customersServed === prevServed &&
       queuePosition > prevQueuePosition && paulaPhase === "idle" && !prefersReducedMotion()) {
       setPaulaPhase("leaving-queue");
     } else if (paulaPhase !== "walking-to-counter" && paulaPhase !== "walking-to-door" && paulaPhase !== "leaving-queue") {
@@ -318,11 +303,11 @@ export function CafePlaceholder({
     if (customersServed > prevServedForFeedback) {
       // A2: serve reaction
       const firstSentence = gameState.statusMessage?.split(/\.\s+/)[0]?.trim() ?? null;
-      if (gameState.day > 3 && gameState.day !== 5 && gameState.day !== 6 && firstSentence) {
+      if (gameState.day === 4 && firstSentence) {
         setServeReaction(prev => ({ text: firstSentence, key: (prev?.key ?? 0) + 1, day: gameState.day }));
       }
       // B1 — every 2nd serve, pick a floor event
-      if (gameState.day > 3 && gameState.day !== 5 && gameState.day !== 6 && customersServed % 2 === 0) {
+      if (gameState.day === 4 && customersServed % 2 === 0) {
         const floorEvents = getNarrativeEventCards(gameState).filter(
           e => e.kicker === "On the floor"
         );
@@ -393,17 +378,27 @@ export function CafePlaceholder({
     prevRepRef.current = gameState.resources.reputation;
   }, [gameState.day, gameState.dayManagement.customersServed, gameState.dayManagement.moneyEarned, gameState.dayPhase, gameState.resources.reputation]);
 
-  const visibleGuests = getEarlySceneGuestVisibility(gameState);
-  const earlyV07 = gameState.day === 2 || gameState.day === 3;
-  const guestInQueue = showQueueGuest || paulaPhase === "walking-to-counter" ||
+  const visibleGuests = getDioramaGuestVisibility(gameState);
+  const frontOfQueue = showQueueGuest || paulaPhase === "walking-to-counter" ||
     paulaPhase === "walking-to-door" || paulaPhase === "leaving-queue" ? queueGuest : null;
-  const lukasHasSeat = visibleGuests.lukas && guestInQueue !== "laptop-lukas";
+  const queueIncludes = (guestId: GuestId) => frontOfQueue === guestId || followingGuest?.id === guestId;
+  const seatedGuests: SeatedGuestId[] = ([
+    ["laptop-lukas", visibleGuests.lukas], ["cappuccino-christa", visibleGuests.christa],
+    ["pendlerin-fatou", visibleGuests.fatou], ["nachbarin-mira", visibleGuests.mira],
+    ["meda", visibleGuests.meda], ["freelancerin-nele", visibleGuests.nele]
+  ] as const).filter(([id, visible]) => visible && !queueIncludes(id)).map(([id]) => id);
   const nextGuest = getNextGuestPreview(gameState);
-  const patience = getGuestPatienceState(gameState);
+  const recovery = nextGuest?.recovery;
+  const wantedProduct = getAvailableProducts(gameState).find(product => product.name === nextGuest?.wants);
   const canTakeOrder =
     canInteract && showQueueGuest && queueGuest === incomingGuestId &&
     paulaPhase === "idle";
 
+  const cleanTable = (tableId: TableId) => {
+    headingRef.current?.focus({ preventScroll: true });
+    if (onCleanTable) onCleanTable(tableId);
+    else onAction?.({ type: "clean_table", tableId });
+  };
   const dirtyTableIds = new Set(gameState.dayManagement.dirtyTableIds);
 
   const showWeirdness = gameState.weirdnessVisible || gameState.day >= 7 || gameState.hiddenWeirdness >= 3;
@@ -413,14 +408,14 @@ export function CafePlaceholder({
   const showBoard = canInteract && isOpen &&
     ((gameState.day >= 3 && gameState.unlocks.pricing) || (gameState.day >= 4 && gameState.unlocks.advertising));
   const highlightBoard = showBoard && getDayCoachHint(gameState)?.target === "offer";
-  const stockEntry = canInteract && (isOpen || isDayEnd) ? (
+  const stockEntry = (canInteract && (isOpen || isDayEnd)) || canReadLetter ? (
     <button
       type="button"
       className={`cafe-cue cafe-cue--stock${isOpen && emptyStock ? " cafe-cue--empty" : ""}`}
       data-cafe-entry
       onClick={(event) => openStation("stock", event.currentTarget)}
     >
-      {isDayEnd ? "Day result & restock" : emptyStock ? "Supplies · empty" : "Supplies"}
+      {letterDelivered ? "Shift report" : isDayEnd ? "Day result & restock" : emptyStock ? "Supplies · empty" : "Supplies"}
     </button>
   ) : null;
   const stationFeedback = selection?.station === activeStation && selection.initialStatus !== gameState.statusMessage
@@ -443,10 +438,33 @@ export function CafePlaceholder({
         <h2 id="cafe-diorama-title" ref={headingRef} tabIndex={-1}>The Café</h2>
         {isOpen && !shiftOver ? (
           <span className="cafe-stage__capacity">
-            {actionPointsRemaining} {actionPointsRemaining === 1 ? "action" : "actions"} left
+            {isFinalShift && (
+              <span className="cafe-final-checklist">
+                <span>{Math.min(customersServed, DAY_SEVEN_SERVE_GOAL)}/{DAY_SEVEN_SERVE_GOAL} served</span>
+                <span>{hasShiftCleaning(gameState) ? "✓ Cleaning done" : "Clean up"}</span>
+                {finalRush && <span className="cafe-final-checklist__rush">Rush</span>}
+              </span>
+            )}
+            {Boolean(gameState.dayManagement.heartsRestored) && (
+              <span className="cafe-recovered"
+                role="img" aria-label={`${gameState.dayManagement.heartsRestored} hearts restored`}>
+                <span aria-hidden="true">♥ {gameState.dayManagement.heartsRestored}</span>
+              </span>
+            )}
+            <span className="cafe-action-pips" role="img" aria-label={`${actionPointsRemaining} actions left`}>
+              {Array.from({ length: Math.min(12, getShiftActionBudget(gameState)) }, (_, index) => (
+                <span key={index} aria-hidden="true" data-filled={index < actionPointsRemaining} />
+              ))}
+            </span>
           </span>
         ) : null}
       </div>
+
+      {onAction && (
+        <p className="status-message" role="status" aria-live="polite" aria-atomic="true">
+          <span key={gameState.statusMessage} className="status-message__text">{gameState.statusMessage}</span>
+        </p>
+      )}
 
       <div className="cafe-scene-frame" data-station={activeStation ?? undefined} ref={sceneRef}>
         <div
@@ -457,13 +475,12 @@ export function CafePlaceholder({
             stressClass,
             dayClass,
             growthDayClass,
-            earlyV07 ? "cafe-diorama--early-v07" : "",
-            gameState.day <= 3 || gameState.day === 5 || gameState.day === 6 ? "cafe-diorama--short-orders" : "",
             kassandraClass,
             weirdnessClass,
-            usesApprovedDayOneScene ? "cafe-diorama--approved-day-one" : "",
+            "cafe-diorama--approved-day-one cafe-diorama--compact-week",
           ].join(" ")}
         >
+          <RecoveryFeedback day={gameState.day} total={gameState.dayManagement.heartsRestored ?? 0} />
           {isOpen && coinTick?.day === gameState.day && (
             <span key={`coin-${coinTick.key}`} className="cafe-coin-tick" aria-hidden="true">
               +{formatAsche(coinTick.money)}{coinTick.rep > 0 ? " ★" : ""}
@@ -485,21 +502,18 @@ export function CafePlaceholder({
           <div className="cafe-world" inert={Boolean(activeStation) || introActive}>
             <img
               className="cafe-stage-base"
-              src={usesApprovedDayOneScene
-                ? approvedDay1StageAsset
-                : DAILY_STAGE_ASSETS[Math.max(0, Math.min(6, gameState.day - 1))]}
+              src={approvedDay1StageAsset}
               alt={`Isometric café room on Day ${gameState.day}, with a counter, door and windows.`}
             />
-            {usesApprovedDayOneScene && (
+            {(
               <div className="cafe-approved-wall-shelf">
                 <img src={approvedWallShelfAsset} alt="" />
                 {stockEntry}
               </div>
             )}
             {showNino && (
-              <div className="cafe-staff-nino" style={{ position: "absolute", left: "56%", bottom: "17%", zIndex: 6, translate: "-50%" }} aria-hidden="true">
-                <span className="cafe-staff-nino__stand" />
-                <span className="cafe-staff-nino__walk" />
+              <div className="cafe-shift-helper cafe-shift-helper--legacy" data-helper="nino">
+                <StaffPortrait helperId="nino" alt="Nino" />
               </div>
             )}
             <CafeShiftHelper gameState={gameState} />
@@ -511,13 +525,13 @@ export function CafePlaceholder({
               </div>
             )}
             {isDusty && <div className="cafe-dust" aria-hidden="true" />}
-            {usesApprovedDayOneScene && gameState.equipment.clock >= 1 && (
+            {gameState.equipment.clock >= 1 && (
               <img className="cafe-approved-wall-clock" src={approvedWallClockAsset} alt="" aria-hidden="true" />
             )}
-            {usesApprovedDayOneScene && (
+            {(
               <div className="cafe-approved-floor-plant" aria-hidden="true">
                 <img src={approvedFloorPlantAsset} alt="" />
-                <DayOneVines actionPointsSpent={gameState.dayManagement.actionPointsSpent} actionPointsRemaining={actionPointsRemaining} />
+                {gameState.day === 1 && <DayOneVines actionPointsSpent={gameState.dayManagement.actionPointsSpent} actionPointsRemaining={actionPointsRemaining} />}
               </div>
             )}
 
@@ -526,9 +540,7 @@ export function CafePlaceholder({
             <div className={`cafe-decor-lamp cafe-decor--tier-${gameState.decor?.lamp ?? 1}`} aria-hidden="true" />
             <div className={`cafe-plant cafe-decor-plant cafe-decor--tier-${gameState.decor?.plant ?? 1}`} aria-hidden="true" />
             <div className={`cafe-decor-plant2 cafe-decor--tier-${gameState.decor?.plant2 ?? 1}`} aria-hidden="true" />
-            <div className={`cafe-furniture-shelf cafe-decor--tier-${gameState.decor?.shelf ?? 1}`}>
-              {!usesApprovedDayOneScene ? stockEntry : null}
-            </div>
+            <div className={`cafe-furniture-shelf cafe-decor--tier-${gameState.decor?.shelf ?? 1}`} />
 
             {/* Fantasy pets — cozy décor with a faint twist (#73 world-building) */}
             <div className="cafe-pet cafe-pet-cat" aria-hidden="true" />
@@ -585,6 +597,7 @@ export function CafePlaceholder({
                   ) : machineSprite}
                   {secondBrewGroup ? <span className="cafe-coffee-machine__connector" aria-hidden="true" /> : null}
                   <span className="cafe-coffee-machine__screen" />
+                  {finalRush && <span className="cafe-threshold-display" aria-hidden="true">THRESHOLD</span>}
                   {gameState.resources.stress >= 35 && (
                     <span className="cafe-coffee-machine__steam" />
                   )}
@@ -656,10 +669,23 @@ export function CafePlaceholder({
                   <span
                     className={`cafe-register__screen${kassandraAwake ? " cafe-register__screen--active" : ""}`}
                   />
+                  {finalRush && <span className="cafe-threshold-display" aria-hidden="true">THRESHOLD</span>}
                   {(gameState.day >= 7 || gameState.dayManagement.kassandraConsulted) && (
                     <span className="cafe-register__receipt cafe-register__receipt--long" aria-hidden="true" />
                   )}
                 </div>
+
+                {canReadLetter && (
+                  <button type="button" className="cafe-letter" data-cafe-entry ref={letterRef}
+                    data-opened={Boolean(gameState.daySevenLetterOpened)}
+                    aria-label={gameState.daySevenLetterOpened ? "Read the letter again" : "Open the sealed letter"}
+                    onClick={(event) => {
+                      onAction?.({ type: "open_day_seven_letter" });
+                      openStation("letter", event.currentTarget);
+                    }}>
+                    <span className="cafe-letter__paper" aria-hidden="true" />
+                  </button>
+                )}
 
                 <div
                   className={`cafe-decor-cups cafe-decor--tier-${gameState.decor?.cups ?? 1}`}
@@ -674,88 +700,38 @@ export function CafePlaceholder({
                 <div className="cafe-service-mat" />
               </div>
 
-              {/* Tables — direct, table-by-table cleaning makes early floor work tangible (#73). */}
-              {gameState.equipment.seating >= 1 && (
-                <>
-                  {([
-                    { pos: "left" },
-                    { pos: "right" },
-                    { pos: "back" }
-                  ] as const).map(({ pos }) => {
-                    const dirty = dirtyTableIds.has(pos);
-                    const hasCemSeat = usesApprovedDayOneScene && pos === "left";
-                    const hasApprovedFatouSeat = usesApprovedDayOneScene && pos === "back";
-                    const className = `cafe-table cafe-table--${pos} cafe-table--tier-${gameState.equipment.seating}`;
-                    const inner = (
-                      <>
-                        <span className="cafe-table__top" />
-                        {!hasApprovedFatouSeat && <span className="cafe-chair cafe-chair--front" />}
-                        {!hasCemSeat && <span className="cafe-chair cafe-chair--side" />}
-                        <span className="cafe-table-plant" aria-hidden="true" />
-                        {dirty && <span className="cafe-cup cafe-cup--dirty" />}
-                      </>
-                    );
-                    const janaCanClear = canJanaClearTable(gameState);
-                    const cleanLabel = janaCanClear ? "ask Jana to clear it (0 actions)" : "wipe it down (1 action)";
-                    const clickable = dirty && isOpen && !shiftOver && !introActive &&
-                      (actionPointsRemaining > 0 || janaCanClear) && Boolean(onCleanTable || onAction);
-                    const table = clickable ? (
-                      <button
-                        key={pos}
-                        type="button"
-                        className={`${className} cafe-table--clickable`}
-                        onClick={() => {
-                          headingRef.current?.focus({ preventScroll: true });
-                          if (onCleanTable) onCleanTable(pos);
-                          else onAction?.({ type: "clean_table", tableId: pos });
-                        }}
-                        aria-label={`Dirty ${pos} table — ${cleanLabel}`}
-                        title={cleanLabel}
-                      >
-                        {inner}
-                        <span className="cafe-cue cafe-cue--wipe" aria-hidden="true">{janaCanClear ? "Ask Jana" : "Wipe"}</span>
-                      </button>
-                    ) : (
-                      <div key={pos} className={className} aria-hidden="true">
-                        {inner}
-                      </div>
-                    );
-                    if (hasCemSeat) {
-                      return (
-                        <div key={pos} className="cafe-table cafe-table--left cafe-cem-table-group">
-                          <span className="cafe-chair cafe-chair--side" aria-hidden="true" />
-                          {visibleGuests.cem && guestInQueue !== "lieferfahrer-cem" && (
-                            <span className="placeholder-guest placeholder-guest-seated cafe-cem-seat"
-                              data-seat="left-back" data-guest="cem" aria-hidden="true">
-                              <img className="cafe-pilot-asset cafe-pilot-asset--guest cafe-pilot-asset--cem"
-                                src={cemSeatedAsset} alt="" aria-hidden="true" />
-                            </span>
-                          )}
-                          {table}
-                        </div>
-                      );
-                    }
-                    if (!hasApprovedFatouSeat) return table;
-                    return (
-                      <div key={pos} className="cafe-table cafe-table--back cafe-fatou-table-group">
-                        {table}
-                        {visibleGuests.fatou && guestInQueue !== "pendlerin-fatou" && (
-                          <span className="placeholder-guest placeholder-guest-seated cafe-fatou-seat"
-                            data-seat="back-front" data-guest="fatou" aria-hidden="true">
-                            <img className="cafe-pilot-asset cafe-pilot-asset--guest cafe-pilot-asset--fatou"
-                              src={approvedFatouSeatedAsset} alt="" aria-hidden="true" />
-                          </span>
-                        )}
-                        <span className={`cafe-chair cafe-chair--front cafe-table--tier-${gameState.equipment.seating}`}
-                          aria-hidden="true" />
-                      </div>
-                    );
-                  })}
-                </>
-              )}
+              {/* Approved chair groups retain their geometry across all seven days. */}
+              {gameState.equipment.seating >= 1 && (["left", "right", "back"] as const).map(pos => {
+                const dirty = dirtyTableIds.has(pos);
+                const janaCanClear = canJanaClearTable(gameState);
+                const cleanLabel = janaCanClear ? "ask Jana to clear it (0 actions)" : "wipe it down (1 action)";
+                const recoverySeat = recovery?.current === 1 && recovery.tableId === pos;
+                const clickable = dirty && isOpen && !shiftOver && !introActive &&
+                  (actionPointsRemaining > 0 || janaCanClear) && Boolean(onCleanTable || onAction);
+                const className = `cafe-table cafe-table--${pos} cafe-table--tier-${gameState.equipment.seating}`;
+                const inner = <>
+                  <span className="cafe-table__top" />
+                  <span className="cafe-table-plant" aria-hidden="true" />
+                  {dirty && <span className="cafe-cup cafe-cup--dirty" />}
+                  {recoverySeat && recovery.restored === 2 &&
+                    <span className="cafe-table-recovery-ready" data-recovery-table={pos} aria-hidden="true">♥</span>}
+                  {clickable && <span className="cafe-cue cafe-cue--wipe" aria-hidden="true">
+                    <span className="cafe-wipe-icon" />
+                    {recoverySeat && <span className="cafe-recovery-seat">♥</span>}
+                    <span className="cafe-wipe-label">{janaCanClear ? "Ask Jana" : "Wipe"}</span>
+                  </span>}
+                </>;
+                return <div key={pos} className={`cafe-table-set cafe-table-set--${pos}`} data-table-id={pos}>
+                  <span className={`cafe-chair cafe-chair--side cafe-table--tier-${gameState.equipment.seating}`} aria-hidden="true" />
+                  {clickable ? <button type="button" className={`${className} cafe-table--clickable`}
+                    aria-label={`Dirty ${pos} table — ${cleanLabel}${recoverySeat ? " · Recovery seat" : ""}`}
+                    title={cleanLabel} onClick={() => cleanTable(pos)}>{inner}</button> : <div className={className} aria-hidden="true">{inner}</div>}
+                  {seatedGuests.filter(id => approvedSeats[id].table === pos).map(id => <CafeTableGuest key={id} guestId={id} />)}
+                  <span className={`cafe-chair cafe-chair--front cafe-table--tier-${gameState.equipment.seating}`} aria-hidden="true" />
+                </div>;
+              })}
 
-              {/* Queue */}
-              <div className="cafe-queue">
+              <div className={`cafe-queue${paulaPhase === "at-door" || paulaPhase === "walking" ? " cafe-queue--entering" : ""}`}>
                 {canInteract && !isDayEnd ? (
                   <button
                     type="button"
@@ -824,176 +800,51 @@ export function CafePlaceholder({
                     {canTakeOrder && nextGuest ? (
                       <button
                         type="button"
-                        className="cafe-order-bubble"
+                        className="cafe-order-bubble cafe-order-bubble--on-guest"
                         data-cafe-entry
+                        title={nextGuest.wants || "Take order"}
                         aria-label={`Take order from ${nextGuest.name}`}
-                        aria-description={nextGuest.orderLine || undefined}
+                        aria-description={[
+                          nextGuest.orderLine.replace(/[.]$/, ""),
+                          gameState.day >= 4 && patience
+                            ? `Patience ${patience.patience / PATIENCE_TICK} of ${patience.max / PATIENCE_TICK}`
+                            : null,
+                          recovery ? `Resting. ${recovery.current} of 3 hearts. A served order restores ${recovery.restored}.` : null,
+                          recovery?.restored === 2 ? `Clean ${recovery.tableId} table adds a recovery heart` : null,
+                          patience?.critical ? "About to leave" : null
+                        ].filter(Boolean).join(". ") || undefined}
                         onClick={(event) => openStation("service", event.currentTarget)}
                       >
-                        <span className="cafe-order-bubble__line">
-                          {nextGuest.orderLine ? <q>{nextGuest.orderLine}</q> : "Take order"}
+                        <span className="cafe-order-bubble__card" aria-hidden="true">
+                          <span className="serve-menu__icon" data-product={wantedProduct?.id ?? "filterkaffee"} />
+                          {recovery && (
+                            <span className="cafe-order-bubble__hearts" aria-hidden="true">
+                              <RecoveryHearts {...recovery} />
+                            </span>
+                          )}
+                          {gameState.day >= 4 && patience && (
+                            <span className="cafe-order-bubble__patience" aria-hidden="true">
+                              {Array.from({ length: patience.max / PATIENCE_TICK }, (_, index) => (
+                                <span key={index} data-filled={index * PATIENCE_TICK < patience.patience} />
+                              ))}
+                            </span>
+                          )}
+                          {patience?.critical ? <span className="cafe-order-bubble__warning">!</span> : null}
                         </span>
-                        <span className="cafe-order-bubble__short">{nextGuest.wants || "Take order"}</span>
-                        <span className="cafe-order-bubble__arrow" aria-hidden="true">→</span>
-                        {patience?.critical ? <span className="cafe-order-bubble__warning">About to leave</span> : null}
                       </button>
                     ) : null}
                   </span>
                 ) : null}
-                <span className="placeholder-guest placeholder-guest-normal-02" aria-hidden="true">
-                  <span className="guest-status guest-status--waiting">Waiting</span>
-                </span>
+                {followingGuest && followingGuest.id !== frontOfQueue ? (
+                  <span key={followingGuest.id} className="cafe-rush-queue-guest" aria-hidden="true">
+                    <span className={`cafe-pilot-asset cafe-pilot-asset--standing cafe-pilot-asset--${QUEUE_SPRITES[followingGuest.id]}-standing`} />
+                  </span>
+                ) : null}
               </div>
 
-              {/* Seated guests */}
-              {visibleGuests.cem && guestInQueue !== "lieferfahrer-cem" && !usesApprovedDayOneScene && (
-                <span
-                  className="placeholder-guest placeholder-guest-seated placeholder-guest-normal-03"
-                  aria-hidden="true"
-                >
-                  <img
-                    className="cafe-pilot-asset cafe-pilot-asset--guest cafe-pilot-asset--cem"
-                    src={cemSeatedAsset}
-                    aria-hidden="true"
-                    alt=""
-                  />
-                  <span className="guest-status guest-status--seated">Cem · Seated</span>
-                </span>
-              )}
-
-              {visibleGuests.mira && guestInQueue !== "nachbarin-mira" && !usesApprovedDayOneScene && (
-                <span
-                  className="placeholder-guest placeholder-guest-seated placeholder-guest-normal-04"
-                  aria-hidden="true"
-                >
-                  <img
-                    className="cafe-pilot-asset cafe-pilot-asset--guest cafe-pilot-asset--mira"
-                    src={miraSeatedAsset}
-                    aria-hidden="true"
-                    alt=""
-                  />
-                  <span className="guest-status guest-status--seated">Mira · Seated</span>
-                </span>
-              )}
-
-              {lukasHasSeat && !usesApprovedDayOneScene && (
-                <span
-                  className="placeholder-guest placeholder-guest-seated placeholder-guest-normal-05"
-                  aria-hidden="true"
-                >
-                  <img
-                    className="cafe-pilot-asset cafe-pilot-asset--guest cafe-pilot-asset--lukas"
-                    src={lukasSeatedAsset}
-                    aria-hidden="true"
-                    alt=""
-                  />
-                  <span className="guest-status guest-status--seated">Lukas · Seated</span>
-                </span>
-              )}
-
-              {visibleGuests.christa && guestInQueue !== "cappuccino-christa" && (
-                <span
-                  className="placeholder-guest placeholder-guest-seated placeholder-guest-normal-06"
-                  aria-hidden="true"
-                >
-                  <img
-                    className="cafe-pilot-asset cafe-pilot-asset--guest cafe-pilot-asset--christa"
-                    src={christaSeatedAsset}
-                    aria-hidden="true"
-                    alt=""
-                  />
-                  <span className="guest-status guest-status--seated">Christa · Seated</span>
-                </span>
-              )}
-
-              {visibleGuests.bohn && guestInQueue !== "herr-bohn" && (
-                <span
-                  className="placeholder-guest placeholder-guest-seated placeholder-guest-normal-07"
-                  aria-hidden="true"
-                >
-                  <img
-                    className="cafe-pilot-asset cafe-pilot-asset--guest cafe-pilot-asset--bohn"
-                    src={bohnSeated}
-                    ref={bohnRef}
-                    alt=""
-                    aria-hidden="true"
-                  />
-                  <span className="guest-status guest-status--seated">Bohn · Seated</span>
-                </span>
-              )}
-
-              {visibleGuests.strange && (
-                <span
-                  className="placeholder-guest placeholder-guest-seated placeholder-guest-strange-01"
-                  aria-hidden="true"
-                >
-                  <img
-                    className="cafe-pilot-asset cafe-pilot-asset--guest cafe-pilot-asset--strange"
-                    src={strangeGuestAsset}
-                    alt=""
-                    aria-hidden="true"
-                  />
-                  <span className="guest-status guest-status--seated">Seated</span>
-                </span>
-              )}
-
-              {visibleGuests.nele && !earlyV07 && (
-                <span
-                  className="placeholder-guest placeholder-guest-seated placeholder-guest-normal-08"
-                  aria-hidden="true"
-                >
-                  <img
-                    className="cafe-pilot-asset cafe-pilot-asset--guest cafe-pilot-asset--nele"
-                    src={neleSeatedAsset}
-                    alt=""
-                    aria-hidden="true"
-                  />
-                  <span className="guest-status guest-status--seated">Nele · Seated</span>
-                </span>
-              )}
-
-              {visibleGuests.meda && (
-                <span
-                  className="placeholder-guest placeholder-guest-seated placeholder-guest-strange-02"
-                  aria-hidden="true"
-                >
-                  <img
-                    className="cafe-pilot-asset cafe-pilot-asset--guest cafe-pilot-asset--meda"
-                    src={medaGuestAsset}
-                    alt=""
-                    aria-hidden="true"
-                  />
-                  <span className="guest-status guest-status--seated">Seated</span>
-                </span>
-              )}
-
-              {visibleGuests.roterRegenschirm && (
-                <span
-                  className="placeholder-guest placeholder-guest-seated placeholder-guest-strange-03"
-                  aria-hidden="true"
-                >
-                  <img
-                    className="cafe-pilot-asset cafe-pilot-asset--guest cafe-pilot-asset--roter-regenschirm"
-                    src={roterRegenschirmGuestAsset}
-                    alt=""
-                    aria-hidden="true"
-                  />
-                  <span className="guest-status guest-status--seated">Seated</span>
-                </span>
-              )}
-
-              {visibleGuests.fatou && guestInQueue !== "pendlerin-fatou" && !usesApprovedDayOneScene && (!earlyV07 || !lukasHasSeat) && (
-                <span
-                  className={`placeholder-guest placeholder-guest-seated ${earlyV07 ? "placeholder-guest-normal-05" : "placeholder-guest-normal-09"}`}
-                  aria-hidden="true"
-                >
-                  <img
-                    className="cafe-pilot-asset cafe-pilot-asset--guest cafe-pilot-asset--fatou"
-                    src={fatouSeatedAsset}
-                    alt=""
-                    aria-hidden="true"
-                  />
-                  <span className="guest-status guest-status--seated">Fatou · Seated</span>
+              {visibleGuests.bohn && !queueIncludes("herr-bohn") && (
+                <span className="cafe-standing-bohn" aria-hidden="true">
+                  <img className="cafe-pilot-asset cafe-pilot-asset--guest" src={bohnStanding} ref={bohnRef} alt="" />
                 </span>
               )}
 
@@ -1001,7 +852,6 @@ export function CafePlaceholder({
                 <div className="cafe-weirdness-hint" aria-hidden="true">
                   <span className="cafe-clock" />
                   <span className="cafe-shadow-note" />
-                  <span className="cafe-envelope" />
                 </div>
               )}
             </div>

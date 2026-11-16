@@ -2,6 +2,7 @@ import { formatAsche } from "../../game/engine/currency";
 import {
   getDayCoachHint,
   getDecorUpgradeOptions,
+  getShiftActionBudget,
   hasActionCapacity
 } from "../../game/engine/selectors";
 import { weekOneEvents } from "../../game/data/events";
@@ -16,7 +17,6 @@ import { EquipmentShop } from "../cafe/CafeManagement";
 
 interface ActionPanelProps {
   gameState: GameState;
-  statusMessage: string;
   onUpgradeDecor: (slot: DecorSlotId) => void;
   onBuyEquipment: (slot: EquipmentSlotId) => void;
   onBuyUpgrade: (upgradeId: UpgradeId) => void;
@@ -53,7 +53,6 @@ function FloorLog({ events }: { events: EventDefinition[] }) {
 
 export function ActionPanel({
   gameState,
-  statusMessage,
   onUpgradeDecor,
   onBuyEquipment,
   onBuyUpgrade,
@@ -66,22 +65,11 @@ export function ActionPanel({
         <h2 id="actions-title">Actions</h2>
       </div>
 
-      {/* Persistent live region: the <p> stays mounted so screen readers
-          announce every status change (serve lines, KASSANDRA, supply warnings).
-          It leads the panel so the result of an action reads next to the
-          café rather than below the fold. The inner span remounts via key to replay the slide-in animation for
-          sighted users without disturbing the live region. See GitHub #70. */}
-      <p className="status-message" role="status" aria-live="polite" aria-atomic="true">
-        <span key={statusMessage} className="status-message__text">
-          {statusMessage}
-        </span>
-      </p>
-
       {gameState.dayPhase === "open" && !gameState.cafeClosed ? (
         <OpenDayControls gameState={gameState} />
       ) : null}
 
-      {gameState.dayPhase === "day_end" ? (
+      {gameState.dayPhase === "day_end" && !gameState.demoComplete ? (
         <UpgradePanel
           gameState={gameState}
           onUpgradeDecor={onUpgradeDecor}
@@ -90,7 +78,7 @@ export function ActionPanel({
         />
       ) : null}
 
-      {(gameState.dayPhase === "open" || gameState.dayPhase === "day_end") ? (
+      {gameState.day !== 7 && (gameState.dayPhase === "open" || gameState.dayPhase === "day_end") ? (
         <FloorLog events={resolveFloorLogEvents(gameState)} />
       ) : null}
 
@@ -101,7 +89,6 @@ export function ActionPanel({
       >
         Reset / New Game
       </button>
-
     </section>
   );
 }
@@ -115,12 +102,8 @@ function OpenDayControls({ gameState }: { gameState: GameState }) {
         <span>Actions left</span>
         <strong>
           {gameState.dayManagement.actionPointsRemaining} /{" "}
-          {gameState.dayManagement.actionPointsRemaining +
-            gameState.dayManagement.actionPointsSpent}
+          {getShiftActionBudget(gameState)}
         </strong>
-        <small>
-          Each action uses one daily slot.
-        </small>
       </div>
 
       {gameState.dayManagement.serveStreak >= 2 ? (

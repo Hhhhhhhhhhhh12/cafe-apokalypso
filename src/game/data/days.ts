@@ -38,7 +38,7 @@ export const weekOneDays = [
     unlocks: ["guest behavior differences"],
     guestIds: [
       "pendler-kemal",
-      "pendlerin-paula",
+      "freelancerin-nele",
       "laptop-lukas",
       "lieferfahrer-cem",
       "cappuccino-christa",
@@ -194,9 +194,9 @@ export const weekOneDays = [
       "freelancerin-nele",
       "pendlerin-fatou",
       "nachbarin-mira",
+      "frau-roter-regenschirm",
       "herr-grau",
-      "meda",
-      "frau-roter-regenschirm"
+      "meda"
     ],
     eventIds: ["day-7-red-umbrella", "day-7-back-wall-doorway", "day-7-menu-bookmark", "day-7-kassandra-threshold", "day-7-closing-count"]
   }

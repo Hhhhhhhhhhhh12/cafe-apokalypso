@@ -75,7 +75,7 @@ describe("App intro/outro screens", () => {
     expect(text).toContain("will not survive a reload");
   });
 
-  it("shows the demo-complete banner after Day 7 and hides the intro", () => {
+  it.each([false, true])("renders only the café envelope for the letter (opened: %s)", (opened) => {
     const storage = createMemoryStorage();
     saveGameState(
       {
@@ -83,7 +83,8 @@ describe("App intro/outro screens", () => {
         day: 7,
         dayPhase: "day_end",
         demoComplete: true,
-        weirdnessVisible: true
+        weirdnessVisible: true,
+        ...(opened ? { daySevenLetterOpened: true } : {})
       },
       storage
     );
@@ -91,13 +92,10 @@ describe("App intro/outro screens", () => {
     const markup = renderAppWith(storage);
     const text = visibleText(markup);
 
-    expect(markup).toContain("demo-complete-banner");
-    expect(text).toContain("Week one complete");
-    expect(text).toContain("7 of 7 days served");
-    expect(text).toContain("Next unlock: Day 8, week two");
-    expect(text).toContain("Not built yet");
-    expect(text).toContain("Replay week one");
-    expect(text).not.toContain("Start the next café week");
+    const envelopeLabel = opened ? "Read the letter again" : "Open the sealed letter";
+    expect(markup.match(new RegExp(`aria-label="${envelopeLabel}"`, "g"))).toHaveLength(1);
+    expect(text).not.toContain("Office for Extraordinary Operational Relevance");
+    expect(text.includes("Replay week one")).toBe(opened);
     expect(markup).not.toContain("intro-cinema");
   });
 });

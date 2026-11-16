@@ -10,16 +10,20 @@ import { describe, expect, it } from "vitest";
 
 import { GuestService } from "../src/ui/cafe/GuestService";
 import { ActionPanel } from "../src/ui/components/ActionPanel";
+import { CafePlaceholder } from "../src/ui/cafe/CafePlaceholder";
+import { ResourceHud } from "../src/ui/panels/ResourceHud";
 import { createInitialGameState } from "../src/game/engine/gameState";
+import { getExpectedProductIncome } from "../src/game/engine/selectors";
+import { getProductById } from "../src/game/engine/management";
+import { formatAsche } from "../src/game/engine/currency";
 import type { GameState } from "../src/game/types/game";
 
 const noop = () => {};
 
-function renderActionPanel(state: GameState, statusMessage = "A test status beat.") {
+function renderActionPanel(state: GameState) {
   return renderToStaticMarkup(
     <ActionPanel
       gameState={state}
-      statusMessage={statusMessage}
       onUpgradeDecor={noop}
       onBuyEquipment={noop}
       onBuyUpgrade={noop}
@@ -44,7 +48,8 @@ function openWithStreak(): GameState {
 
 describe("screen-reader announcements (#70)", () => {
   it("renders the status line as a persistent live region with a keyed inner span", () => {
-    const markup = renderActionPanel(openWithStreak(), "Served Kemal his filter coffee.");
+    const state = { ...openWithStreak(), statusMessage: "Served Kemal his filter coffee." };
+    const markup = renderToStaticMarkup(<CafePlaceholder gameState={state} onAction={noop} />);
 
     // The <p> itself is the live region — it carries the ARIA, not a remounting node.
     expect(markup).toContain('class="status-message"');
@@ -54,14 +59,23 @@ describe("screen-reader announcements (#70)", () => {
     // The animated text lives in an inner span so the region can stay mounted.
     expect(markup).toContain('class="status-message__text"');
     expect(markup).toContain("Served Kemal his filter coffee.");
+    expect(markup.indexOf('class="status-message"')).toBeLessThan(markup.indexOf('class="cafe-scene-frame"'));
   });
 
-  it("keeps exactly one live region in an active open shift (no announcement pile-up)", () => {
-    // Full action capacity + a streak: flow-meter and next-guest are visible but
-    // must NOT be live regions, so only the status line announces.
-    const markup = renderActionPanel(openWithStreak());
-    const statusRegions = markup.match(/role="status"/g) ?? [];
-    expect(statusRegions).toHaveLength(1);
+  it("announces the shift result only at the stage", () => {
+    const state = openWithStreak();
+    const stage = renderToStaticMarkup(<CafePlaceholder gameState={state} onAction={noop} />);
+    expect((stage.match(/class="status-message"/g) ?? [])).toHaveLength(1);
+    expect(renderActionPanel(state)).not.toContain('role="status"');
+  });
+
+  it.each([4, 6])("shows the same modified action budget in both panels (%i total)", (total) => {
+    const state = openWithStreak();
+    state.day = 5;
+    state.dayManagement.actionPointsSpent = 1;
+    state.dayManagement.actionPointsRemaining = total - 1;
+    expect(renderActionPanel(state)).toContain(`${total - 1} / ${total}`);
+    expect(renderToStaticMarkup(<ResourceHud gameState={state} />)).toContain(`/ ${total}`);
   });
 
   it("keeps the flow meter visible and labelled but not a live region", () => {
@@ -85,6 +99,30 @@ describe("screen-reader announcements (#70)", () => {
     expect(markup).toContain("Est. 1.5 Asche");
     expect(markup).toContain('aria-label="Filter Coffee: estimated income 1.5 Asche per guest"');
     expect(markup).toContain("Menu price 2.2 Asche.");
+  });
+
+  it("previews the actual substitute and reputation penalty before an out-of-stock order", () => {
+    const state = openWithStreak();
+    state.supplies.milk = 0;
+    const markup = renderService(state);
+    const cappuccino = markup.match(/<button[^>]*aria-label="Cappuccino:[\s\S]*?<\/button>/)?.[0] ?? "";
+    const income = getExpectedProductIncome(state, getProductById("espresso"), Math.max(0, state.resources.reputation - 1));
+    expect(cappuccino).toContain(`estimated income ${formatAsche(income)} per guest`);
+    expect(cappuccino).toContain("→ Espresso · −1 reputation");
+    expect(cappuccino).toContain('data-product="espresso"');
+    expect(cappuccino).not.toContain("serve-menu__item--suggested");
+  });
+
+  it("does not promise income when an order has neither stock nor substitute", () => {
+    const state = openWithStreak();
+    state.supplies.coffee = 0;
+    state.supplies.pastries = 2;
+    const markup = renderService(state);
+    const espresso = markup.match(/<button[^>]*aria-label="Espresso:[\s\S]*?<\/button>/)?.[0] ?? "";
+    expect(espresso).toContain('aria-label="Espresso: no sale"');
+    expect(espresso).toContain("No sale · −1 reputation");
+    expect(espresso).toContain("Uses one action without serving a guest.");
+    expect(espresso).not.toContain("Est.");
   });
 
   it("warns only when another patience action can actually cause a walkout", () => {

@@ -251,6 +251,13 @@ export function RestockControls({
           </div>
         );
       })}
+      {preview.canAfford && (
+        <p className="action-hint">
+          {preview.sellableTomorrow.length > 0
+            ? `Tomorrow’s menu: ${preview.sellableTomorrow.map((product) => product.name).join(" · ")}`
+            : "Tomorrow: nothing on the menu with this stock."}
+        </p>
+      )}
       <button
         type="button"
         className="restock-confirm"
@@ -272,9 +279,14 @@ export function RestockControls({
         <p className="action-hint">Reduce the quantities to stay within {formatAsche(gameState.resources.money)}.</p>
       ) : null}
       {!nothingToBuy ? (
-        <button type="button" className="secondary-button" onClick={onSkipRestocking}>
-          Open tomorrow without restocking
-        </button>
+        <>
+          <button type="button" className="secondary-button" onClick={onSkipRestocking}>
+            Open tomorrow without restocking
+          </button>
+          {!preview.canServeWithoutRestock && (
+            <p className="action-hint">Skipping leaves nothing to sell tomorrow.</p>
+          )}
+        </>
       ) : null}
     </div>
   );

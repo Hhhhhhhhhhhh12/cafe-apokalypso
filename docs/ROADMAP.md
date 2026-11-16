@@ -37,7 +37,7 @@ Out of scope:
 - accounts
 - multiple locations
 - usable bedrooms or upper floors
-- healing / inn-room mechanics
+- dedicated healing services and inn rooms beyond Week 1 heart recovery
 - overnight guest management
 - full mythology roster
 - advanced animations

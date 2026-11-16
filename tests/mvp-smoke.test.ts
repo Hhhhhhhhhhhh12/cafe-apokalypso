@@ -10,9 +10,12 @@ import {
   CURRENT_GAME_STATE_VERSION
 } from "../src/game/engine/gameState";
 import { gameReducer } from "../src/game/engine/reducer";
+import { createInitialDayManagement } from "../src/game/engine/management";
 import {
   getCurrentDayDefinition,
   getCurrentDayEvents,
+  getGuestForCustomer,
+  getGuestPatienceState,
   getVisibleDaySevenLetter,
   getVisibleKassandraMessages,
   getVisibleStaffOptions
@@ -288,10 +291,31 @@ describe("mvp-smoke: Day 7 cliffhanger and letter", () => {
     expect(ids).toContain("day-7-closing-count");
   });
 
+  it("brings the red umbrella to the counter during the rush and lets the shift meet its objective", () => {
+    const dayStart = createDayStartState(7);
+    let state = gameReducer({
+      ...dayStart,
+      dayManagement: createInitialDayManagement(dayStart.resources.reputation, 7)
+    }, { type: "open_day" });
+    expect(getGuestPatienceState(state)?.max).toBe(100);
+    for (let i = 0; i < 3; i++) {
+      state = gameReducer(state, { type: "serve_product", productId: "espresso" });
+    }
+
+    expect(getGuestForCustomer(state, 3)?.id).toBe("frau-roter-regenschirm");
+    expect(getGuestPatienceState(state)?.max).toBe(state.resources.cleanliness < 50 ? 50 : 75);
+    state = gameReducer(state, { type: "serve_product", productId: "cappuccino" });
+    expect(state.dayManagement.servedGuestIds).toContain("frau-roter-regenschirm");
+    state = gameReducer(state, { type: "clean_tables" });
+    state = gameReducer(state, { type: "complete_day" });
+    expect(state.daySummary?.objectiveCompleted).toBe(true);
+  });
+
   it("weirdness is still hidden before day 7 is closed", () => {
     const state = createDayStartState(7);
     expect(state.weirdnessVisible).toBe(false);
     expect(getVisibleDaySevenLetter(state)).toBeNull();
+    expect(gameReducer(state, { type: "open_day_seven_letter" })).toBe(state);
   });
 
   it("weirdnessVisible becomes true and letter is delivered after day 7 close", () => {
@@ -302,7 +326,8 @@ describe("mvp-smoke: Day 7 cliffhanger and letter", () => {
 
     expect(state.demoComplete).toBe(true);
     expect(state.weirdnessVisible).toBe(true);
-    expect(getVisibleDaySevenLetter(state)).not.toBeNull();
+    expect(getVisibleDaySevenLetter(state)).toBeNull();
+    expect(state.unlockedAchievements).not.toContain("week-one-letter");
   });
 
   it("the letter body mentions the 'Office for Extraordinary Operational Relevance'", () => {
@@ -311,7 +336,12 @@ describe("mvp-smoke: Day 7 cliffhanger and letter", () => {
     state = gameReducer(state, { type: "take_order" });
     state = gameReducer(state, { type: "complete_day" });
 
-    const letter = getVisibleDaySevenLetter(state);
+    const opened = gameReducer(state, { type: "open_day_seven_letter" });
+    expect(gameReducer(opened, { type: "open_day_seven_letter" })).toBe(opened);
+    expect(opened.unlockedAchievements).toContain("week-one-letter");
+    expect(opened.daySummary).toBe(state.daySummary);
+    expect(opened.resources).toBe(state.resources);
+    const letter = getVisibleDaySevenLetter(opened);
     expect(letter).not.toBeNull();
     expect(letter).toContain("Office for Extraordinary Operational Relevance");
   });
