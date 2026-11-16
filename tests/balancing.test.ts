@@ -931,7 +931,8 @@ function getStrategyActions(strategy: StrategyName, day: DayNumber): GameAction[
     4: ["filterkaffee", "espresso", "handfilter", "cappuccino"],
     5: ["kaffee-croissant", "espresso", "cappuccino", "handfilter"],
     6: ["filterkaffee", "espresso", "cappuccino", "handfilter"],
-    7: ["filterkaffee", "espresso", "cappuccino", "handfilter", "kaffee-croissant"]
+    // The red umbrella guest is fourth and orders a cappuccino.
+    7: ["filterkaffee", "espresso", "cappuccino", "cappuccino", "kaffee-croissant"]
   };
 
   if (strategy === "conservative") {
