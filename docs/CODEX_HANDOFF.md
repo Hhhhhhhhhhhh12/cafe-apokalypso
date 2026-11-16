@@ -71,6 +71,16 @@ merging. Do not repeat that implementation from an old handoff prompt.
 
 ## Current work selection
 
+Recovery feedback follow-up (2026-11-16, based on `adc9147`): the counter
+briefly shows the actual newly earned heart count, including combined service.
+The header keeps the shift total without a reward animation or a plus sign.
+Loading a save and changing days do not replay rewards. Reduced motion keeps
+the badge readable without movement. Verification on this patch: 12 focused
+guest/feedback tests, TypeScript and changed-file lint passed (2.4 seconds).
+An isolated 1024×768 touch-browser run passed Day 1–2 service, clean-table
+recovery, reload without reward replay and reduced-motion feedback (21.6
+seconds). This is technical browser evidence, not native or visual acceptance.
+
 Use the live [pull requests](https://github.com/Hhhhhhhhhhhh12/cafe-apokalypso/pulls)
 and [issues](https://github.com/Hhhhhhhhhhhh12/cafe-apokalypso/issues), not the
 October 12 PR list or the July onboarding task list. Inspect the current branch,

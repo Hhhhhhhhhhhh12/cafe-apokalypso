@@ -123,13 +123,43 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .cafe-recovered {
+  .cafe-recovery-feedback__reward {
     animation: cafe-heart-rise 380ms ease-out both;
   }
 }
 
 @keyframes cafe-heart-rise {
   from { transform: translateY(4px) scale(0.82); opacity: 0.5; }
+}
+
+.cafe-recovery-feedback {
+  position: absolute;
+  z-index: 30;
+  left: 62%;
+  top: 47%;
+  pointer-events: none;
+}
+
+.cafe-recovery-feedback__reward {
+  display: inline-block;
+  padding: 0.3rem 0.55rem;
+  border: 2px solid #245e4c;
+  border-radius: 0.4rem;
+  background: #e7f4df;
+  color: #245e4c;
+  box-shadow: 0 3px 0 #244231;
+  font-size: 1.125rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.cafe-recovery-feedback__announcement {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .cafe-stage > .status-message {

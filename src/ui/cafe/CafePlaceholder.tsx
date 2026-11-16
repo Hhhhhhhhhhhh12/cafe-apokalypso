@@ -25,6 +25,7 @@ import { canJanaClearTable, PATIENCE_TICK } from "../../game/engine/management";
 import { DAY_SEVEN_SERVE_GOAL, hasShiftCleaning } from "../../game/engine/objectives";
 import { CafeInteraction, type CafeStation } from "./CafeInteraction";
 import { CafeShiftHelper, StaffPortrait } from "./CafeShiftHelper";
+import { RecoveryFeedback } from "./RecoveryFeedback";
 import stageDay1Asset from "../../../assets/backgrounds/placeholder-cafe-stage-v07-day-1.png";
 import stageDay2Asset from "../../../assets/backgrounds/placeholder-cafe-stage-v07-day-2.png";
 import stageDay3Asset from "../../../assets/backgrounds/placeholder-cafe-stage-v07-day-3.png";
@@ -458,9 +459,9 @@ export function CafePlaceholder({
               </span>
             )}
             {Boolean(gameState.dayManagement.heartsRestored) && (
-              <span className="cafe-recovered" key={gameState.dayManagement.heartsRestored}
+              <span className="cafe-recovered"
                 role="img" aria-label={`${gameState.dayManagement.heartsRestored} hearts restored`}>
-                <span aria-hidden="true">♥ +{gameState.dayManagement.heartsRestored}</span>
+                <span aria-hidden="true">♥ {gameState.dayManagement.heartsRestored}</span>
               </span>
             )}
             <span className="cafe-action-pips" role="img" aria-label={`${actionPointsRemaining} actions left`}>
@@ -493,6 +494,7 @@ export function CafePlaceholder({
             usesApprovedDayOneScene ? "cafe-diorama--approved-day-one" : "",
           ].join(" ")}
         >
+          <RecoveryFeedback day={gameState.day} total={gameState.dayManagement.heartsRestored ?? 0} />
           {isOpen && coinTick?.day === gameState.day && (
             <span key={`coin-${coinTick.key}`} className="cafe-coin-tick" aria-hidden="true">
               +{formatAsche(coinTick.money)}{coinTick.rep > 0 ? " ★" : ""}
