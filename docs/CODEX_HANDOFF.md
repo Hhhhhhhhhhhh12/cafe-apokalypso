@@ -82,6 +82,9 @@ Verification: 80 focused narrative, guest-display, save and week-one balance
 tests, TypeScript and changed-file lint passed (1.8 seconds). An isolated
 1024×768 touch-browser route from Day 1 reached Nele's Day-2 order, reloaded,
 served her, then checked Lukas's recovery (23.5 seconds, no runtime errors).
+The first full PR CI caught four stale Day-2 Paula assertions in the legacy
+guest-transition tests. Only those identities were corrected; all six movement
+cases then passed locally, including reduced motion and rapid serving.
 
 Service preview follow-up (based on `4d48523`): missing recipes now show the
 actual substitute, its income after the existing reputation penalty, and the
