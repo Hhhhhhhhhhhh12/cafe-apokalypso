@@ -671,7 +671,8 @@ button.cafe-order-bubble:hover {
   grid-template-columns: 1fr auto;
   align-items: center;
   column-gap: 0.625rem;
-  width: clamp(11rem, 24vw, 16.5rem);
+  width: max-content;
+  max-width: min(12rem, 41vw);
   padding: 0.625rem 0.75rem;
   transform: translateX(-50%);
   text-align: left;
@@ -693,8 +694,17 @@ button.cafe-order-bubble:hover {
   pointer-events: none;
 }
 
-.cafe-order-bubble__short {
-  display: none;
+/* The waiting area moves forward from Day 4, away from the tables. */
+:is(.cafe-diorama--day-four, .cafe-diorama--day-seven) .cafe-order-bubble {
+  left: calc(100% + 1.2rem);
+  bottom: 1rem;
+  transform: none;
+}
+
+:is(.cafe-diorama--day-four, .cafe-diorama--day-seven) .cafe-order-bubble::after {
+  top: 50%;
+  left: 0;
+  transform: translate(-50%, -50%) rotate(135deg);
 }
 
 .cafe-order-bubble__arrow {
@@ -1088,14 +1098,6 @@ button.cafe-order-bubble:hover {
     font-size: 0.8125rem;
   }
 
-  .cafe-order-bubble__line {
-    display: none;
-  }
-
-  .cafe-order-bubble__short {
-    display: block;
-  }
-
   .workspace-grid--cafe > .action-panel,
   .workspace-grid--cafe > .day-progress-panel {
     grid-row: auto;
@@ -1145,10 +1147,6 @@ button.cafe-order-bubble:hover {
   bottom: calc(var(--cafe-door-y) + 85px);
 }
 
-.cafe-diorama--short-orders .cafe-order-bubble {
-  width: max-content;
-}
-
 .cafe-scene-frame .cafe-pilot-asset--standing {
   width: var(--cafe-standing-size);
   height: var(--cafe-standing-size);
@@ -1163,14 +1161,6 @@ button.cafe-order-bubble:hover {
 ) {
   background-size: 115%;
   background-position: center 48%;
-}
-
-.cafe-diorama--short-orders .cafe-order-bubble__line {
-  display: none;
-}
-
-.cafe-diorama--short-orders .cafe-order-bubble__short {
-  display: block;
 }
 
 

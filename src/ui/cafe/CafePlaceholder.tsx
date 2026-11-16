@@ -488,7 +488,6 @@ export function CafePlaceholder({
             dayClass,
             growthDayClass,
             earlyV07 ? "cafe-diorama--early-v07" : "",
-            gameState.day !== 4 ? "cafe-diorama--short-orders" : "",
             kassandraClass,
             weirdnessClass,
             usesApprovedDayOneScene ? "cafe-diorama--approved-day-one" : "",
@@ -876,7 +875,7 @@ export function CafePlaceholder({
                         data-cafe-entry
                         aria-label={`Take order from ${nextGuest.name}`}
                       aria-description={[
-                        nextGuest.orderLine,
+                        nextGuest.orderLine.replace(/[.]$/, ""),
                         gameState.day >= 4 && patience
                           ? `Patience ${patience.patience / PATIENCE_TICK} of ${patience.max / PATIENCE_TICK}`
                           : null,
@@ -884,10 +883,7 @@ export function CafePlaceholder({
                       ].filter(Boolean).join(". ") || undefined}
                         onClick={(event) => openStation("service", event.currentTarget)}
                       >
-                        <span className="cafe-order-bubble__line">
-                          {nextGuest.orderLine ? <q>{nextGuest.orderLine}</q> : "Take order"}
-                        </span>
-                        <span className="cafe-order-bubble__short">{nextGuest.wants || "Take order"}</span>
+                        <span>{nextGuest.wants || "Take order"}</span>
                         <span className="cafe-order-bubble__arrow" aria-hidden="true">→</span>
                         {recovery && (
                           <span className="cafe-order-bubble__hearts" aria-hidden="true">
