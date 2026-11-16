@@ -288,14 +288,6 @@
   font-size: 0.8rem;
 }
 
-.cafe-order-bubble__hearts > span {
-  color: #9b7b6e;
-}
-
-.cafe-order-bubble__hearts > [data-filled="true"] {
-  color: #942f43;
-}
-
 .cafe-shift-helper--legacy {
   left: 56%;
   bottom: 17%;
@@ -1317,3 +1309,34 @@ button.cafe-order-bubble:hover {
   left: 29.92%;
   bottom: 19.77%;
 }
+
+/* Forecast hearts are marked with a plus and outline, not color alone. */
+.cafe-recovery-hearts {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  color: #245e4c;
+  font-size: 1.25rem;
+  line-height: 1.15;
+}
+.cafe-recovery-hearts > span {
+  position: relative;
+  min-width: 1rem;
+  text-align: center;
+}
+.cafe-recovery-hearts > [data-forecast="true"] {
+  color: #77501c;
+  border-bottom: 2px dotted currentColor;
+}
+.cafe-recovery-hearts sup {
+  position: absolute;
+  top: -0.15rem;
+  right: -0.15rem;
+  padding: 0 0.08rem;
+  border-radius: 50%;
+  background: #fff5e2;
+  font-size: 0.65rem;
+  font-weight: 900;
+  line-height: 1;
+}
+.cafe-order-bubble__hearts .cafe-recovery-hearts { font-size: 1rem; }

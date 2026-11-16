@@ -1,3 +1,4 @@
+import { RecoveryHearts } from "./RecoveryHearts";
 import { formatAsche } from "../../game/engine/currency";
 import {
   getAvailableProducts,
@@ -56,7 +57,7 @@ export function GuestService({
           ) : null}
           {nextGuest.recovery && (
             <div className="guest-recovery">
-              <strong><span aria-hidden="true">♥ </span>+{nextGuest.recovery.restored} {nextGuest.recovery.restored === 1 ? "heart" : "hearts"}</strong>
+              <RecoveryHearts {...nextGuest.recovery} />
               {nextGuest.recovery.restored === 2 && <small>Clean table bonus</small>}
               {nextGuest.recovery.current === 1 && nextGuest.recovery.restored === 1 && nextGuest.recovery.tableId &&
                 <small>Clean café and clear table · +1 extra</small>}

@@ -71,6 +71,19 @@ merging. Do not repeat that implementation from an old handoff prompt.
 
 ## Current work selection
 
+### Recovery forecast at the order (2026-11-16)
+
+`RecoveryHearts` shows present hearts and plus-marked forecast hearts in both
+the queue and service panel. It uses the same current/restored values as service;
+the accessible label makes successful service conditional. The actual earned
+reward remains separate. No save, artwork or chair-anchor changes are involved.
+Focused recovery/display checks (25 cases including the corrected service-only
+SSR fixture), TypeScript and scoped lint passed. An isolated iPad touch run
+checked one versus two forecast hearts before/after wiping, actual healing,
+reload and reduced motion in 22.9 s; total local checks stayed below 30 s.
+Visual follow-up: the standing Lukas sprite is visibly coarser than the approved
+seated figure. Locate any approved standing counterpart before altering artwork.
+
 ### Approved room restored for the whole week (2026-11-16)
 
 The user explicitly reconfirmed `outfit-selection-20261105.png` and instructed

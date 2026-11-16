@@ -1,3 +1,4 @@
+import { RecoveryHearts } from "./RecoveryHearts";
 import { formatAsche } from "../../game/engine/currency";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { GameAction, GameState, TableId } from "../../game/types/game";
@@ -805,7 +806,7 @@ export function CafePlaceholder({
                         gameState.day >= 4 && patience
                           ? `Patience ${patience.patience / PATIENCE_TICK} of ${patience.max / PATIENCE_TICK}`
                           : null,
-                        recovery ? `Resting. ${recovery.current} of 3 hearts.` : null,
+                        recovery ? `Resting. ${recovery.current} of 3 hearts. A served order restores ${recovery.restored}.` : null,
                         recovery?.restored === 2 ? `Clean ${recovery.tableId} table adds a recovery heart` : null
                       ].filter(Boolean).join(". ") || undefined}
                         onClick={(event) => openStation("service", event.currentTarget)}
@@ -814,11 +815,7 @@ export function CafePlaceholder({
                         <span className="cafe-order-bubble__arrow" aria-hidden="true">→</span>
                         {recovery && (
                           <span className="cafe-order-bubble__hearts" aria-hidden="true">
-                            {Array.from({ length: 3 }, (_, index) =>
-                              <span key={index} data-filled={index < recovery.current}>
-                                {index < recovery.current ? "♥" : "♡"}
-                              </span>
-                            )}
+                            <RecoveryHearts {...recovery} />
                           </span>
                         )}
                         {gameState.day >= 4 && patience && (
