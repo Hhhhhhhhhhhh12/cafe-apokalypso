@@ -19,12 +19,12 @@ function stateForDay(day: DayNumber, overrides: Partial<GameState> = {}): GameSt
 }
 
 describe("guest serve lines", () => {
-  it("does not select Nele before Day 3, then includes her in the normal pool", () => {
-    for (const day of [1, 2] as const) {
-      for (let index = 0; index < 12; index += 1) {
-        expect(getGuestForCustomer(stateForDay(day), index)?.id).not.toBe("freelancerin-nele");
-      }
+  it("introduces Nele as the second Day 2 guest, never on Day 1", () => {
+    for (let index = 0; index < 12; index += 1) {
+      expect(getGuestForCustomer(stateForDay(1), index)?.id).not.toBe("freelancerin-nele");
     }
+    expect(getGuestForCustomer(stateForDay(2), 1)?.id).toBe("freelancerin-nele");
+    expect(getGuestForCustomer(stateForDay(2), 2)?.id).toBe("laptop-lukas");
     const dayThreeGuests = Array.from({ length: 8 }, (_, index) =>
       getGuestForCustomer(stateForDay(3), index)?.id
     );
@@ -167,8 +167,10 @@ describe("resource HUD labels", () => {
 describe("day-7 letter", () => {
   it("returns the letter body without the debug weirdness line once revealed", () => {
     const revealed = stateForDay(7, {
+      dayPhase: "day_end",
       demoComplete: true,
-      weirdnessVisible: true
+      weirdnessVisible: true,
+      daySevenLetterOpened: true
     });
     const letter = getVisibleDaySevenLetter(revealed);
 

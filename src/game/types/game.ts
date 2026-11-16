@@ -63,6 +63,8 @@ export interface DayManagementState {
   actionPointsSpent: number;
   customersServed: number;
   servedGuestIds?: GuestId[];
+  /** Recovery earned by visitors served this shift. Absent on older saves. */
+  heartsRestored?: number;
   moneyEarned: number;
   moneySpent: number;
   suppliesUsed: SupplyState;
@@ -204,6 +206,8 @@ export interface GameState {
   weirdnessVisible: boolean;
   kassandraInstalled: boolean;
   demoComplete: boolean;
+  /** Older saves can contain a completed week with the letter still sealed. */
+  daySevenLetterOpened?: boolean;
   /** True once the café has permanently closed (money or reputation fail-state). */
   cafeClosed: boolean;
   /** Why the café closed, or null if still open. */
@@ -255,6 +259,7 @@ export type GameAction =
   | { type: "clear_helper" }
   | { type: "open_day" }
   | { type: "complete_day" }
+  | { type: "open_day_seven_letter" }
   | { type: "set_supply_purchase"; ingredient: IngredientKey; quantity: number }
   | { type: "confirm_supply_purchase"; withoutRestocking?: boolean }
   | { type: "upgrade_decor"; slot: DecorSlotId }

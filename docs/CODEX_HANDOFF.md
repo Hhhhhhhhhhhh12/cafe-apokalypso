@@ -48,6 +48,10 @@ current task, not the whole documentation archive.
   cues read the same counters as the closing recap.
 - From Day 6, the register sprite opens KASSANDRA. The terminal previews
   action and patience costs, and the printed forecast stays with the shift save.
+- On Day 7 the red umbrella guest is fourth in line. From that position onward
+  new guests have one fewer patience step. Closing leaves a sealed letter on
+  the counter. Opening it records the achievement and keeps the letter readable
+  after reload, including on saves from before the envelope was interactive.
 - Paula is the owner/player character. Nele's approved first appearance is
   Day 2, not Day 1; this timing is no longer an unresolved design question.
 - Use `npm run test` to establish the current test count and result. Old test
@@ -66,6 +70,134 @@ implementation on `main` in commit `9c60669`; the redundant PR was closed withou
 merging. Do not repeat that implementation from an old handoff prompt.
 
 ## Current work selection
+
+The current character direction is [Lukas as a JRPG hero off duty](art/LUKAS_OFF_DUTY.md).
+The separate standing concept has been shown but has not been approved or installed.
+
+
+### Direct guest interaction (2026-11-16)
+
+The single order button now covers the visible guest body instead of a large
+floating text box. A compact, tappable card beside the figure shows drink,
+recovery and patience; an exclamation mark and accessible description retain
+the walkout warning. The existing entry button and focus-return path are kept.
+The card avoids the shelf, machine and register controls without changing the
+approved figures, fixed chairs or world anchors.
+
+Based on `af16ce9`: 24 focused display/control/recovery tests, TypeScript and
+scoped ESLint passed. The isolated iPad touch route completed Days 1–7, goals,
+KASSANDRA and the letter (89.8 s). A subagent found a shrinking patience row and
+minimum-width centring issue; both were corrected. Final focused browser checks
+passed at 1024 and 390 px on Days 2/4/6/7: body/card taps, Enter, focus return,
+visible patience-pip width, 44-px minimum targets and no station-control overlap
+(3.7 s). Including earlier attempts and a corrected patience fixture, this local
+package used under 115 s. Artwork approval remains separate.
+
+### Affordable escape from an empty pantry (2026-11-16)
+
+At closing, only when tomorrow has no sellable recipe and the automatic replacement
+basket is unaffordable or still unhelpful, suggest one coffee bean if its regular
+0.8-Asche cost is available after overhead. Affordable useful baskets, manual
+quantities and skipping remain unchanged. No free stock or new prices are added.
+The correction is based on `6d744f4`; 79 focused management tests, TypeScript and
+scoped ESLint passed. An isolated iPad-size browser confirmed the untouched default
+at exactly 0.8 Asche and completed the next sale (2.0 s). Total local checks,
+including a corrected closing-state test fixture, stayed below 10 s.
+
+### Recovery forecast at the order (2026-11-16)
+
+`RecoveryHearts` shows present hearts and plus-marked forecast hearts in both
+the queue and service panel. It uses the same current/restored values as service;
+the accessible label makes successful service conditional. The actual earned
+reward remains separate. No save, artwork or chair-anchor changes are involved.
+Focused recovery/display checks (25 cases including the corrected service-only
+SSR fixture), TypeScript and scoped lint passed. An isolated iPad touch run
+checked one versus two forecast hearts before/after wiping, actual healing,
+reload and reduced motion in 22.9 s; total local checks stayed below 30 s.
+Visual follow-up: the standing Lukas sprite is visibly coarser than the approved
+seated figure. Locate any approved standing counterpart before altering artwork.
+
+### Approved room restored for the whole week (2026-11-16)
+
+The user explicitly reconfirmed `outfit-selection-20261105.png` and instructed
+its adoption on Days 1–7, preserving the approved figures and chair positions.
+The authority is the Nov-5 six-person approval (`9d59d10` geometry/assets,
+`448f8c6:docs/art/OUTFIT_SELECTION_20261105.md`), not the later v07 experiments.
+`approved-cafe.css` now supplies the compact v12 room throughout the week.
+`approvedSeats.ts` keeps Meda/Lukas left, Mira/Christa right, Nele/Fatou at the
+front-right group (legacy ID `back`). Christa and Nele use their v04 outfits.
+Runtime seating still requires actual service history and excludes queued guests.
+The same fixed table is used for cleaning and recovery: Lukas's bonus now belongs
+to his left table. Cleaning it after Kemal and Nele leaves the fourth action for
+Lukas on Day 2. Old save data is preserved; no new save schema is introduced.
+Earlier v07 visual findings below are historical and do not supersede this approval.
+
+Verification on the working candidate based on `4e4f839`: 150 focused tests
+(guest display, management, diorama, brew group, KASSANDRA, recovery and save
+regressions), TypeScript and changed-file ESLint passed. Isolated 1024×768 browser:
+full Day 1–7 route including goals, brew-group install, KASSANDRA, letter/reload
+and empty-stock fallback passed in 90.9 s; Day-2 cleaning/recovery and reload
+passed in 22.4 s with movement enabled and reduced-motion coverage. A separate
+six-guest review fixture verified all six approved contact anchors within 0.02 px
+and scale 1:1 in 1.2 s; it is a visual fixture, not an invented gameplay history.
+Including failed checks and focused repeats, local checks took under 130 s total.
+The moving queue uses centred animation and enters behind the fixed chairs.
+No native build, installation or publication is included in this change.
+
+
+Nele arrival correction (based on `0c5529b`): the confirmed Day-2 arrival in
+PROJECT_CANON and DECISIONS is now playable as the second order. Kemal remains
+first and Lukas third; Day 1, Day 3, action budgets, objectives and helper unlocks
+are unchanged. Nele replaces the Day-2 commuter Paula slot and prefers espresso
+(one bean, with the normal espresso price). Modern saves retain their recorded
+guest identities, including earlier Day-2 Paula visits. Saves without identities
+still use the existing conservative roster-prefix fallback.
+Verification: 80 focused narrative, guest-display, save and week-one balance
+tests, TypeScript and changed-file lint passed (1.8 seconds). An isolated
+1024×768 touch-browser route from Day 1 reached Nele's Day-2 order, reloaded,
+served her, then checked Lukas's recovery (23.5 seconds, no runtime errors).
+The first full PR CI caught four stale Day-2 Paula assertions in the legacy
+guest-transition tests. Only those identities were corrected; all six movement
+cases then passed locally, including reduced motion and rapid serving.
+
+Service preview follow-up (based on `4d48523`): missing recipes now show the
+actual substitute, its income after the existing reputation penalty, and the
+penalty before committing an action. A recipe with no substitute says “No sale”
+and promises no income. Unavailable preferred recipes are no longer highlighted
+as suggested. Existing substitution and failed-order rules remain unchanged.
+Verification: 92 focused announcement, brew-group and management tests,
+TypeScript and changed-file lint passed (2.0 seconds). An isolated iPad browser
+compared the shown replacement price with the actual shift ledger and checked
+no-sale money/customer/action changes (22.2 seconds). No runtime errors.
+
+Recovery feedback follow-up (2026-11-16, based on `adc9147`): the counter
+briefly shows the actual newly earned heart count, including combined service.
+The header keeps the shift total without a reward animation or a plus sign.
+Loading a save and changing days do not replay rewards. Reduced motion keeps
+the badge readable without movement. Verification on this patch: 12 focused
+guest/feedback tests, TypeScript and changed-file lint passed (2.4 seconds).
+An isolated 1024×768 touch-browser run passed Day 1–2 service, clean-table
+recovery, reload without reward replay and reduced-motion feedback (21.6
+seconds). This is technical browser evidence, not native or visual acceptance.
+
+Recovery seating follow-up (based on `b43e948`): the next recovering guest's
+clean table carries a heart marker only when its bonus is actually available.
+Lukas's existing seat follows his recorded successful service index, so earlier
+walkouts do not assign him to the wrong table. Old saves without that record
+retain the existing placement. No art assets or recovery rules changed.
+Fourteen focused display/feedback tests, TypeScript and changed-file lint passed
+(2.5 seconds). The isolated iPad browser verified clean/dirty-table cues and
+Lukas's back-table placement after reload. Other characters still use their
+existing seat anchors; full roster art consistency remains unfinished.
+The two browser runs took 21.7 and 21.9 seconds. The settled frame exposes the
+old Lukas sprite's baked-in laptop table; this remains an art defect, not a
+successful visual acceptance. The table-free v02 pose in historical commit
+`918b1a6` is approved only for the compact v12 room (see the review document in
+`6764432`), explicitly not for v07. Do not silently transfer that approval.
+The Day 2–3 waiting position now clears the occupied recovery table. A focused
+23.2-second browser run measured an 11-pixel gap between the seated and waiting
+sprite boxes at 1024×768; the order control also remained fully inside a
+390-pixel viewport. Door, aisle and counter waypoints remain unchanged.
 
 Use the live [pull requests](https://github.com/Hhhhhhhhhhhh12/cafe-apokalypso/pulls)
 and [issues](https://github.com/Hhhhhhhhhhhh12/cafe-apokalypso/issues), not the

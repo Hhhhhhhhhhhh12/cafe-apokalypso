@@ -20,6 +20,10 @@ The player starts with a seemingly normal small café. Early gameplay focuses on
 
 Over time, guests, events and systems become increasingly strange: mythological regulars, AI-oracle hints, bureaucratic apocalypse systems and reality glitches.
 
+From Day 2, some regulars come back from video-game adventures to recover. Lukas
+is the first to let a remark about a checkpoint slip. Café service restores a
+heart, and a clean room with a clear table can restore a second.
+
 The long-term game shifts from micromanagement to macromanagement: staff, delegation, marketing, economy, expansion and delaying world-ending incidents.
 
 ## Tone

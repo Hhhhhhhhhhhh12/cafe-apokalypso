@@ -85,7 +85,7 @@ describe("guest entrance, departure and seat handover", () => {
     expect(guest()).toBe("pendler-kemal");
     expect(container.querySelector(".cafe-guest-thought-bubble")).toBeNull();
     exit(); arrive();
-    expect(guest()).toBe("pendlerin-paula");
+    expect(guest()).toBe("freelancerin-nele");
     state = serve(state);
     exit(); arrive();
     expect(guest()).toBe("laptop-lukas");
@@ -105,7 +105,7 @@ describe("guest entrance, departure and seat handover", () => {
     render(state);
     expect(phase()).toBe("idle");
     state = serve(state);
-    expect(guest()).toBe("pendlerin-paula");
+    expect(guest()).toBe("freelancerin-nele");
     state = serve(state);
     expect(guest()).toBe("laptop-lukas");
     expect(phase()).toBe("idle");
@@ -123,7 +123,7 @@ describe("guest entrance, departure and seat handover", () => {
     const state = createInitialGameState();
     render({ ...state, day: 2 }); arrive();
     render({ ...state, day: 2, dayManagement: { ...state.dayManagement, guestsLost: 1 } });
-    expect(guest()).toBe("pendlerin-paula");
+    expect(guest()).toBe("freelancerin-nele");
     arrive();
     render({ ...state, day: 3 });
     expect(guest()).toBe("pendler-kemal");
@@ -136,7 +136,7 @@ describe("guest entrance, departure and seat handover", () => {
     render(state);
     frame(); frame(); // still walking in
     state = serve(state);
-    expect(guest()).toBe("pendlerin-paula");
+    expect(guest()).toBe("freelancerin-nele");
     arrive();
     state = serve(state);
     expect(phase()).toBe("walking-to-counter");

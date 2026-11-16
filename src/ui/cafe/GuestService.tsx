@@ -1,6 +1,8 @@
+import { RecoveryHearts } from "./RecoveryHearts";
 import { formatAsche } from "../../game/engine/currency";
 import {
   getAvailableProducts,
+  canServeFromStock,
   getDoubleEspressoOption,
   getExpectedProductIncome,
   getGuestPatienceState,
@@ -9,18 +11,20 @@ import {
   hasActionCapacity,
   hasSecondBrewGroup
 } from "../../game/engine/selectors";
-import { getMissingIngredients, PATIENCE_TICK } from "../../game/engine/management";
+import { findSubstituteProduct, getMissingIngredients, PATIENCE_TICK } from "../../game/engine/management";
 import type { ProductId } from "../../game/types/content";
 import type { GameState } from "../../game/types/game";
 
 export function GuestService({
   gameState,
   onServeProduct,
-  onServeDoubleEspresso
+  onServeDoubleEspresso,
+  onGoToDoor
 }: {
   gameState: GameState;
   onServeProduct: (productId: ProductId) => void;
   onServeDoubleEspresso?: () => void;
+  onGoToDoor?: () => void;
 }) {
   const nextGuest = getNextGuestPreview(gameState);
   const patienceState = getGuestPatienceState(gameState);
@@ -35,6 +39,15 @@ export function GuestService({
   const extraOrder = Boolean(helper && gameState.dayManagement.helperExtraOrdersRemaining > 0);
   const baristaBonus = helper?.taskId === "barista" && gameState.dayManagement.baristaReputationBonus < 3;
 
+  if (canAct && !canServeFromStock(gameState)) {
+    return (
+      <>
+        <p className="action-hint">Nothing on the menu can be made with the stock left.</p>
+        {onGoToDoor && <button type="button" onClick={onGoToDoor}>Go to closing</button>}
+      </>
+    );
+  }
+
   return (
     <>
       {nextGuest ? (
@@ -42,6 +55,14 @@ export function GuestService({
           {nextGuest.orderLine ? (
             <q className="next-guest__order">{nextGuest.orderLine}</q>
           ) : null}
+          {nextGuest.recovery && (
+            <div className="guest-recovery">
+              <RecoveryHearts {...nextGuest.recovery} />
+              {nextGuest.recovery.restored === 2 && <small>Clean table bonus</small>}
+              {nextGuest.recovery.current === 1 && nextGuest.recovery.restored === 1 && nextGuest.recovery.tableId &&
+                <small>Clean café and clear table · +1 extra</small>}
+            </div>
+          )}
           {patienceState ? (
             <span
               className={`next-guest__patience next-guest__patience--${patienceState.label.toLowerCase()}${patienceState.critical ? " next-guest__patience--critical" : ""}`}
@@ -70,9 +91,6 @@ export function GuestService({
               One more action that uses patience and this guest leaves unserved.
             </span>
           ) : null}
-          {nextGuest.learningCue ? (
-            <span className="next-guest__cue">{nextGuest.learningCue}</span>
-          ) : null}
         </div>
       ) : null}
 
@@ -83,43 +101,55 @@ export function GuestService({
           <h4 className="serve-menu__label">Serve <span>· 1 action</span></h4>
           <div className="serve-menu__items">
             {products.map((product) => {
-              const income = getExpectedProductIncome(gameState, product).toFixed(2);
-              const priceDetail = `Menu price ${formatAsche(product.basePrice)}. Estimate per guest includes reputation and today's offer; excludes tips, helper orders and substitutions.`;
               const missing = getMissingIngredients(product, gameState.supplies, gameState.helperAssignment);
+              const servedProduct = missing.length > 0
+                ? findSubstituteProduct(product, gameState.supplies, gameState.helperAssignment)
+                : product;
+              const income = servedProduct ? getExpectedProductIncome(gameState, servedProduct,
+                Math.max(0, gameState.resources.reputation - (missing.length > 0 ? 1 : 0))) : 0;
+              const outcome = missing.length > 0
+                ? `${servedProduct ? `→ ${servedProduct.name}` : "No sale"} · −1 reputation`
+                : null;
+              const priceDetail = servedProduct
+                ? `Menu price ${formatAsche(servedProduct.basePrice)}. Estimate per guest includes reputation and today's offer; excludes tips and helper orders.`
+                : "Uses one action without serving a guest.";
               const missingLabel = missing.length > 0
                 ? `Short on ${missing.map(getIngredientLabel).join(", ")}`
                 : null;
-              const helperLabel = baristaBonus && (product.id === "espresso" || product.id === "cappuccino")
+              const helperLabel = baristaBonus && (servedProduct?.id === "espresso" || servedProduct?.id === "cappuccino")
                 ? "Nino · +1 reputation"
                 : extraOrder ? "Extra guest if stock allows" : null;
               return (
                 <button
                   key={product.id}
                   type="button"
-                  className={`serve-menu__item${product.name === nextGuest?.wants ? " serve-menu__item--suggested" : ""}`}
+                  className={`serve-menu__item${missing.length === 0 && product.name === nextGuest?.wants ? " serve-menu__item--suggested" : ""}`}
                   onClick={() => onServeProduct(product.id)}
                   disabled={!canAct}
                   title={!canAct ? "No actions left this shift." : priceDetail}
-                  aria-label={`${product.name}: estimated income ${formatAsche(Number(income))} per guest`}
-                  aria-description={[missingLabel, helperLabel, priceDetail].filter(Boolean).join(". ")}
+                  aria-label={`${product.name}: ${servedProduct ? `estimated income ${formatAsche(income)} per guest` : "no sale"}`}
+                  aria-description={[missingLabel, outcome, servedProduct ? helperLabel : null, priceDetail].filter(Boolean).join(". ")}
                 >
-                  <span>
+                  <span className="serve-menu__icon" data-product={servedProduct?.id ?? product.id} aria-hidden="true" />
+                  <span className="serve-menu__copy">
                     <span className="serve-menu__name">{product.name}</span>
                     {missingLabel ? <small className="serve-menu__shortage">{missingLabel}</small> : null}
+                    {outcome ? <small className="serve-menu__shortage">{outcome}</small> : null}
                     {!missingLabel && helperLabel ? <small>{helperLabel}</small> : null}
                   </span>
-                  <span className="serve-menu__price">Est. {formatAsche(Number(income))}</span>
+                  <span className="serve-menu__price">{servedProduct ? `Est. ${formatAsche(income)}` : "—"}</span>
                 </button>
               );
             })}
             {doubleEspresso ? (
               <button
                 type="button"
-                className="serve-menu__item"
+                className="serve-menu__item serve-menu__item--double"
                 onClick={onServeDoubleEspresso}
                 disabled={Boolean(doubleEspresso.unavailable)}
               >
-                <span>
+                <span className="serve-menu__icon" data-product="double-espresso" aria-hidden="true" />
+                <span className="serve-menu__copy">
                   <span className="serve-menu__name">Two espressos · {doubleEspresso.beans} beans</span>
                   <small>
                     {doubleEspresso.unavailable ??
@@ -130,6 +160,12 @@ export function GuestService({
             ) : null}
           </div>
         </div>
+      )}
+      {nextGuest?.learningCue && gameState.day !== 7 && (
+        <details className="cafe-station-note">
+          <summary>Guest hint</summary>
+          <p>{nextGuest.learningCue}</p>
+        </details>
       )}
     </>
   );

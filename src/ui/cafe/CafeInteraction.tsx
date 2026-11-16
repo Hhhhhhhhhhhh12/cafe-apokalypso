@@ -2,10 +2,12 @@ import { formatAsche } from "../../game/engine/currency";
 import type { Ref } from "react";
 import {
   canCompleteCurrentDay,
+  canServeFromStock,
   getDayEndRecapLine,
   getIngredientLabel,
   getNextGuestPreview,
   getObjectiveStatus,
+  getVisibleDaySevenLetter,
   hasSecondBrewGroup
 } from "../../game/engine/selectors";
 import { DAILY_FIXED_COST } from "../../game/engine/management";
@@ -15,7 +17,7 @@ import { GuestService } from "./GuestService";
 import { Noticeboard, SupplyShelf } from "./ShiftStations";
 import { KassandraTerminal } from "./KassandraTerminal";
 
-export type CafeStation = "setup" | "service" | "door" | "stock" | "board" | "machine" | "register";
+export type CafeStation = "setup" | "service" | "door" | "stock" | "board" | "machine" | "register" | "letter";
 
 interface CafeInteractionProps {
   station: CafeStation;
@@ -43,6 +45,7 @@ export function CafeInteraction({
     ...(gameState.dayManagement.dayThreeObservations?.missingIngredients ?? [])
   ])];
   const isClosing = gameState.dayPhase === "open";
+  const letter = station === "letter" ? getVisibleDaySevenLetter(gameState) : null;
   const title = {
     setup: "Equip the counter",
     service: guest?.name ?? "At the counter",
@@ -50,7 +53,8 @@ export function CafeInteraction({
     stock: isClosing ? "Supply shelf" : `Day ${gameState.day} closed`,
     board: "Noticeboard",
     machine: "Espresso machine",
-    register: "KASSANDRA"
+    register: "KASSANDRA",
+    letter: "Official notice"
   }[station];
 
   const isEntry = station === "setup" || (station === "door" && gameState.dayPhase === "setup");
@@ -70,7 +74,8 @@ export function CafeInteraction({
     <section className={`cafe-interaction${isEntry ? " cafe-interaction--entry" : ""}`}
       id="cafe-interaction" aria-labelledby="cafe-interaction-title">
       {isEntry ? <header className="cafe-interaction__heading">{heading}{backButton}</header> : <>{backButton}{heading}</>}
-      {feedback && station !== "register" ? <p className="cafe-interaction__feedback">{feedback}</p> : null}
+      {feedback && station !== "register" ? <p className="cafe-interaction__feedback cafe-interaction__action-feedback">{feedback}</p> : null}
+      {letter && <p className="cafe-letter__body">{letter}</p>}
       {station === "setup" ? (
         <OpeningEquipment
           gameState={gameState}
@@ -83,6 +88,7 @@ export function CafeInteraction({
           gameState={gameState}
           onServeProduct={(productId) => onAction({ type: "serve_product", productId })}
           onServeDoubleEspresso={() => onAction({ type: "serve_double_espresso" })}
+          onGoToDoor={onGoToDoor}
         />
       ) : null}
       {station === "door" ? <DoorControls gameState={gameState} onAction={onAction} /> : null}
@@ -110,6 +116,9 @@ export function CafeInteraction({
               <p>Sales {formatAsche(summary.moneyEarned)} · Overhead {formatAsche(summary.dailyOverhead)}
                 {summary.moneySpent > 0 ? ` · Shift spending ${formatAsche(summary.moneySpent)}` : ""}</p>
               <p><strong>{formatAsche(gameState.resources.money)} in the till</strong></p>
+              {Boolean(gameState.dayManagement.heartsRestored) && (
+                <p className="guest-recovery"><span aria-hidden="true">♥ </span>{gameState.dayManagement.heartsRestored} hearts restored</p>
+              )}
               {gameState.day === 3 ? (
                 <>
                   <p>{summary.helperAutonomyRecap ?? summary.helperRecap}</p>
@@ -189,6 +198,7 @@ function DoorControls({
     <>
       <div id="cafe-door-hint" className="cafe-interaction__receipt">
         {!canClose ? <p>Serve at least one guest before closing.</p> : null}
+        {!canServeFromStock(gameState) ? <p>Nothing on the menu can be made with the stock left.</p> : null}
         {canClose && !objective.completed ? <p>Daily objective still open · {objective.objective.title}</p> : null}
         <p>Rent and utilities cost {formatAsche(DAILY_FIXED_COST)} at closing.</p>
         {gameState.resources.money <= DAILY_FIXED_COST ? <p>Closing now will empty the till.</p> : null}

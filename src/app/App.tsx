@@ -94,11 +94,10 @@ export function App() {
     }
   }, [gameState.unlockedAchievements]);
 
-  // Move focus to the closure banner when the café closes, so keyboard and
-  // screen-reader users are not stranded on a now-disabled control.
+  // Day 7 keeps focus in the café through its report and letter.
   const closureHeadingRef = useRef<HTMLHeadingElement>(null);
   useEffect(() => {
-    if (gameState.cafeClosed || gameState.demoComplete) {
+    if (gameState.cafeClosed && !gameState.demoComplete) {
       closureHeadingRef.current?.focus();
     }
   }, [gameState.cafeClosed, gameState.demoComplete]);
@@ -181,20 +180,14 @@ export function App() {
       />
       <DayTransitionBanner day={gameState.day} dayPhase={gameState.dayPhase} />
 
-      <header className="hero-bar" aria-labelledby="app-title">
-        <div>
-          <h1 id="app-title">Café Apokalypso</h1>
-          <p className="intro">
-            A cozy café. Seven days. Something is not quite right.
-          </p>
-        </div>
+      <header className="hero-bar hero-bar--game" aria-labelledby="app-title">
+        <h1 id="app-title">Café Apokalypso</h1>
         <div className="hero-bar__aside">
-          <OptionsMenu panelRef={setOptionsPanel} />
           <div className="day-card" aria-label={`Current status: Day ${gameState.day}`}>
-            <span className="day-card__label">Current day</span>
             <strong>Day {gameState.day}</strong>
             <span>{gameState.phaseLabel}</span>
           </div>
+          <OptionsMenu panelRef={setOptionsPanel} />
         </div>
       </header>
 
@@ -219,28 +212,6 @@ export function App() {
         </section>
       ) : null}
 
-      {gameState.demoComplete ? (
-        <section
-          className="demo-complete-banner"
-          role="alert"
-          aria-labelledby="demo-complete-title"
-        >
-          <p className="eyebrow">Week one complete</p>
-          <h2 id="demo-complete-title" ref={closureHeadingRef} tabIndex={-1}>
-            7 of 7 days served
-          </h2>
-          <p>
-            The letter is open. The register is talking. The guestbook remembers.
-          </p>
-          <p className="demo-complete-banner__teaser">
-            Next unlock: Day 8, week two. Not built yet. Replay from Day 1.
-          </p>
-          <button type="button" onClick={handleReset}>
-            Replay week one
-          </button>
-        </section>
-      ) : null}
-
       <section className="workspace-grid workspace-grid--cafe" aria-label="Game shell workspace">
         <CafePlaceholder
           gameState={gameState}
@@ -252,7 +223,6 @@ export function App() {
         <DayProgressPanel gameState={gameState} />
         <ActionPanel
           gameState={gameState}
-          statusMessage={gameState.statusMessage}
           onUpgradeDecor={(slot) => dispatch({ type: "upgrade_decor", slot })}
           onBuyEquipment={(slot) => dispatch({ type: "buy_equipment", slot })}
           onBuyUpgrade={(upgradeId) => dispatch({ type: "buy_upgrade", upgradeId })}
@@ -260,13 +230,13 @@ export function App() {
         />
       </section>
 
-      <footer className="app-footer">
-        <p>
-          Display &amp; accessibility options — including a colour-blind-friendly
-          palette — are on the way. The café would like everyone to be able to read
-          the menu.
-        </p>
-      </footer>
+      {gameState.demoComplete && gameState.daySevenLetterOpened && (
+        <section className="demo-complete-banner" aria-labelledby="demo-complete-title">
+          <h2 id="demo-complete-title">Week one complete</h2>
+          <button type="button" onClick={handleReset}>Replay week one</button>
+        </section>
+      )}
+
     </main>
   );
 }
