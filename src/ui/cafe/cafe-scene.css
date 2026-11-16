@@ -1245,7 +1245,7 @@ button.cafe-order-bubble:hover {
 
 /* The v07 floor is shallower. Its path runs between the table groups. */
 .cafe-diorama--early-v07 .cafe-queue {
-  --queue-x: 86%;
+  --queue-x: 140%;
   --queue-y: 42%;
   --aisle-x: -91%;
   --aisle-y: 72%;

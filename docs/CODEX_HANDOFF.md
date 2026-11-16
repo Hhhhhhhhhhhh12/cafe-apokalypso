@@ -95,6 +95,10 @@ old Lukas sprite's baked-in laptop table; this remains an art defect, not a
 successful visual acceptance. The table-free v02 pose in historical commit
 `918b1a6` is approved only for the compact v12 room (see the review document in
 `6764432`), explicitly not for v07. Do not silently transfer that approval.
+The Day 2–3 waiting position now clears the occupied recovery table. A focused
+23.2-second browser run measured an 11-pixel gap between the seated and waiting
+sprite boxes at 1024×768; the order control also remained fully inside a
+390-pixel viewport. Door, aisle and counter waypoints remain unchanged.
 
 Use the live [pull requests](https://github.com/Hhhhhhhhhhhh12/cafe-apokalypso/pulls)
 and [issues](https://github.com/Hhhhhhhhhhhh12/cafe-apokalypso/issues), not the
