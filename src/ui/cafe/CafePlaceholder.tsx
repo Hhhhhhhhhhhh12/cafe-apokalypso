@@ -43,7 +43,7 @@ import strangeGuestAsset from "../../../assets/sprites/guests/placeholder-guest-
 import cemSeatedAsset from "../../../assets/sprites/guests/placeholder-guest-cem-seated.png";
 import miraSeatedAsset from "../../../assets/sprites/guests/placeholder-guest-mira-seated.png";
 import lukasSeatedAsset from "../../../assets/sprites/guests/placeholder-guest-lukas-seated.png";
-import christaSeatedAsset from "../../../assets/sprites/guests/placeholder-guest-christa-seated.png";
+import christaSeatedAsset from "../../../assets/sprites/guests/placeholder-guest-christa-seated-v02-approved-style.png";
 import neleSeatedAsset from "../../../assets/sprites/guests/placeholder-guest-nele-seated.png";
 import medaGuestAsset from "../../../assets/sprites/guests/placeholder-guest-meda.png";
 import roterRegenschirmGuestAsset from "../../../assets/sprites/guests/placeholder-guest-roter-regenschirm.png";
