@@ -75,6 +75,24 @@ The current character direction is [Lukas as a JRPG hero off duty](art/LUKAS_OFF
 The separate standing concept has been shown but has not been approved or installed.
 
 
+### Direct guest interaction (2026-11-16)
+
+The single order button now covers the visible guest body instead of a large
+floating text box. A compact, tappable card beside the figure shows drink,
+recovery and patience; an exclamation mark and accessible description retain
+the walkout warning. The existing entry button and focus-return path are kept.
+The card avoids the shelf, machine and register controls without changing the
+approved figures, fixed chairs or world anchors.
+
+Based on `af16ce9`: 24 focused display/control/recovery tests, TypeScript and
+scoped ESLint passed. The isolated iPad touch route completed Days 1–7, goals,
+KASSANDRA and the letter (89.8 s). A subagent found a shrinking patience row and
+minimum-width centring issue; both were corrected. Final focused browser checks
+passed at 1024 and 390 px on Days 2/4/6/7: body/card taps, Enter, focus return,
+visible patience-pip width, 44-px minimum targets and no station-control overlap
+(3.7 s). Including earlier attempts and a corrected patience fixture, this local
+package used under 115 s. Artwork approval remains separate.
+
 ### Affordable escape from an empty pantry (2026-11-16)
 
 At closing, only when tomorrow has no sellable recipe and the automatic replacement

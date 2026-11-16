@@ -294,13 +294,70 @@
   background-size: contain;
   background-position: center bottom;
 }
-.cafe-scene-frame .cafe-diorama--compact-week .cafe-order-bubble {
+/* One order control covers the guest, with a compact, tappable hint beside them. */
+.cafe-scene-frame .cafe-diorama--compact-week .cafe-order-bubble--on-guest {
+  top: 12%;
   left: 50%;
-  bottom: 82%;
+  bottom: auto;
+  width: 46%;
+  height: 82%;
+  min-width: 44px;
+  min-height: 44px;
+  max-width: none;
+  padding: 0;
+  display: block;
   transform: translateX(-50%);
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  box-shadow: none;
 }
-.cafe-scene-frame .cafe-diorama--compact-week .cafe-order-bubble::after {
-  top: 100%; left: 50%; transform: translate(-50%, -50%) rotate(45deg);
+.cafe-scene-frame .cafe-diorama--compact-week .cafe-order-bubble--on-guest::after { display: none; }
+.cafe-order-bubble__card {
+  position: absolute;
+  top: 30%;
+  left: calc(100% + 3px);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  justify-items: center;
+  gap: 3px;
+  width: max-content;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 5px;
+  border: 2px solid var(--cue-edge);
+  border-radius: 8px;
+  background: var(--cue-paper);
+  box-shadow: 0 2px 0 #56351f;
+}
+.cafe-order-bubble__card .serve-menu__icon {
+  grid-area: auto;
+  grid-column: 1 / -1;
+  width: 28px;
+  height: 26px;
+}
+.cafe-order-bubble__card .cafe-order-bubble__patience { justify-self: stretch; }
+.cafe-order-bubble__card .cafe-order-bubble__warning {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  min-width: 18px;
+  height: 18px;
+  margin: 0;
+  border: 1px solid #8c2f27;
+  border-radius: 50%;
+  background: #fff5e2;
+  text-align: center;
+  font-weight: 900;
+}
+.cafe-order-bubble--on-guest:hover .cafe-order-bubble__card { background: #ffe3a8; }
+.cafe-order-bubble--on-guest:focus-visible {
+  outline: 3px solid #0d635c;
+  outline-offset: 2px;
+}
+.cafe-order-bubble--on-guest:focus-visible .cafe-order-bubble__card {
+  outline: 3px solid #0d635c;
+  outline-offset: 2px;
 }
 .cafe-diorama--compact-week .cafe-rush-queue-guest { left: 44%; bottom: 15%; }
 .cafe-diorama--compact-week .cafe-standing-bohn {
@@ -337,3 +394,9 @@
 
 /* Arriving guests pass behind the fixed chairs; idle service controls remain above them. */
 .cafe-scene-frame .cafe-diorama--compact-week .cafe-queue--entering { z-index: 4; }
+
+@media (max-width: 760px) {
+  .cafe-order-bubble__card { top: 45%; grid-template-columns: auto auto; }
+  .cafe-order-bubble__card .serve-menu__icon { grid-column: 1; grid-row: 1; }
+  .cafe-order-bubble__card .cafe-order-bubble__hearts { grid-column: 2; grid-row: 1; }
+}

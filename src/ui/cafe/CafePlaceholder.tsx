@@ -7,6 +7,7 @@ import {
   canAccessBrewGroup,
   canUseKassandra,
   getDayCoachHint,
+  getAvailableProducts,
   getDioramaGuestVisibility,
   getGuestForCustomer,
   getGuestPatienceState,
@@ -388,6 +389,7 @@ export function CafePlaceholder({
   ] as const).filter(([id, visible]) => visible && !queueIncludes(id)).map(([id]) => id);
   const nextGuest = getNextGuestPreview(gameState);
   const recovery = nextGuest?.recovery;
+  const wantedProduct = getAvailableProducts(gameState).find(product => product.name === nextGuest?.wants);
   const canTakeOrder =
     canInteract && showQueueGuest && queueGuest === incomingGuestId &&
     paulaPhase === "idle";
@@ -798,34 +800,37 @@ export function CafePlaceholder({
                     {canTakeOrder && nextGuest ? (
                       <button
                         type="button"
-                        className="cafe-order-bubble"
+                        className="cafe-order-bubble cafe-order-bubble--on-guest"
                         data-cafe-entry
+                        title={nextGuest.wants || "Take order"}
                         aria-label={`Take order from ${nextGuest.name}`}
-                      aria-description={[
-                        nextGuest.orderLine.replace(/[.]$/, ""),
-                        gameState.day >= 4 && patience
-                          ? `Patience ${patience.patience / PATIENCE_TICK} of ${patience.max / PATIENCE_TICK}`
-                          : null,
-                        recovery ? `Resting. ${recovery.current} of 3 hearts. A served order restores ${recovery.restored}.` : null,
-                        recovery?.restored === 2 ? `Clean ${recovery.tableId} table adds a recovery heart` : null
-                      ].filter(Boolean).join(". ") || undefined}
+                        aria-description={[
+                          nextGuest.orderLine.replace(/[.]$/, ""),
+                          gameState.day >= 4 && patience
+                            ? `Patience ${patience.patience / PATIENCE_TICK} of ${patience.max / PATIENCE_TICK}`
+                            : null,
+                          recovery ? `Resting. ${recovery.current} of 3 hearts. A served order restores ${recovery.restored}.` : null,
+                          recovery?.restored === 2 ? `Clean ${recovery.tableId} table adds a recovery heart` : null,
+                          patience?.critical ? "About to leave" : null
+                        ].filter(Boolean).join(". ") || undefined}
                         onClick={(event) => openStation("service", event.currentTarget)}
                       >
-                        <span>{nextGuest.wants || "Take order"}</span>
-                        <span className="cafe-order-bubble__arrow" aria-hidden="true">→</span>
-                        {recovery && (
-                          <span className="cafe-order-bubble__hearts" aria-hidden="true">
-                            <RecoveryHearts {...recovery} />
-                          </span>
-                        )}
-                        {gameState.day >= 4 && patience && (
-                          <span className="cafe-order-bubble__patience" aria-hidden="true">
-                            {Array.from({ length: patience.max / PATIENCE_TICK }, (_, index) => (
-                              <span key={index} data-filled={index * PATIENCE_TICK < patience.patience} />
-                            ))}
-                          </span>
-                        )}
-                        {patience?.critical ? <span className="cafe-order-bubble__warning">About to leave</span> : null}
+                        <span className="cafe-order-bubble__card" aria-hidden="true">
+                          <span className="serve-menu__icon" data-product={wantedProduct?.id ?? "filterkaffee"} />
+                          {recovery && (
+                            <span className="cafe-order-bubble__hearts" aria-hidden="true">
+                              <RecoveryHearts {...recovery} />
+                            </span>
+                          )}
+                          {gameState.day >= 4 && patience && (
+                            <span className="cafe-order-bubble__patience" aria-hidden="true">
+                              {Array.from({ length: patience.max / PATIENCE_TICK }, (_, index) => (
+                                <span key={index} data-filled={index * PATIENCE_TICK < patience.patience} />
+                              ))}
+                            </span>
+                          )}
+                          {patience?.critical ? <span className="cafe-order-bubble__warning">!</span> : null}
+                        </span>
                       </button>
                     ) : null}
                   </span>
