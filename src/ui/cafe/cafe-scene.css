@@ -685,6 +685,26 @@ button.cafe-order-bubble:hover {
   line-height: 1;
 }
 
+/* Show the clean-seat benefit where the next service actually uses it. */
+.cafe-table-recovery-ready {
+  position: absolute;
+  z-index: 12;
+  left: 50%;
+  top: 4%;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border: 2px solid #245e4c;
+  border-radius: 50%;
+  background: #e7f4df;
+  color: #245e4c;
+  box-shadow: 0 0 0 4px #e7f4df88;
+  font-size: 1rem;
+  pointer-events: none;
+}
+
 .cafe-table--clickable:focus-visible .cafe-wipe-label {
   display: inline;
 }
@@ -1210,6 +1230,17 @@ button.cafe-order-bubble:hover {
   --front-y: 16%;
   --counter-x: 216%;
   --counter-y: 58%;
+}
+
+/* Keep the first recovering hero at the table actually used by service. */
+.cafe-scene-frame .placeholder-guest-normal-05[data-service-table="right"] {
+  top: 41.5%;
+  left: 52.9%;
+}
+
+.cafe-scene-frame .placeholder-guest-normal-05[data-service-table="back"] {
+  top: 52.4%;
+  left: 39.3%;
 }
 
 /* The v07 floor is shallower. Its path runs between the table groups. */

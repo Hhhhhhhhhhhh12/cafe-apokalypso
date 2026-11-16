@@ -18,6 +18,27 @@ function render(state: ReturnType<typeof stateFor>) {
 }
 
 describe("engine-driven guest display", () => {
+  it("marks only the actual clean recovery table and hides the bonus when unavailable", () => {
+    const state = stateFor(2);
+    state.dayPhase = "open";
+    state.equipment.seating = 1;
+    state.resources.cleanliness = 80;
+    state.dayManagement.customersServed = 2;
+    state.dayManagement.actionPointsRemaining = 3;
+    state.dayManagement.dirtyTableIds = [];
+    const live = () => renderToStaticMarkup(<CafePlaceholder gameState={state} />);
+    expect(live()).toContain('data-recovery-table="back"');
+    expect(live()).not.toContain('data-recovery-table="left"');
+    state.dayManagement.dirtyTableIds = ["back"];
+    expect(live()).not.toContain('data-recovery-table=');
+    state.dayManagement.dirtyTableIds = [];
+    state.resources.cleanliness = 49;
+    expect(live()).not.toContain('data-recovery-table=');
+    state.resources.cleanliness = 80;
+    state.dayPhase = "day_end";
+    expect(live()).not.toContain('data-recovery-table=');
+  });
+
   it("shows only served characters as seated in the live café", () => {
     const base = stateFor(1);
     base.equipment.seating = 1;
@@ -77,6 +98,15 @@ describe("engine-driven guest display", () => {
     expect(getDioramaGuestVisibility(state).lukas).toBe(true);
     expect(getDioramaGuestVisibility(state).cem).toBe(false);
     expect(render(state)).toContain('data-guest-id="lieferfahrer-cem"');
+    expect(renderToStaticMarkup(<CafePlaceholder gameState={state} />)).toContain('data-service-table="left"');
+  });
+
+  it("seats the third served hero at the same back table used for recovery", () => {
+    const state = stateFor(2);
+    state.equipment.seating = 1;
+    state.dayManagement.customersServed = 3;
+    state.dayManagement.servedGuestIds = ["pendler-kemal", "pendlerin-paula", "laptop-lukas"];
+    expect(renderToStaticMarkup(<CafePlaceholder gameState={state} />)).toContain('data-service-table="back"');
   });
 
   it("records both orders in a helper serve", () => {

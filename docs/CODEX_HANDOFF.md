@@ -81,6 +81,21 @@ An isolated 1024×768 touch-browser run passed Day 1–2 service, clean-table
 recovery, reload without reward replay and reduced-motion feedback (21.6
 seconds). This is technical browser evidence, not native or visual acceptance.
 
+Recovery seating follow-up (based on `b43e948`): the next recovering guest's
+clean table carries a heart marker only when its bonus is actually available.
+Lukas's existing seat follows his recorded successful service index, so earlier
+walkouts do not assign him to the wrong table. Old saves without that record
+retain the existing placement. No art assets or recovery rules changed.
+Fourteen focused display/feedback tests, TypeScript and changed-file lint passed
+(2.5 seconds). The isolated iPad browser verified clean/dirty-table cues and
+Lukas's back-table placement after reload. Other characters still use their
+existing seat anchors; full roster art consistency remains unfinished.
+The two browser runs took 21.7 and 21.9 seconds. The settled frame exposes the
+old Lukas sprite's baked-in laptop table; this remains an art defect, not a
+successful visual acceptance. The table-free v02 pose in historical commit
+`918b1a6` is approved only for the compact v12 room (see the review document in
+`6764432`), explicitly not for v07. Do not silently transfer that approval.
+
 Use the live [pull requests](https://github.com/Hhhhhhhhhhhh12/cafe-apokalypso/pulls)
 and [issues](https://github.com/Hhhhhhhhhhhh12/cafe-apokalypso/issues), not the
 October 12 PR list or the July onboarding task list. Inspect the current branch,

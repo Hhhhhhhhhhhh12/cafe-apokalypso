@@ -21,7 +21,7 @@ import "./firstCup.css";
 import { useBohnAppearance } from "./bohnAppearance";
 import { DayOneVines } from "./DayOneVines";
 import type { StorageLike } from "../../game/engine/save";
-import { canJanaClearTable, PATIENCE_TICK } from "../../game/engine/management";
+import { canJanaClearTable, getServiceTableId, PATIENCE_TICK } from "../../game/engine/management";
 import { DAY_SEVEN_SERVE_GOAL, hasShiftCleaning } from "../../game/engine/objectives";
 import { CafeInteraction, type CafeStation } from "./CafeInteraction";
 import { CafeShiftHelper, StaffPortrait } from "./CafeShiftHelper";
@@ -406,6 +406,8 @@ export function CafePlaceholder({
     paulaPhase === "walking-to-door" || paulaPhase === "leaving-queue" ? queueGuest : null;
   const queueIncludes = (guestId: GuestId) => frontOfQueue === guestId || followingGuest?.id === guestId;
   const lukasHasSeat = visibleGuests.lukas && !queueIncludes("laptop-lukas");
+  const lukasServiceIndex = gameState.dayManagement.servedGuestIds?.lastIndexOf("laptop-lukas") ?? -1;
+  const lukasTable = lukasServiceIndex >= 0 ? getServiceTableId(gameState, lukasServiceIndex) : null;
   const nextGuest = getNextGuestPreview(gameState);
   const recovery = nextGuest?.recovery;
   const canTakeOrder =
@@ -729,6 +731,8 @@ export function CafePlaceholder({
                     const dirty = dirtyTableIds.has(pos);
                     const hasCemSeat = usesApprovedDayOneScene && pos === "left";
                     const hasApprovedFatouSeat = usesApprovedDayOneScene && pos === "back";
+                    const recoverySeat = recovery?.current === 1 && recovery.tableId === pos;
+                    const recoveryReady = recoverySeat && recovery.restored === 2;
                     const className = `cafe-table cafe-table--${pos} cafe-table--tier-${gameState.equipment.seating}`;
                     const inner = (
                       <>
@@ -737,11 +741,11 @@ export function CafePlaceholder({
                         {!hasCemSeat && <span className="cafe-chair cafe-chair--side" />}
                         <span className="cafe-table-plant" aria-hidden="true" />
                         {dirty && <span className="cafe-cup cafe-cup--dirty" />}
+                        {recoveryReady && <span className="cafe-table-recovery-ready" data-recovery-table={pos} aria-hidden="true">♥</span>}
                       </>
                     );
                     const janaCanClear = canJanaClearTable(gameState);
                     const cleanLabel = janaCanClear ? "ask Jana to clear it (0 actions)" : "wipe it down (1 action)";
-                    const recoverySeat = recovery?.current === 1 && recovery.tableId === pos;
                     const clickable = dirty && isOpen && !shiftOver && !introActive &&
                       (actionPointsRemaining > 0 || janaCanClear) && Boolean(onCleanTable || onAction);
                     const table = clickable ? (
@@ -881,7 +885,8 @@ export function CafePlaceholder({
                         gameState.day >= 4 && patience
                           ? `Patience ${patience.patience / PATIENCE_TICK} of ${patience.max / PATIENCE_TICK}`
                           : null,
-                        recovery ? `Resting. ${recovery.current} of 3 hearts.` : null
+                        recovery ? `Resting. ${recovery.current} of 3 hearts.` : null,
+                        recovery?.restored === 2 ? `Clean ${recovery.tableId} table adds a recovery heart` : null
                       ].filter(Boolean).join(". ") || undefined}
                         onClick={(event) => openStation("service", event.currentTarget)}
                       >
@@ -947,6 +952,7 @@ export function CafePlaceholder({
               {lukasHasSeat && !usesApprovedDayOneScene && (
                 <span
                   className="placeholder-guest placeholder-guest-seated placeholder-guest-normal-05"
+                  data-service-table={lukasTable ?? undefined}
                   aria-hidden="true"
                 >
                   <img
