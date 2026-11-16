@@ -206,8 +206,9 @@ export function CafePlaceholder({
   if (selection && !activeStation) setSelection(null);
 
   useLayoutEffect(() => {
+    const preventScroll = window.innerWidth > 760;
     if (activeStation) {
-      backRef.current?.focus();
+      backRef.current?.focus({ preventScroll });
     } else if (entryRef.current) {
       const entry = entryRef.current;
       entryRef.current = null;
@@ -220,7 +221,7 @@ export function CafePlaceholder({
       const next = firstGuest ?? (entry.button.isConnected
         ? entry.button
         : letterRef.current ?? scene?.querySelector<HTMLButtonElement>("[data-cafe-entry]") ?? headingRef.current);
-      next?.focus();
+      next?.focus({ preventScroll });
     }
   }, [activeStation, canReadLetter, introActive, isOpen, shiftOver]);
 
@@ -449,7 +450,7 @@ export function CafePlaceholder({
       <div className="panel-heading">
         <h2 id="cafe-diorama-title" ref={headingRef} tabIndex={-1}>The Café</h2>
         {isOpen && !shiftOver ? (
-          <span className="cafe-stage__capacity" role={isFinalShift ? "status" : undefined}>
+          <span className="cafe-stage__capacity">
             {isFinalShift && (
               <span className="cafe-final-checklist">
                 <span>{Math.min(customersServed, DAY_SEVEN_SERVE_GOAL)}/{DAY_SEVEN_SERVE_GOAL} served</span>
@@ -461,6 +462,12 @@ export function CafePlaceholder({
           </span>
         ) : null}
       </div>
+
+      {onAction && (
+        <p className="status-message" role="status" aria-live="polite" aria-atomic="true">
+          <span key={gameState.statusMessage} className="status-message__text">{gameState.statusMessage}</span>
+        </p>
+      )}
 
       <div className="cafe-scene-frame" data-station={activeStation ?? undefined} ref={sceneRef}>
         <div
@@ -857,7 +864,7 @@ export function CafePlaceholder({
                         aria-label={`Take order from ${nextGuest.name}`}
                       aria-description={[
                         nextGuest.orderLine,
-                        isFinalShift && patience
+                        gameState.day >= 4 && patience
                           ? `Patience ${patience.patience / PATIENCE_TICK} of ${patience.max / PATIENCE_TICK}`
                           : null
                       ].filter(Boolean).join(". ") || undefined}
@@ -868,7 +875,7 @@ export function CafePlaceholder({
                         </span>
                         <span className="cafe-order-bubble__short">{nextGuest.wants || "Take order"}</span>
                         <span className="cafe-order-bubble__arrow" aria-hidden="true">→</span>
-                        {isFinalShift && patience && (
+                        {gameState.day >= 4 && patience && (
                           <span className="cafe-order-bubble__patience" aria-hidden="true">
                             {Array.from({ length: patience.max / PATIENCE_TICK }, (_, index) => (
                               <span key={index} data-filled={index * PATIENCE_TICK < patience.patience} />

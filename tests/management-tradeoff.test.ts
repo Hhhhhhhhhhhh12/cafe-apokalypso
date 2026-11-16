@@ -11,6 +11,7 @@ import {
   getMoneyRecoveryWarning,
   getNextGuestPreview,
   getObjectiveStatus,
+  getRestockPreview,
   getVisibleDaySevenLetter,
   getVisibleKassandraMessages,
   getVisibleStaffOptions
@@ -123,6 +124,25 @@ describe("management tradeoff system", () => {
     expect(nextState.day).toBe(2);
     expect(nextState.supplies).toEqual({ coffee: 12, milk: 11, pastries: 11 });
     expect(nextState.resources.money).toBe(38.8);
+  });
+
+  it("allows a stockless shift to close with an unspent budget and previews the next menu", () => {
+    const open: GameState = {
+      ...createInitialGameState(),
+      dayPhase: "open",
+      supplies: { coffee: 0, milk: 1, pastries: 0 }
+    };
+    expect(canCompleteCurrentDay(open)).toBe(true);
+    expect(canCompleteCurrentDay({ ...open, supplies: { ...open.supplies, coffee: 1 } })).toBe(false);
+    const closed = gameReducer(open, { type: "complete_day" });
+    expect(closed.dayPhase).toBe("day_end");
+    expect(closed.daySummary?.customersServed).toBe(0);
+    expect(closed.dayManagement.actionPointsRemaining).toBe(open.dayManagement.actionPointsRemaining);
+    const restock = gameReducer(closed, { type: "set_supply_purchase", ingredient: "coffee", quantity: 1 });
+    const preview = getRestockPreview(restock);
+    expect(preview.canServeWithoutRestock).toBe(false);
+    expect(preview.sellableTomorrow.map(product => product.id)).toContain("espresso");
+    expect(gameReducer(restock, { type: "confirm_supply_purchase" }).supplies.coffee).toBe(1);
   });
 
   it("rewards the Day-3 inventory audit when supplies are checked before anything is empty", () => {
@@ -880,7 +900,8 @@ describe("fail-state and reputation-scaled income", () => {
     expect(canCompleteCurrentDay(emptyShift)).toBe(true);
     expect(canCompleteCurrentDay({
       ...emptyShift,
-      resources: { ...emptyShift.resources, money: 1 }
+      resources: { ...emptyShift.resources, money: 1 },
+      supplies: { ...emptyShift.supplies, coffee: 1 }
     })).toBe(false);
 
     const firstClose = gameReducer(emptyShift, { type: "complete_day" });

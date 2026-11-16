@@ -180,20 +180,14 @@ export function App() {
       />
       <DayTransitionBanner day={gameState.day} dayPhase={gameState.dayPhase} />
 
-      <header className="hero-bar" aria-labelledby="app-title">
-        <div>
-          <h1 id="app-title">Café Apokalypso</h1>
-          <p className="intro">
-            A cozy café. Seven days. Something is not quite right.
-          </p>
-        </div>
+      <header className="hero-bar hero-bar--game" aria-labelledby="app-title">
+        <h1 id="app-title">Café Apokalypso</h1>
         <div className="hero-bar__aside">
-          <OptionsMenu panelRef={setOptionsPanel} />
           <div className="day-card" aria-label={`Current status: Day ${gameState.day}`}>
-            <span className="day-card__label">Current day</span>
             <strong>Day {gameState.day}</strong>
             <span>{gameState.phaseLabel}</span>
           </div>
+          <OptionsMenu panelRef={setOptionsPanel} />
         </div>
       </header>
 
@@ -229,7 +223,6 @@ export function App() {
         <DayProgressPanel gameState={gameState} />
         <ActionPanel
           gameState={gameState}
-          statusMessage={gameState.statusMessage}
           onUpgradeDecor={(slot) => dispatch({ type: "upgrade_decor", slot })}
           onBuyEquipment={(slot) => dispatch({ type: "buy_equipment", slot })}
           onBuyUpgrade={(upgradeId) => dispatch({ type: "buy_upgrade", upgradeId })}

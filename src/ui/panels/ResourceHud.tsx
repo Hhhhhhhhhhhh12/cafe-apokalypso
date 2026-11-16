@@ -1,7 +1,6 @@
 import { formatAsche } from "../../game/engine/currency";
 import { useEffect, useRef, useState } from "react";
-import { getManagementHudLabels } from "../../game/engine/selectors";
-import { ACTION_BUDGET_BY_DAY } from "../../game/engine/management";
+import { getManagementHudLabels, getShiftActionBudget } from "../../game/engine/selectors";
 import type { GameState } from "../../game/types/game";
 
 interface ResourceHudProps {
@@ -14,7 +13,7 @@ export function ResourceHud({ gameState }: ResourceHudProps) {
   const labels = getManagementHudLabels(gameState);
   const { cleanliness, stress, reputation } = gameState.resources;
   const actionsRemaining = gameState.dayManagement.actionPointsRemaining;
-  const actionsTotal = ACTION_BUDGET_BY_DAY[gameState.day] ?? actionsRemaining;
+  const actionsTotal = getShiftActionBudget(gameState);
 
   return (
     <section className="panel resource-panel" aria-label="Café resources">

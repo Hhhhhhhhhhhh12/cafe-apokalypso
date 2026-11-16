@@ -1,6 +1,7 @@
 import { formatAsche } from "../../game/engine/currency";
 import {
   getAvailableProducts,
+  canServeFromStock,
   getDoubleEspressoOption,
   getExpectedProductIncome,
   getGuestPatienceState,
@@ -16,11 +17,13 @@ import type { GameState } from "../../game/types/game";
 export function GuestService({
   gameState,
   onServeProduct,
-  onServeDoubleEspresso
+  onServeDoubleEspresso,
+  onGoToDoor
 }: {
   gameState: GameState;
   onServeProduct: (productId: ProductId) => void;
   onServeDoubleEspresso?: () => void;
+  onGoToDoor?: () => void;
 }) {
   const nextGuest = getNextGuestPreview(gameState);
   const patienceState = getGuestPatienceState(gameState);
@@ -34,6 +37,15 @@ export function GuestService({
     : null;
   const extraOrder = Boolean(helper && gameState.dayManagement.helperExtraOrdersRemaining > 0);
   const baristaBonus = helper?.taskId === "barista" && gameState.dayManagement.baristaReputationBonus < 3;
+
+  if (canAct && !canServeFromStock(gameState)) {
+    return (
+      <>
+        <p className="action-hint">Nothing on the menu can be made with the stock left.</p>
+        {onGoToDoor && <button type="button" onClick={onGoToDoor}>Go to closing</button>}
+      </>
+    );
+  }
 
   return (
     <>

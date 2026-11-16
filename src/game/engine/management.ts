@@ -313,6 +313,14 @@ export function clampSupply(ingredient: IngredientKey, value: number): number {
   return clamp(Math.floor(value), 0, SUPPLY_CAPS[ingredient]);
 }
 
+export function applySupplyPurchase(supplies: SupplyState, purchase: SupplyState): SupplyState {
+  return {
+    coffee: clampSupply("coffee", supplies.coffee + purchase.coffee),
+    milk: clampSupply("milk", supplies.milk + purchase.milk),
+    pastries: clampSupply("pastries", supplies.pastries + purchase.pastries)
+  };
+}
+
 export function clampResource(value: number): number {
   return clamp(Math.round(value * 100) / 100, 0, Number.POSITIVE_INFINITY);
 }

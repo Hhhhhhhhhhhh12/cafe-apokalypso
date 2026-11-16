@@ -2,6 +2,7 @@ import { formatAsche } from "../../game/engine/currency";
 import type { Ref } from "react";
 import {
   canCompleteCurrentDay,
+  canServeFromStock,
   getDayEndRecapLine,
   getIngredientLabel,
   getNextGuestPreview,
@@ -73,7 +74,7 @@ export function CafeInteraction({
     <section className={`cafe-interaction${isEntry ? " cafe-interaction--entry" : ""}`}
       id="cafe-interaction" aria-labelledby="cafe-interaction-title">
       {isEntry ? <header className="cafe-interaction__heading">{heading}{backButton}</header> : <>{backButton}{heading}</>}
-      {feedback && station !== "register" ? <p className="cafe-interaction__feedback">{feedback}</p> : null}
+      {feedback && station !== "register" ? <p className="cafe-interaction__feedback cafe-interaction__action-feedback">{feedback}</p> : null}
       {letter && <p className="cafe-letter__body">{letter}</p>}
       {station === "setup" ? (
         <OpeningEquipment
@@ -87,6 +88,7 @@ export function CafeInteraction({
           gameState={gameState}
           onServeProduct={(productId) => onAction({ type: "serve_product", productId })}
           onServeDoubleEspresso={() => onAction({ type: "serve_double_espresso" })}
+          onGoToDoor={onGoToDoor}
         />
       ) : null}
       {station === "door" ? <DoorControls gameState={gameState} onAction={onAction} /> : null}
@@ -193,6 +195,7 @@ function DoorControls({
     <>
       <div id="cafe-door-hint" className="cafe-interaction__receipt">
         {!canClose ? <p>Serve at least one guest before closing.</p> : null}
+        {!canServeFromStock(gameState) ? <p>Nothing on the menu can be made with the stock left.</p> : null}
         {canClose && !objective.completed ? <p>Daily objective still open · {objective.objective.title}</p> : null}
         <p>Rent and utilities cost {formatAsche(DAILY_FIXED_COST)} at closing.</p>
         {gameState.resources.money <= DAILY_FIXED_COST ? <p>Closing now will empty the till.</p> : null}

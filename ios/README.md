@@ -11,6 +11,14 @@ keinen Vorschau-Server. Der bisherige Safari-Spielstand wird nicht importiert.
 3. Vor jedem neuen Gerätebuild nach Spieländerungen den Paketbefehl erneut
    ausführen. `ios/Web/` enthält generierte Dateien und wird nicht eingecheckt.
 
+Ein Release-Build prüft vor dem Kompilieren den Paketstand gegen den sauberen
+Checkout. Die Prüfung ist auch manuell mit `node tools/pack-ipad.mjs --check`
+möglich. Nach Xcode prüft `node tools/pack-ipad.mjs --check-app /Pfad/CafeApokalypso.app`
+die tatsächlich eingebetteten Dateien, den Commit und die App-Metadaten.
+Nach einem Paketabbruch mit `ios/.web-pack-lock/previous-Web/` zuerst prüfen,
+ob ein Packvorgang läuft. Ohne laufenden Vorgang das gesicherte Paket bei
+fehlendem `ios/Web/` zurückverschieben, dann das Sperrverzeichnis entfernen.
+
 Das Projekt setzt mindestens iPadOS 17 voraus. Der Bundle-Identifier
 `com.cafeapokalypso.ipadtest` und die lokale WebKit-Adresse entsprechen dem
 bisherigen iPad-Testbuild. Das App-Symbol ist die abgenommene Variante B

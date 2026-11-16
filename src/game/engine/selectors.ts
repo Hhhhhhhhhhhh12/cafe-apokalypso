@@ -11,9 +11,11 @@ import {
 import { DAY_ONE_FATOU_SERVED_FRAGMENT, dayTwoOpenerWithFatou } from "../data/days";
 import {
   ACTION_BUDGET_BY_DAY,
+  applySupplyPurchase,
   getCleanlinessLabel,
   getEarnedPrice,
   getIngredientRequirement,
+  getMissingIngredients,
   getPatienceLabelFromCounter,
   getHelperLabel,
   getProductById,
@@ -29,6 +31,7 @@ import { equipmentSlots, getEquipmentTier, getMaxEquipmentTier } from "../data/e
 import { getCurrentObjective, getObjectiveStatus } from "./objectives";
 import type {
   DayDefinition,
+  DayNumber,
   DayModifierDefinition,
   EventDefinition,
   GuestDefinition,
@@ -76,6 +79,16 @@ export function getCurrentDayModifier(state: GameState): DayModifierDefinition {
 
 export function getAvailableProducts(state: GameState): readonly ProductDefinition[] {
   return weekOneProducts.filter((product) => product.firstDay <= state.day);
+}
+
+function getSellableProducts(state: GameState): readonly ProductDefinition[] {
+  return getAvailableProducts(state).filter((product) =>
+    getMissingIngredients(product, state.supplies, state.helperAssignment).length === 0
+  );
+}
+
+export function canServeFromStock(state: GameState): boolean {
+  return getSellableProducts(state).length > 0;
 }
 
 /** Estimate the first sale, using the reputation that applies at payment. */
@@ -470,7 +483,7 @@ export function canCompleteCurrentDay(state: GameState): boolean {
   // this prevents soft-locks (no supplies, no cleaning, etc.).
   // Any missing tasks (cleaning, serving) apply penalties in applyDayEndConsequences.
   // An empty till also permits closing with no orders or supplies left.
-  if (state.dayManagement.actionPointsRemaining <= 0 || state.resources.money <= 0) {
+  if (state.dayManagement.actionPointsRemaining <= 0 || state.resources.money <= 0 || !canServeFromStock(state)) {
     return true;
   }
 
@@ -699,17 +712,32 @@ export function hasActionCapacity(state: GameState): boolean {
 
 export function getRestockPreview(state: GameState) {
   const totalCost = getSupplyPurchaseCost(state.pendingSupplyPurchase);
+  const nextShift = {
+    ...state,
+    day: Math.min(state.day + 1, 7) as DayNumber,
+    helperAssignment: null
+  };
 
   return {
     totalCost,
     balanceAfter: Math.round((state.resources.money - totalCost) * 100) / 100,
     canAfford: totalCost <= state.resources.money,
+    sellableTomorrow: getSellableProducts({
+      ...nextShift,
+      supplies: applySupplyPurchase(state.supplies, state.pendingSupplyPurchase)
+    }),
+    canServeWithoutRestock: canServeFromStock(nextShift),
     maxPurchase: {
       coffee: SUPPLY_CAPS.coffee - state.supplies.coffee,
       milk: SUPPLY_CAPS.milk - state.supplies.milk,
       pastries: SUPPLY_CAPS.pastries - state.supplies.pastries
     } satisfies SupplyState
   };
+}
+
+export function getShiftActionBudget(state: GameState): number {
+  const { actionPointsRemaining, actionPointsSpent } = state.dayManagement;
+  return actionPointsRemaining + actionPointsSpent;
 }
 
 export function getSupplyPurchaseCost(purchase: SupplyState): number {

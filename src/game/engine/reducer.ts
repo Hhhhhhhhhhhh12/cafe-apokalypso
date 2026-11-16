@@ -15,6 +15,7 @@ import {
 } from "../data/equipment";
 import {
   canAccessBrewGroup,
+  canCompleteCurrentDay,
   getAvailableProducts,
   getCurrentDayDefinition,
   getCurrentDayModifier,
@@ -38,10 +39,10 @@ import {
   getDayFiveHelperRecap,
   getHelperAutonomyRecapLine,
   applyProductConsumption,
+  applySupplyPurchase,
   canJanaClearTable,
   clampMeter,
   clampResource,
-  clampSupply,
   COMFORTABLE_CAPACITY_BY_DAY,
   createHelperAssignment,
   createInitialDayManagement,
@@ -1238,7 +1239,7 @@ function completeCurrentDay(state: GameState): GameState {
     };
   }
 
-  if (!hasRequiredActions(state)) {
+  if (!canCompleteCurrentDay(state)) {
     return {
       ...state,
       statusMessage:
@@ -1888,20 +1889,6 @@ function applyEmptySupplyStress(
   };
 }
 
-function hasRequiredActions(state: GameState): boolean {
-  // When all action points are spent, the day can always be closed — prevents soft-locks
-  // (depleted supplies, no cleaning, etc.). Missing tasks apply penalties at day end.
-  // No stock and no cash must still allow the rescue shift to end.
-  if (state.dayManagement.actionPointsRemaining <= 0 || state.resources.money <= 0) {
-    return true;
-  }
-  // While actions remain, require at least one served customer.
-  return (
-    state.dayManagement.customersServed > 0 &&
-    state.completedActions.includes("take_order")
-  );
-}
-
 function spendActionPoint(state: GameState, actionLabel: string): GameState | null {
   if (state.dayManagement.actionPointsRemaining <= 0) {
     return null;
@@ -1973,14 +1960,6 @@ function getPurchaseCost(purchase: SupplyState): number {
       purchase.milk * SUPPLY_UNIT_COSTS.milk +
       purchase.pastries * SUPPLY_UNIT_COSTS.pastries
   );
-}
-
-function applySupplyPurchase(supplies: SupplyState, purchase: SupplyState): SupplyState {
-  return {
-    coffee: clampSupply("coffee", supplies.coffee + purchase.coffee),
-    milk: clampSupply("milk", supplies.milk + purchase.milk),
-    pastries: clampSupply("pastries", supplies.pastries + purchase.pastries)
-  };
 }
 
 function getSuppliesUsedForProduct(
