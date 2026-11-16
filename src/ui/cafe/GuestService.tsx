@@ -54,6 +54,14 @@ export function GuestService({
           {nextGuest.orderLine ? (
             <q className="next-guest__order">{nextGuest.orderLine}</q>
           ) : null}
+          {nextGuest.recovery && (
+            <div className="guest-recovery">
+              <strong><span aria-hidden="true">♥ </span>+{nextGuest.recovery.restored} {nextGuest.recovery.restored === 1 ? "heart" : "hearts"}</strong>
+              {nextGuest.recovery.restored === 2 && <small>Clean table bonus</small>}
+              {nextGuest.recovery.current === 1 && nextGuest.recovery.restored === 1 && nextGuest.recovery.tableId &&
+                <small>Clean café and clear table · +1 extra</small>}
+            </div>
+          )}
           {patienceState ? (
             <span
               className={`next-guest__patience next-guest__patience--${patienceState.label.toLowerCase()}${patienceState.critical ? " next-guest__patience--critical" : ""}`}
@@ -81,9 +89,6 @@ export function GuestService({
             <span className="next-guest__cue">
               One more action that uses patience and this guest leaves unserved.
             </span>
-          ) : null}
-          {nextGuest.learningCue && gameState.day !== 7 ? (
-            <span className="next-guest__cue">{nextGuest.learningCue}</span>
           ) : null}
         </div>
       ) : null}
@@ -115,7 +120,8 @@ export function GuestService({
                   aria-label={`${product.name}: estimated income ${formatAsche(Number(income))} per guest`}
                   aria-description={[missingLabel, helperLabel, priceDetail].filter(Boolean).join(". ")}
                 >
-                  <span>
+                  <span className="serve-menu__icon" data-product={product.id} aria-hidden="true" />
+                  <span className="serve-menu__copy">
                     <span className="serve-menu__name">{product.name}</span>
                     {missingLabel ? <small className="serve-menu__shortage">{missingLabel}</small> : null}
                     {!missingLabel && helperLabel ? <small>{helperLabel}</small> : null}
@@ -127,11 +133,12 @@ export function GuestService({
             {doubleEspresso ? (
               <button
                 type="button"
-                className="serve-menu__item"
+                className="serve-menu__item serve-menu__item--double"
                 onClick={onServeDoubleEspresso}
                 disabled={Boolean(doubleEspresso.unavailable)}
               >
-                <span>
+                <span className="serve-menu__icon" data-product="double-espresso" aria-hidden="true" />
+                <span className="serve-menu__copy">
                   <span className="serve-menu__name">Two espressos · {doubleEspresso.beans} beans</span>
                   <small>
                     {doubleEspresso.unavailable ??
@@ -142,6 +149,12 @@ export function GuestService({
             ) : null}
           </div>
         </div>
+      )}
+      {nextGuest?.learningCue && gameState.day !== 7 && (
+        <details className="cafe-station-note">
+          <summary>Guest hint</summary>
+          <p>{nextGuest.learningCue}</p>
+        </details>
       )}
     </>
   );

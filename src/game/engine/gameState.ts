@@ -254,6 +254,7 @@ function isValidDayManagement(value: unknown): value is DayManagementState {
     isNonNegativeNumber(management.moneySpent) &&
     isValidSupplyUsage(management.suppliesUsed) &&
     isCounter(management.cleaningActions) &&
+    (management.heartsRestored === undefined || isCounter(management.heartsRestored)) &&
     isValidTableIdArray(management.dirtyTableIds) &&
     (management.servedGuestIds === undefined ||
       (Array.isArray(management.servedGuestIds) &&

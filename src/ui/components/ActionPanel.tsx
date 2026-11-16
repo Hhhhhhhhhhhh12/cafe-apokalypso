@@ -104,9 +104,6 @@ function OpenDayControls({ gameState }: { gameState: GameState }) {
           {gameState.dayManagement.actionPointsRemaining} /{" "}
           {getShiftActionBudget(gameState)}
         </strong>
-        <small>
-          Each action uses one daily slot.
-        </small>
       </div>
 
       {gameState.dayManagement.serveStreak >= 2 ? (

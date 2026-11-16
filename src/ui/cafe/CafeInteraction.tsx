@@ -116,6 +116,9 @@ export function CafeInteraction({
               <p>Sales {formatAsche(summary.moneyEarned)} · Overhead {formatAsche(summary.dailyOverhead)}
                 {summary.moneySpent > 0 ? ` · Shift spending ${formatAsche(summary.moneySpent)}` : ""}</p>
               <p><strong>{formatAsche(gameState.resources.money)} in the till</strong></p>
+              {Boolean(gameState.dayManagement.heartsRestored) && (
+                <p className="guest-recovery"><span aria-hidden="true">♥ </span>{gameState.dayManagement.heartsRestored} hearts restored</p>
+              )}
               {gameState.day === 3 ? (
                 <>
                   <p>{summary.helperAutonomyRecap ?? summary.helperRecap}</p>

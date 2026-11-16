@@ -7,6 +7,7 @@ import {
   getDayEndRecapLine,
   getDecorUpgradeOptions,
   getGuestForCustomer,
+  getGuestRecovery,
   getKassandraConsultLine,
   getMoneyRecoveryWarning,
   getNextGuestPreview,
@@ -33,6 +34,25 @@ import type { DayNumber } from "../src/game/types/content";
 import type { GameState } from "../src/game/types/game";
 
 describe("management tradeoff system", () => {
+  it("lets Lukas recover from Day 2 service and rewards a clean table", () => {
+    let dayTwo = gameReducer(createDayStartState(2), { type: "open_day" });
+    dayTwo = { ...dayTwo, equipment: { ...dayTwo.equipment, seating: 1 } };
+    dayTwo = gameReducer(dayTwo, { type: "take_order" });
+    dayTwo = gameReducer(dayTwo, { type: "take_order" });
+    expect(getGuestRecovery({ ...dayTwo, day: 1 }, "laptop-lukas")).toBeNull();
+    expect(getNextGuestPreview(dayTwo)?.recovery).toEqual({ current: 1, restored: 2, tableId: "back" });
+    const stocked = gameReducer(dayTwo, { type: "serve_product", productId: "filterkaffee" });
+    expect(stocked.dayManagement.heartsRestored).toBe(2);
+    expect(stocked.statusMessage).toContain("Hearts +2");
+    const dirty: GameState = { ...dayTwo, dayManagement: { ...dayTwo.dayManagement, dirtyTableIds: ["back"] } };
+    expect(gameReducer(dirty, { type: "take_order" }).dayManagement.heartsRestored).toBe(1);
+    const failed = gameReducer({ ...dayTwo, supplies: { coffee: 0, milk: 0, pastries: 0 } }, { type: "take_order" });
+    expect(failed.dayManagement.heartsRestored).toBeUndefined();
+    const storage = createMemoryStorage();
+    saveGameState(stocked, storage);
+    expect(loadGameState(storage)?.dayManagement.heartsRestored).toBe(2);
+  });
+
   it("defines one visible objective for each week-one day", () => {
     expect(weekOneDays).toHaveLength(7);
 

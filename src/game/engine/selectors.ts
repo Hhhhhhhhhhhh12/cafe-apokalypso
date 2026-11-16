@@ -19,6 +19,7 @@ import {
   getPatienceLabelFromCounter,
   getHelperLabel,
   getProductById,
+  getServiceTableId,
   getStressLabel,
   guestsCanWalkOut,
   PATIENCE_TICK,
@@ -205,6 +206,25 @@ export interface NextGuestPreview {
   learningCue: string | null;
   /** Name of a product this guest particularly values, if any (a light hint). */
   wants: string | null;
+  recovery: ReturnType<typeof getGuestRecovery>;
+}
+
+const arrivingHearts: Partial<Record<GuestId, 1 | 2>> = {
+  "laptop-lukas": 1,
+  "lieferfahrer-cem": 2,
+  "nachbarin-mira": 1,
+  "herr-grau": 2,
+  meda: 1,
+  "frau-roter-regenschirm": 1
+};
+
+export function getGuestRecovery(state: GameState, guestId: GuestId) {
+  const current = arrivingHearts[guestId];
+  if (state.day < 2 || current === undefined) return null;
+  const tableId = getServiceTableId(state, state.dayManagement.customersServed);
+  const cleanSeat = tableId !== null && state.resources.cleanliness >= 50 &&
+    !state.dayManagement.dirtyTableIds.includes(tableId);
+  return { current, restored: Math.min(3 - current, cleanSeat ? 2 : 1), tableId };
 }
 
 /**
@@ -229,11 +249,14 @@ export function getNextGuestPreview(state: GameState): NextGuestPreview | null {
 
   return {
     name: guest.name,
-    orderLine: guest.orderLine ?? guest.sampleLines[0] ?? "",
+    orderLine: state.day === 2 && guest.id === "laptop-lukas"
+      ? "Filter coffee, please. The last checkpoint didn’t save."
+      : guest.orderLine ?? guest.sampleLines[0] ?? "",
     learningCue: knownProductName
       ? `You remember: ${guest.name} tends toward ${knownProductName}.`
       : guest.learningCue ?? getCurrentDayModifier(state).learningHint,
-    wants: wantedProductId ? getProductById(wantedProductId).name : null
+    wants: wantedProductId ? getProductById(wantedProductId).name : null,
+    recovery: getGuestRecovery(state, guest.id)
   };
 }
 
@@ -392,44 +415,6 @@ export function getDioramaGuestVisibility(
     meda: seated("meda"),
     roterRegenschirm: seated("frau-roter-regenschirm"),
     fatou: seated("pendlerin-fatou")
-  };
-}
-
-export function getEarlySceneGuestVisibility(
-  state: GameState
-): DioramaGuestVisibility {
-  if (state.day >= 4) return getDioramaGuestVisibility(state);
-
-  const { customersServed } = state.dayManagement;
-
-  // No furniture, no sitting: until seating is bought, guests order at the
-  // counter and stand / take away, so no one is shown seated.
-  if (state.equipment.seating < 1) {
-    return {
-      cem: false,
-      mira: false,
-      lukas: false,
-      christa: false,
-      bohn: false,
-      strange: false,
-      nele: false,
-      meda: false,
-      roterRegenschirm: false,
-      fatou: false
-    };
-  }
-
-  return {
-    cem: customersServed >= 1,
-    mira: customersServed >= 2,
-    lukas: customersServed >= 3,
-    christa: state.day >= 2 && customersServed >= 2,
-    bohn: getServedGuestIds(state).includes("herr-bohn"),
-    strange: state.day >= 4 && customersServed >= 3,
-    nele: state.day >= 3 && customersServed >= 1,
-    meda: state.day >= 5 && customersServed >= 1,
-    roterRegenschirm: state.day >= 7 && customersServed >= 2,
-    fatou: customersServed >= 1
   };
 }
 

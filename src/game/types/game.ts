@@ -63,6 +63,8 @@ export interface DayManagementState {
   actionPointsSpent: number;
   customersServed: number;
   servedGuestIds?: GuestId[];
+  /** Recovery earned by visitors served this shift. Absent on older saves. */
+  heartsRestored?: number;
   moneyEarned: number;
   moneySpent: number;
   suppliesUsed: SupplyState;

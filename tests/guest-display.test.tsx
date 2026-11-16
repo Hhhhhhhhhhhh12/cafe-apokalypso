@@ -4,6 +4,7 @@ import { createInitialGameState } from "../src/game/engine/gameState";
 import { gameReducer } from "../src/game/engine/reducer";
 import { getDioramaGuestVisibility, getGuestForCustomer, getNextGuestPreview } from "../src/game/engine/selectors";
 import { CafeScene } from "../src/ui/cafe/CafeScene";
+import { CafePlaceholder } from "../src/ui/cafe/CafePlaceholder";
 import type { DayNumber, GuestId } from "../src/game/types/content";
 
 function stateFor(day: DayNumber) {
@@ -17,6 +18,20 @@ function render(state: ReturnType<typeof stateFor>) {
 }
 
 describe("engine-driven guest display", () => {
+  it("shows only served characters as seated in the live café", () => {
+    const base = stateFor(1);
+    base.equipment.seating = 1;
+    const live = (state: ReturnType<typeof stateFor>) =>
+      renderToStaticMarkup(<CafePlaceholder gameState={state} />);
+    const firstServe = serve(base);
+    const active = live(firstServe);
+    expect(active).not.toContain('data-guest="fatou"');
+    expect(active).not.toContain('data-guest="cem"');
+    expect(active).not.toContain("placeholder-guest-normal-02");
+    expect(live(serve(serve(firstServe)))).toContain('data-guest="fatou"');
+    expect(live({ ...firstServe, dayPhase: "day_end" })).not.toContain('data-guest-id=');
+  });
+
   it("renders the two required Day 1 guests and then optional Fatou", () => {
     const expected: GuestId[] = ["pendler-kemal", "pendlerin-paula", "pendlerin-fatou"];
     for (const seating of [0, 1]) {

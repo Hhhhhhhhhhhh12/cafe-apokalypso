@@ -17,8 +17,15 @@ import type {
   HelperTaskId,
   IngredientKey,
   StressStateLabel,
-  SupplyState
+  SupplyState,
+  TableId
 } from "../types/game";
+
+export function getServiceTableId(state: GameState, customerIndex: number): TableId | null {
+  if (state.equipment.seating < 1) return null;
+  const tables = ["left", "right", "back"] as const;
+  return tables[customerIndex % tables.length];
+}
 
 /** Starting reputation for a new game. Higher than the old value (1) so a
  *  fresh café has a small buffer before the reputation fail-state. */

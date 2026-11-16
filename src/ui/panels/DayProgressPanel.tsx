@@ -16,7 +16,6 @@ interface DayProgressPanelProps {
 
 export function DayProgressPanel({ gameState }: DayProgressPanelProps) {
   const currentDay = getCurrentDayDefinition(gameState);
-  const isDayFive = gameState.day === 5;
   const isFinalShift = gameState.day === 7;
   const eventCards = isFinalShift ? [] : getNarrativeEventCards(gameState);
   const staffOptions = getVisibleStaffOptions(gameState);
@@ -36,78 +35,73 @@ export function DayProgressPanel({ gameState }: DayProgressPanelProps) {
         </h2>
       </div>
 
-      {!isFinalShift && <p className="day-opener">{getCurrentDayOpener(gameState)}</p>}
-
       <section className="objective-card" aria-labelledby="daily-objective-title">
         <div>
           <p className="eyebrow">Daily objective</p>
           <h3 id="daily-objective-title">{objectiveStatus.objective.title}</h3>
         </div>
-        {!isDayFive && !isFinalShift && <p>{objectiveStatus.objective.description}</p>}
         <p className="action-hint">{objectiveStatus.objective.completionHint}</p>
         <strong className={`objective-state objective-state--${objectiveStatus.status}`}>
           {formatObjectiveStatus(objectiveStatus.status)}
         </strong>
       </section>
 
-      {!isDayFive && !isFinalShift && <p className="day-milestone">{currentDay.milestone}</p>}
+      {(!isFinalShift || staffOptions.length > 0) && (
+        <details className="cafe-journal">
+          <summary>Café journal</summary>
+          {!isFinalShift && <p className="day-opener">{getCurrentDayOpener(gameState)}</p>}
 
-      {!isDayFive && currentDay.unlockMessage ? (
-        <p className="unlock-message">{currentDay.unlockMessage}</p>
-      ) : null}
+          {currentDay.unlockMessage ? (
+            <p className="unlock-message">{currentDay.unlockMessage}</p>
+          ) : null}
 
-      {eventCards.length > 0 ? (
-        <div className="event-card-list" aria-label="Today in the café">
-          {eventCards.map((event) => (
-            <section
-              className={`inline-callout event-card${event.tone === "anomaly" ? " event-card--anomaly" : ""}`}
-              key={event.id}
-              aria-label={event.title}
-            >
-              {event.kicker ? <p className="eyebrow event-card-kicker">{event.kicker}</p> : null}
-              <h3>{event.title}</h3>
-              <p>{event.text}</p>
-              {event.flavorLines?.[0] ? (
-                <p className="event-card-flavor">{event.flavorLines[0]}</p>
-              ) : null}
+          {eventCards.length > 0 ? (
+            <div className="event-card-list" aria-label="Today in the café">
+              {eventCards.map((event) => (
+                <section
+                  className={`inline-callout event-card${event.tone === "anomaly" ? " event-card--anomaly" : ""}`}
+                  key={event.id}
+                  aria-label={event.title}
+                >
+                  {event.kicker ? <p className="eyebrow event-card-kicker">{event.kicker}</p> : null}
+                  <h3>{event.title}</h3>
+                  <p>{event.text}</p>
+                  {event.flavorLines?.[0] ? (
+                    <p className="event-card-flavor">{event.flavorLines[0]}</p>
+                  ) : null}
+                </section>
+              ))}
+            </div>
+          ) : null}
+
+          {staffOptions.length > 0 ? (
+            <section className="inline-callout" aria-labelledby="staff-options-title">
+              <h3 id="staff-options-title">Temporary help</h3>
+              <ul className="staff-xp-list">
+                {staffOptions.map((staffOption) => {
+                  const xp = gameState.staffXp[staffOption.id] ?? 0;
+                  const level = getEmployeeLevel(xp);
+                  const nextThreshold = XP_LEVEL_THRESHOLDS[Math.min(3, level + 1) as 1 | 2 | 3];
+                  const xpToNext = level < 3 ? nextThreshold - xp : null;
+                  return (
+                    <li key={staffOption.id} className="staff-xp-entry">
+                      <strong>{staffOption.name}</strong>{" "}
+                      <span className="staff-xp-level">Lv.{level}</span>
+                      {" · "}
+                      <span className="staff-xp-count">{xp} XP</span>
+                      {xpToNext !== null ? (
+                        <span className="staff-xp-next"> ({xpToNext} to Lv.{level + 1})</span>
+                      ) : (
+                        <span className="staff-xp-max"> (max.)</span>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
             </section>
-          ))}
-        </div>
-      ) : null}
-
-      {staffOptions.length > 0 ? (
-        <section className="inline-callout" aria-labelledby="staff-options-title">
-          <h3 id="staff-options-title">Temporary help</h3>
-          {!isDayFive && !isFinalShift && <p>
-            {gameState.helperAssignment
-              ? `${gameState.helperAssignment.flavorLine}`
-              : `Choose one day helper or keep the money. Available: ${staffOptions
-                  .map((staffOption) => staffOption.name)
-                  .join(", ")}.`}
-          </p>}
-          <ul className="staff-xp-list">
-            {staffOptions.map((staffOption) => {
-              const xp = gameState.staffXp[staffOption.id] ?? 0;
-              const level = getEmployeeLevel(xp);
-              const nextThreshold = XP_LEVEL_THRESHOLDS[Math.min(3, level + 1) as 1 | 2 | 3];
-              const xpToNext = level < 3 ? nextThreshold - xp : null;
-              return (
-                <li key={staffOption.id} className="staff-xp-entry">
-                  <strong>{staffOption.name}</strong>{" "}
-                  <span className="staff-xp-level">Lv.{level}</span>
-                  {" · "}
-                  <span className="staff-xp-count">{xp} XP</span>
-                  {xpToNext !== null ? (
-                    <span className="staff-xp-next"> ({xpToNext} to Lv.{level + 1})</span>
-                  ) : (
-                    <span className="staff-xp-max"> (max.)</span>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-        </section>
-      ) : null}
+          ) : null}
+        </details>
+      )}
 
       {gameState.daySummary ? (
         <section
@@ -134,40 +128,43 @@ export function DayProgressPanel({ gameState }: DayProgressPanelProps) {
               <strong>{gameState.daySummary.customersServed}</strong>
             </div>
           </div>
-          <p className="day-recap-line">{getDayEndRecapLine(gameState)}</p>
-          {gameState.daySummary.helperAutonomyRecap ? (
-            <p className="helper-recap-line">{gameState.daySummary.helperAutonomyRecap}</p>
-          ) : null}
-          <dl className="summary-list">
-            {[
-              { label: "Objective", value: `${gameState.daySummary.objectiveCompleted ? "Completed" : "Missed"} · ${gameState.daySummary.objectiveTitle}` },
-              { label: "Money earned", value: `${formatAsche(gameState.daySummary.moneyEarned)}` },
-              { label: "Money spent", value: `${formatAsche(gameState.daySummary.moneySpent)}` },
-              { label: "Daily overhead", value: `-${formatAsche(gameState.daySummary.dailyOverhead)}` },
-              { label: "Customers served", value: String(gameState.daySummary.customersServed) },
-              ...(gameState.daySummary.guestsLost > 0 ? [{ label: "Walked out", value: String(gameState.daySummary.guestsLost) }] : []),
-              ...(gameState.daySummary.bestServeStreak >= 3 ? [{ label: "Best flow", value: `×${gameState.daySummary.bestServeStreak}` }] : []),
-              { label: "Supplies used", value: `Coffee ${gameState.daySummary.suppliesUsed.coffee}, Milk ${gameState.daySummary.suppliesUsed.milk}, Pastries ${gameState.daySummary.suppliesUsed.pastries}` },
-              ...(gameState.pendingSupplyPurchase && (gameState.pendingSupplyPurchase.coffee > 0 || gameState.pendingSupplyPurchase.milk > 0 || gameState.pendingSupplyPurchase.pastries > 0) ? [{ label: "Restock planned", value: `Coffee ${gameState.pendingSupplyPurchase.coffee}, Milk ${gameState.pendingSupplyPurchase.milk}, Pastries ${gameState.pendingSupplyPurchase.pastries}` }] : []),
-              { label: "Supplies left", value: `Coffee ${gameState.daySummary.suppliesRemaining.coffee}, Milk ${gameState.daySummary.suppliesRemaining.milk}, Pastries ${gameState.daySummary.suppliesRemaining.pastries}` },
-              { label: "Cleanliness", value: gameState.daySummary.cleanlinessLabel },
-              { label: "Stress", value: gameState.daySummary.stressLabel },
-              { label: "Reputation change", value: gameState.daySummary.reputationDelta > 0 ? `+${gameState.daySummary.reputationDelta}` : String(gameState.daySummary.reputationDelta) },
-              { label: "Helper", value: gameState.daySummary.helperRecap ?? "None" },
-            ].map(({ label, value }, i) => (
-              <div key={label} style={{ "--i": i } as React.CSSProperties}>
-                <dt>{label}</dt>
-                <dd>{value}</dd>
-              </div>
-            ))}
-          </dl>
-          {gameState.daySummary.flavorLines.length > 0 ? (
-            <div className="day-flavor-lines">
-              {gameState.daySummary.flavorLines.map((line) => (
-                <p key={line} className="day-flavor-line">{line}</p>
+          <details className="cafe-station-note">
+            <summary>Full shift report</summary>
+            <p className="day-recap-line">{getDayEndRecapLine(gameState)}</p>
+            {gameState.daySummary.helperAutonomyRecap ? (
+              <p className="helper-recap-line">{gameState.daySummary.helperAutonomyRecap}</p>
+            ) : null}
+            <dl className="summary-list">
+              {[
+                { label: "Objective", value: `${gameState.daySummary.objectiveCompleted ? "Completed" : "Missed"} · ${gameState.daySummary.objectiveTitle}` },
+                { label: "Money earned", value: `${formatAsche(gameState.daySummary.moneyEarned)}` },
+                { label: "Money spent", value: `${formatAsche(gameState.daySummary.moneySpent)}` },
+                { label: "Daily overhead", value: `-${formatAsche(gameState.daySummary.dailyOverhead)}` },
+                { label: "Customers served", value: String(gameState.daySummary.customersServed) },
+                ...(gameState.daySummary.guestsLost > 0 ? [{ label: "Walked out", value: String(gameState.daySummary.guestsLost) }] : []),
+                ...(gameState.daySummary.bestServeStreak >= 3 ? [{ label: "Best flow", value: `×${gameState.daySummary.bestServeStreak}` }] : []),
+                { label: "Supplies used", value: `Coffee ${gameState.daySummary.suppliesUsed.coffee}, Milk ${gameState.daySummary.suppliesUsed.milk}, Pastries ${gameState.daySummary.suppliesUsed.pastries}` },
+                ...(gameState.pendingSupplyPurchase && (gameState.pendingSupplyPurchase.coffee > 0 || gameState.pendingSupplyPurchase.milk > 0 || gameState.pendingSupplyPurchase.pastries > 0) ? [{ label: "Restock planned", value: `Coffee ${gameState.pendingSupplyPurchase.coffee}, Milk ${gameState.pendingSupplyPurchase.milk}, Pastries ${gameState.pendingSupplyPurchase.pastries}` }] : []),
+                { label: "Supplies left", value: `Coffee ${gameState.daySummary.suppliesRemaining.coffee}, Milk ${gameState.daySummary.suppliesRemaining.milk}, Pastries ${gameState.daySummary.suppliesRemaining.pastries}` },
+                { label: "Cleanliness", value: gameState.daySummary.cleanlinessLabel },
+                { label: "Stress", value: gameState.daySummary.stressLabel },
+                { label: "Reputation change", value: gameState.daySummary.reputationDelta > 0 ? `+${gameState.daySummary.reputationDelta}` : String(gameState.daySummary.reputationDelta) },
+                { label: "Helper", value: gameState.daySummary.helperRecap ?? "None" },
+              ].map(({ label, value }, i) => (
+                <div key={label} style={{ "--i": i } as React.CSSProperties}>
+                  <dt>{label}</dt>
+                  <dd>{value}</dd>
+                </div>
               ))}
-            </div>
-          ) : null}
+            </dl>
+            {gameState.daySummary.flavorLines.length > 0 ? (
+              <div className="day-flavor-lines">
+                {gameState.daySummary.flavorLines.map((line) => (
+                  <p key={line} className="day-flavor-line">{line}</p>
+                ))}
+              </div>
+            ) : null}
+          </details>
         </section>
       ) : null}
 

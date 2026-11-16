@@ -6,11 +6,12 @@ import {
   canAccessBrewGroup,
   canUseKassandra,
   getDayCoachHint,
-  getEarlySceneGuestVisibility,
+  getDioramaGuestVisibility,
   getGuestForCustomer,
   getGuestPatienceState,
   getNarrativeEventCards,
   getNextGuestPreview,
+  getShiftActionBudget,
   hasSecondBrewGroup,
   isDaySevenLetterDelivered,
   isDaySevenRush,
@@ -23,7 +24,7 @@ import type { StorageLike } from "../../game/engine/save";
 import { canJanaClearTable, PATIENCE_TICK } from "../../game/engine/management";
 import { DAY_SEVEN_SERVE_GOAL, hasShiftCleaning } from "../../game/engine/objectives";
 import { CafeInteraction, type CafeStation } from "./CafeInteraction";
-import { CafeShiftHelper } from "./CafeShiftHelper";
+import { CafeShiftHelper, StaffPortrait } from "./CafeShiftHelper";
 import stageDay1Asset from "../../../assets/backgrounds/placeholder-cafe-stage-v07-day-1.png";
 import stageDay2Asset from "../../../assets/backgrounds/placeholder-cafe-stage-v07-day-2.png";
 import stageDay3Asset from "../../../assets/backgrounds/placeholder-cafe-stage-v07-day-3.png";
@@ -42,16 +43,12 @@ import approvedCupAsset from "../../../assets/sprites/props/placeholder-cafe-cup
 import approvedWallShelfAsset from "../../../assets/sprites/props/placeholder-cafe-wall-shelf-v01-target-reference.png";
 import approvedWallClockAsset from "../../../assets/sprites/props/placeholder-cafe-wall-clock-v01-target-reference.png";
 import approvedFloorPlantAsset from "../../../assets/sprites/props/placeholder-cafe-floor-plant-v02-target-reference.png";
-import strangeGuestAsset from "../../../assets/sprites/guests/placeholder-guest-strange.png";
 import cemSeatedAsset from "../../../assets/sprites/guests/placeholder-guest-cem-seated.png";
 import miraSeatedAsset from "../../../assets/sprites/guests/placeholder-guest-mira-seated.png";
 import lukasSeatedAsset from "../../../assets/sprites/guests/placeholder-guest-lukas-seated.png";
 import christaSeatedAsset from "../../../assets/sprites/guests/placeholder-guest-christa-seated.png";
 import neleSeatedAsset from "../../../assets/sprites/guests/placeholder-guest-nele-seated.png";
-import medaGuestAsset from "../../../assets/sprites/guests/placeholder-guest-meda.png";
-import roterRegenschirmGuestAsset from "../../../assets/sprites/guests/placeholder-guest-roter-regenschirm.png";
 import approvedFatouSeatedAsset from "../../../assets/sprites/guests/placeholder-guest-fatou-seated-v02-front-candidate.png";
-import fatouSeatedAsset from "../../../assets/sprites/guests/placeholder-guest-fatou-seated.png";
 
 const QUEUE_SPRITES = {
   "pendler-kemal": "kemal",
@@ -163,7 +160,7 @@ export function CafePlaceholder({
 
   const shiftOver = gameState.cafeClosed || gameState.demoComplete;
   const showQueueGuest = isOpen && actionPointsRemaining > 0 && !shiftOver;
-  const followingRushGuest = finalRush && showQueueGuest && actionPointsRemaining > 1
+  const followingGuest = (finalRush || (gameState.day >= 4 && !isFinalShift)) && showQueueGuest && actionPointsRemaining > 1
     ? getGuestForCustomer(gameState, queuePosition + 1)
     : undefined;
   const canInteract = Boolean(onAction) && !shiftOver && !introActive;
@@ -290,7 +287,7 @@ export function CafePlaceholder({
       (paulaPhase === "idle" || paulaPhase === "walking") && !prefersReducedMotion()
     ) {
       setPaulaPhase("walking-to-counter");
-    } else if (gameState.day >= 6 && customersServed === prevServed &&
+    } else if (gameState.day >= 4 && customersServed === prevServed &&
       queuePosition > prevQueuePosition && paulaPhase === "idle" && !prefersReducedMotion()) {
       setPaulaPhase("leaving-queue");
     } else if (paulaPhase !== "walking-to-counter" && paulaPhase !== "walking-to-door" && paulaPhase !== "leaving-queue") {
@@ -402,12 +399,14 @@ export function CafePlaceholder({
     prevRepRef.current = gameState.resources.reputation;
   }, [gameState.day, gameState.dayManagement.customersServed, gameState.dayManagement.moneyEarned, gameState.dayPhase, gameState.resources.reputation]);
 
-  const visibleGuests = getEarlySceneGuestVisibility(gameState);
+  const visibleGuests = getDioramaGuestVisibility(gameState);
   const earlyV07 = gameState.day === 2 || gameState.day === 3;
-  const guestInQueue = showQueueGuest || paulaPhase === "walking-to-counter" ||
+  const frontOfQueue = showQueueGuest || paulaPhase === "walking-to-counter" ||
     paulaPhase === "walking-to-door" || paulaPhase === "leaving-queue" ? queueGuest : null;
-  const lukasHasSeat = visibleGuests.lukas && guestInQueue !== "laptop-lukas";
+  const queueIncludes = (guestId: GuestId) => frontOfQueue === guestId || followingGuest?.id === guestId;
+  const lukasHasSeat = visibleGuests.lukas && !queueIncludes("laptop-lukas");
   const nextGuest = getNextGuestPreview(gameState);
+  const recovery = nextGuest?.recovery;
   const canTakeOrder =
     canInteract && showQueueGuest && queueGuest === incomingGuestId &&
     paulaPhase === "idle";
@@ -458,7 +457,17 @@ export function CafePlaceholder({
                 {finalRush && <span className="cafe-final-checklist__rush">Rush</span>}
               </span>
             )}
-            {actionPointsRemaining} {actionPointsRemaining === 1 ? "action" : "actions"} left
+            {Boolean(gameState.dayManagement.heartsRestored) && (
+              <span className="cafe-recovered" key={gameState.dayManagement.heartsRestored}
+                role="img" aria-label={`${gameState.dayManagement.heartsRestored} hearts restored`}>
+                <span aria-hidden="true">♥ +{gameState.dayManagement.heartsRestored}</span>
+              </span>
+            )}
+            <span className="cafe-action-pips" role="img" aria-label={`${actionPointsRemaining} actions left`}>
+              {Array.from({ length: Math.min(12, getShiftActionBudget(gameState)) }, (_, index) => (
+                <span key={index} aria-hidden="true" data-filled={index < actionPointsRemaining} />
+              ))}
+            </span>
           </span>
         ) : null}
       </div>
@@ -518,9 +527,8 @@ export function CafePlaceholder({
               </div>
             )}
             {showNino && (
-              <div className="cafe-staff-nino" style={{ position: "absolute", left: "56%", bottom: "17%", zIndex: 6, translate: "-50%" }} aria-hidden="true">
-                <span className="cafe-staff-nino__stand" />
-                <span className="cafe-staff-nino__walk" />
+              <div className="cafe-shift-helper cafe-shift-helper--legacy" data-helper="nino">
+                <StaffPortrait helperId="nino" alt="Nino" />
               </div>
             )}
             <CafeShiftHelper gameState={gameState} />
@@ -732,6 +740,7 @@ export function CafePlaceholder({
                     );
                     const janaCanClear = canJanaClearTable(gameState);
                     const cleanLabel = janaCanClear ? "ask Jana to clear it (0 actions)" : "wipe it down (1 action)";
+                    const recoverySeat = recovery?.current === 1 && recovery.tableId === pos;
                     const clickable = dirty && isOpen && !shiftOver && !introActive &&
                       (actionPointsRemaining > 0 || janaCanClear) && Boolean(onCleanTable || onAction);
                     const table = clickable ? (
@@ -744,11 +753,15 @@ export function CafePlaceholder({
                           if (onCleanTable) onCleanTable(pos);
                           else onAction?.({ type: "clean_table", tableId: pos });
                         }}
-                        aria-label={`Dirty ${pos} table — ${cleanLabel}`}
+                        aria-label={`Dirty ${pos} table — ${cleanLabel}${recoverySeat ? " · Recovery seat" : ""}`}
                         title={cleanLabel}
                       >
                         {inner}
-                        <span className="cafe-cue cafe-cue--wipe" aria-hidden="true">{janaCanClear ? "Ask Jana" : "Wipe"}</span>
+                        <span className="cafe-cue cafe-cue--wipe" aria-hidden="true">
+                          <span className="cafe-wipe-icon" />
+                          {recoverySeat && <span className="cafe-recovery-seat">♥</span>}
+                          <span className="cafe-wipe-label">{janaCanClear ? "Ask Jana" : "Wipe"}</span>
+                        </span>
                       </button>
                     ) : (
                       <div key={pos} className={className} aria-hidden="true">
@@ -759,7 +772,7 @@ export function CafePlaceholder({
                       return (
                         <div key={pos} className="cafe-table cafe-table--left cafe-cem-table-group">
                           <span className="cafe-chair cafe-chair--side" aria-hidden="true" />
-                          {visibleGuests.cem && guestInQueue !== "lieferfahrer-cem" && (
+                          {visibleGuests.cem && !queueIncludes("lieferfahrer-cem") && (
                             <span className="placeholder-guest placeholder-guest-seated cafe-cem-seat"
                               data-seat="left-back" data-guest="cem" aria-hidden="true">
                               <img className="cafe-pilot-asset cafe-pilot-asset--guest cafe-pilot-asset--cem"
@@ -774,7 +787,7 @@ export function CafePlaceholder({
                     return (
                       <div key={pos} className="cafe-table cafe-table--back cafe-fatou-table-group">
                         {table}
-                        {visibleGuests.fatou && guestInQueue !== "pendlerin-fatou" && (
+                        {visibleGuests.fatou && !queueIncludes("pendlerin-fatou") && (
                           <span className="placeholder-guest placeholder-guest-seated cafe-fatou-seat"
                             data-seat="back-front" data-guest="fatou" aria-hidden="true">
                             <img className="cafe-pilot-asset cafe-pilot-asset--guest cafe-pilot-asset--fatou"
@@ -866,7 +879,8 @@ export function CafePlaceholder({
                         nextGuest.orderLine,
                         gameState.day >= 4 && patience
                           ? `Patience ${patience.patience / PATIENCE_TICK} of ${patience.max / PATIENCE_TICK}`
-                          : null
+                          : null,
+                        recovery ? `Resting. ${recovery.current} of 3 hearts.` : null
                       ].filter(Boolean).join(". ") || undefined}
                         onClick={(event) => openStation("service", event.currentTarget)}
                       >
@@ -875,6 +889,15 @@ export function CafePlaceholder({
                         </span>
                         <span className="cafe-order-bubble__short">{nextGuest.wants || "Take order"}</span>
                         <span className="cafe-order-bubble__arrow" aria-hidden="true">→</span>
+                        {recovery && (
+                          <span className="cafe-order-bubble__hearts" aria-hidden="true">
+                            {Array.from({ length: 3 }, (_, index) =>
+                              <span key={index} data-filled={index < recovery.current}>
+                                {index < recovery.current ? "♥" : "♡"}
+                              </span>
+                            )}
+                          </span>
+                        )}
                         {gameState.day >= 4 && patience && (
                           <span className="cafe-order-bubble__patience" aria-hidden="true">
                             {Array.from({ length: patience.max / PATIENCE_TICK }, (_, index) => (
@@ -887,19 +910,15 @@ export function CafePlaceholder({
                     ) : null}
                   </span>
                 ) : null}
-                {followingRushGuest ? (
-                  <span key={followingRushGuest.id} className="cafe-rush-queue-guest" aria-hidden="true">
-                    <span className={`cafe-pilot-asset cafe-pilot-asset--standing cafe-pilot-asset--${QUEUE_SPRITES[followingRushGuest.id]}-standing`} />
-                  </span>
-                ) : !isFinalShift ? (
-                  <span className="placeholder-guest placeholder-guest-normal-02" aria-hidden="true">
-                    <span className="guest-status guest-status--waiting">Waiting</span>
+                {followingGuest && followingGuest.id !== frontOfQueue ? (
+                  <span key={followingGuest.id} className="cafe-rush-queue-guest" aria-hidden="true">
+                    <span className={`cafe-pilot-asset cafe-pilot-asset--standing cafe-pilot-asset--${QUEUE_SPRITES[followingGuest.id]}-standing`} />
                   </span>
                 ) : null}
               </div>
 
               {/* Seated guests */}
-              {visibleGuests.cem && guestInQueue !== "lieferfahrer-cem" && !usesApprovedDayOneScene && (
+              {visibleGuests.cem && !queueIncludes("lieferfahrer-cem") && !usesApprovedDayOneScene && (
                 <span
                   className="placeholder-guest placeholder-guest-seated placeholder-guest-normal-03"
                   aria-hidden="true"
@@ -910,11 +929,10 @@ export function CafePlaceholder({
                     aria-hidden="true"
                     alt=""
                   />
-                  <span className="guest-status guest-status--seated">Cem · Seated</span>
                 </span>
               )}
 
-              {visibleGuests.mira && guestInQueue !== "nachbarin-mira" && !usesApprovedDayOneScene && (
+              {visibleGuests.mira && !queueIncludes("nachbarin-mira") && !usesApprovedDayOneScene && (
                 <span
                   className="placeholder-guest placeholder-guest-seated placeholder-guest-normal-04"
                   aria-hidden="true"
@@ -925,7 +943,6 @@ export function CafePlaceholder({
                     aria-hidden="true"
                     alt=""
                   />
-                  <span className="guest-status guest-status--seated">Mira · Seated</span>
                 </span>
               )}
 
@@ -940,11 +957,10 @@ export function CafePlaceholder({
                     aria-hidden="true"
                     alt=""
                   />
-                  <span className="guest-status guest-status--seated">Lukas · Seated</span>
                 </span>
               )}
 
-              {visibleGuests.christa && guestInQueue !== "cappuccino-christa" && (
+              {visibleGuests.christa && !queueIncludes("cappuccino-christa") && (
                 <span
                   className="placeholder-guest placeholder-guest-seated placeholder-guest-normal-06"
                   aria-hidden="true"
@@ -955,11 +971,10 @@ export function CafePlaceholder({
                     aria-hidden="true"
                     alt=""
                   />
-                  <span className="guest-status guest-status--seated">Christa · Seated</span>
                 </span>
               )}
 
-              {visibleGuests.bohn && guestInQueue !== "herr-bohn" && (
+              {visibleGuests.bohn && !queueIncludes("herr-bohn") && (
                 <span
                   className="placeholder-guest placeholder-guest-seated placeholder-guest-normal-07"
                   aria-hidden="true"
@@ -971,82 +986,13 @@ export function CafePlaceholder({
                     alt=""
                     aria-hidden="true"
                   />
-                  <span className="guest-status guest-status--seated">Bohn · Seated</span>
                 </span>
               )}
 
-              {visibleGuests.strange && (
-                <span
-                  className="placeholder-guest placeholder-guest-seated placeholder-guest-strange-01"
-                  aria-hidden="true"
-                >
-                  <img
-                    className="cafe-pilot-asset cafe-pilot-asset--guest cafe-pilot-asset--strange"
-                    src={strangeGuestAsset}
-                    alt=""
-                    aria-hidden="true"
-                  />
-                  <span className="guest-status guest-status--seated">Seated</span>
-                </span>
-              )}
-
-              {visibleGuests.nele && !earlyV07 && (
-                <span
-                  className="placeholder-guest placeholder-guest-seated placeholder-guest-normal-08"
-                  aria-hidden="true"
-                >
-                  <img
-                    className="cafe-pilot-asset cafe-pilot-asset--guest cafe-pilot-asset--nele"
-                    src={neleSeatedAsset}
-                    alt=""
-                    aria-hidden="true"
-                  />
-                  <span className="guest-status guest-status--seated">Nele · Seated</span>
-                </span>
-              )}
-
-              {visibleGuests.meda && (
-                <span
-                  className="placeholder-guest placeholder-guest-seated placeholder-guest-strange-02"
-                  aria-hidden="true"
-                >
-                  <img
-                    className="cafe-pilot-asset cafe-pilot-asset--guest cafe-pilot-asset--meda"
-                    src={medaGuestAsset}
-                    alt=""
-                    aria-hidden="true"
-                  />
-                  <span className="guest-status guest-status--seated">Seated</span>
-                </span>
-              )}
-
-              {visibleGuests.roterRegenschirm && guestInQueue !== "frau-roter-regenschirm" && (
-                <span
-                  className="placeholder-guest placeholder-guest-seated placeholder-guest-strange-03"
-                  aria-hidden="true"
-                >
-                  <img
-                    className="cafe-pilot-asset cafe-pilot-asset--guest cafe-pilot-asset--roter-regenschirm"
-                    src={roterRegenschirmGuestAsset}
-                    alt=""
-                    aria-hidden="true"
-                  />
-                  <span className="guest-status guest-status--seated">Seated</span>
-                </span>
-              )}
-
-              {visibleGuests.fatou && guestInQueue !== "pendlerin-fatou" && !usesApprovedDayOneScene && (!earlyV07 || !lukasHasSeat) && (
-                <span
-                  className={`placeholder-guest placeholder-guest-seated ${earlyV07 ? "placeholder-guest-normal-05" : "placeholder-guest-normal-09"}`}
-                  aria-hidden="true"
-                >
-                  <img
-                    className="cafe-pilot-asset cafe-pilot-asset--guest cafe-pilot-asset--fatou"
-                    src={fatouSeatedAsset}
-                    alt=""
-                    aria-hidden="true"
-                  />
-                  <span className="guest-status guest-status--seated">Fatou · Seated</span>
+              {visibleGuests.nele && !queueIncludes("freelancerin-nele") && !earlyV07 && (
+                <span className="placeholder-guest placeholder-guest-seated placeholder-guest-normal-08" aria-hidden="true">
+                  <img className="cafe-pilot-asset cafe-pilot-asset--guest cafe-pilot-asset--nele"
+                    src={neleSeatedAsset} alt="" />
                 </span>
               )}
 

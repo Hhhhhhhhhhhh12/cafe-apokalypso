@@ -47,7 +47,6 @@ export function AchievementToast({ queue, onDequeue }: AchievementToastProps) {
     >
       <span className="achievement-toast__check" aria-hidden="true">✓</span>
       <div className="achievement-toast__body">
-        <p className="achievement-toast__label">Achievement</p>
         <p className="achievement-toast__name">{current.name}</p>
         <p className="achievement-toast__desc">{current.description}</p>
       </div>

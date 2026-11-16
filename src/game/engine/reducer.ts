@@ -21,6 +21,7 @@ import {
   getCurrentDayModifier,
   getDoubleEspressoOption,
   getGuestForCustomer,
+  getGuestRecovery,
   getGuestWantedProductId,
   getIngredientLabel,
   getKassandraReceipt,
@@ -54,6 +55,7 @@ import {
   getEmployeeLevel,
   getEmployeeLevelBonuses,
   getIngredientRequirement,
+  getServiceTableId,
   getCleanlinessLabel,
   getDefaultProductForState,
   getEarnedPrice,
@@ -186,6 +188,8 @@ function appendActionFeedback(before: GameState, after: GameState, action: GameA
   }
 
   const changes: string[] = [];
+  const restoredHearts = (after.dayManagement.heartsRestored ?? 0) - (before.dayManagement.heartsRestored ?? 0);
+  if (restoredHearts > 0) changes.push(`Hearts +${restoredHearts}`);
   const moneyDelta = Math.round((after.resources.money - before.resources.money) * 100) / 100;
   if (moneyDelta !== 0) {
     changes.push(`${moneyDelta > 0 ? "+" : "−"}${formatAsche(Math.abs(moneyDelta))}`);
@@ -436,6 +440,10 @@ function applySuccessfulServe(
       };
     }
 
+    const recovery = servedGuest && getGuestRecovery({ ...workingState, resources, dayManagement: management }, servedGuest.id);
+    if (recovery) {
+      management.heartsRestored = (management.heartsRestored ?? 0) + recovery.restored;
+    }
     supplies = applyProductConsumption(product, supplies, workingState.helperAssignment);
     const suppliesUsed = getSuppliesUsedForProduct(product, workingState.helperAssignment);
     if (helperImpact) {
@@ -473,7 +481,7 @@ function applySuccessfulServe(
       suppliesUsed: addSupplies(management.suppliesUsed, suppliesUsed)
     };
 
-    const tableToClear = getTableForServedCustomer(workingState, management.customersServed);
+    const tableToClear = getServiceTableId(workingState, management.customersServed - 1);
     if (tableToClear && !management.dirtyTableIds.includes(tableToClear)) {
       management = {
         ...management,
@@ -810,15 +818,6 @@ function cleanTable(state: GameState, tableId: TableId | undefined): GameState {
     },
     statusMessage: [cleanMessage, walkoutLine].filter(Boolean).join(" ")
   };
-}
-
-function getTableForServedCustomer(state: GameState, customersServed: number): TableId | null {
-  if (state.equipment.seating < 1) {
-    return null;
-  }
-
-  const tables: readonly TableId[] = ["left", "right", "back"];
-  return tables[(customersServed - 1) % tables.length];
 }
 
 function checkSupplies(state: GameState): GameState {
