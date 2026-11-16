@@ -76,7 +76,7 @@ describe("engine-driven guest display", () => {
     let state = stateFor(2);
     state.dayManagement.actionPointsRemaining = 20;
     state.supplies = { coffee: 30, milk: 30, pastries: 30 };
-    const expected: GuestId[] = ["pendler-kemal", "pendlerin-paula", "laptop-lukas", "lieferfahrer-cem", "cappuccino-christa", "herr-bohn", "pendlerin-fatou", "nachbarin-mira"];
+    const expected: GuestId[] = ["pendler-kemal", "freelancerin-nele", "laptop-lukas", "lieferfahrer-cem", "cappuccino-christa", "herr-bohn", "pendlerin-fatou", "nachbarin-mira"];
     for (const id of expected) {
       const guest = getGuestForCustomer(state, state.dayManagement.customersServed);
       expect(guest?.id).toBe(id);
@@ -85,12 +85,12 @@ describe("engine-driven guest display", () => {
       state = serve(state);
       expect(state.dayManagement.servedGuestIds?.[state.dayManagement.customersServed - 1]).toBe(id);
     }
-    expect(getDioramaGuestVisibility(state).nele).toBe(false);
+    expect(getDioramaGuestVisibility(state).nele).toBe(true);
   });
 
   it("does not seat walked-out guests and advances the queue on a walkout", () => {
     let state = stateFor(2);
-    // Kemal and Paula leave; Lukas is the next engine customer.
+    // Kemal and Nele leave; Lukas is the next engine customer.
     state.dayManagement.guestsLost = 2;
     expect(render(state)).toContain('data-guest-id="laptop-lukas"');
     state = serve(state);
@@ -113,7 +113,7 @@ describe("engine-driven guest display", () => {
     const state = stateFor(2);
     state.dayManagement.helperExtraOrdersRemaining = 1;
     const next = serve(state);
-    expect(next.dayManagement.servedGuestIds).toEqual(["pendler-kemal", "pendlerin-paula"]);
+    expect(next.dayManagement.servedGuestIds).toEqual(["pendler-kemal", "freelancerin-nele"]);
     expect(getDioramaGuestVisibility(next).lukas).toBe(false);
   });
 
@@ -140,7 +140,7 @@ describe("daily guest history compatibility", () => {
     delete state.dayManagement.servedGuestIds;
     state.dayManagement.customersServed = 2;
     const next = serve(state);
-    expect(next.dayManagement.servedGuestIds).toEqual(["pendler-kemal", "pendlerin-paula", "laptop-lukas"]);
+    expect(next.dayManagement.servedGuestIds).toEqual(["pendler-kemal", "freelancerin-nele", "laptop-lukas"]);
   });
 
   it("resets seated identities when opening the next day", () => {

@@ -71,6 +71,18 @@ merging. Do not repeat that implementation from an old handoff prompt.
 
 ## Current work selection
 
+Nele arrival correction (based on `0c5529b`): the confirmed Day-2 arrival in
+PROJECT_CANON and DECISIONS is now playable as the second order. Kemal remains
+first and Lukas third; Day 1, Day 3, action budgets, objectives and helper unlocks
+are unchanged. Nele replaces the Day-2 commuter Paula slot and prefers espresso
+(one bean, with the normal espresso price). Modern saves retain their recorded
+guest identities, including earlier Day-2 Paula visits. Saves without identities
+still use the existing conservative roster-prefix fallback.
+Verification: 80 focused narrative, guest-display, save and week-one balance
+tests, TypeScript and changed-file lint passed (1.8 seconds). An isolated
+1024×768 touch-browser route from Day 1 reached Nele's Day-2 order, reloaded,
+served her, then checked Lukas's recovery (23.5 seconds, no runtime errors).
+
 Service preview follow-up (based on `4d48523`): missing recipes now show the
 actual substitute, its income after the existing reputation penalty, and the
 penalty before committing an action. A recipe with no substitute says “No sale”

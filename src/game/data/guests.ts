@@ -141,10 +141,10 @@ export const weekOneGuests = [
     id: "freelancerin-nele",
     name: "Freelancerin Nele",
     category: "normal",
-    firstDay: 3,
+    firstDay: 2,
     behaviorTags: ["dry-humor", "observant", "freelancer", "persistent"],
     summary:
-      "Dry, observant recurring guest from Day 3. Remembers earlier runs in the story only; gameplay memory resets with a new run. She is not Meda. KASSANDRA does not classify her.",
+      "Dry, observant recurring guest from Day 2. Remembers earlier runs in the story only; gameplay memory resets with a new run. She is not Meda. KASSANDRA does not classify her.",
     sampleLines: [
       "The café is authentic. I am not sure whether that is good.",
       "The light is good. Slightly existential, but good."

@@ -38,7 +38,7 @@ export const weekOneDays = [
     unlocks: ["guest behavior differences"],
     guestIds: [
       "pendler-kemal",
-      "pendlerin-paula",
+      "freelancerin-nele",
       "laptop-lukas",
       "lieferfahrer-cem",
       "cappuccino-christa",
