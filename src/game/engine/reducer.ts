@@ -481,7 +481,7 @@ function applySuccessfulServe(
       suppliesUsed: addSupplies(management.suppliesUsed, suppliesUsed)
     };
 
-    const tableToClear = getServiceTableId(workingState, management.customersServed - 1);
+    const tableToClear = getServiceTableId(workingState, management.customersServed - 1, servedGuest?.id);
     if (tableToClear && !management.dirtyTableIds.includes(tableToClear)) {
       management = {
         ...management,

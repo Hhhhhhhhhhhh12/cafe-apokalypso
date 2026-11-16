@@ -18,6 +18,28 @@ function render(state: ReturnType<typeof stateFor>) {
 }
 
 describe("engine-driven guest display", () => {
+  it.each([1, 2, 3, 4, 5, 6, 7] as DayNumber[])("uses the approved compact room on day %i", (day) => {
+    const markup = renderToStaticMarkup(<CafePlaceholder gameState={stateFor(day)} />);
+    expect(markup).toContain("placeholder-cafe-background-v12-isometric-day1-windows.png");
+    expect(markup).toContain("cafe-diorama--compact-week");
+    expect(markup).not.toContain("background-v07");
+  });
+  it("preserves each approved guest on their fixed chair", () => {
+    const state = stateFor(2);
+    state.dayPhase = "day_end";
+    state.equipment.seating = 1;
+    state.dayManagement.customersServed = 4;
+    state.dayManagement.servedGuestIds = ["laptop-lukas", "pendler-kemal", "pendlerin-fatou", "cappuccino-christa"];
+    const markup = renderToStaticMarkup(<CafePlaceholder gameState={state} />);
+    expect(markup).toContain('data-seat="right-front" data-service-table="right"');
+    expect(markup).toContain('data-seat="back-front" data-service-table="back"');
+    expect(markup).toContain('data-seat="left-front" data-service-table="left"');
+    expect(markup).toContain("placeholder-guest-christa-seated-v04-outfit-review.png");
+    expect(markup).not.toContain("placeholder-guest-christa-seated.png");
+    state.equipment.seating = 0;
+    expect(renderToStaticMarkup(<CafePlaceholder gameState={state} />)).not.toContain('data-seated-guest=');
+  });
+
   it("marks only the actual clean recovery table and hides the bonus when unavailable", () => {
     const state = stateFor(2);
     state.dayPhase = "open";
@@ -27,9 +49,9 @@ describe("engine-driven guest display", () => {
     state.dayManagement.actionPointsRemaining = 3;
     state.dayManagement.dirtyTableIds = [];
     const live = () => renderToStaticMarkup(<CafePlaceholder gameState={state} />);
-    expect(live()).toContain('data-recovery-table="back"');
-    expect(live()).not.toContain('data-recovery-table="left"');
-    state.dayManagement.dirtyTableIds = ["back"];
+    expect(live()).toContain('data-recovery-table="left"');
+    expect(live()).not.toContain('data-recovery-table="back"');
+    state.dayManagement.dirtyTableIds = ["left"];
     expect(live()).not.toContain('data-recovery-table=');
     state.dayManagement.dirtyTableIds = [];
     state.resources.cleanliness = 49;
@@ -101,12 +123,12 @@ describe("engine-driven guest display", () => {
     expect(renderToStaticMarkup(<CafePlaceholder gameState={state} />)).toContain('data-service-table="left"');
   });
 
-  it("seats the third served hero at the same back table used for recovery", () => {
+  it("seats the third served hero at the same left table used for recovery", () => {
     const state = stateFor(2);
     state.equipment.seating = 1;
     state.dayManagement.customersServed = 3;
     state.dayManagement.servedGuestIds = ["pendler-kemal", "pendlerin-paula", "laptop-lukas"];
-    expect(renderToStaticMarkup(<CafePlaceholder gameState={state} />)).toContain('data-service-table="back"');
+    expect(renderToStaticMarkup(<CafePlaceholder gameState={state} />)).toContain('data-seat="left-front" data-service-table="left"');
   });
 
   it("records both orders in a helper serve", () => {

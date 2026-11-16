@@ -1232,17 +1232,6 @@ button.cafe-order-bubble:hover {
   --counter-y: 58%;
 }
 
-/* Keep the first recovering hero at the table actually used by service. */
-.cafe-scene-frame .placeholder-guest-normal-05[data-service-table="right"] {
-  top: 41.5%;
-  left: 52.9%;
-}
-
-.cafe-scene-frame .placeholder-guest-normal-05[data-service-table="back"] {
-  top: 52.4%;
-  left: 39.3%;
-}
-
 /* The v07 floor is shallower. Its path runs between the table groups. */
 .cafe-diorama--early-v07 .cafe-queue {
   --queue-x: 140%;

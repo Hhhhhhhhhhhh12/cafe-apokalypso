@@ -221,7 +221,7 @@ const arrivingHearts: Partial<Record<GuestId, 1 | 2>> = {
 export function getGuestRecovery(state: GameState, guestId: GuestId) {
   const current = arrivingHearts[guestId];
   if (state.day < 2 || current === undefined) return null;
-  const tableId = getServiceTableId(state, state.dayManagement.customersServed);
+  const tableId = getServiceTableId(state, state.dayManagement.customersServed, guestId);
   const cleanSeat = tableId !== null && state.resources.cleanliness >= 50 &&
     !state.dayManagement.dirtyTableIds.includes(tableId);
   return { current, restored: Math.min(3 - current, cleanSeat ? 2 : 1), tableId };

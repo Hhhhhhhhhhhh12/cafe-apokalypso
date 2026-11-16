@@ -40,11 +40,16 @@ describe("management tradeoff system", () => {
     dayTwo = gameReducer(dayTwo, { type: "take_order" });
     dayTwo = gameReducer(dayTwo, { type: "take_order" });
     expect(getGuestRecovery({ ...dayTwo, day: 1 }, "laptop-lukas")).toBeNull();
-    expect(getNextGuestPreview(dayTwo)?.recovery).toEqual({ current: 1, restored: 2, tableId: "back" });
+    expect(getNextGuestPreview(dayTwo)?.recovery?.restored).toBe(1);
+    dayTwo = gameReducer(dayTwo, { type: "clean_table", tableId: "left" });
+    expect(getNextGuestPreview(dayTwo)?.recovery).toEqual({ current: 1, restored: 2, tableId: "left" });
     const stocked = gameReducer(dayTwo, { type: "serve_product", productId: "filterkaffee" });
     expect(stocked.dayManagement.heartsRestored).toBe(2);
+    expect(stocked.dayManagement.actionPointsRemaining).toBe(0);
+    expect(stocked.dayManagement.dirtyTableIds).toContain("left");
+    expect(gameReducer(stocked, { type: "complete_day" }).daySummary?.objectiveCompleted).toBe(true);
     expect(stocked.statusMessage).toContain("Hearts +2");
-    const dirty: GameState = { ...dayTwo, dayManagement: { ...dayTwo.dayManagement, dirtyTableIds: ["back"] } };
+    const dirty: GameState = { ...dayTwo, dayManagement: { ...dayTwo.dayManagement, dirtyTableIds: ["left"] } };
     expect(gameReducer(dirty, { type: "take_order" }).dayManagement.heartsRestored).toBe(1);
     const failed = gameReducer({ ...dayTwo, supplies: { coffee: 0, milk: 0, pastries: 0 } }, { type: "take_order" });
     expect(failed.dayManagement.heartsRestored).toBeUndefined();
@@ -610,7 +615,8 @@ describe("management tradeoff system", () => {
     expect(closed.daySummary?.objectiveCompleted).toBe(true);
     expect(closed.daySummary?.helperAutonomyRecap).toBe("Jana cleared a table without using one of your actions.");
     expect(closed.daySummary?.flavorLines).toContain("Missing at the counter: Milk.");
-    expect(closed.daySummary?.flavorLines).toContain("1 table still needed clearing at closing.");
+    expect(closed.dayManagement.dirtyTableIds).toEqual([]);
+    expect(closed.daySummary?.flavorLines.join(" ")).not.toContain("still needed clearing");
   });
 
   it.each([1, 2])("reports whether Jana served an extra guest on Day 3 with %i coffee", (coffee) => {

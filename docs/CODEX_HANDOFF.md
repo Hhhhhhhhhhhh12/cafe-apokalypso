@@ -71,6 +71,34 @@ merging. Do not repeat that implementation from an old handoff prompt.
 
 ## Current work selection
 
+### Approved room restored for the whole week (2026-11-16)
+
+The user explicitly reconfirmed `outfit-selection-20261105.png` and instructed
+its adoption on Days 1–7, preserving the approved figures and chair positions.
+The authority is the Nov-5 six-person approval (`9d59d10` geometry/assets,
+`448f8c6:docs/art/OUTFIT_SELECTION_20261105.md`), not the later v07 experiments.
+`approved-cafe.css` now supplies the compact v12 room throughout the week.
+`approvedSeats.ts` keeps Meda/Lukas left, Mira/Christa right, Nele/Fatou at the
+front-right group (legacy ID `back`). Christa and Nele use their v04 outfits.
+Runtime seating still requires actual service history and excludes queued guests.
+The same fixed table is used for cleaning and recovery: Lukas's bonus now belongs
+to his left table. Cleaning it after Kemal and Nele leaves the fourth action for
+Lukas on Day 2. Old save data is preserved; no new save schema is introduced.
+Earlier v07 visual findings below are historical and do not supersede this approval.
+
+Verification on the working candidate based on `4e4f839`: 150 focused tests
+(guest display, management, diorama, brew group, KASSANDRA, recovery and save
+regressions), TypeScript and changed-file ESLint passed. Isolated 1024×768 browser:
+full Day 1–7 route including goals, brew-group install, KASSANDRA, letter/reload
+and empty-stock fallback passed in 90.9 s; Day-2 cleaning/recovery and reload
+passed in 22.4 s with movement enabled and reduced-motion coverage. A separate
+six-guest review fixture verified all six approved contact anchors within 0.02 px
+and scale 1:1 in 1.2 s; it is a visual fixture, not an invented gameplay history.
+Including failed checks and focused repeats, local checks took under 130 s total.
+The moving queue uses centred animation and enters behind the fixed chairs.
+No native build, installation or publication is included in this change.
+
+
 Nele arrival correction (based on `0c5529b`): the confirmed Day-2 arrival in
 PROJECT_CANON and DECISIONS is now playable as the second order. Kemal remains
 first and Lukas third; Day 1, Day 3, action budgets, objectives and helper unlocks

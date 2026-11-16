@@ -1,7 +1,9 @@
 import { weekOneProducts, weekOneStaffOptions } from "../data";
+import { approvedSeats, type SeatedGuestId } from "../data/approvedSeats";
 import { roundAscheEarnings } from "./currency";
 import type {
   GuestDefinition,
+  GuestId,
   ProductDefinition,
   ProductId,
   StaffOptionId
@@ -21,8 +23,9 @@ import type {
   TableId
 } from "../types/game";
 
-export function getServiceTableId(state: GameState, customerIndex: number): TableId | null {
+export function getServiceTableId(state: GameState, customerIndex: number, guestId?: GuestId): TableId | null {
   if (state.equipment.seating < 1) return null;
+  if (guestId && guestId in approvedSeats) return approvedSeats[guestId as SeatedGuestId].table;
   const tables = ["left", "right", "back"] as const;
   return tables[customerIndex % tables.length];
 }
