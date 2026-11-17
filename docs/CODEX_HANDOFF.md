@@ -335,3 +335,7 @@ new visual acceptance. No device build or publication was performed.
 The final CSS adjustment also right-aligns the service detail panel, keeping it
 inside the room. The same five-role browser now asserts disclosure bounds as well
 as the interactions above and passed in 4.9 s. Package checks remain under one minute.
+Regular PR CI then caught three older Day-5 tests still expecting the retired
+text labels. Their reducer assertions remain; display checks now assert available
+versus completed icons and accessible contribution wording. All five cases in
+that module plus its lint passed (0.8 s); full validation remains with GitHub CI.
