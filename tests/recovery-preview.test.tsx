@@ -1,4 +1,4 @@
-import { canImproveRecoveryByCleaning, canImproveRecoveryByTidying, getNextGuestPreview } from "../src/game/engine/selectors";
+import { canImproveRecoveryByCleaning, canImproveRecoveryByTidying, getNextGuestPreview, getRecoveredGuestNames } from "../src/game/engine/selectors";
 import { gameReducer } from "../src/game/engine/reducer";
 import { createHelperAssignment } from "../src/game/engine/management";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -21,6 +21,37 @@ function service(state: ReturnType<typeof stateForLukas>) {
 }
 
 describe("successful-service recovery forecast", () => {
+  it("retains both helper-served recovery reactions, and only the first when stock runs out", () => {
+    const state = stateForLukas();
+    state.day = 5;
+    state.helperAssignment = { ...createHelperAssignment("jana", "service", 5)!, locked: true };
+    state.dayManagement.helperExtraOrdersRemaining = 1;
+    state.dayManagement.servedGuestIds = ["pendler-kemal", "pendlerin-paula"];
+    const served = gameReducer(state, { type: "serve_product", productId: "espresso" });
+    expect(served.statusMessage).toContain('Lukas takes a sip. "That can wait."');
+    expect(served.statusMessage).toContain("Herr Grau stays for another quiet sip.");
+    expect(getRecoveredGuestNames(served)).toEqual(["Laptop-Lukas", "Herr Grau"]);
+    state.supplies.coffee = 1;
+    const partial = gameReducer(state, { type: "serve_product", productId: "espresso" });
+    expect(partial.statusMessage).toContain('Lukas takes a sip. "That can wait."');
+    expect(partial.statusMessage).not.toContain("Herr Grau stays");
+    expect(getRecoveredGuestNames(partial)).toEqual(["Laptop-Lukas"]);
+  });
+  it("replaces Lukas's work reaction after actual recovery, without claiming failed service", () => {
+    const state = stateForLukas();
+    state.dayManagement.servedGuestIds = ["pendler-kemal", "freelancerin-nele"];
+    const served = gameReducer(state, { type: "serve_product", productId: "filterkaffee" });
+    expect(served.statusMessage).toContain('Lukas takes a sip. "That can wait."');
+    expect(served.statusMessage).not.toContain("opens another browser tab");
+    expect(getRecoveredGuestNames(served)).toEqual(["Laptop-Lukas"]);
+    const failed = gameReducer({ ...state, supplies: { coffee: 0, milk: 0, pastries: 0 } }, { type: "serve_product", productId: "filterkaffee" });
+    expect(failed.statusMessage).not.toContain("That can wait");
+    expect(getRecoveredGuestNames(failed)).toEqual([]);
+    // Lost visitors must not be inferred as healed in an old save without history.
+    delete state.dayManagement.servedGuestIds;
+    state.dayManagement.guestsLost = 1;
+    expect(getRecoveredGuestNames(state)).toEqual([]);
+  });
   it("marks two forecast hearts for a clear seat, one for a dirty seat, and preserves the present heart", () => {
     const state = stateForLukas();
     const clean = service(state);

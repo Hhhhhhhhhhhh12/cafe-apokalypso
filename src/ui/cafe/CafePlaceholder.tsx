@@ -15,6 +15,7 @@ import {
   getGuestPatienceState,
   getNarrativeEventCards,
   getNextGuestPreview,
+  getRecoveredGuestNames,
   getShiftActionBudget,
   hasSecondBrewGroup,
   isDaySevenLetterDelivered,
@@ -299,14 +300,18 @@ export function CafePlaceholder({
 
   // Adjust-during-render: a serve increment spawns the feedback bubbles, reading
   // statusMessage and the narrative selectors straight from this render's props.
-  const [prevServedForFeedback, setPrevServedForFeedback] = useState(customersServed);
-  if (prevServedForFeedback !== customersServed) {
-    setPrevServedForFeedback(customersServed);
-    if (customersServed > prevServedForFeedback) {
+  const recoveryTotal = gameState.dayManagement.heartsRestored ?? 0;
+  const [prevServedForFeedback, setPrevServedForFeedback] = useState({ day: gameState.day, served: customersServed, hearts: recoveryTotal });
+  if (prevServedForFeedback.day !== gameState.day || prevServedForFeedback.served !== customersServed) {
+    setPrevServedForFeedback({ day: gameState.day, served: customersServed, hearts: recoveryTotal });
+    if (prevServedForFeedback.day === gameState.day && customersServed > prevServedForFeedback.served) {
       // A2: serve reaction
       const firstSentence = gameState.statusMessage?.split(/\.\s+/)[0]?.trim() ?? null;
-      if (gameState.day === 4 && firstSentence) {
+      if (gameState.day === 4 && firstSentence && recoveryTotal <= prevServedForFeedback.hearts) {
         setServeReaction(prev => ({ text: firstSentence, key: (prev?.key ?? 0) + 1, day: gameState.day }));
+      } else {
+        // The named heart reward already explains this serve; avoid stacked bubbles.
+        setServeReaction(null);
       }
       // B1 — every 2nd serve, pick a floor event
       if (gameState.day === 4 && customersServed % 2 === 0) {
@@ -482,7 +487,8 @@ export function CafePlaceholder({
             "cafe-diorama--approved-day-one cafe-diorama--compact-week",
           ].join(" ")}
         >
-          <RecoveryFeedback day={gameState.day} total={gameState.dayManagement.heartsRestored ?? 0} />
+          <RecoveryFeedback day={gameState.day} total={gameState.dayManagement.heartsRestored ?? 0}
+            guestNames={getRecoveredGuestNames(gameState)} />
           {isOpen && coinTick?.day === gameState.day && (
             <span key={`coin-${coinTick.key}`} className="cafe-coin-tick" aria-hidden="true">
               +{formatAsche(coinTick.money)}{coinTick.rep > 0 ? " ★" : ""}

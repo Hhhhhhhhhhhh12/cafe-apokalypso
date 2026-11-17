@@ -405,6 +405,7 @@ function applySuccessfulServe(
   let management = { ...state.dayManagement };
   let guestMemory = { ...state.guestMemory };
   const flavorLines: string[] = [];
+  const recoveryLines: string[] = [];
   const helperImpact = management.dayFiveHelperImpact && { ...management.dayFiveHelperImpact };
 
   for (let index = 0; index < orderCount; index += 1) {
@@ -444,6 +445,7 @@ function applySuccessfulServe(
     }
 
     const recovery = servedGuest && getGuestRecovery({ ...workingState, resources, dayManagement: management }, servedGuest.id);
+    if (recovery && servedGuest?.recoveryLine) recoveryLines.push(servedGuest.recoveryLine);
     if (recovery) {
       management.heartsRestored = (management.heartsRestored ?? 0) + recovery.restored;
     }
@@ -571,7 +573,7 @@ function applySuccessfulServe(
   }
 
   const servedCustomerIndex = Math.max(0, management.customersServed + management.guestsLost - 1);
-  const serveLine = getServeLineForCustomer(workingState, servedCustomerIndex);
+  const serveLine = recoveryLines.join(" ") || getServeLineForCustomer(workingState, servedCustomerIndex);
 
   // Guest appreciation (#56): a guest who values the product just served gives a
   // reputation bump that scales with the product's craft quality — a premium

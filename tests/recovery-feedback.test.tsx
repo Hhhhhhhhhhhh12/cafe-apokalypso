@@ -6,8 +6,8 @@ import { RecoveryFeedback } from "../src/ui/cafe/RecoveryFeedback";
 
 let root: Root;
 let container: HTMLDivElement;
-function show(day: number, total: number) {
-  act(() => root.render(<RecoveryFeedback day={day} total={total} />));
+function show(day: number, total: number, guestNames?: string[]) {
+  act(() => root.render(<RecoveryFeedback day={day} total={total} guestNames={guestNames} />));
 }
 beforeEach(() => {
   vi.useFakeTimers();
@@ -54,4 +54,25 @@ it("clears a reward across day changes and never rewards reset or Day 1", () => 
   show(1, 0);
   show(1, 2);
   expect(container.textContent).toBe("");
+});
+
+it("names only newly recovered guests, including both people in a combined serve", () => {
+  show(5, 2, ["Laptop-Lukas"]);
+  expect(container.textContent).toBe("");
+  show(5, 5, ["Laptop-Lukas", "Meda", "Herr Grau"]);
+  const names = container.querySelector(".cafe-recovery-feedback__names");
+  expect(names?.textContent).toBe("Meda · Herr Grau");
+  expect(container.textContent).toContain("Meda and Herr Grau: 3 hearts restored");
+  expect(container.textContent).not.toContain("Lukas");
+  show(6, 0, []);
+  show(6, 1, ["Herr Grau"]);
+  expect(container.querySelector(".cafe-recovery-feedback__names")?.textContent).toBe("Herr Grau");
+});
+
+it("rebases legacy inferred names after a walkout without replaying hearts", () => {
+  show(5, 2, ["Laptop-Lukas"]);
+  show(5, 2, []);
+  expect(container.textContent).toBe("");
+  show(5, 3, ["Meda"]);
+  expect(container.querySelector(".cafe-recovery-feedback__names")?.textContent).toBe("Meda");
 });
