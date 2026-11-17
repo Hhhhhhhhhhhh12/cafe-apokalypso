@@ -360,3 +360,34 @@ room tidy from 38 to 50 cleanliness, two actual recovery hearts, reload persiste
 last-action and critical-patience gates, disabled duplicate-Grau double service and
 successful single service (2.5 s). No page errors. Each run had a 150-second watchdog;
 package total under 10 seconds. Diorama, approved cast and seat anchors unchanged.
+
+### Personal recovery reactions (2026-11-17)
+
+Candidate based on main `550ba9e`: the six recovery-capable visitors now have a
+brief recovery reaction replacing their ordinary serve line after successful
+service. Lukas's checkpoint remark ends in a pause rather than another browser
+tab; the other gestures stay within existing character motifs. No added dialogue
+panels, lore explanations, rewards, save fields or art changes.
+
+The existing floating heart reward now names the newly recovered visitors from
+actual served history. Combined service retains both names, while mounting a
+saved shift does not replay its total. Unknown pre-history saves retain the
+existing conservative fallback; walked-out visitors are not reconstructed.
+Day-4 text reactions are suppressed when the named heart reward already explains
+the service, preventing stacked bubbles observed during visual inspection.
+
+Final scoped checks: 44 recovery/voice/brew-group/guest-transition tests, TypeScript
+and affected-file lint passed (3.1 s). Isolated 1024x768 touch browser verified
+Lukas's named reward, room bounds, no overlapping reaction, reload without replay,
+actual Meda-plus-umbrella double service retaining both names and fitting the room
+(3.1 s). The first added Day-7 case used a wrong roster position and timed out;
+only its fixture was corrected against days.ts before the successful repeat.
+All local checks including iterations used under 30 seconds, each process capped
+at 150 seconds. No native build or publication. Approved room/figures/seats unchanged.
+Final read-only review caught first-reaction loss in helper service and an old-save
+history-length rebase after a walkout. Recovery reactions are now collected only
+for successful serves; the feedback baseline also follows history-only changes.
+The 18 affected recovery cases, including partial stock failure and legacy history,
+plus TypeScript/scoped lint passed after these corrections. Substitution warnings
+intentionally retain priority over prose reactions; named heart feedback still
+identifies recovered guests. Local package checks remain below 45 seconds.

@@ -50,6 +50,7 @@ export const weekOneGuests = [
   },
   {
     id: "nachbarin-mira",
+    recoveryLine: "Mira wraps both hands around the cup. Her shoulders settle.",
     name: "Nachbarin Mira",
     category: "normal",
     firstDay: 2,
@@ -67,6 +68,7 @@ export const weekOneGuests = [
   },
   {
     id: "laptop-lukas",
+    recoveryLine: "Lukas takes a sip. \"That can wait.\"",
     name: "Laptop-Lukas",
     category: "normal",
     firstDay: 2,
@@ -85,6 +87,7 @@ export const weekOneGuests = [
   },
   {
     id: "lieferfahrer-cem",
+    recoveryLine: "For one sip, Cem stops checking the street.",
     name: "Lieferfahrer Cem",
     category: "normal",
     firstDay: 2,
@@ -164,6 +167,7 @@ export const weekOneGuests = [
   },
   {
     id: "herr-grau",
+    recoveryLine: "Herr Grau stays for another quiet sip.",
     name: "Herr Grau",
     category: "subtly_strange",
     firstDay: 4,
@@ -188,6 +192,7 @@ export const weekOneGuests = [
   },
   {
     id: "frau-roter-regenschirm",
+    recoveryLine: "Her hand loosens around the umbrella. She breathes out.",
     name: "Frau mit rotem Regenschirm",
     category: "subtly_strange",
     firstDay: 7,
@@ -210,6 +215,7 @@ export const weekOneGuests = [
   },
   {
     id: "meda",
+    recoveryLine: "Meda rests her hands around the cup. Nobody stares.",
     name: "Meda",
     category: "subtly_strange",
     firstDay: 5,

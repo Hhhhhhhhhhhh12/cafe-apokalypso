@@ -119,6 +119,8 @@ export interface GuestDefinition {
    * Distinct from sampleLines (which are authoring/reference lines).
    */
   serveLine: string;
+  /** Replaces the ordinary reaction only after an actual recovery-producing serve. */
+  recoveryLine?: string;
   /** Shown after serving the guest's soft preference when no reputation bonus applies. */
   matchedPreferenceLine?: string;
   /** Shown after missing the guest's soft preference when no penalty applies. */

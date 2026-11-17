@@ -222,6 +222,17 @@ const arrivingHearts: Partial<Record<GuestId, 1 | 2>> = {
   "frau-roter-regenschirm": 1
 };
 
+/** Service history, not the current queue: a helper can restore more than one visitor. */
+export function getRecoveredGuestNames(state: GameState): string[] {
+  if (state.day < 2) return [];
+  return getServedGuestIds(state)
+    .filter(id => arrivingHearts[id] !== undefined)
+    .flatMap(id => {
+      const guest = weekOneGuests.find(entry => entry.id === id);
+      return guest ? [guest.name] : [];
+    });
+}
+
 export function getGuestRecovery(state: GameState, guestId: GuestId) {
   const current = arrivingHearts[guestId];
   if (state.day < 2 || current === undefined) return null;
