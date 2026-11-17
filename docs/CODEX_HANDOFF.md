@@ -391,3 +391,24 @@ The 18 affected recovery cases, including partial stock failure and legacy histo
 plus TypeScript/scoped lint passed after these corrections. Substitution warnings
 intentionally retain priority over prose reactions; named heart feedback still
 identifies recovered guests. Local package checks remain below 45 seconds.
+
+### Per-guest helper rewards (2026-11-17)
+
+Based on main `8a1040e`: guest appreciation, decor atmosphere and better-beans
+rewards now run inside the successful guest-service loop. Previously a helper's
+extra order left only the last guest eligible. Existing formulas and daily caps
+remain; the first reward updates reputation before the next sale's income.
+Reaction lines retain both guests' results, and a stock failure after the first
+order preserves its earned reward. Appreciation prose now reports the actual
+meter gain rather than a hardcoded +2 when only +1 fits the daily cap.
+
+The regression reaches Day 5 normally: Jana service, six beans, initial room
+cleanliness 49, three upkeep actions causing Kemal's walkout, two espressos for
+Paula/Lukas, then the last action serves Grau/Meda. Grau's handfilter earns +2;
+combined income, reputation and consumption match two single serves. Extra cases
+cover the remaining daily cap, meter maximum and only enough beans for Grau.
+Read-only subagent review confirmed unchanged single-service formulas and caps.
+Initial focused service/recovery suite: 101 passed. After the display correction,
+83 affected reward/management cases, TypeScript and scoped lint passed. Total
+local check time under 10 seconds; each command capped at 150 seconds. Full tests
+and build belong to regular CI. No art, geometry, save schema or native changes.

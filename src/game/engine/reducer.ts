@@ -406,6 +406,7 @@ function applySuccessfulServe(
   let guestMemory = { ...state.guestMemory };
   const flavorLines: string[] = [];
   const recoveryLines: string[] = [];
+  const guestReactionLines: string[] = [];
   const helperImpact = management.dayFiveHelperImpact && { ...management.dayFiveHelperImpact };
 
   for (let index = 0; index < orderCount; index += 1) {
@@ -563,6 +564,88 @@ function applySuccessfulServe(
       }
       management = { ...management, serveStreak: 0 };
     }
+    // Guest appreciation (#56): a guest who values the product just served gives a
+    // reputation bump that scales with the product's craft quality — a premium
+    // (tier-3) drink earns more than a standard one. The bonus is capped per day.
+    // A wrong choice for a picky guest only adds a gentle letdown line — no penalty.
+    const guestPreferences = servedGuest?.appreciatedProductIds ?? [];
+    const appreciates = guestPreferences.includes(product.id);
+    const matchesSoftPreference = servedGuest?.preferredProductId === product.id;
+    let appreciationLine = "";
+
+    if (appreciates) {
+      const qualityTier = product.qualityTier ?? 1;
+      const fullBonus = 1 + Math.max(0, qualityTier - 2); // standard/good +1, premium +2
+      const remainingCap = APPRECIATION_DAILY_CAP - management.appreciationBonusesGiven;
+      const bonus = Math.min(fullBonus, Math.max(0, remainingCap));
+
+      if (bonus > 0) {
+        const reputation = clampMeter(resources.reputation + bonus);
+        const earned = Number((reputation - resources.reputation).toFixed(2));
+        resources = { ...resources, reputation };
+        management = {
+          ...management,
+          appreciationBonusesGiven: management.appreciationBonusesGiven + bonus
+        };
+        appreciationLine = (servedGuest?.delightLine ?? "").replace(/Rep \+\d+(?:\.\d+)?\./, `Rep +${earned}.`);
+      } else {
+        appreciationLine = servedGuest?.matchedPreferenceLine ?? "";
+      }
+    } else if (matchesSoftPreference) {
+      appreciationLine = servedGuest?.matchedPreferenceLine ?? "";
+    } else if (guestPreferences.length > 0) {
+      appreciationLine = servedGuest?.letdownLine ?? "";
+    } else if (servedGuest?.preferredProductId) {
+      appreciationLine = servedGuest.missedPreferenceLine ?? "";
+    }
+
+    // Mild waste (#56): the craft of a premium drink is lost on a guest who neither
+    // values it nor reached for it, and whose own taste runs simpler. No reputation
+    // penalty — the cost is the wasted beans and effort — but the line makes the
+    // over-serve legible, so "give everyone the fanciest cup" is not a free strategy.
+    let wasteLine = "";
+    const servedTier = product.qualityTier ?? 1;
+    const preferredProduct = servedGuest?.preferredProductId
+      ? getProductById(servedGuest.preferredProductId)
+      : undefined;
+    const preferredTier = preferredProduct?.qualityTier ?? 1;
+    const overServedPremium =
+      servedGuest != null &&
+      servedTier >= 3 &&
+      !appreciates &&
+      !matchesSoftPreference &&
+      preferredProduct != null &&
+      servedTier > preferredTier;
+    if (overServedPremium) {
+      wasteLine = `${servedGuest.name} drinks the ${product.name.toLowerCase()} without ceremony. The slow craft — and the extra supplies — are lost on someone who only wanted a ${preferredProduct.name.toLowerCase()}.`;
+    }
+
+    // Decor atmosphere bonus: atmosphere-sensitive guests notice a well-maintained café.
+    let decorAtmosphereLine = "";
+    const decorBonusDef = servedGuest?.decorAtmosphereBonus;
+    if (decorBonusDef && management.decorBonusesGiven < DECOR_ATMOSPHERE_DAILY_CAP) {
+      const decorTiers = Object.values(workingState.decor) as number[];
+      const avgDecorTier = decorTiers.reduce((a, b) => a + b, 0) / decorTiers.length;
+      if (avgDecorTier >= decorBonusDef.minAvgTier) {
+        resources = { ...resources, reputation: clampMeter(resources.reputation + 1) };
+        management = { ...management, decorBonusesGiven: management.decorBonusesGiven + 1 };
+        decorAtmosphereLine = servedGuest?.decorAtmosphereLine ?? "";
+      }
+    }
+
+    // better-beans upgrade: quality-sensitive guests notice the improved roast — +1 rep,
+    // stacks with the appreciation bonus. Capped at the existing meter max.
+    let betterBeansLine = "";
+    if (
+      workingState.purchasedUpgrades.includes("better-beans") &&
+      servedGuest?.behaviorTags.includes("quality-expectations")
+    ) {
+      resources = { ...resources, reputation: clampMeter(resources.reputation + 1) };
+      betterBeansLine = "The beans speak for themselves. Rep +1.";
+    }
+
+    guestReactionLines.push(...[appreciationLine, decorAtmosphereLine, betterBeansLine, wasteLine].filter(Boolean));
+
   }
 
   if (helperExtraOrder) {
@@ -575,86 +658,7 @@ function applySuccessfulServe(
   const servedCustomerIndex = Math.max(0, management.customersServed + management.guestsLost - 1);
   const serveLine = recoveryLines.join(" ") || getServeLineForCustomer(workingState, servedCustomerIndex);
 
-  // Guest appreciation (#56): a guest who values the product just served gives a
-  // reputation bump that scales with the product's craft quality — a premium
-  // (tier-3) drink earns more than a standard one. The bonus is capped per day.
-  // A wrong choice for a picky guest only adds a gentle letdown line — no penalty.
-  const servedGuest = getGuestForCustomer(workingState, servedCustomerIndex);
-  const guestPreferences = servedGuest?.appreciatedProductIds ?? [];
-  const appreciates = guestPreferences.includes(product.id);
-  const matchesSoftPreference = servedGuest?.preferredProductId === product.id;
-  let appreciationLine = "";
-
-  if (appreciates) {
-    const qualityTier = product.qualityTier ?? 1;
-    const fullBonus = 1 + Math.max(0, qualityTier - 2); // standard/good +1, premium +2
-    const remainingCap = APPRECIATION_DAILY_CAP - management.appreciationBonusesGiven;
-    const bonus = Math.min(fullBonus, Math.max(0, remainingCap));
-
-    if (bonus > 0) {
-      resources = { ...resources, reputation: clampMeter(resources.reputation + bonus) };
-      management = {
-        ...management,
-        appreciationBonusesGiven: management.appreciationBonusesGiven + bonus
-      };
-      appreciationLine = servedGuest?.delightLine ?? "";
-    } else {
-      appreciationLine = servedGuest?.matchedPreferenceLine ?? "";
-    }
-  } else if (matchesSoftPreference) {
-    appreciationLine = servedGuest?.matchedPreferenceLine ?? "";
-  } else if (guestPreferences.length > 0) {
-    appreciationLine = servedGuest?.letdownLine ?? "";
-  } else if (servedGuest?.preferredProductId) {
-    appreciationLine = servedGuest.missedPreferenceLine ?? "";
-  }
-
-  // Mild waste (#56): the craft of a premium drink is lost on a guest who neither
-  // values it nor reached for it, and whose own taste runs simpler. No reputation
-  // penalty — the cost is the wasted beans and effort — but the line makes the
-  // over-serve legible, so "give everyone the fanciest cup" is not a free strategy.
-  let wasteLine = "";
-  const servedTier = product.qualityTier ?? 1;
-  const preferredProduct = servedGuest?.preferredProductId
-    ? getProductById(servedGuest.preferredProductId)
-    : undefined;
-  const preferredTier = preferredProduct?.qualityTier ?? 1;
-  const overServedPremium =
-    servedGuest != null &&
-    servedTier >= 3 &&
-    !appreciates &&
-    !matchesSoftPreference &&
-    preferredProduct != null &&
-    servedTier > preferredTier;
-  if (overServedPremium) {
-    wasteLine = `${servedGuest.name} drinks the ${product.name.toLowerCase()} without ceremony. The slow craft — and the extra supplies — are lost on someone who only wanted a ${preferredProduct.name.toLowerCase()}.`;
-  }
-
-  // Decor atmosphere bonus: atmosphere-sensitive guests notice a well-maintained café.
-  let decorAtmosphereLine = "";
-  const decorBonusDef = servedGuest?.decorAtmosphereBonus;
-  if (decorBonusDef && management.decorBonusesGiven < DECOR_ATMOSPHERE_DAILY_CAP) {
-    const decorTiers = Object.values(workingState.decor) as number[];
-    const avgDecorTier = decorTiers.reduce((a, b) => a + b, 0) / decorTiers.length;
-    if (avgDecorTier >= decorBonusDef.minAvgTier) {
-      resources = { ...resources, reputation: clampMeter(resources.reputation + 1) };
-      management = { ...management, decorBonusesGiven: management.decorBonusesGiven + 1 };
-      decorAtmosphereLine = servedGuest?.decorAtmosphereLine ?? "";
-    }
-  }
-
-  // better-beans upgrade: quality-sensitive guests notice the improved roast — +1 rep,
-  // stacks with the appreciation bonus. Capped at the existing meter max.
-  let betterBeansLine = "";
-  if (
-    workingState.purchasedUpgrades.includes("better-beans") &&
-    servedGuest?.behaviorTags.includes("quality-expectations")
-  ) {
-    resources = { ...resources, reputation: clampMeter(resources.reputation + 1) };
-    betterBeansLine = "The beans speak for themselves. Rep +1.";
-  }
-
-  const statusParts = [serveLine, appreciationLine, decorAtmosphereLine, betterBeansLine, wasteLine, ...flavorLines].filter(
+  const statusParts = [serveLine, ...guestReactionLines, ...flavorLines].filter(
     (part) => part.length > 0
   );
 
