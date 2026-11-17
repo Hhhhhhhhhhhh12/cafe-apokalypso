@@ -306,3 +306,7 @@ The final WebP sources passed the same 43 focused tests and TypeScript (1.3 s),
 and all-identity/seat browser checks (4.2 s). Encoding plus byte-equality checks
 used 10.7 s. Overall local verification including exports stayed below three
 minutes for the package, within the original 15-minute budget.
+The lookbook gallery now includes WebP runtime files and excludes their retained
+PNG sources, preventing duplicate artwork in the web build. Its standalone
+browser page lists all 15 exports without PNG duplicates (3.7 s); scoped lint
+and TypeScript passed (0.9 s). Total package verification remains below 3 minutes.
