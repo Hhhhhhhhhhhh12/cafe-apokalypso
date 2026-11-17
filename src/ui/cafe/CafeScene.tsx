@@ -1,4 +1,5 @@
 import "./firstCup.css";
+import { StaffPortrait } from "./CafeShiftHelper";
 import { weekOneEvents } from "../../game/data/events";
 import { useCallback, useEffect, useRef, useState, type MouseEvent } from "react";
 import type { GameState } from "../../game/types/game";
@@ -35,7 +36,7 @@ import fatouSeatedAsset from "../../../assets/sprites/guests/placeholder-guest-f
 
 const firstCupEvent = weekOneEvents.find((event) => event.id === "day-1-first-cup");
 
-const GUEST_SPRITES = {
+const GUEST_VISIBILITY_KEYS = {
   "pendler-kemal": "kemal",
   "pendlerin-paula": "paula",
   "lieferfahrer-cem": "cem",
@@ -49,6 +50,12 @@ const GUEST_SPRITES = {
   "meda": "meda",
   "frau-roter-regenschirm": "roterRegenschirm",
 } as const satisfies Record<GuestId, string>;
+
+const GUEST_SPRITES = {
+  ...GUEST_VISIBILITY_KEYS,
+  "herr-grau": "grau",
+  "frau-roter-regenschirm": "roter-regenschirm",
+} as const;
 
 const SEATED_GUESTS = [
   { key: "cem", asset: cemSeatedAsset, label: "Cem · Seated" },
@@ -443,8 +450,7 @@ export function CafeScene({ gameState, onCleanTables, bohnStorage = null, bohnOc
 
           {showNino && (
             <div className="cafe-staff-nino" style={spotStyle(NINO_ARRIVAL)} aria-hidden="true">
-              <span className="cafe-staff-nino__stand" />
-              <span className="cafe-staff-nino__walk" />
+              <StaffPortrait helperId="nino" className="cafe-staff-nino__portrait" alt="" />
             </div>
           )}
 
@@ -537,7 +543,7 @@ export function CafeScene({ gameState, onCleanTables, bohnStorage = null, bohnOc
 
           {/* Sitzende Gäste — Sichtbarkeit aus dem Selector, Platz aus scene.ts */}
           {SEATED_GUESTS.map(({ key, label, ...guest }) =>
-            visibleGuests[key] && !(queueGuest && GUEST_SPRITES[queueGuest.id] === key &&
+            visibleGuests[key] && !(queueGuest && GUEST_VISIBILITY_KEYS[queueGuest.id] === key &&
               (showQueueGuest || guestPhase === "walking-to-counter" || guestPhase === "exiting-east")) ? (
               <span
                 key={key}

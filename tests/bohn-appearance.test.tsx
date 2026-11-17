@@ -84,7 +84,7 @@ describe("Bohn's appearance", () => {
     render(queued);
     see(true);
     expect(container.querySelector<HTMLElement>(".cafe-pilot-asset--bohn-standing")?.style.backgroundImage)
-      .toContain("bohn-oldest-standing");
+      .toContain("bohn-standing-v03-off-duty-approved");
     render(seatedState());
     see(true);
     expect(seatedSprite()?.src).toContain("bohn-oldest-seated");

@@ -1,6 +1,7 @@
 # Off-duty cast · collected review · 2026-11-17
 
-Status: concept boards only, not approved production sprites. The user requested
+Status: all four boards approved by the user on 2026-11-17 (“Alle passen.
+Übernimm die Figuren”). Autonomous extraction and adoption are authorized. The user requested
 video-game heroes after work, following the approved unarmed Lukas. Keep diverse
 skin tones, ages and silhouettes; avoid franchise costumes and overt combat gear.
 
@@ -14,13 +15,14 @@ Boards (left to right):
 Existing approved guest assets supplied identity references. Cem's shorter stocky
 silhouette and short hair distinguish him from Kemal; Christa retains mature,
 fuller proportions; Meda retains dark glasses; the umbrella woman remains reserved.
-Nele's proposed workwear uses the approved guest's long copper hair, reconciling
+Nele's approved workwear uses the approved guest's long copper hair, reconciling
 the older staff bob. Bohn's other ages remain production assets and need equivalent
-review before any replacement. Genre accessories are proposals, not new story canon.
+review before any replacement. The visual accessories are approved; they do not establish new story canon.
 
-No seated sprite, chair anchor, save field or roster has changed. The only installed
-new art is the explicitly approved standing Lukas. These boards require selection
-before individual transparent production poses are prepared and checked in the café.
+No seated sprite, chair anchor, save field or roster has changed. Lukas remains installed. The other eleven standing guests and three helper
+portraits are now individual transparent cutouts; the boards themselves are not
+production sprite sheets. Exact prompts, output identities and asset hashes are
+in [OFF_DUTY_ASSET_PROVENANCE.json](OFF_DUTY_ASSET_PROVENANCE.json).
 
 ## Review artifact identity
 

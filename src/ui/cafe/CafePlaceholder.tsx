@@ -839,7 +839,8 @@ export function CafePlaceholder({
                 ) : null}
                 {followingGuest && followingGuest.id !== frontOfQueue ? (
                   <span key={followingGuest.id} className="cafe-rush-queue-guest" aria-hidden="true">
-                    <span className={`cafe-pilot-asset cafe-pilot-asset--standing cafe-pilot-asset--${QUEUE_SPRITES[followingGuest.id]}-standing`} />
+                    <span className={`cafe-pilot-asset cafe-pilot-asset--standing cafe-pilot-asset--${QUEUE_SPRITES[followingGuest.id]}-standing`}
+                      style={followingGuest.id === "herr-bohn" ? { backgroundImage: `url("${bohnStanding}")` } : undefined} />
                   </span>
                 ) : null}
               </div>

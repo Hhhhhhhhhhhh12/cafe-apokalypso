@@ -1,0 +1,254 @@
+[
+  {
+    "key": "kemal",
+    "file": "assets/sprites/guests/placeholder-guest-kemal-standing-v03-off-duty-approved.png",
+    "source": "exec-023489ad-693b-4bb5-8388-1d87e5a4e1a9.png",
+    "tool": "built-in Imagegen",
+    "prompt": "Use case: background-extraction. Asset type: individual transparent game character sprite. Input: the attached APPROVED cast board is the edit target, not inspiration. Isolate ONLY the FIRST / far-left man Kemal, navy padded jacket, full beard. Preserve this exact character's identity, face, body shape, skin tone, hair, clothing details, accessories, expression, pose, line weight and illustrated pixel-like shading as faithfully as possible. Delete all other people and the ivory backdrop. Do NOT redesign, beautify, re-age or recolor. Output exactly ONE complete full-body figure with all its held objects, genuinely transparent RGBA background, no ground shadow or halo, no floor, text, labels or extra objects. Center the character horizontally on a portrait canvas; entire figure including hair/umbrella and shoes fits with small transparent margin (about 4% top and bottom); soles level near the bottom. Keep compact source proportions (Cem short and stocky; no elongated legs). Unarmed. Preserve approved style rather than making a new pixel-art interpretation.",
+    "sha256": "b9ebf516a6e9b7aae34e3fafa5710f48923e22fc34fd1f03ea3e90a7b4cbd0b7",
+    "size": [
+      1024,
+      1536
+    ],
+    "alphaBounds8": [
+      232,
+      57,
+      765,
+      1491
+    ]
+  },
+  {
+    "key": "paula",
+    "file": "assets/sprites/guests/placeholder-guest-paula-standing-v03-off-duty-approved.png",
+    "source": "exec-700b834b-dba8-444a-9588-6750d2a4f7a0.png",
+    "tool": "built-in Imagegen",
+    "prompt": "Use case: background-extraction. Asset type: individual transparent game character sprite. Input: the attached APPROVED cast board is the edit target, not inspiration. Isolate ONLY the SECOND person from left, commuter Paula in mustard jacket with shoulder bag. Preserve this exact character's identity, face, body shape, skin tone, hair, clothing details, accessories, expression, pose, line weight and illustrated pixel-like shading as faithfully as possible. Delete all other people and the ivory backdrop. Do NOT redesign, beautify, re-age or recolor. Output exactly ONE complete full-body figure with all its held objects, genuinely transparent RGBA background, no ground shadow or halo, no floor, text, labels or extra objects. Center the character horizontally on a portrait canvas; entire figure including hair/umbrella and shoes fits with small transparent margin (about 4% top and bottom); soles level near the bottom. Keep compact source proportions (Cem short and stocky; no elongated legs). Unarmed. Preserve approved style rather than making a new pixel-art interpretation.",
+    "sha256": "40f816e1478d3a3460399c91d63adb7252e5a8f4813ab369bb81e28d2db393f1",
+    "size": [
+      1024,
+      1536
+    ],
+    "alphaBounds8": [
+      271,
+      47,
+      734,
+      1489
+    ]
+  },
+  {
+    "key": "fatou",
+    "file": "assets/sprites/guests/placeholder-guest-fatou-standing-v03-off-duty-approved.png",
+    "source": "exec-9422eee6-2826-4c08-8dc2-4f135bd5ed6e.png",
+    "tool": "built-in Imagegen",
+    "prompt": "Use case: background-extraction. Asset type: individual transparent game character sprite. Input: the attached APPROVED cast board is the edit target, not inspiration. Isolate ONLY the THIRD person from left, Fatou with long dark hair and burgundy sweater holding notebook. Preserve this exact character's identity, face, body shape, skin tone, hair, clothing details, accessories, expression, pose, line weight and illustrated pixel-like shading as faithfully as possible. Delete all other people and the ivory backdrop. Do NOT redesign, beautify, re-age or recolor. Output exactly ONE complete full-body figure with all its held objects, genuinely transparent RGBA background, no ground shadow or halo, no floor, text, labels or extra objects. Center the character horizontally on a portrait canvas; entire figure including hair/umbrella and shoes fits with small transparent margin (about 4% top and bottom); soles level near the bottom. Keep compact source proportions (Cem short and stocky; no elongated legs). Unarmed. Preserve approved style rather than making a new pixel-art interpretation.",
+    "sha256": "c5692bdc6fd38ab1897324e235a63039726820e3121d4df591ce1ba6906cc2cc",
+    "size": [
+      1024,
+      1536
+    ],
+    "alphaBounds8": [
+      303,
+      49,
+      722,
+      1488
+    ]
+  },
+  {
+    "key": "cem",
+    "file": "assets/sprites/guests/placeholder-guest-cem-standing-v03-off-duty-approved.png",
+    "source": "exec-bf5cef2a-3e49-40b7-8916-b26e171d58e2.png",
+    "tool": "built-in Imagegen",
+    "prompt": "Use case: background-extraction. Asset type: individual transparent game character sprite. Input: the attached APPROVED cast board is the edit target, not inspiration. Isolate ONLY the FOURTH / far-right man Cem, short stocky build, olive courier jacket and satchel. Preserve this exact character's identity, face, body shape, skin tone, hair, clothing details, accessories, expression, pose, line weight and illustrated pixel-like shading as faithfully as possible. Delete all other people and the ivory backdrop. Do NOT redesign, beautify, re-age or recolor. Output exactly ONE complete full-body figure with all its held objects, genuinely transparent RGBA background, no ground shadow or halo, no floor, text, labels or extra objects. Center the character horizontally on a portrait canvas; entire figure including hair/umbrella and shoes fits with small transparent margin (about 4% top and bottom); soles level near the bottom. Keep compact source proportions (Cem short and stocky; no elongated legs). Unarmed. Preserve approved style rather than making a new pixel-art interpretation.",
+    "sha256": "ae4e9b707a69a552b6542ee36edca3c247352545cdf5f908dcea517eba6b95d1",
+    "size": [
+      1024,
+      1536
+    ],
+    "alphaBounds8": [
+      183,
+      68,
+      833,
+      1505
+    ]
+  },
+  {
+    "key": "mira",
+    "file": "assets/sprites/guests/placeholder-guest-mira-standing-v03-off-duty-approved.png",
+    "source": "exec-8edaaebe-d78a-4788-9e32-e900e8eca6c0.png",
+    "tool": "built-in Imagegen",
+    "prompt": "Use case: background-extraction. Asset type: individual transparent game character sprite. Input: the attached APPROVED cast board is the edit target, not inspiration. Isolate ONLY the FIRST / far-left woman Mira, chestnut curls, teal sweater and jeans. Preserve this exact character's identity, face, body shape, skin tone, hair, clothing details, accessories, expression, pose, line weight and illustrated pixel-like shading as faithfully as possible. Delete all other people and the ivory backdrop. Do NOT redesign, beautify, re-age or recolor. Output exactly ONE complete full-body figure with all its held objects, genuinely transparent RGBA background, no ground shadow or halo, no floor, text, labels or extra objects. Center the character horizontally on a portrait canvas; entire figure including hair/umbrella and shoes fits with small transparent margin (about 4% top and bottom); soles level near the bottom. Keep compact source proportions (Cem short and stocky; no elongated legs). Unarmed. Preserve approved style rather than making a new pixel-art interpretation.",
+    "sha256": "87da962c7dd4fb401142d2f9ba24400407369a5ee6b11a0fb6517b2eec152469",
+    "size": [
+      1024,
+      1536
+    ],
+    "alphaBounds8": [
+      289,
+      28,
+      703,
+      1519
+    ]
+  },
+  {
+    "key": "christa",
+    "file": "assets/sprites/guests/placeholder-guest-christa-standing-v03-off-duty-approved.png",
+    "source": "exec-0919dcdc-8371-4100-8b6a-c1b41d9e6240.png",
+    "tool": "built-in Imagegen",
+    "prompt": "Use case: background-extraction. Asset type: individual transparent game character sprite. Input: the attached APPROVED cast board is the edit target, not inspiration. Isolate ONLY the SECOND woman from left Christa, mature fuller build, auburn bob, burgundy wrap, cup. Preserve this exact character's identity, face, body shape, skin tone, hair, clothing details, accessories, expression, pose, line weight and illustrated pixel-like shading as faithfully as possible. Delete all other people and the ivory backdrop. Do NOT redesign, beautify, re-age or recolor. Output exactly ONE complete full-body figure with all its held objects, genuinely transparent RGBA background, no ground shadow or halo, no floor, text, labels or extra objects. Center the character horizontally on a portrait canvas; entire figure including hair/umbrella and shoes fits with small transparent margin (about 4% top and bottom); soles level near the bottom. Keep compact source proportions (Cem short and stocky; no elongated legs). Unarmed. Preserve approved style rather than making a new pixel-art interpretation.",
+    "sha256": "03b7ed4a2442ecbc8a6216934145688e43282cdbc2b988bc5ec08f5d70061f8c",
+    "size": [
+      1024,
+      1536
+    ],
+    "alphaBounds8": [
+      253,
+      62,
+      763,
+      1501
+    ]
+  },
+  {
+    "key": "nele",
+    "file": "assets/sprites/guests/placeholder-guest-nele-standing-v03-off-duty-approved.png",
+    "source": "exec-8fdc1c0a-b556-4807-a28b-99e795b7c469.png",
+    "tool": "built-in Imagegen",
+    "prompt": "Use case: background-extraction. Asset type: individual transparent game character sprite. Input: the attached APPROVED cast board is the edit target, not inspiration. Isolate ONLY the THIRD woman from left Nele, long copper hair, olive jacket, notebook. Preserve this exact character's identity, face, body shape, skin tone, hair, clothing details, accessories, expression, pose, line weight and illustrated pixel-like shading as faithfully as possible. Delete all other people and the ivory backdrop. Do NOT redesign, beautify, re-age or recolor. Output exactly ONE complete full-body figure with all its held objects, genuinely transparent RGBA background, no ground shadow or halo, no floor, text, labels or extra objects. Center the character horizontally on a portrait canvas; entire figure including hair/umbrella and shoes fits with small transparent margin (about 4% top and bottom); soles level near the bottom. Keep compact source proportions (Cem short and stocky; no elongated legs). Unarmed. Preserve approved style rather than making a new pixel-art interpretation.",
+    "sha256": "fa837561026bff8cf45bfb147a609fb2ef54411e522036cb2383fa07fdcc3eb0",
+    "size": [
+      1024,
+      1536
+    ],
+    "alphaBounds8": [
+      319,
+      42,
+      732,
+      1523
+    ]
+  },
+  {
+    "key": "meda",
+    "file": "assets/sprites/guests/placeholder-guest-meda-standing-v03-off-duty-approved.png",
+    "source": "exec-c968d3a5-634c-493b-a0fd-ca4a53227c64.png",
+    "tool": "built-in Imagegen",
+    "prompt": "Use case: background-extraction. Asset type: individual transparent game character sprite. Input: the attached APPROVED cast board is the edit target, not inspiration. Isolate ONLY the FOURTH / far-right woman Meda, deep warm skin, dark curls and sunglasses, teal dress. Preserve this exact character's identity, face, body shape, skin tone, hair, clothing details, accessories, expression, pose, line weight and illustrated pixel-like shading as faithfully as possible. Delete all other people and the ivory backdrop. Do NOT redesign, beautify, re-age or recolor. Output exactly ONE complete full-body figure with all its held objects, genuinely transparent RGBA background, no ground shadow or halo, no floor, text, labels or extra objects. Center the character horizontally on a portrait canvas; entire figure including hair/umbrella and shoes fits with small transparent margin (about 4% top and bottom); soles level near the bottom. Keep compact source proportions (Cem short and stocky; no elongated legs). Unarmed. Preserve approved style rather than making a new pixel-art interpretation.",
+    "sha256": "c9b15686ca4829a31710dde6891ce7bb927440bb4f6994e6cd40407eb017e262",
+    "size": [
+      1024,
+      1536
+    ],
+    "alphaBounds8": [
+      295,
+      40,
+      754,
+      1519
+    ]
+  },
+  {
+    "key": "bohn",
+    "file": "assets/sprites/guests/placeholder-guest-bohn-standing-v03-off-duty-approved.png",
+    "source": "exec-35284ce7-f3a8-4c35-9c9a-ad198b151d66.png",
+    "tool": "built-in Imagegen",
+    "prompt": "Use case: background-extraction. Asset type: individual transparent game character sprite. Input: the attached APPROVED cast board is the edit target, not inspiration. Isolate ONLY the FIRST / far-left elderly man Bohn, white side hair and beard, warm orange vest and cup. Preserve this exact character's identity, face, body shape, skin tone, hair, clothing details, accessories, expression, pose, line weight and illustrated pixel-like shading as faithfully as possible. Delete all other people and the ivory backdrop. Do NOT redesign, beautify, re-age or recolor. Output exactly ONE complete full-body figure with all its held objects, genuinely transparent RGBA background, no ground shadow or halo, no floor, text, labels or extra objects. Use a SQUARE transparent canvas. Center horizontally. Preserve the complete figure in the middle 69% of the canvas height, top of hair at 23% and shoe soles at 92%, leaving 8% empty transparent space below the shoes. Do not stretch or change the figure; this is export framing for a fixed caf\u00e9 slot. Keep compact source proportions (Cem short and stocky; no elongated legs). Unarmed. Preserve approved style rather than making a new pixel-art interpretation.",
+    "sha256": "8857839c755ad9bb535085d6923c8b8cd4f04d25971809e7a1110192ffb6baf7",
+    "size": [
+      1254,
+      1254
+    ],
+    "alphaBounds8": [
+      432,
+      205,
+      817,
+      1154
+    ]
+  },
+  {
+    "key": "grau",
+    "file": "assets/sprites/guests/placeholder-guest-grau-standing-v03-off-duty-approved.png",
+    "source": "exec-0539edec-4126-4bad-916e-e0760f32c807.png",
+    "tool": "built-in Imagegen",
+    "prompt": "Use case: background-extraction. Asset type: individual transparent game character sprite. Input: the attached APPROVED cast board is the edit target, not inspiration. Isolate ONLY the SECOND / middle older man Herr Grau, grey olive formal suit, holding coin. Preserve this exact character's identity, face, body shape, skin tone, hair, clothing details, accessories, expression, pose, line weight and illustrated pixel-like shading as faithfully as possible. Delete all other people and the ivory backdrop. Do NOT redesign, beautify, re-age or recolor. Output exactly ONE complete full-body figure with all its held objects, genuinely transparent RGBA background, no ground shadow or halo, no floor, text, labels or extra objects. Center the character horizontally on a portrait canvas; entire figure including hair/umbrella and shoes fits with small transparent margin (about 4% top and bottom); soles level near the bottom. Keep compact source proportions (Cem short and stocky; no elongated legs). Unarmed. Preserve approved style rather than making a new pixel-art interpretation.",
+    "sha256": "f7c3bb65e4905d3fee15975321391ffc04e6b3b184be94975799ffc5dba0f113",
+    "size": [
+      1024,
+      1536
+    ],
+    "alphaBounds8": [
+      223,
+      31,
+      767,
+      1520
+    ]
+  },
+  {
+    "key": "roter-regenschirm",
+    "file": "assets/sprites/guests/placeholder-guest-roter-regenschirm-standing-v03-off-duty-approved.png",
+    "source": "exec-ffa265d4-9bfa-41a6-95dd-862f3efdfff8.png",
+    "tool": "built-in Imagegen",
+    "prompt": "Use case: background-extraction. Asset type: individual transparent game character sprite. Input: the attached APPROVED cast board is the edit target, not inspiration. Isolate ONLY the THIRD / far-right woman with red umbrella, dark clothing, cup and shaded face. Preserve this exact character's identity, face, body shape, skin tone, hair, clothing details, accessories, expression, pose, line weight and illustrated pixel-like shading as faithfully as possible. Delete all other people and the ivory backdrop. Do NOT redesign, beautify, re-age or recolor. Output exactly ONE complete full-body figure with all its held objects, genuinely transparent RGBA background, no ground shadow or halo, no floor, text, labels or extra objects. Center the character horizontally on a portrait canvas; entire figure including hair/umbrella and shoes fits with small transparent margin (about 4% top and bottom); soles level near the bottom. Keep compact source proportions (Cem short and stocky; no elongated legs). Unarmed. Preserve approved style rather than making a new pixel-art interpretation.",
+    "sha256": "82ee85cd9dfe1257b562d2a0e960441680c170c06fac521664faf72df8ff7cb4",
+    "size": [
+      1024,
+      1536
+    ],
+    "alphaBounds8": [
+      230,
+      48,
+      841,
+      1504
+    ]
+  },
+  {
+    "key": "staff-jana",
+    "file": "assets/sprites/guests/placeholder-staff-jana-v02-off-duty-approved.png",
+    "source": "exec-1b8fa3cb-76ae-47d4-8cca-e0da674521fc.png",
+    "tool": "built-in Imagegen",
+    "prompt": "Use case: background-extraction. Isolate only Jana from the input image, which is the approved illustration and edit target. Select the LEFT figure, brunette hair in a bun, white rolled-sleeve collared shirt, forest green apron with round leaf badge and tied bow, off-white towel with green stripes draped over her bent forearm, other arm down, charcoal trousers and brown lace-up boots. Faithfully retain the same exact pose, silhouette, expression, body proportions, complexion, clothing detail, colors, line weights, and grainy hand-drawn rendering from the board. The only edits are removal of the surrounding ivory background and two other characters, and framing the retained figure alone. Render the complete standing figure, head to both soles, centered with modest transparent margins and the feet near the bottom of the portrait canvas. Output genuine transparent alpha outside the silhouette, including gaps between limbs, with clean edges. No platform, cast shadow, border, text, added styling, extra elements, or redesign. Reproduce this exact figure as closely as possible.",
+    "sha256": "efef7cc606c801be53b5b09a40fd7b3da5484f736609190f41bf1e44c5d83bfe",
+    "size": [
+      1024,
+      1536
+    ],
+    "alphaBounds8": [
+      319,
+      50,
+      728,
+      1503
+    ]
+  },
+  {
+    "key": "staff-nino",
+    "file": "assets/sprites/guests/placeholder-staff-nino-v02-off-duty-approved.png",
+    "source": "exec-a79dc8a5-7203-452d-bb44-056b885bcd3a.png",
+    "tool": "built-in Imagegen",
+    "prompt": "Use case: background-extraction. Isolate only Nino from the input image, which is the approved illustration and edit target. Select the CENTER figure, tousled brown hair, rectangular dark glasses, white rolled-sleeve collared shirt, brown apron with tied waist, cream towel with red stripes tucked into the waist, hands at his pockets, dark blue pants and brown lace-up shoes. Faithfully retain the same exact pose, silhouette, expression, body proportions, complexion, clothing detail, colors, line weights, and grainy hand-drawn rendering from the board. The only edits are removal of the surrounding ivory background and two other characters, and framing the retained figure alone. Render the complete standing figure, head to both soles, centered with modest transparent margins and the feet near the bottom of the portrait canvas. Output genuine transparent alpha outside the silhouette, including gaps between limbs, with clean edges. No platform, cast shadow, border, text, added styling, extra elements, or redesign. Reproduce this exact figure as closely as possible.",
+    "sha256": "f77295845a923af0db60339272a53058f9b86461593b605cbb06190af5a629ca",
+    "size": [
+      1024,
+      1536
+    ],
+    "alphaBounds8": [
+      298,
+      52,
+      709,
+      1491
+    ]
+  },
+  {
+    "key": "staff-nele",
+    "file": "assets/sprites/guests/placeholder-staff-nele-v02-off-duty-approved.png",
+    "source": "exec-58b63662-7254-4ca0-ad71-047b84d07874.png",
+    "tool": "built-in Imagegen",
+    "prompt": "Use case: background-extraction. Isolate only Nele from the input image, which is the approved illustration and edit target. Select the RIGHT figure, long loose wavy auburn hair, olive collared jacket, a dark brown clipboard held in both hands, sand beige waist apron with pockets, straight charcoal trousers and brown ankle boots. Faithfully retain the same exact pose, silhouette, expression, body proportions, complexion, clothing detail, colors, line weights, and grainy hand-drawn rendering from the board. The only edits are removal of the surrounding ivory background and two other characters, and framing the retained figure alone. Render the complete standing figure, head to both soles, centered with modest transparent margins and the feet near the bottom of the portrait canvas. Output genuine transparent alpha outside the silhouette, including gaps between limbs, with clean edges. No platform, cast shadow, border, text, added styling, extra elements, or redesign. Reproduce this exact figure as closely as possible.",
+    "sha256": "55914adf2ee26cd85a1cc4bcc329ba02cd8de512df67906a2a2e3345c956b027",
+    "size": [
+      1024,
+      1536
+    ],
+    "alphaBounds8": [
+      312,
+      43,
+      723,
+      1498
+    ]
+  }
+]

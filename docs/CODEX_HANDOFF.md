@@ -73,11 +73,13 @@ merging. Do not repeat that implementation from an old handoff prompt.
 
 The current character direction is [Lukas as a JRPG hero off duty](art/LUKAS_OFF_DUTY.md).
 The user approved the standing concept on 2026-11-17; it is now installed.
-The other characters remain [collected drafts](art/OFF_DUTY_CAST_REVIEW_20261117.md), awaiting visual approval.
+The user approved [all four character boards](art/OFF_DUTY_CAST_REVIEW_20261117.md)
+on 2026-11-17 and authorized autonomous adoption, preserving the diorama and seats.
 The [current character sheets](art/CHARACTER_SHEETS.md) record source assets,
 identity constraints and pose-specific approval boundaries. The June roster is
-historical. Next gate: collected figure selection and human impression of the
-first week; no additional mechanic is required by the current source audit.
+historical. Eleven guest cutouts and three staff portraits now follow these
+approved designs; seated assets and anchors are preserved. The overall human
+play impression remains separate from technical proof.
 
 
 ### Direct guest interaction (2026-11-16)
@@ -264,3 +266,31 @@ cues for last-action and critical-patience fixtures (23.9 s, no page errors).
 Initial test fixture mistakes (Day 2 walkout assumption, Day 3 queue position,
 English rather than internal product ID) were corrected. Local package checks
 including failed runs and the final accessible-label regression totaled under 60 s. This is not native/device acceptance.
+
+### Approved off-duty cast adoption (2026-11-17)
+
+The user approved all four shown boards and authorized adoption with subagents,
+keeping the diorama and seat positions. Fourteen transparent cutouts are installed:
+eleven standing guests (Lukas was already adopted) and Jana/Nino/Nele workwear.
+`OFF_DUTY_ASSET_PROVENANCE.json` records built-in Imagegen prompts, output names,
+asset hashes and alpha bounds. Originals were copied unchanged, not flattened
+from raw boards. CSS normalizes apparent standing size inside existing slots;
+helper pictures remain proportional and no longer appear miniature.
+
+Bohn's oldest standing pose follows the new board; other ages and seated poses
+remain. His following queue position now uses the same age source as the front.
+The lookbook uses the new Nino portrait throughout entrance rather than flashing
+the old walk sheet; correct standing keys are separate from legacy visibility
+keys, preserving the no-duplicate-seat guard for Grau and the umbrella woman.
+
+Verified on the candidate based on `cc4bfc4`: 43 focused guest/diorama/Bohn tests,
+TypeScript and scoped lint passed. The additional Nino portrait regression passed
+with its 13-case module. The first run caught the lookbook visibility-key mismatch,
+which was fixed before the final checks. A 1024×768 isolated browser checked all
+12 standing identities, three helper portraits and six chair contacts (4.2 s,
+then 3.7 s after helper sizing). The week-one route passed all seven goals,
+KASSANDRA, letter/reload, empty stock and reduced motion (90.0 s). No page errors.
+All six seated PNGs, `approvedSeats.ts`, `CafeTableGuest.tsx` and `approved-cafe.css`
+are byte-identical to the main baseline. All 14 new images have transparent edges
+and match their recorded hashes. Total local checking including repeats and the
+contact-sheet render stayed below two minutes; no native build or publication.

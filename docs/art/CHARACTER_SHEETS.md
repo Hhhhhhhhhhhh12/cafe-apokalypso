@@ -1,7 +1,8 @@
 # Character sheets · off-duty cast
 
-Status checked 2026-11-17 against main `cc4bfc4`. This is a production handoff,
-not approval of the collected concepts or new narrative lore.
+Baseline checked 2026-11-17 against main `cc4bfc4`. The user then approved all
+four boards and instructed autonomous adoption, preserving the diorama and seats.
+This approves the shown designs, not new narrative lore.
 
 ## Direction and authority
 
@@ -13,11 +14,12 @@ not only in enlarged concept illustrations.
 
 - **Approved:** the compact room and six existing seated poses, reconfirmed for
   Days 1–7; Lukas's shown standing counterpart accepted on 2026-11-17.
-- **Pending:** all four [collected boards](OFF_DUTY_CAST_REVIEW_20261117.md).
-  Their accessories and workwear are proposals. Approval of one figure does not
-  approve the rest, new seating poses, animation frames or a new lore reveal.
-- **Production baseline, not blanket approval:** other installed standing/staff
-  sprites are identity references until their replacement is selected.
+- **Approved on 2026-11-17:** all four [collected boards](OFF_DUTY_CAST_REVIEW_20261117.md).
+  Eleven standing guests and three staff portraits are derived as transparent
+  individual assets; see [provenance](OFF_DUTY_ASSET_PROVENANCE.json).
+  New seating poses, animation frames and lore reveals were not part of the boards.
+- **Retained baseline:** existing seated sprites and Bohn's other age variants
+  remain unchanged; old sprite files remain available as references.
 - **Canon:** [PROJECT_CANON](../PROJECT_CANON.md). Guest IDs/appearance timing:
   `src/game/data/guests.ts` and `src/game/data/days.ts`. Do not derive timing or
   biographies from the historical June roster.
@@ -26,9 +28,9 @@ not only in enlarged concept illustrations.
 
 All filenames below are under `assets/sprites/guests/`. The named file is the
 identity reference, not necessarily the current standing runtime sprite.
-“Board” refers to the pending collection, left-to-right order.
+“Board” refers to the approved collection, left-to-right order.
 
-| Figure / runtime ID | Identity to retain | Reference filename | Pending board |
+| Figure / runtime ID | Identity to retain | Reference filename | Approved board |
 | --- | --- | --- | --- |
 | Kemal / `pendler-kemal` | Broad build, brown skin, short dark hair and full beard, navy padded jacket | `placeholder-guest-kemal-v02-approved-style.png` | 1, first |
 | Commuter Paula / `pendlerin-paula` | Brown bun, mustard jacket, cream shirt, practical shoulder bag | `placeholder-guest-paula-v02-approved-style.png` | 1, second |
@@ -55,11 +57,11 @@ KASSANDRA classification is intentional.
 
 ## Staff wardrobe references
 
-| Figure | Installed reference | Proposed collection / boundary |
+| Figure | Installed reference | Approved collection / boundary |
 | --- | --- | --- |
 | Jana | `placeholder-staff-jana.png` | Board 4, first: dark bun, white shirt and green apron retained |
 | Nino | `placeholder-staff-nino.png` | Board 4, second: dark hair, glasses, white shirt and brown apron retained |
-| Nele | `placeholder-staff-nele.png` | Board 4, third: proposed long copper hair matches approved guest Nele; replaces the old staff bob only after selection |
+| Nele | `placeholder-staff-nele.png` | Board 4, third: approved long copper hair matches guest Nele; replaces the old staff bob |
 
 These are workwear variants, not new people. The artwork proposal does not
 change helper pricing, job unlocks, station positions or service bonuses.
@@ -85,13 +87,14 @@ in the café. Do not extract an entire concept board as a production sprite shee
 Bohn's `grey-temples`, `mature`, `silver` and `oldest` variants remain distinct;
 Board 3 is not approval to collapse them to one age.
 
-## Review still needed
+## Integration verification
 
-1. Select or correct the four shown boards by figure.
-2. Prepare only selected individual transparent poses; compare them beside the
-   existing seated figures at actual café size, including standing-to-seat change.
-3. Keep the room, seating and identities consistent; verify alpha edges, occlusion,
-   touch targets and reduced-motion fallback before integrating an approved pose.
+All 14 individual cutouts are in `assets/sprites/guests/`, with original Imagegen
+outputs copied unchanged. CSS fits them inside the existing room slots; helper
+artwork is now proportional and sized consistently with guests. Room geometry,
+seated poses and chair anchors remain unchanged. The actual café view, service
+transitions, reduced motion, portrait loading and seat contacts are checked as
+one bounded package. No new native build or publication is implied.
 
 Technical checks do not establish that the first week is enjoyable or that its
 ending invites Day 8. That overall play impression remains a human review, separate
