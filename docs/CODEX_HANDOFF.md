@@ -444,3 +444,20 @@ This is an integrated browser-game checkpoint, not native-device testing, a new
 signed iPad package, App Store release or a new user visual acceptance. The earlier
 iPad build remains on its explicitly retained version. Regular GitHub CI verifies
 the complete suite and web build for the exact PR and actual main merge.
+
+### iPad portrait helper-detail verification (2026-11-17)
+
+The native Xcode configurations explicitly allow all four iPad orientations.
+A focused 768x1024 browser check on main `176976b` confirmed five helper roles,
+44px targets, no action collisions or horizontal overflow. With root text enlarged
+from 16px to 20px, Nele's marketing detail extended 30.5px above the clipped scene.
+Its disclosure now opens below its unchanged symbol instead of above it. All
+portrait positions, artwork, room and seating geometry remain unchanged.
+
+After the CSS-only correction, isolated runs covering all five helper roles passed
+at 1024x768 (4.9 s), 768x1024 (5.2 s), and 768x1024 with 25% larger text (5.0 s).
+Checks include complete detail bounds, target sizes, scene-button collisions,
+Enter/Escape, touch toggling, mouse toggling, outside dismissal and hover persistence.
+No page errors. Initial diagnosis plus repeats totaled under 35 seconds, including
+parallel runs counted separately; each had a 150-second watchdog and cleaned up
+its own server/browser. No native build or physical-device claim.
