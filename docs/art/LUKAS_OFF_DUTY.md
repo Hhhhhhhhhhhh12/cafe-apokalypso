@@ -11,16 +11,26 @@ The approved seated pose and fixed left-front chair remain the production
 reference. A standing counterpart must match that identity and the café's fine
 pixel illustration at actual display size. Do not copy an existing franchise.
 
-## Draft, not approved artwork
+## Approved standing artwork · 2026-11-17
 
-With explicit permission, built-in Imagegen produced a separate standing concept:
-navy casual jacket, modest asymmetric fastening, restrained woven trim, charcoal
-trousers, brown everyday shoes, closed laptop. No weapons or armor. The concept
-is outside the repository, under the current chat's generated-images folder:
-`exec-d45ff2bf-bbfa-4653-88f7-6b7907075085.png`.
+The user approved the shown concept and its café preview: “Ja, Lukas passt so.
+Übernimm ihn”. The built-in Imagegen output
+`exec-d45ff2bf-bbfa-4653-88f7-6b7907075085.png` is installed byte-for-byte as
+`assets/sprites/guests/placeholder-guest-lukas-standing-v03-off-duty-approved.png`.
+The standing CSS uses this asset. It shows a navy casual jacket, modest asymmetric
+fastening, restrained woven trim, charcoal trousers, brown everyday shoes and a
+closed laptop. No weapons or armor; no existing franchise reference.
 
-This image has been shown for review, not accepted or installed. Before any
-integration: confirm the design in the real café at display size, clean the
-remaining surrounding haze/alpha, and reconcile any accepted outfit change with
-the seated pose without moving its chair anchor. Existing production assets are
-unchanged. Permission to generate the draft is not approval of the resulting art.
+The RGBA source is 1024 × 1536; all four outer borders are transparent. No further
+haze removal was applied. The approved seated artwork and left-front anchor remain
+unchanged. This approval applies to Lukas's shown standing artwork, not the other
+characters' new concepts. See [collected cast review](OFF_DUTY_CAST_REVIEW_20261117.md).
+
+## Technical verification · 2026-11-17
+
+On the candidate based on `fcbc1ff`, an isolated 1024×768 touch browser played
+Day 1 through Lukas's Day 2 service: new standing CSS image verified, Nele's
+arrival preserved, cleaning forecast/service/recovery and reload passed, including
+reduced motion. No page errors. Runtime 23.0 s; a sandbox-blocked server attempt
+was stopped after 9.9 s. Own contexts/server were closed; total 32.9 s.
+Read-only diff review confirmed no seated artwork or anchor changes.
