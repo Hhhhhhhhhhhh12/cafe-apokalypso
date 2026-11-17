@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import {
   getGuestPatienceState,
+  getKassandraConsultValue,
   getVisibleKassandraMessages,
   isEarlyKassandraConsult
 } from "../../game/engine/selectors";
@@ -17,6 +18,7 @@ export function KassandraTerminal({ gameState, onConsult }: {
   const waiting = getGuestPatienceState(gameState);
   const early = isEarlyKassandraConsult(gameState);
   const message = getVisibleKassandraMessages(gameState)[0];
+  const value = getKassandraConsultValue(gameState);
 
   useEffect(() => {
     if (kassandraConsulted && printedHere.current) receiptRef.current?.focus();
@@ -38,7 +40,7 @@ export function KassandraTerminal({ gameState, onConsult }: {
       ) : (
         <>
           <button type="button" disabled={actionPointsRemaining === 0}
-            aria-describedby="kassandra-consult-timing"
+            aria-describedby={`kassandra-consult-timing${actionPointsRemaining > 0 ? " kassandra-consult-value" : ""}`}
             onClick={() => {
               printedHere.current = true;
               onConsult();
@@ -46,6 +48,10 @@ export function KassandraTerminal({ gameState, onConsult }: {
           >
             Print forecast{actionPointsRemaining > 0 ? early ? " · 0 actions" : " · 1 action" : ""}
           </button>
+          {actionPointsRemaining > 0 && <p id="kassandra-consult-value" className="kassandra-terminal__value">
+            <span aria-hidden="true">{value === "stock-risk" ? "⚠ " : value === "covered" ? "✓ " : "— "}</span>
+            {value === "stock-risk" ? "Stock risk ahead" : value === "covered" ? "Stock looks sufficient" : "No orders to inspect"}
+          </p>}
           <p id="kassandra-consult-timing">
             {actionPointsRemaining === 0 ? "Requires an available action."
               : waiting?.critical ? "The waiting guest will leave."

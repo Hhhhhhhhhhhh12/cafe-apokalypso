@@ -504,6 +504,12 @@
   --scene-pan-y: -8%;
 }
 
+.cafe-register__control {
+  /* The register immediately opens a panel above it; keep the browser's tap
+     flash from painting over that new panel. Keyboard focus stays explicit. */
+  -webkit-tap-highlight-color: transparent;
+}
+
 .cafe-register__control:focus-visible {
   outline: 3px solid #3dada9;
   outline-offset: 3px;
