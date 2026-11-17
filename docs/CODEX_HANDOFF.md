@@ -310,3 +310,32 @@ The lookbook gallery now includes WebP runtime files and excludes their retained
 PNG sources, preventing duplicate artwork in the web build. Its standalone
 browser page lists all 15 exports without PNG duplicates (3.7 s); scoped lint
 and TypeScript passed (0.9 s). Total package verification remains below 3 minutes.
+
+### Compact helper contribution cues (2026-11-17)
+
+Approved cast adoption is on main via PR #232, merge `09554975a157888366aad2cfeb914e155965e8fc`;
+its actual main CI and CodeQL passed. Follow-up based on that commit replaces
+Day-5 helper sentences with at most two compact effect cues: checked/solid means
+recorded work, clock/dashed means still available. Existing recap data supplies
+all values; full contributions and stock conditions remain in the disclosure.
+No new rewards, costs or service rules. Barista/counter/service helper portraits
+move within the right counter area to clear guest faces and action controls.
+The approved room, seated assets and chair anchors are unchanged.
+
+A real 44px-minimum button supports touch and keyboard, mouse hover can reach the
+details, and Escape/outside interaction dismisses them. Read-only subagent review
+caught hover-versus-click and unfocused Escape cases; both were corrected.
+Final targeted verification: 13 helper cue/recap tests, TypeScript and scoped lint
+passed (2.4 s); isolated 1024x768 touch browser checked five roles, dirty-table
+controls, hit-area collisions, Enter/Escape, touch toggling, outside dismissal,
+mouse toggling and hover persistence (4.6 s). No overlaps with other scene buttons
+or page errors. Local package checks including iterations stayed below one minute;
+each process had a 150-second watchdog. This is browser evidence, not native or
+new visual acceptance. No device build or publication was performed.
+The final CSS adjustment also right-aligns the service detail panel, keeping it
+inside the room. The same five-role browser now asserts disclosure bounds as well
+as the interactions above and passed in 4.9 s. Package checks remain under one minute.
+Regular PR CI then caught three older Day-5 tests still expecting the retired
+text labels. Their reducer assertions remain; display checks now assert available
+versus completed icons and accessible contribution wording. All five cases in
+that module plus its lint passed (1.5 s); full validation remains with GitHub CI.

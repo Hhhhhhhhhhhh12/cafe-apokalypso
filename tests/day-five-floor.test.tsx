@@ -41,15 +41,18 @@ describe("Day 5 staffing on the café floor", () => {
     expect(cleared.dayManagement.dirtyTableIds).not.toContain(tableId);
     expect(cleared.dayManagement.actionPointsRemaining).toBe(served.dayManagement.actionPointsRemaining);
     expect(cleared.dayManagement.dayFiveHelperImpact?.cleanlinessRestored).toBe(1);
-    expect(renderHelper(cleared)).toContain("1 cleared");
+    expect(renderHelper(cleared)).toContain("1 table cleared without using an action");
+    expect(renderHelper(cleared)).toContain('data-phase="done" data-icon="broom"');
   });
 
   it("shows the extra order only when Jana on service has completed it", () => {
     const open = startDayFive("jana", "service");
-    expect(renderHelper(open)).toContain("Extra order ready");
+    expect(renderHelper(open)).toContain("1 extra order ready if stock allows");
+    expect(renderHelper(open)).toContain('data-phase="ready" data-icon="cup"');
     const served = gameReducer(open, espresso);
     expect(served.dayManagement.customersServed).toBe(2);
-    expect(renderHelper(served)).toContain("+1 served");
+    expect(renderHelper(served)).toContain('data-phase="done" data-icon="cup"');
+    expect(renderHelper(served)).not.toContain('data-phase="ready" data-icon="cup"');
   });
 
   it("shows Nino's drink reputation at the machine and Nele's consumed flyer bonus at the board", () => {
@@ -57,11 +60,13 @@ describe("Day 5 staffing on the café floor", () => {
     expect(renderHelper(nino)).toContain("cafe-shift-helper--barista");
     expect(renderHelper(nino)).toContain("+1 reputation");
     const nele = startDayFive("nele", "marketing");
-    expect(renderHelper(nele)).toContain("Flyer · 0 actions");
+    expect(renderHelper(nele)).toContain("Flyer ready without spending an action");
+    expect(renderHelper(nele)).toContain('data-phase="ready" data-icon="flyer"');
     const advertised = gameReducer(nele, { type: "run_advertising", adType: "flyer" });
     expect(advertised.dayManagement.actionPointsRemaining).toBe(nele.dayManagement.actionPointsRemaining);
     expect(advertised.resources.money).toBe(nele.resources.money - 2);
-    expect(renderHelper(advertised)).toContain("Flyer posted");
+    expect(renderHelper(advertised)).toContain("Bonus flyer used without spending a daily action");
+    expect(renderHelper(advertised)).toContain('data-phase="done" data-icon="flyer"');
   });
 
   it("keeps solo shifts playable and applies the existing action tradeoff", () => {
