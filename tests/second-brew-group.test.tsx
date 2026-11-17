@@ -4,7 +4,7 @@ import { createInitialGameState } from "../src/game/engine/gameState";
 import { createInitialDayManagement } from "../src/game/engine/management";
 import { gameReducer } from "../src/game/engine/reducer";
 import { loadGameState, saveGameState, type StorageLike } from "../src/game/engine/save";
-import { getTriggeredEvents, hasSecondBrewGroup } from "../src/game/engine/selectors";
+import { getDoubleEspressoOption, getGuestForCustomer, getTriggeredEvents, hasSecondBrewGroup } from "../src/game/engine/selectors";
 import type { GameState } from "../src/game/types/game";
 import { GuestService } from "../src/ui/cafe/GuestService";
 import { Noticeboard } from "../src/ui/cafe/ShiftStations";
@@ -37,6 +37,19 @@ function reload(state: GameState): GameState {
 }
 
 describe("Day 4 second brew group", () => {
+  it("does not count a repeated queue identity as two waiting guests or two recoveries", () => {
+    const state = gameReducer(openDayFour(), install);
+    state.dayManagement.customersServed = 3;
+    expect(getGuestForCustomer(state, 3)?.id).toBe("herr-grau");
+    expect(getGuestForCustomer(state, 4)?.id).toBe("herr-grau");
+    expect(getDoubleEspressoOption(state).unavailable).toBe("Two guests must be waiting.");
+    const refused = gameReducer(state, double);
+    expect(refused.dayManagement).toEqual(state.dayManagement);
+    expect(refused.supplies).toEqual(state.supplies);
+    const served = gameReducer(state, single);
+    expect(served.dayManagement.customersServed).toBe(4);
+    expect(served.dayManagement.heartsRestored).toBe(1);
+  });
   it("only fits during an open shift from Day 4 onward and records the discovery once for free", () => {
     const state = openDayFour();
     for (const unavailable of [{ ...state, day: 3 as const }, { ...state, dayPhase: "day_start" as const }]) {
