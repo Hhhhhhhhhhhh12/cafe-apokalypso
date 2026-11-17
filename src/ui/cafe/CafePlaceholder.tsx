@@ -487,8 +487,8 @@ export function CafePlaceholder({
             "cafe-diorama--approved-day-one cafe-diorama--compact-week",
           ].join(" ")}
         >
-          <RecoveryFeedback day={gameState.day} total={gameState.dayManagement.heartsRestored ?? 0}
-            guestNames={getRecoveredGuestNames(gameState)} />
+          {isOpen && <RecoveryFeedback day={gameState.day} total={gameState.dayManagement.heartsRestored ?? 0}
+            guestNames={getRecoveredGuestNames(gameState)} />}
           {isOpen && coinTick?.day === gameState.day && (
             <span key={`coin-${coinTick.key}`} className="cafe-coin-tick" aria-hidden="true">
               +{formatAsche(coinTick.money)}{coinTick.rep > 0 ? " ★" : ""}

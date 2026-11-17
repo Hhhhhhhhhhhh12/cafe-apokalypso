@@ -412,3 +412,35 @@ Initial focused service/recovery suite: 101 passed. After the display correction
 83 affected reward/management cases, TypeScript and scoped lint passed. Total
 local check time under 10 seconds; each command capped at 150 seconds. Full tests
 and build belong to regular CI. No art, geometry, save schema or native changes.
+
+### KASSANDRA value cue and integrated week checkpoint (2026-11-17)
+
+Based on main `8d23c98`: KASSANDRA now gives a coarse stock-risk/covered cue before
+printing. Concrete recipes and missing ingredients remain on the receipt. Both
+use one stock projection; the value cue advances the queue if consulting will
+cause a walkout. No-action states omit the cue and keep printing disabled.
+Read-only subagent review confirmed preview/reducer parity and the early-refund
+boundary. The register's native touch flash no longer paints over the new panel;
+its explicit keyboard-focus outline remains.
+
+Visual inspection of the first complete run found a live heart reward briefly
+covering the delivered letter after closing. Recovery feedback now exists only
+during the open shift; closing removes it and remounting cannot replay saved hearts.
+The envelope remains the same direct accessible control with its arrival animation.
+
+Verification: 83 KASSANDRA/management cases plus TypeScript/scoped lint initially
+passed (1.9 s). After the visibility correction, 29 terminal/guest-display/recovery
+cases plus TypeScript/scoped lint passed (2.6 s). The final isolated 1024x768 touch
+browser completed all seven daily goals, the machine upgrade, KASSANDRA via its
+register sprite, the sealed envelope via the café, opening it, reload and rereading,
+empty-stock closing and reduced motion, without page errors (91.1 s). This repeats
+the earlier 91.3-second full route after the visual corrections. A focused envelope
+case waits for its finite delivery animation, verifies visible paper and no heart
+overlay, then opens it successfully (2.7 s). Two register-overlay inspections used
+1.7 s and 1.2 s. Total local verification below four minutes; every run has a
+150-second watchdog and cleans up its own server/browser. Art and seat files unchanged.
+
+This is an integrated browser-game checkpoint, not native-device testing, a new
+signed iPad package, App Store release or a new user visual acceptance. The earlier
+iPad build remains on its explicitly retained version. Regular GitHub CI verifies
+the complete suite and web build for the exact PR and actual main merge.

@@ -18,6 +18,15 @@ function render(state: ReturnType<typeof stateFor>) {
 }
 
 describe("engine-driven guest display", () => {
+  it("keeps the closed-shift letter free of live recovery feedback", () => {
+    const state = stateFor(7);
+    state.dayPhase = "day_end";
+    state.dayManagement.heartsRestored = 3;
+    const markup = renderToStaticMarkup(<CafePlaceholder gameState={state} />);
+    expect(markup).not.toContain('class="cafe-recovery-feedback"');
+    state.dayPhase = "open";
+    expect(renderToStaticMarkup(<CafePlaceholder gameState={state} />)).toContain('class="cafe-recovery-feedback"');
+  });
   it.each([1, 2, 3, 4, 5, 6, 7] as DayNumber[])("uses the approved compact room on day %i", (day) => {
     const markup = renderToStaticMarkup(<CafePlaceholder gameState={stateFor(day)} />);
     expect(markup).toContain("placeholder-cafe-background-v12-isometric-day1-windows.png");

@@ -4,6 +4,7 @@ import { createInitialGameState, isValidGameState } from "../src/game/engine/gam
 import { createInitialDayManagement, PATIENCE_TICK } from "../src/game/engine/management";
 import { gameReducer } from "../src/game/engine/reducer";
 import { KassandraTerminal } from "../src/ui/cafe/KassandraTerminal";
+import { getKassandraConsultValue, getKassandraReceipt } from "../src/game/engine/selectors";
 
 const consult = { type: "consult_kassandra" } as const;
 
@@ -28,6 +29,9 @@ describe("KASSANDRA at the register", () => {
     state.supplies.coffee = 1;
     expect(render(state)).toContain("Print forecast · 0 actions");
     expect(render(state)).toContain("loses one patience step");
+    expect(render(state)).toContain("Stock risk ahead");
+    expect(render(state)).not.toContain("Short on:");
+    expect(render(state)).not.toContain("Next orders:");
     const next = gameReducer(state, consult);
     expect(next.dayManagement.actionPointsRemaining).toBe(state.dayManagement.actionPointsRemaining);
     expect(next.dayManagement.currentGuestPatience).toBe(state.dayManagement.currentGuestPatience - PATIENCE_TICK);
@@ -45,10 +49,15 @@ describe("KASSANDRA at the register", () => {
   it("charges one action after service and forecasts from the queue after a walkout", () => {
     const state = gameReducer(openDaySix(), { type: "serve_product", productId: "espresso" });
     state.dayManagement.currentGuestPatience = PATIENCE_TICK;
+    state.supplies.coffee = 2;
+    expect(getKassandraReceipt(state)).toContain("Stock covers these orders.");
+    expect(getKassandraConsultValue(state)).toBe("stock-risk");
+    expect(render(state)).toContain("Stock risk ahead");
     expect(render(state)).toContain("Print forecast · 1 action");
     expect(render(state)).toContain("The waiting guest will leave.");
     const next = gameReducer(state, consult);
     expect(next.dayManagement.guestsLost).toBe(state.dayManagement.guestsLost + 1);
+    expect(next.dayManagement.kassandraReceipt).toContain("Short on: Coffee beans");
     expect(next.dayManagement.actionPointsRemaining).toBe(state.dayManagement.actionPointsRemaining - 1);
     expect(next.dayManagement.kassandraReceipt?.[0]).not.toBe(gameReducer({
       ...state, dayManagement: { ...state.dayManagement, currentGuestPatience: 2 * PATIENCE_TICK }
@@ -60,6 +69,16 @@ describe("KASSANDRA at the register", () => {
     state.dayManagement.actionPointsRemaining = 0;
     expect(render(state)).toContain("Requires an available action.");
     expect(render(state)).toContain("Register message");
+    expect(render(state)).not.toContain("Stock looks sufficient");
     expect(gameReducer(state, consult).dayManagement.kassandraReceipt).toBeUndefined();
+  });
+
+  it("signals covered stock without revealing the specific future orders", () => {
+    const state = openDaySix();
+    state.supplies.coffee = 10;
+    expect(getKassandraConsultValue(state)).toBe("covered");
+    expect(render(state)).toContain("Stock looks sufficient");
+    expect(render(state)).not.toContain("Next orders:");
+    expect(gameReducer(state, consult).dayManagement.kassandraReceipt).toContain("Stock covers these orders.");
   });
 });

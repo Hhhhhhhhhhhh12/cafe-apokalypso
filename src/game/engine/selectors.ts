@@ -372,7 +372,7 @@ export function isEarlyKassandraConsult(state: GameState): boolean {
 }
 
 /** Forecast the next two orders from the current queue and stock. */
-export function getKassandraReceipt(state: GameState): string[] {
+function getKassandraStockForecast(state: GameState) {
   const { customersServed, guestsLost } = state.dayManagement;
   const projectedStock = { ...state.supplies };
   const ingredients = ["coffee", "milk", "pastries"] as const;
@@ -391,9 +391,23 @@ export function getKassandraReceipt(state: GameState): string[] {
     }
   }
 
+  return { orders, shortages: [...shortages] };
+}
+
+/** A coarse value cue; concrete orders and ingredients remain on the paid receipt. */
+export function getKassandraConsultValue(state: GameState): "stock-risk" | "covered" | "no-orders" {
+  const afterWait = getGuestPatienceState(state)?.critical
+    ? { ...state, dayManagement: { ...state.dayManagement, guestsLost: state.dayManagement.guestsLost + 1 } }
+    : state;
+  const { orders, shortages } = getKassandraStockForecast(afterWait);
+  return orders.length === 0 ? "no-orders" : shortages.length > 0 ? "stock-risk" : "covered";
+}
+
+export function getKassandraReceipt(state: GameState): string[] {
+  const { orders, shortages } = getKassandraStockForecast(state);
   return [
     orders.length > 0 ? `Next orders: ${orders.join(" → ")}` : "No order forecast.",
-    shortages.size > 0 ? `Short on: ${[...shortages].map(getIngredientLabel).join(", ")}` : "Stock covers these orders.",
+    shortages.length > 0 ? `Short on: ${shortages.map(getIngredientLabel).join(", ")}` : "Stock covers these orders.",
     getKassandraConsultLine(state)
   ];
 }
