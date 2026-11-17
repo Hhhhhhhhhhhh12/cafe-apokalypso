@@ -17,7 +17,7 @@ The user approved the shown concept and its café preview: “Ja, Lukas passt so
 Übernimm ihn”. The built-in Imagegen output
 `exec-d45ff2bf-bbfa-4653-88f7-6b7907075085.png` is installed byte-for-byte as
 `assets/sprites/guests/placeholder-guest-lukas-standing-v03-off-duty-approved.png`.
-The standing CSS uses this asset. It shows a navy casual jacket, modest asymmetric
+The standing CSS uses the pixel-identical lossless WebP export of this asset. It shows a navy casual jacket, modest asymmetric
 fastening, restrained woven trim, charcoal trousers, brown everyday shoes and a
 closed laptop. No weapons or armor; no existing franchise reference.
 
@@ -34,3 +34,10 @@ arrival preserved, cleaning forecast/service/recovery and reload passed, includi
 reduced motion. No page errors. Runtime 23.0 s; a sandbox-blocked server attempt
 was stopped after 9.9 s. Own contexts/server were closed; total 32.9 s.
 Read-only diff review confirmed no seated artwork or anchor changes.
+
+## Lossless runtime export · 2026-11-17
+
+`assets/sprites/guests/placeholder-guest-lukas-standing-v03-off-duty-approved.webp` is encoded with
+`cwebp 1.6.0 -lossless -exact -metadata icc -m 6`. Its decoded RGBA bytes
+match the approved PNG exactly. SHA-256: `1a6dade820a2fcade1a17db308413c8c03285c9c5c645ece3acf9d21e5cb1343`.
+The source PNG remains unchanged.

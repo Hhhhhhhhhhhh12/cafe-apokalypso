@@ -90,7 +90,8 @@ Board 3 is not approval to collapse them to one age.
 ## Integration verification
 
 All 14 individual cutouts are in `assets/sprites/guests/`, with original Imagegen
-outputs copied unchanged. CSS fits them inside the existing room slots; helper
+outputs copied unchanged. Runtime uses lossless WebP exports with byte-identical
+decoded RGBA pixels, including Lukas. CSS fits them inside the existing room slots; helper
 artwork is now proportional and sized consistently with guests. Room geometry,
 seated poses and chair anchors remain unchanged. The actual café view, service
 transitions, reduced motion, portrait loading and seat contacts are checked as

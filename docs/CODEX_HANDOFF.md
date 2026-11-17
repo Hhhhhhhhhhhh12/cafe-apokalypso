@@ -294,3 +294,15 @@ All six seated PNGs, `approvedSeats.ts`, `CafeTableGuest.tsx` and `approved-cafe
 are byte-identical to the main baseline. All 14 new images have transparent edges
 and match their recorded hashes. Total local checking including repeats and the
 contact-sheet render stayed below two minutes; no native build or publication.
+
+Lossless delivery follow-up in the same package: all fourteen adopted cutouts
+plus the existing approved Lukas standing PNG have `cwebp 1.6.0 -lossless -exact
+-metadata icc -m 6` runtime exports. Decoded RGBA bytes match each source exactly.
+Combined runtime images shrink from 22,758,279 to 14,229,688 bytes (37.5%). Source
+PNGs remain for provenance; active imports/CSS use WebP. No appearance, geometry,
+save or game-rule changes. The cast browser check is repeated for decoding and
+loading the final URLs; the unchanged seven-day mechanics are not replayed again.
+The final WebP sources passed the same 43 focused tests and TypeScript (1.3 s),
+and all-identity/seat browser checks (4.2 s). Encoding plus byte-equality checks
+used 10.7 s. Overall local verification including exports stayed below three
+minutes for the package, within the original 15-minute budget.

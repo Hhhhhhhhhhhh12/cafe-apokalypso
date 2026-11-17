@@ -15,7 +15,10 @@
       57,
       765,
       1491
-    ]
+    ],
+    "runtimeFile": "assets/sprites/guests/placeholder-guest-kemal-standing-v03-off-duty-approved.webp",
+    "runtimeSha256": "66c87d77757e33876c85c40f4a71ee10fc303bbf217979a2cdda536139b5bc6c",
+    "runtimeEncoding": "cwebp 1.6.0 -lossless -exact -metadata icc -m 6; decoded RGBA byte-identical"
   },
   {
     "key": "paula",
@@ -33,7 +36,10 @@
       47,
       734,
       1489
-    ]
+    ],
+    "runtimeFile": "assets/sprites/guests/placeholder-guest-paula-standing-v03-off-duty-approved.webp",
+    "runtimeSha256": "0750b004d184465d8f8927c49eec45428b865c2dad350dfe3b23aa78cc0fdcff",
+    "runtimeEncoding": "cwebp 1.6.0 -lossless -exact -metadata icc -m 6; decoded RGBA byte-identical"
   },
   {
     "key": "fatou",
@@ -51,7 +57,10 @@
       49,
       722,
       1488
-    ]
+    ],
+    "runtimeFile": "assets/sprites/guests/placeholder-guest-fatou-standing-v03-off-duty-approved.webp",
+    "runtimeSha256": "1d71afed6a55d0193f773a906c858f9b5aa7793e9a6346e6656403a60ed76f57",
+    "runtimeEncoding": "cwebp 1.6.0 -lossless -exact -metadata icc -m 6; decoded RGBA byte-identical"
   },
   {
     "key": "cem",
@@ -69,7 +78,10 @@
       68,
       833,
       1505
-    ]
+    ],
+    "runtimeFile": "assets/sprites/guests/placeholder-guest-cem-standing-v03-off-duty-approved.webp",
+    "runtimeSha256": "c991a315db1fece57984adb32b39045f0008ee662788a37e9f4243bb0d49602d",
+    "runtimeEncoding": "cwebp 1.6.0 -lossless -exact -metadata icc -m 6; decoded RGBA byte-identical"
   },
   {
     "key": "mira",
@@ -87,7 +99,10 @@
       28,
       703,
       1519
-    ]
+    ],
+    "runtimeFile": "assets/sprites/guests/placeholder-guest-mira-standing-v03-off-duty-approved.webp",
+    "runtimeSha256": "2eb48c09a5c2954600930d627a50b25f11dbc5c16904a022a87d0a89c19c0bf0",
+    "runtimeEncoding": "cwebp 1.6.0 -lossless -exact -metadata icc -m 6; decoded RGBA byte-identical"
   },
   {
     "key": "christa",
@@ -105,7 +120,10 @@
       62,
       763,
       1501
-    ]
+    ],
+    "runtimeFile": "assets/sprites/guests/placeholder-guest-christa-standing-v03-off-duty-approved.webp",
+    "runtimeSha256": "5906fafa36ea37bca3001b8ffc76b5dc122acab116c2bb57948e793e83947e4e",
+    "runtimeEncoding": "cwebp 1.6.0 -lossless -exact -metadata icc -m 6; decoded RGBA byte-identical"
   },
   {
     "key": "nele",
@@ -123,7 +141,10 @@
       42,
       732,
       1523
-    ]
+    ],
+    "runtimeFile": "assets/sprites/guests/placeholder-guest-nele-standing-v03-off-duty-approved.webp",
+    "runtimeSha256": "363a53701da6f4acdd899575f1743099e739a1d0fb1d67ddf11419502f484227",
+    "runtimeEncoding": "cwebp 1.6.0 -lossless -exact -metadata icc -m 6; decoded RGBA byte-identical"
   },
   {
     "key": "meda",
@@ -141,7 +162,10 @@
       40,
       754,
       1519
-    ]
+    ],
+    "runtimeFile": "assets/sprites/guests/placeholder-guest-meda-standing-v03-off-duty-approved.webp",
+    "runtimeSha256": "1bf6d09765267a75961793078be30b6394d71338a4dc255182f7b05e57acd504",
+    "runtimeEncoding": "cwebp 1.6.0 -lossless -exact -metadata icc -m 6; decoded RGBA byte-identical"
   },
   {
     "key": "bohn",
@@ -159,7 +183,10 @@
       205,
       817,
       1154
-    ]
+    ],
+    "runtimeFile": "assets/sprites/guests/placeholder-guest-bohn-standing-v03-off-duty-approved.webp",
+    "runtimeSha256": "8319ac29bd19fe65ae82fae86d2df433b6373f1f7e0f845a9e51019f387e2051",
+    "runtimeEncoding": "cwebp 1.6.0 -lossless -exact -metadata icc -m 6; decoded RGBA byte-identical"
   },
   {
     "key": "grau",
@@ -177,7 +204,10 @@
       31,
       767,
       1520
-    ]
+    ],
+    "runtimeFile": "assets/sprites/guests/placeholder-guest-grau-standing-v03-off-duty-approved.webp",
+    "runtimeSha256": "b602ca5ad8fac0d9b02b2fec1f414ab7837a5cf8400af551a0e50626faf6907c",
+    "runtimeEncoding": "cwebp 1.6.0 -lossless -exact -metadata icc -m 6; decoded RGBA byte-identical"
   },
   {
     "key": "roter-regenschirm",
@@ -195,7 +225,10 @@
       48,
       841,
       1504
-    ]
+    ],
+    "runtimeFile": "assets/sprites/guests/placeholder-guest-roter-regenschirm-standing-v03-off-duty-approved.webp",
+    "runtimeSha256": "a7777fc804e1e7ab91266a4ed30a146cdfb0ec357650e3ce096de5c527742933",
+    "runtimeEncoding": "cwebp 1.6.0 -lossless -exact -metadata icc -m 6; decoded RGBA byte-identical"
   },
   {
     "key": "staff-jana",
@@ -213,7 +246,10 @@
       50,
       728,
       1503
-    ]
+    ],
+    "runtimeFile": "assets/sprites/guests/placeholder-staff-jana-v02-off-duty-approved.webp",
+    "runtimeSha256": "e7a70905653e3935e967a9d96fec6bda745b1f668c24ead35e91739b715c7bf4",
+    "runtimeEncoding": "cwebp 1.6.0 -lossless -exact -metadata icc -m 6; decoded RGBA byte-identical"
   },
   {
     "key": "staff-nino",
@@ -231,7 +267,10 @@
       52,
       709,
       1491
-    ]
+    ],
+    "runtimeFile": "assets/sprites/guests/placeholder-staff-nino-v02-off-duty-approved.webp",
+    "runtimeSha256": "3c07a7226f3b5b1e75760a56ef66bde59efa41c8a34aa0d1db9bc346c0fe301c",
+    "runtimeEncoding": "cwebp 1.6.0 -lossless -exact -metadata icc -m 6; decoded RGBA byte-identical"
   },
   {
     "key": "staff-nele",
@@ -249,6 +288,9 @@
       43,
       723,
       1498
-    ]
+    ],
+    "runtimeFile": "assets/sprites/guests/placeholder-staff-nele-v02-off-duty-approved.webp",
+    "runtimeSha256": "2bee03a711cf713b5c25898d1d19d7ac2a5250e2dfe260f7e2e8d1e9bd55c287",
+    "runtimeEncoding": "cwebp 1.6.0 -lossless -exact -metadata icc -m 6; decoded RGBA byte-identical"
   }
 ]

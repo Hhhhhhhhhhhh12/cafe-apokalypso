@@ -1844,18 +1844,18 @@ button.cafe-table {
    rendered at the same scale as the seated guests (see .cafe-pilot-asset--standing
    base rule below). Idle motion is the shared CSS breathe, so the whole roster
    reads at one consistent size/proportion/pixel scale. */
-.cafe-pilot-asset--cem-standing     { background-image: url("../../assets/sprites/guests/placeholder-guest-cem-standing-v03-off-duty-approved.png"); }
-.cafe-pilot-asset--mira-standing    { background-image: url("../../assets/sprites/guests/placeholder-guest-mira-standing-v03-off-duty-approved.png"); }
-.cafe-pilot-asset--lukas-standing   { background-image: url("../../assets/sprites/guests/placeholder-guest-lukas-standing-v03-off-duty-approved.png"); }
-.cafe-pilot-asset--christa-standing { background-image: url("../../assets/sprites/guests/placeholder-guest-christa-standing-v03-off-duty-approved.png"); }
-.cafe-pilot-asset--kemal-standing   { background-image: url("../../assets/sprites/guests/placeholder-guest-kemal-standing-v03-off-duty-approved.png"); }
-.cafe-pilot-asset--paula-standing   { background-image: url("../../assets/sprites/guests/placeholder-guest-paula-standing-v03-off-duty-approved.png"); }
-.cafe-pilot-asset--fatou-standing   { background-image: url("../../assets/sprites/guests/placeholder-guest-fatou-standing-v03-off-duty-approved.png"); }
-.cafe-pilot-asset--bohn-standing    { background-image: url("../../assets/sprites/guests/placeholder-guest-bohn-standing-v03-off-duty-approved.png"); }
-.cafe-pilot-asset--grau-standing    { background-image: url("../../assets/sprites/guests/placeholder-guest-grau-standing-v03-off-duty-approved.png"); }
-.cafe-pilot-asset--nele-standing    { background-image: url("../../assets/sprites/guests/placeholder-guest-nele-standing-v03-off-duty-approved.png"); }
-.cafe-pilot-asset--roter-regenschirm-standing { background-image: url("../../assets/sprites/guests/placeholder-guest-roter-regenschirm-standing-v03-off-duty-approved.png"); }
-.cafe-pilot-asset--meda-standing    { background-image: url("../../assets/sprites/guests/placeholder-guest-meda-standing-v03-off-duty-approved.png"); }
+.cafe-pilot-asset--cem-standing     { background-image: url("../../assets/sprites/guests/placeholder-guest-cem-standing-v03-off-duty-approved.webp"); }
+.cafe-pilot-asset--mira-standing    { background-image: url("../../assets/sprites/guests/placeholder-guest-mira-standing-v03-off-duty-approved.webp"); }
+.cafe-pilot-asset--lukas-standing   { background-image: url("../../assets/sprites/guests/placeholder-guest-lukas-standing-v03-off-duty-approved.webp"); }
+.cafe-pilot-asset--christa-standing { background-image: url("../../assets/sprites/guests/placeholder-guest-christa-standing-v03-off-duty-approved.webp"); }
+.cafe-pilot-asset--kemal-standing   { background-image: url("../../assets/sprites/guests/placeholder-guest-kemal-standing-v03-off-duty-approved.webp"); }
+.cafe-pilot-asset--paula-standing   { background-image: url("../../assets/sprites/guests/placeholder-guest-paula-standing-v03-off-duty-approved.webp"); }
+.cafe-pilot-asset--fatou-standing   { background-image: url("../../assets/sprites/guests/placeholder-guest-fatou-standing-v03-off-duty-approved.webp"); }
+.cafe-pilot-asset--bohn-standing    { background-image: url("../../assets/sprites/guests/placeholder-guest-bohn-standing-v03-off-duty-approved.webp"); }
+.cafe-pilot-asset--grau-standing    { background-image: url("../../assets/sprites/guests/placeholder-guest-grau-standing-v03-off-duty-approved.webp"); }
+.cafe-pilot-asset--nele-standing    { background-image: url("../../assets/sprites/guests/placeholder-guest-nele-standing-v03-off-duty-approved.webp"); }
+.cafe-pilot-asset--roter-regenschirm-standing { background-image: url("../../assets/sprites/guests/placeholder-guest-roter-regenschirm-standing-v03-off-duty-approved.webp"); }
+.cafe-pilot-asset--meda-standing    { background-image: url("../../assets/sprites/guests/placeholder-guest-meda-standing-v03-off-duty-approved.webp"); }
 
 /* Seated guests slide up on first appearance (one-shot on DOM mount). */
 @keyframes guest-seat-in {
