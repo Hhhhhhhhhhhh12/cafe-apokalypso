@@ -72,7 +72,8 @@ merging. Do not repeat that implementation from an old handoff prompt.
 ## Current work selection
 
 The current character direction is [Lukas as a JRPG hero off duty](art/LUKAS_OFF_DUTY.md).
-The separate standing concept has been shown but has not been approved or installed.
+The user approved the standing concept on 2026-11-17; it is now installed.
+The other characters remain [collected drafts](art/OFF_DUTY_CAST_REVIEW_20261117.md), awaiting visual approval.
 
 
 ### Direct guest interaction (2026-11-16)
@@ -114,8 +115,8 @@ Focused recovery/display checks (25 cases including the corrected service-only
 SSR fixture), TypeScript and scoped lint passed. An isolated iPad touch run
 checked one versus two forecast hearts before/after wiping, actual healing,
 reload and reduced motion in 22.9 s; total local checks stayed below 30 s.
-Visual follow-up: the standing Lukas sprite is visibly coarser than the approved
-seated figure. Locate any approved standing counterpart before altering artwork.
+Resolved on 2026-11-17: the user approved the new standing Lukas counterpart;
+the seated figure and its anchor remain unchanged.
 
 ### Approved room restored for the whole week (2026-11-16)
 
