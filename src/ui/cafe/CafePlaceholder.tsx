@@ -5,6 +5,7 @@ import type { GameAction, GameState, TableId } from "../../game/types/game";
 import type { GuestId } from "../../game/types/content";
 import {
   canAccessBrewGroup,
+  canImproveRecoveryByCleaning,
   canUseKassandra,
   getDayCoachHint,
   getAvailableProducts,
@@ -706,6 +707,7 @@ export function CafePlaceholder({
                 const janaCanClear = canJanaClearTable(gameState);
                 const cleanLabel = janaCanClear ? "ask Jana to clear it (0 actions)" : "wipe it down (1 action)";
                 const recoverySeat = recovery?.current === 1 && recovery.tableId === pos;
+                const recoveryWipe = canImproveRecoveryByCleaning(gameState, pos);
                 const clickable = dirty && isOpen && !shiftOver && !introActive &&
                   (actionPointsRemaining > 0 || janaCanClear) && Boolean(onCleanTable || onAction);
                 const className = `cafe-table cafe-table--${pos} cafe-table--tier-${gameState.equipment.seating}`;
@@ -717,14 +719,14 @@ export function CafePlaceholder({
                     <span className="cafe-table-recovery-ready" data-recovery-table={pos} aria-hidden="true">♥</span>}
                   {clickable && <span className="cafe-cue cafe-cue--wipe" aria-hidden="true">
                     <span className="cafe-wipe-icon" />
-                    {recoverySeat && <span className="cafe-recovery-seat">♥</span>}
+                    {recoveryWipe && <span className="cafe-recovery-seat">♥</span>}
                     <span className="cafe-wipe-label">{janaCanClear ? "Ask Jana" : "Wipe"}</span>
                   </span>}
                 </>;
                 return <div key={pos} className={`cafe-table-set cafe-table-set--${pos}`} data-table-id={pos}>
                   <span className={`cafe-chair cafe-chair--side cafe-table--tier-${gameState.equipment.seating}`} aria-hidden="true" />
                   {clickable ? <button type="button" className={`${className} cafe-table--clickable`}
-                    aria-label={`Dirty ${pos} table — ${cleanLabel}${recoverySeat ? " · Recovery seat" : ""}`}
+                    aria-label={`Dirty ${pos} table — ${cleanLabel}${recoveryWipe ? " · Enables one extra recovery heart" : ""}`}
                     title={cleanLabel} onClick={() => cleanTable(pos)}>{inner}</button> : <div className={className} aria-hidden="true">{inner}</div>}
                   {seatedGuests.filter(id => approvedSeats[id].table === pos).map(id => <CafeTableGuest key={id} guestId={id} />)}
                   <span className={`cafe-chair cafe-chair--front cafe-table--tier-${gameState.equipment.seating}`} aria-hidden="true" />
@@ -837,7 +839,8 @@ export function CafePlaceholder({
                 ) : null}
                 {followingGuest && followingGuest.id !== frontOfQueue ? (
                   <span key={followingGuest.id} className="cafe-rush-queue-guest" aria-hidden="true">
-                    <span className={`cafe-pilot-asset cafe-pilot-asset--standing cafe-pilot-asset--${QUEUE_SPRITES[followingGuest.id]}-standing`} />
+                    <span className={`cafe-pilot-asset cafe-pilot-asset--standing cafe-pilot-asset--${QUEUE_SPRITES[followingGuest.id]}-standing`}
+                      style={followingGuest.id === "herr-bohn" ? { backgroundImage: `url("${bohnStanding}")` } : undefined} />
                   </span>
                 ) : null}
               </div>

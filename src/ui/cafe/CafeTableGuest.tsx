@@ -2,7 +2,7 @@ import type { CSSProperties } from "react";
 import { approvedSeats, type SeatedGuestId } from "../../game/data/approvedSeats";
 import lukas from "../../../assets/sprites/guests/placeholder-guest-lukas-seated-v02-front-review.png";
 import christa from "../../../assets/sprites/guests/placeholder-guest-christa-seated-v04-outfit-review.png";
-import fatou from "../../../assets/sprites/guests/placeholder-guest-fatou-seated-v02-approved-style.png";
+import fatou from "../../../assets/sprites/guests/placeholder-guest-fatou-seated-v02-front-candidate.png";
 import mira from "../../../assets/sprites/guests/placeholder-guest-mira-seated-v02-back-review.png";
 import meda from "../../../assets/sprites/guests/placeholder-guest-meda-seated-v02-back-review.png";
 import nele from "../../../assets/sprites/guests/placeholder-guest-nele-seated-v04-quiet-review.png";

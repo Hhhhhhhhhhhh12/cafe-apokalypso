@@ -43,6 +43,8 @@ import {
   applyProductConsumption,
   applySupplyPurchase,
   canJanaClearTable,
+  TABLE_CLEANLINESS_GAIN,
+  JANA_TABLE_CLEANLINESS_GAIN,
   clampMeter,
   clampResource,
   COMFORTABLE_CAPACITY_BY_DAY,
@@ -804,7 +806,7 @@ function cleanTable(state: GameState, tableId: TableId | undefined): GameState {
     completedActions: addUniqueDayAction(tickedState.completedActions, "clean_tables"),
     resources: {
       ...tickedState.resources,
-      cleanliness: clampMeter(tickedState.resources.cleanliness + 12),
+      cleanliness: clampMeter(tickedState.resources.cleanliness + TABLE_CLEANLINESS_GAIN),
       stress: clampMeter(tickedState.resources.stress - slowWindowReduction),
       mood: "calm"
     },
@@ -2252,7 +2254,7 @@ function applyHelperAutonomy(state: GameState, actionsWithoutServing: number): G
 }
 
 function clearTableWithJana(state: GameState, tableId: TableId): GameState {
-  const cleanliness = clampMeter(state.resources.cleanliness + 1);
+  const cleanliness = clampMeter(state.resources.cleanliness + JANA_TABLE_CLEANLINESS_GAIN);
   const impact = state.dayManagement.dayFiveHelperImpact;
   return {
     ...state,

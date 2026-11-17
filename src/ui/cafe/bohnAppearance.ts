@@ -7,7 +7,7 @@ import oldestSeated from "../../../assets/sprites/guests/placeholder-guest-bohn-
 import matureStanding from "../../../assets/sprites/guests/placeholder-guest-bohn-mature-standing.png";
 import greyTemplesStanding from "../../../assets/sprites/guests/placeholder-guest-bohn-grey-temples-standing.png";
 import silverStanding from "../../../assets/sprites/guests/placeholder-guest-bohn-silver-standing.png";
-import oldestStanding from "../../../assets/sprites/guests/placeholder-guest-bohn-oldest-standing.png";
+import oldestStanding from "../../../assets/sprites/guests/placeholder-guest-bohn-standing-v03-off-duty-approved.webp";
 
 const appearances = [
   { seated: oldestSeated, standing: oldestStanding },

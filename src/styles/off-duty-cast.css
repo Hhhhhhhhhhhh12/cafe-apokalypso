@@ -1,0 +1,29 @@
+/* Approved cast: normalize artwork inside existing slots, never room/seat anchors. */
+.cafe-diorama--compact-week .cafe-queue .cafe-pilot-asset--kemal-standing { background-size: auto 93.1883%; background-position: center 51.9963%; }
+.cafe-diorama--compact-week .cafe-queue .cafe-pilot-asset--paula-standing { background-size: auto 92.6713%; background-position: center 56.8225%; }
+.cafe-diorama--compact-week .cafe-queue .cafe-pilot-asset--fatou-standing { background-size: auto 92.8645%; background-position: center 56.5836%; }
+.cafe-diorama--compact-week .cafe-queue .cafe-pilot-asset--cem-standing { background-size: auto 83.3737%; background-position: center 74.0331%; }
+.cafe-diorama--compact-week .cafe-queue .cafe-pilot-asset--mira-standing { background-size: auto 89.6258%; background-position: center 51.7261%; }
+.cafe-diorama--compact-week .cafe-queue .cafe-pilot-asset--christa-standing { background-size: auto 88.5949%; background-position: center 65.0926%; }
+.cafe-diorama--compact-week .cafe-queue .cafe-pilot-asset--nele-standing { background-size: auto 90.2309%; background-position: center 46.3989%; }
+.cafe-diorama--compact-week .cafe-queue .cafe-pilot-asset--meda-standing { background-size: auto 90.3529%; background-position: center 48.1707%; }
+.cafe-diorama--compact-week .cafe-queue .cafe-pilot-asset--grau-standing { background-size: auto 89.7461%; background-position: center 50.6026%; }
+.cafe-diorama--compact-week .cafe-queue .cafe-pilot-asset--roter-regenschirm-standing { background-size: auto 94.9451%; background-position: center 20.4348%; }
+
+/* Portrait sources remain proportional in both square picker and floor slots. */
+.helper-picker__portrait { object-fit: contain; }
+.cafe-shift-helper { width: 20%; }
+.cafe-shift-helper img {
+  aspect-ratio: 1;
+  box-sizing: border-box;
+  object-fit: contain;
+  padding: 8% 0 3%;
+}
+/* The lookbook keeps its entrance path, using the same face throughout. */
+.cafe-staff-nino > .cafe-staff-nino__portrait {
+  display: block;
+  width: 100%; height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
