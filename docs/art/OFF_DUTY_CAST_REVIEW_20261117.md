@@ -1,6 +1,7 @@
 # Off-duty cast · collected review · 2026-11-17
 
-Status: concept boards only, not approved production sprites. The user requested
+Status: all four boards approved by the user on 2026-11-17 (“Alle passen.
+Übernimm die Figuren”). Autonomous extraction and adoption are authorized. The user requested
 video-game heroes after work, following the approved unarmed Lukas. Keep diverse
 skin tones, ages and silhouettes; avoid franchise costumes and overt combat gear.
 
@@ -14,18 +15,27 @@ Boards (left to right):
 Existing approved guest assets supplied identity references. Cem's shorter stocky
 silhouette and short hair distinguish him from Kemal; Christa retains mature,
 fuller proportions; Meda retains dark glasses; the umbrella woman remains reserved.
-Nele's proposed workwear uses the approved guest's long copper hair, reconciling
+Nele's approved workwear uses the approved guest's long copper hair, reconciling
 the older staff bob. Bohn's other ages remain production assets and need equivalent
-review before any replacement. Genre accessories are proposals, not new story canon.
+review before any replacement. The visual accessories are approved; they do not establish new story canon.
 
-No seated sprite, chair anchor, save field or roster has changed. The only installed
-new art is the explicitly approved standing Lukas. These boards require selection
-before individual transparent production poses are prepared and checked in the café.
+No seated sprite, chair anchor, save field or roster has changed. Lukas remains installed. The other eleven standing guests and three helper
+portraits are now individual transparent cutouts; the boards themselves are not
+production sprite sheets. Exact prompts, output identities and asset hashes are
+in [OFF_DUTY_ASSET_PROVENANCE.json](OFF_DUTY_ASSET_PROVENANCE.json).
 
-Local review artifacts and exact Imagegen prompts:
+## Review artifact identity
 
-- `/Users/Heineken/.codex/visualizations/2026/11/12/01a1d1a6-db8c-7212-a39f-4fc97f1ef979/01-kemal-paula-fatou-cem.png` (source `exec-ff85f878-1f1a-42ed-a862-1bc15743c506.png`).
-- `/Users/Heineken/.codex/visualizations/2026/11/12/01a1d1a6-db8c-7212-a39f-4fc97f1ef979/02-mira-christa-nele-meda.png` (source `exec-c9ee5160-46c9-4c07-90c9-bd218001092b.png`).
-- `/Users/Heineken/.codex/visualizations/2026/11/12/01a1d1a6-db8c-7212-a39f-4fc97f1ef979/03-bohn-grau-regenschirm.png` (source `exec-39ad9f1d-2219-4f1d-a596-02789bc8a4a4.png`).
-- `/Users/Heineken/.codex/visualizations/2026/11/12/01a1d1a6-db8c-7212-a39f-4fc97f1ef979/04-jana-nino-nele.png` (source `exec-7bd64754-7e55-4b8a-8a5f-ef7705bcd338.png`).
-- `/Users/Heineken/.codex/visualizations/2026/11/12/01a1d1a6-db8c-7212-a39f-4fc97f1ef979/cafe-cast-prompts.json` (initial prompts and final correction prompts).
+The four images were shown together in the design chat on 2026-11-17.
+They remain external review artifacts, not repository assets. Filenames and
+SHA-256 identify the exact shown versions without publishing workstation paths.
+The external `cafe-cast-prompts.json` retains the initial and correction prompts.
+
+| Board | Review filename | SHA-256 |
+| --- | --- | --- |
+| 1 | `01-kemal-paula-fatou-cem.png` | `44e824bf89f389ed6ad3a16d14314e53a10227fb7c9c92b3d6504e397eb30d00` |
+| 2 | `02-mira-christa-nele-meda.png` | `f5c8f999745da762f4b5d869d177ddd2be1800ca4aa1addfe5a35affd62eb0a5` |
+| 3 | `03-bohn-grau-regenschirm.png` | `e86d171a985f44061bf3e9a03ba2be83cafde200b53dbaf0567a47120c747935` |
+| 4 | `04-jana-nino-nele.png` | `3a97b1496d54cbac6ee1e2fc87985c7f54a321609a20dd3ed57523a47af0ff1a` |
+
+Production preparation follows the [character sheets](CHARACTER_SHEETS.md).

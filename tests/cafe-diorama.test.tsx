@@ -117,6 +117,8 @@ describe("café diorama view", () => {
     const assignment = state.helperAssignment!;
 
     expect(renderCafe(state)).toContain(ninoClass);
+    expect(renderCafe(state)).toContain("cafe-staff-nino__portrait");
+    expect(renderCafe(state)).not.toContain("cafe-staff-nino__walk");
     expect(renderCafe({ ...state, day: 2 })).not.toContain(ninoClass);
     expect(renderCafe({ ...state, dayPhase: "day_end" })).not.toContain(ninoClass);
     expect(renderCafe({ ...state, helperAssignment: null })).not.toContain(ninoClass);
@@ -189,7 +191,7 @@ describe("café diorama view", () => {
     expect(getDioramaGuestVisibility(state).strange).toBe(true);
     // The same guest is next again: do not duplicate them at a table.
     const markup = renderCafe(state);
-    expect(markup).toContain("cafe-pilot-asset--strange-standing");
+    expect(markup).toContain("cafe-pilot-asset--grau-standing");
     expect(markup).not.toContain("placeholder-guest-strange.png");
     expect(getDioramaGuestVisibility(cafeStateFor(3, 3)).strange).toBe(false);
   });

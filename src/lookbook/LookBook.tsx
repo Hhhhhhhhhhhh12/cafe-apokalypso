@@ -12,12 +12,16 @@ import type { GameState } from "../game/types/game";
  */
 
 // --- Sprite galleries, pulled straight from the asset folders -------------
-// Eager URL globs so adding/removing a PNG updates the lookbook automatically.
+// Show runtime artwork once; retain source PNGs in Git without bundling duplicates.
 const propModules = import.meta.glob("../../assets/sprites/props/*.png", {
   eager: true,
   import: "default"
 }) as Record<string, string>;
-const guestModules = import.meta.glob("../../assets/sprites/guests/*.png", {
+const guestModules = import.meta.glob([
+  "../../assets/sprites/guests/*.png",
+  "../../assets/sprites/guests/*.webp",
+  "!../../assets/sprites/guests/*-off-duty-approved.png",
+], {
   eager: true,
   import: "default"
 }) as Record<string, string>;
@@ -32,7 +36,7 @@ function toEntries(modules: Record<string, string>, stripPrefixes: string[]): Sp
   return Object.entries(modules)
     .map(([path, url]) => {
       const file = path.split("/").pop() ?? path;
-      let label = file.replace(/\.png$/, "");
+      let label = file.replace(/\.(?:png|webp)$/, "");
       for (const prefix of stripPrefixes) {
         if (label.startsWith(prefix)) {
           label = label.slice(prefix.length);

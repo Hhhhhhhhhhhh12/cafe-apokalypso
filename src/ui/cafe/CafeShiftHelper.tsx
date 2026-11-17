@@ -1,7 +1,7 @@
 import type { GameState } from "../../game/types/game";
-import jana from "../../../assets/sprites/guests/placeholder-staff-jana.png";
-import nino from "../../../assets/sprites/guests/placeholder-staff-nino.png";
-import nele from "../../../assets/sprites/guests/placeholder-staff-nele.png";
+import jana from "../../../assets/sprites/guests/placeholder-staff-jana-v02-off-duty-approved.webp";
+import nino from "../../../assets/sprites/guests/placeholder-staff-nino-v02-off-duty-approved.webp";
+import nele from "../../../assets/sprites/guests/placeholder-staff-nele-v02-off-duty-approved.webp";
 
 const staffPortraits = { jana, nino, nele };
 

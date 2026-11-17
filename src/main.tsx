@@ -4,6 +4,7 @@ import { App } from "./app/App";
 import "./styles/global.css";
 import "./ui/cafe/cafe-scene.css";
 import "./styles/approved-cafe.css";
+import "./styles/off-duty-cast.css";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
