@@ -1,4 +1,4 @@
-import { canImproveRecoveryByCleaning, getNextGuestPreview } from "../src/game/engine/selectors";
+import { canImproveRecoveryByCleaning, canImproveRecoveryByTidying, getNextGuestPreview } from "../src/game/engine/selectors";
 import { gameReducer } from "../src/game/engine/reducer";
 import { createHelperAssignment } from "../src/game/engine/management";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -49,6 +49,29 @@ describe("successful-service recovery forecast", () => {
 
 // The cleaning cue must be actionable, not merely describe a theoretical bonus.
 describe("actionable recovery cleaning", () => {
+  it("shows room upkeep only when one paid action preserves the guest and enables a second heart", () => {
+    const state = stateForLukas();
+    state.day = 4;
+    state.resources.cleanliness = 38;
+    state.dayManagement.dirtyTableIds = [];
+    state.dayManagement.currentGuestPatience = 100;
+    state.dayManagement.currentGuestPatienceMax = 100;
+    expect(canImproveRecoveryByTidying(state)).toBe(true);
+    expect(service(state)).toContain("Clean café and clear table");
+    const cleaned = gameReducer(state, { type: "clean_tables" });
+    expect(getNextGuestPreview(cleaned)?.name).toBe(getNextGuestPreview(state)?.name);
+    expect(gameReducer(cleaned, { type: "serve_product", productId: "filterkaffee" }).dayManagement.heartsRestored).toBe(2);
+    for (const cleanliness of [37, 50, 100]) {
+      expect(canImproveRecoveryByTidying({ ...state, resources: { ...state.resources, cleanliness } })).toBe(false);
+    }
+    for (const patch of [{ actionPointsRemaining: 1 }, { currentGuestPatience: 25 }, { dirtyTableIds: ["left" as const] }]) {
+      expect(canImproveRecoveryByTidying({ ...state, dayManagement: { ...state.dayManagement, ...patch } })).toBe(false);
+    }
+    expect(canImproveRecoveryByTidying({ ...state, supplies: { coffee: 0, milk: 0, pastries: 0 } })).toBe(false);
+    state.helperAssignment = createHelperAssignment("jana", "cleaning", 4);
+    state.dayManagement.actionPointsRemaining = 1;
+    expect(canImproveRecoveryByTidying(state)).toBe(false);
+  });
   it.each([
     [1, 100, 80, false],
     [2, 25, 80, false],

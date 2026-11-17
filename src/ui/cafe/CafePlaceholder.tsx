@@ -6,6 +6,7 @@ import type { GuestId } from "../../game/types/content";
 import {
   canAccessBrewGroup,
   canImproveRecoveryByCleaning,
+  canImproveRecoveryByTidying,
   canUseKassandra,
   getDayCoachHint,
   getAvailableProducts,
@@ -624,13 +625,14 @@ export function CafePlaceholder({
                   <button
                     type="button"
                     className="cafe-cue cafe-cue--tidy"
-                    aria-label="Tidy the room (1 action)"
+                    aria-label={`Tidy the room (1 action)${canImproveRecoveryByTidying(gameState) ? " · Enables one extra recovery heart" : ""}`}
                     onClick={() => {
                       if (actionPointsRemaining === 1) headingRef.current?.focus({ preventScroll: true });
                       onAction?.({ type: "clean_tables" });
                     }}
                   >
                     Tidy room
+                    {canImproveRecoveryByTidying(gameState) && <span aria-hidden="true"> ♥</span>}
                   </button>
                 ) : null}
 

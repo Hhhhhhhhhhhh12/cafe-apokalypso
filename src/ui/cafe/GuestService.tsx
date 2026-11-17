@@ -3,6 +3,7 @@ import { formatAsche } from "../../game/engine/currency";
 import {
   getAvailableProducts,
   canImproveRecoveryByCleaning,
+  canImproveRecoveryByTidying,
   canServeFromStock,
   getDoubleEspressoOption,
   getExpectedProductIncome,
@@ -60,7 +61,7 @@ export function GuestService({
             <div className="guest-recovery">
               <RecoveryHearts {...nextGuest.recovery} />
               {nextGuest.recovery.restored === 2 && <small>Clean table bonus</small>}
-              {gameState.dayManagement.dirtyTableIds.some(id => canImproveRecoveryByCleaning(gameState, id)) &&
+              {(canImproveRecoveryByTidying(gameState) || gameState.dayManagement.dirtyTableIds.some(id => canImproveRecoveryByCleaning(gameState, id))) &&
                 <small>Clean café and clear table · +1 extra</small>}
             </div>
           )}

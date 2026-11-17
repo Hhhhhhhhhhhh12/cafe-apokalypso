@@ -339,3 +339,24 @@ Regular PR CI then caught three older Day-5 tests still expecting the retired
 text labels. Their reducer assertions remain; display checks now assert available
 versus completed icons and accessible contribution wording. All five cases in
 that module plus its lint passed (1.5 s); full validation remains with GitHub CI.
+
+### Recovery cues and distinct double-service guests (2026-11-17)
+
+Follow-up to main `e4eb066`: room upkeep now carries the same extra-heart cue as
+wiping a table when it can actually enable a second recovery heart. The forecast
+requires a clear service table, sufficient cleanliness after one paid tidy action,
+a remaining serve action, safe patience and available stock. Jana does not make
+room upkeep free. No new cleaning/recovery rules or geometry changes.
+
+Read-only subagent review also identified Day-4 queue positions 3 and 4 resolving
+to Herr Grau. The visible queue correctly showed only one identity, but double
+espresso counted him twice. Its selector now requires distinct guest identities;
+the reducer uses the same gate, leaving stock/actions/recovery unchanged on refusal.
+Single service remains available. Existing distinct-guest double service is retained.
+
+Verification on this candidate: 36 focused recovery/brew-group/guest-display tests,
+TypeScript and scoped lint passed (2.7 s). An isolated 1024x768 touch browser checked
+room tidy from 38 to 50 cleanliness, two actual recovery hearts, reload persistence,
+last-action and critical-patience gates, disabled duplicate-Grau double service and
+successful single service (2.5 s). No page errors. Each run had a 150-second watchdog;
+package total under 10 seconds. Diorama, approved cast and seat anchors unchanged.

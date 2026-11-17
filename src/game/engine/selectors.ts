@@ -244,6 +244,16 @@ export function canImproveRecoveryByCleaning(state: GameState, tableId: TableId)
     (recovery.tableId === tableId || !state.dayManagement.dirtyTableIds.includes(recovery.tableId));
 }
 
+/** Room upkeep costs an action even with Jana; leave time to serve the same guest. */
+export function canImproveRecoveryByTidying(state: GameState): boolean {
+  const recovery = getNextGuestPreview(state)?.recovery;
+  return Boolean(recovery?.current === 1 && recovery.restored === 1 && recovery.tableId &&
+    state.dayManagement.dirtyTableIds.length === 0 &&
+    state.resources.cleanliness + TABLE_CLEANLINESS_GAIN >= 50 &&
+    state.dayManagement.actionPointsRemaining >= 2 &&
+    !getGuestPatienceState(state)?.critical && canServeFromStock(state));
+}
+
 /**
  * A subtle preview of the next guest the queue will serve, so the player can
  * choose a drink with some foresight. Deterministic — uses the same guest
@@ -294,6 +304,7 @@ export function hasSecondBrewGroup(state: GameState): boolean {
 export function getDoubleEspressoOption(state: GameState) {
   const beans = 2 * (getProductById("espresso").ingredients.coffee ?? 0);
   const nextPosition = state.dayManagement.customersServed + state.dayManagement.guestsLost;
+  const nextGuest = getGuestForCustomer(state, nextPosition);
   const followingGuest = getGuestForCustomer(state, nextPosition + 1);
   const wanted = followingGuest && getGuestWantedProductId(state, followingGuest);
   const unavailable = !canAccessBrewGroup(state) || !hasSecondBrewGroup(state)
@@ -304,7 +315,7 @@ export function getDoubleEspressoOption(state: GameState) {
         ? `Needs ${beans} coffee beans in stock.`
         : !hasActionCapacity(state)
           ? "No actions left this shift."
-          : !followingGuest || !getGuestForCustomer(state, nextPosition)
+          : !followingGuest || !nextGuest || followingGuest.id === nextGuest.id
             ? "Two guests must be waiting."
             : null;
 
