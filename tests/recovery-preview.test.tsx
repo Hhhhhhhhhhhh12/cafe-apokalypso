@@ -1,3 +1,6 @@
+import { canImproveRecoveryByCleaning, getNextGuestPreview } from "../src/game/engine/selectors";
+import { gameReducer } from "../src/game/engine/reducer";
+import { createHelperAssignment } from "../src/game/engine/management";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { createInitialGameState } from "../src/game/engine/gameState";
@@ -41,5 +44,60 @@ describe("successful-service recovery forecast", () => {
     const state = stateForLukas();
     state.day = 1;
     expect(service(state)).not.toContain('cafe-recovery-hearts');
+  });
+});
+
+// The cleaning cue must be actionable, not merely describe a theoretical bonus.
+describe("actionable recovery cleaning", () => {
+  it.each([
+    [1, 100, 80, false],
+    [2, 25, 80, false],
+    [2, 100, 37, false],
+    [2, 100, 38, true],
+    [2, 100, 80, true]
+  ])("with %i actions, %i patience and %i cleanliness: %s", (actions, patience, cleanliness, expected) => {
+    const state = stateForLukas();
+    state.day = 4;
+    state.dayManagement.actionPointsRemaining = actions;
+    state.dayManagement.currentGuestPatience = patience;
+    state.dayManagement.currentGuestPatienceMax = 100;
+    state.dayManagement.dirtyTableIds = ["left"];
+    state.resources.cleanliness = cleanliness;
+    expect(canImproveRecoveryByCleaning(state, "left")).toBe(expected);
+    expect(service(state).includes("Clean café and clear table")).toBe(expected);
+    if (expected) {
+      const cleaned = gameReducer(state, { type: "clean_table", tableId: "left" });
+      expect(getNextGuestPreview(cleaned)?.name).toBe(getNextGuestPreview(state)?.name);
+      const served = gameReducer(cleaned, { type: "serve_product", productId: "filterkaffee" });
+      expect(served.dayManagement.heartsRestored).toBe(2);
+    }
+  });
+
+  it("does not advertise a clean or unrelated table, or healing without stock", () => {
+    const state = stateForLukas();
+    expect(canImproveRecoveryByCleaning(state, "left")).toBe(false);
+    state.dayManagement.dirtyTableIds = ["left", "right"];
+    expect(canImproveRecoveryByCleaning(state, "right")).toBe(false);
+    state.supplies = { coffee: 0, milk: 0, pastries: 0 };
+    expect(canImproveRecoveryByCleaning(state, "left")).toBe(false);
+  });
+
+  it("allows Jana's free wipe with one action and critical patience, but only if it earns the bonus", () => {
+    const state = stateForLukas();
+    state.day = 5;
+    state.helperAssignment = createHelperAssignment("jana", "cleaning", 5);
+    state.dayManagement.actionPointsRemaining = 1;
+    state.dayManagement.currentGuestPatience = 25;
+    state.dayManagement.currentGuestPatienceMax = 100;
+    state.dayManagement.dirtyTableIds = ["left"];
+    state.resources.cleanliness = 48;
+    expect(canImproveRecoveryByCleaning(state, "left")).toBe(false);
+    state.resources.cleanliness = 49;
+    expect(canImproveRecoveryByCleaning(state, "left")).toBe(true);
+    const cleaned = gameReducer(state, { type: "clean_table", tableId: "left" });
+    expect(cleaned.dayManagement.actionPointsRemaining).toBe(1);
+    expect(cleaned.dayManagement.currentGuestPatience).toBe(25);
+    const served = gameReducer(cleaned, { type: "serve_product", productId: "filterkaffee" });
+    expect(served.dayManagement.heartsRestored).toBe(2);
   });
 });
