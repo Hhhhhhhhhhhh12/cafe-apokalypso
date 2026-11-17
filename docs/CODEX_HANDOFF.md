@@ -243,3 +243,20 @@ style and approval gates. No new mechanics or broad refactors without approval.
 - Keep original chat logs, personal/local paths, raw generated asset sheets and
   secrets out of the public repository. Any future archive import requires its
   own review and must stay distinct from current instructions.
+
+### Actionable cleaning for recovery (2026-11-17)
+
+Based on `319c9f7`: the service hint and table heart now identify only a wipe
+that actually enables the extra recovery heart while leaving this guest
+serviceable. They account for the last action, walkout risk (from Day 4), stock,
+the correct chair and cleanliness threshold. Jana's free wipe remains available
+with one action and critical patience if its smaller cleanliness gain suffices.
+Cleaning costs, earned hearts, guest artwork and chair anchors are unchanged.
+
+Validation: 13 focused recovery tests, TypeScript and scoped lint passed; tests
+compare advertised cleaning with actual reducer cleaning/service outcomes.
+An isolated 1024×768 touch run checked the normal Day 1–2 route and suppressed
+cues for last-action and critical-patience fixtures (23.9 s, no page errors).
+Initial test fixture mistakes (Day 2 walkout assumption, Day 3 queue position,
+English rather than internal product ID) were corrected. Local package checks
+including failed runs and the final accessible-label regression totaled under 60 s. This is not native/device acceptance.

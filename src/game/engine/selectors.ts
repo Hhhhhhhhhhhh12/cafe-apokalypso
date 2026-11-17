@@ -11,6 +11,9 @@ import {
 import { DAY_ONE_FATOU_SERVED_FRAGMENT, dayTwoOpenerWithFatou } from "../data/days";
 import {
   ACTION_BUDGET_BY_DAY,
+  canJanaClearTable,
+  TABLE_CLEANLINESS_GAIN,
+  JANA_TABLE_CLEANLINESS_GAIN,
   applySupplyPurchase,
   getCleanlinessLabel,
   getEarnedPrice,
@@ -48,7 +51,8 @@ import type {
   EquipmentSlotId,
   GameState,
   IngredientKey,
-  SupplyState
+  SupplyState,
+  TableId
 } from "../types/game";
 
 export { getCurrentObjective, getObjectiveStatus };
@@ -225,6 +229,19 @@ export function getGuestRecovery(state: GameState, guestId: GuestId) {
   const cleanSeat = tableId !== null && state.resources.cleanliness >= 50 &&
     !state.dayManagement.dirtyTableIds.includes(tableId);
   return { current, restored: Math.min(3 - current, cleanSeat ? 2 : 1), tableId };
+}
+
+/** Highlight only a single wipe that leaves this guest available to heal. */
+export function canImproveRecoveryByCleaning(state: GameState, tableId: TableId): boolean {
+  const recovery = getNextGuestPreview(state)?.recovery;
+  if (!recovery || recovery.current !== 1 || recovery.restored !== 1 || !recovery.tableId ||
+      !state.dayManagement.dirtyTableIds.includes(tableId) || !canServeFromStock(state)) return false;
+  const jana = canJanaClearTable(state);
+  if (state.dayManagement.actionPointsRemaining < (jana ? 1 : 2) ||
+      (!jana && getGuestPatienceState(state)?.critical)) return false;
+  const gain = jana ? JANA_TABLE_CLEANLINESS_GAIN : TABLE_CLEANLINESS_GAIN;
+  return state.resources.cleanliness + gain >= 50 &&
+    (recovery.tableId === tableId || !state.dayManagement.dirtyTableIds.includes(recovery.tableId));
 }
 
 /**

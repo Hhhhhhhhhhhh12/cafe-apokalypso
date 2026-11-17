@@ -434,6 +434,9 @@ export function getIngredientRequirement(
   return baseRequirement;
 }
 
+export const TABLE_CLEANLINESS_GAIN = 12;
+export const JANA_TABLE_CLEANLINESS_GAIN = 1;
+
 export function canJanaClearTable(state: GameState): boolean {
   return (state.day === 3 || state.day === 5) &&
     state.dayPhase === "open" &&
