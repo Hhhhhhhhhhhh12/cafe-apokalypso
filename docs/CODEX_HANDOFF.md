@@ -74,6 +74,10 @@ merging. Do not repeat that implementation from an old handoff prompt.
 The current character direction is [Lukas as a JRPG hero off duty](art/LUKAS_OFF_DUTY.md).
 The user approved the standing concept on 2026-11-17; it is now installed.
 The other characters remain [collected drafts](art/OFF_DUTY_CAST_REVIEW_20261117.md), awaiting visual approval.
+The [current character sheets](art/CHARACTER_SHEETS.md) record source assets,
+identity constraints and pose-specific approval boundaries. The June roster is
+historical. Next gate: collected figure selection and human impression of the
+first week; no additional mechanic is required by the current source audit.
 
 
 ### Direct guest interaction (2026-11-16)

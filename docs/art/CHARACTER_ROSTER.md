@@ -1,5 +1,10 @@
 # Café Apokalypso — Character Roster
-*Stand: 2026-06-01 · Sprite-Status bezieht sich auf `assets/sprites/guests/`*
+*Historical snapshot: 2026-06-01. Not current casting or approval authority.*
+
+For current identities, approved poses and pending off-duty concepts, use
+[CHARACTER_SHEETS.md](CHARACTER_SHEETS.md). Runtime guest IDs/timing come from
+`src/game/data/guests.ts` and `src/game/data/days.ts`. Historical role, first-day,
+sprite and speculative-secret entries below must not override those sources.
 
 ---
 
