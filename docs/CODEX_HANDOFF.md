@@ -332,3 +332,6 @@ mouse toggling and hover persistence (4.6 s). No overlaps with other scene butto
 or page errors. Local package checks including iterations stayed below one minute;
 each process had a 150-second watchdog. This is browser evidence, not native or
 new visual acceptance. No device build or publication was performed.
+The final CSS adjustment also right-aligns the service detail panel, keeping it
+inside the room. The same five-role browser now asserts disclosure bounds as well
+as the interactions above and passed in 4.9 s. Package checks remain under one minute.

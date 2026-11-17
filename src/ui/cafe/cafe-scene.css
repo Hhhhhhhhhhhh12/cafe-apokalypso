@@ -446,6 +446,7 @@
 }
 .cafe-shift-helper__details[hidden] { display: none; }
 .cafe-shift-helper--counter .cafe-shift-helper__details,
+.cafe-shift-helper--service .cafe-shift-helper__details,
 .cafe-shift-helper--barista .cafe-shift-helper__details { left: auto; right: 0; transform: none; }
 @media (prefers-reduced-motion: no-preference) {
   .cafe-shift-helper__cues { animation: cafe-helper-work 260ms ease-out; }
