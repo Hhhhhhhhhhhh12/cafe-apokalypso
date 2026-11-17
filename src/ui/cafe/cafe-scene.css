@@ -366,10 +366,10 @@
   pointer-events: none;
 }
 
-.cafe-shift-helper--barista { left: 69%; bottom: 43%; }
-.cafe-shift-helper--counter { left: 79%; bottom: 30%; }
+.cafe-shift-helper--barista { left: 84%; bottom: 43%; }
+.cafe-shift-helper--counter { left: 84%; bottom: 30%; }
 .cafe-shift-helper--marketing { left: 36%; bottom: 40%; }
-.cafe-shift-helper--service { left: 60%; bottom: 28%; }
+.cafe-shift-helper--service { left: 84%; bottom: 28%; }
 
 .cafe-shift-helper img {
   display: block;
@@ -379,24 +379,79 @@
 
 .cafe-shift-helper__work {
   position: absolute;
-  top: 0;
+  top: 100%;
   left: 50%;
-  transform: translate(-50%, -70%);
-  padding: 0.12rem 0.35rem;
-  border-radius: 0.25rem;
-  background: #fff0cf;
+  transform: translateX(-50%);
+  pointer-events: auto;
+  width: max-content;
   color: #442a20;
   font-size: 0.75rem;
-  font-weight: 700;
+  border-radius: 0.25rem;
+}
+/* Keep contribution cues beside the counter and clear of the guest aisle. */
+.cafe-shift-helper--barista .cafe-shift-helper__work { left: 90%; }
+.cafe-shift-helper--counter .cafe-shift-helper__work,
+.cafe-shift-helper--service .cafe-shift-helper__work { left: 85%; }
+.cafe-shift-helper--marketing .cafe-shift-helper__work { top: 0; left: auto; right: 75%; transform: none; }
+.cafe-shift-helper__work-button {
+  display: block;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  box-shadow: none;
+  color: inherit;
+  font: inherit;
+  cursor: help;
+}
+.cafe-shift-helper__work-button:hover { background: transparent; }
+.cafe-shift-helper__cues {
+  display: flex;
+  justify-content: center;
+  gap: 3px;
   white-space: nowrap;
 }
-
-@media (prefers-reduced-motion: no-preference) {
-  .cafe-shift-helper__work { animation: cafe-helper-work 260ms ease-out; }
+.cafe-helper-cue {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-height: 24px;
+  padding: 2px 4px;
+  border: 1px solid #6a4a32;
+  border-radius: 5px;
+  background: #fff0cf;
 }
-
+.cafe-helper-cue[data-phase="ready"] { border-style: dashed; }
+.cafe-helper-cue[data-phase="done"] { color: #245e4c; background: #e7f4df; }
+.cafe-helper-cue > svg { width: 18px; height: 18px; flex: none; }
+.cafe-helper-cue > .cafe-helper-cue__clock { width: 11px; height: 11px; }
+.cafe-helper-cue > small { font-size: 0.75rem; font-weight: 800; }
+.cafe-shift-helper__work-button:focus-visible { outline: 3px solid #0d635c; outline-offset: 3px; }
+.cafe-shift-helper__details {
+  position: absolute;
+  z-index: 40;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(250px, 60vw);
+  padding: 0.5rem;
+  border: 1px solid #6a4a32;
+  border-radius: 5px;
+  background: #fff5e2;
+  color: #442a20;
+  line-height: 1.4;
+  pointer-events: auto;
+}
+.cafe-shift-helper__details[hidden] { display: none; }
+.cafe-shift-helper--counter .cafe-shift-helper__details,
+.cafe-shift-helper--barista .cafe-shift-helper__details { left: auto; right: 0; transform: none; }
+@media (prefers-reduced-motion: no-preference) {
+  .cafe-shift-helper__cues { animation: cafe-helper-work 260ms ease-out; }
+}
 @keyframes cafe-helper-work {
-  from { transform: translate(-50%, -45%); opacity: 0.4; }
+  from { transform: translateY(4px) scale(0.9); opacity: 0.4; }
 }
 
 .cafe-scene-frame {
