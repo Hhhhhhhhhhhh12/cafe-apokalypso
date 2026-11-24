@@ -27,6 +27,14 @@ export type EmployeeLevel = 1 | 2 | 3;
 /** Tables in the café that can be directly selected for cleaning. */
 export type TableId = "left" | "right" | "back";
 
+export interface ShiftRush {
+  satisfied: number;
+  heartsRestored: number;
+  reputationLost: number;
+  tip: number;
+  reputationGained: number;
+}
+
 export type DayActionId =
   | "take_order"
   | "prepare_drink"
@@ -65,6 +73,9 @@ export interface DayManagementState {
   servedGuestIds?: GuestId[];
   /** Recovery earned by visitors served this shift. Absent on older saves. */
   heartsRestored?: number;
+  researchEarned?: number;
+  /** Present on shifts opened with the two-guest rush rules. */
+  rush?: ShiftRush;
   moneyEarned: number;
   moneySpent: number;
   suppliesUsed: SupplyState;
@@ -228,6 +239,9 @@ export interface GameState {
   unlocks: UnlockState;
   /** Accumulated XP per hired helper (key = StaffOptionId). XP = customers served on days they worked. */
   staffXp: Partial<Record<StaffOptionId, number>>;
+  /** Older saves start with zero Research and no training. Staff XP is retained. */
+  research?: number;
+  trainedStaff?: StaffOptionId[];
   guestHistory: GuestId[];
   eventHistory: EventId[];
   /** Events triggered during the current open day, in the order they fired. Reset on open_day. */
@@ -257,6 +271,7 @@ export type GameAction =
       taskId: HelperTaskId;
     }
   | { type: "clear_helper" }
+  | { type: "train_helper"; helperId: StaffOptionId }
   | { type: "open_day" }
   | { type: "complete_day" }
   | { type: "open_day_seven_letter" }

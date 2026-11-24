@@ -86,7 +86,7 @@ describe("Day 5 staffing on the café floor", () => {
       <RestockControls gameState={{ ...base, day: 4, resources: { ...base.resources, money } }}
         onSetSupplyPurchase={noop} onConfirmSupplyPurchase={noop} onSkipRestocking={noop} />
     );
-    expect(render(20)).toContain("Tomorrow: help from 14 Asche");
-    expect(render(10)).toContain("Tomorrow: 4 Asche short for help");
+    expect(render(20)).toContain("Tomorrow: help from 7 Asche");
+    expect(render(3)).toContain("Tomorrow: 4 Asche short for help");
   });
 });

@@ -112,7 +112,7 @@ export const weekOneDays = [
     title: "Delegation Pressure",
     milestone: "Helper choices start to matter more as the café gets busier.",
     dayOpener:
-      "Three guests to serve. Who takes the work you can't get to?",
+      "Three guests to serve. Who takes the work you can't get to? Lukas called ahead: he and a few others could use somewhere to sit after their last attempt.",
     unlockMessage:
       "One helper for the shift.",
     objective: {
@@ -143,7 +143,7 @@ export const weekOneDays = [
     title: "KASSANDRA",
     milestone: "Read KASSANDRA's register messages and consult its daily analysis.",
     dayOpener:
-      "The till installed an update overnight.",
+      "The till installed an update overnight. Its first receipt reads: Return visits expected. Keep a table clear.",
     unlockMessage:
       "Tap the till for a forecast.",
     objective: {

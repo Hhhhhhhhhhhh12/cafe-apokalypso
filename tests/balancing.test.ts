@@ -21,6 +21,7 @@ import {
   createInitialDayManagement,
   getEarnedPrice,
   getHelperAutonomyLevel,
+  getHelperDailyCost,
   getReputationIncomeFactor
 } from "../src/game/engine/management";
 import { weekOneProducts } from "../src/game/data";
@@ -656,12 +657,6 @@ interface StrategyRun {
   };
 }
 
-const helperDailyCosts: Record<StaffOptionId, number> = {
-  jana: 14,
-  nino: 22,
-  nele: 20
-};
-
 describe("balancing: fresh setup reaches Day-4 autonomy", () => {
   it("lets a table-first café afford Jana's cleaning shift on Day 4", () => {
     let state = createFreshRunState();
@@ -916,7 +911,7 @@ function getHelperPlan(
   };
 
   const plan = planByStrategy[strategy][day] ?? null;
-  if (!plan || state.resources.money < helperDailyCosts[plan.helperId]) {
+  if (!plan || state.resources.money < getHelperDailyCost(plan.helperId, day)) {
     return null;
   }
 
