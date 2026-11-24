@@ -23,7 +23,7 @@ export const weekOneUpgrades = [
     id: "better-beans",
     name: "Better Beans",
     unlockDay: 3,
-    cost: 20,
+    cost: 26,
     purchasable: true,
     effects: ["Supports quality-sensitive guests"],
     summary: "Serving a guest with quality expectations grants +1 reputation."
@@ -32,7 +32,7 @@ export const weekOneUpgrades = [
     id: "second-table",
     name: "Second Small Table",
     unlockDay: 4,
-    cost: 28,
+    cost: 34,
     purchasable: true,
     effects: ["Supports higher guest traffic"],
     summary: "+1 action each day from the next café opening."
@@ -41,7 +41,7 @@ export const weekOneUpgrades = [
     id: "cleaning-kit",
     name: "Cleaning Kit",
     unlockDay: 5,
-    cost: 14,
+    cost: 18,
     purchasable: true,
     effects: ["Supports table cleaning"],
     summary: "Each served customer costs 1 cleanliness instead of 2."

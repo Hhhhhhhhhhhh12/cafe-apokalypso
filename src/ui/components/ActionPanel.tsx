@@ -204,7 +204,7 @@ function UpgradeShop({
 }) {
   const available = weekOneUpgrades.filter(
     (upgrade) =>
-      upgrade.cost > 0 &&
+      upgrade.purchasable &&
       upgrade.unlockDay <= gameState.day + 1 &&
       !gameState.purchasedUpgrades.includes(upgrade.id)
   );
@@ -218,6 +218,7 @@ function UpgradeShop({
       <h3>Upgrades</h3>
       <p className="action-hint">Invest before tomorrow's opening.</p>
       {available.map((upgrade) => {
+        const unlocked = upgrade.unlockDay <= gameState.day;
         const affordable = upgrade.cost <= gameState.resources.money;
         return (
           <div className="decor-row" key={upgrade.id}>
@@ -228,11 +229,11 @@ function UpgradeShop({
             <button
               type="button"
               className="secondary-button"
-              disabled={!affordable}
+              disabled={!unlocked || !affordable}
               onClick={() => onBuyUpgrade(upgrade.id)}
-              title={!affordable ? `${formatAsche(upgrade.cost)} needed` : upgrade.summary}
+              title={!unlocked ? `Available after Day ${upgrade.unlockDay}` : !affordable ? `${formatAsche(upgrade.cost)} needed` : upgrade.summary}
             >
-              Buy: {upgrade.name} · {formatAsche(upgrade.cost)}
+              Buy {upgrade.name} · {formatAsche(upgrade.cost)}{unlocked ? "" : ` · Day ${upgrade.unlockDay}`}
             </button>
           </div>
         );

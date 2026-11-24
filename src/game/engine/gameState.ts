@@ -89,6 +89,8 @@ export function createInitialGameState(): GameState {
     completedActions: [],
     unlocks: { ...initialUnlocks },
     staffXp: {},
+    research: 0,
+    trainedStaff: [],
     guestHistory: [],
     eventHistory: [],
     pendingEvents: [],
@@ -168,7 +170,12 @@ export function isValidGameState(value: unknown): value is GameState {
     isStringArray(candidate.pendingEvents) &&
     isStringArray(candidate.unlockedAchievements) &&
     isStringArray(candidate.purchasedUpgrades) &&
-    isValidStaffXp(candidate.staffXp)
+    isValidStaffXp(candidate.staffXp) &&
+    (candidate.research === undefined || isCounter(candidate.research)) &&
+    (candidate.trainedStaff === undefined ||
+      (isStringArray(candidate.trainedStaff) &&
+        candidate.trainedStaff.every((id) => id === "jana" || id === "nino" || id === "nele") &&
+        new Set(candidate.trainedStaff).size === candidate.trainedStaff.length))
   );
 }
 
@@ -245,6 +252,7 @@ function isValidDayManagement(value: unknown): value is DayManagementState {
   const management = value as Partial<DayManagementState>;
   const impact = management.dayFiveHelperImpact;
   const observations = management.dayThreeObservations;
+  const rush = management.rush;
 
   return (
     isCounter(management.actionPointsRemaining) &&
@@ -255,6 +263,12 @@ function isValidDayManagement(value: unknown): value is DayManagementState {
     isValidSupplyUsage(management.suppliesUsed) &&
     isCounter(management.cleaningActions) &&
     (management.heartsRestored === undefined || isCounter(management.heartsRestored)) &&
+    (management.researchEarned === undefined || isCounter(management.researchEarned)) &&
+    (rush === undefined ||
+      (rush !== null && typeof rush === "object" && !Array.isArray(rush) &&
+        isCounter(rush.satisfied) && isCounter(rush.heartsRestored) &&
+        isNonNegativeNumber(rush.reputationLost) && isCounter(rush.tip) &&
+        isNonNegativeNumber(rush.reputationGained))) &&
     isValidTableIdArray(management.dirtyTableIds) &&
     (management.servedGuestIds === undefined ||
       (Array.isArray(management.servedGuestIds) &&

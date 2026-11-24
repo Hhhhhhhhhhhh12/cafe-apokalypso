@@ -1,4 +1,5 @@
 import { formatAsche } from "../../game/engine/currency";
+import { staffTraining } from "../../game/data/staff";
 import {
   getEquipmentShopOptions,
   getIngredientLabel,
@@ -6,6 +7,7 @@ import {
   getVisibleStaffOptions
 } from "../../game/engine/selectors";
 import { getHelperDailyCost, getHelperTaskHint, getHelperTaskLabel, SUPPLY_UNIT_COSTS } from "../../game/engine/management";
+import { getRushStart } from "../../game/engine/rush";
 import type { StaffOptionId } from "../../game/types/content";
 import type { EquipmentSlotId, GameState, HelperTaskId, IngredientKey } from "../../game/types/game";
 import { StaffPortrait } from "./CafeShiftHelper";
@@ -112,17 +114,21 @@ export function HelperStartPanel({
   gameState,
   onSelectHelper,
   onClearHelper,
+  onTrainHelper,
   onOpenDay
 }: {
   gameState: GameState;
   onSelectHelper: (helperId: StaffOptionId, taskId: HelperTaskId) => void;
   onClearHelper: () => void;
+  onTrainHelper?: (helperId: StaffOptionId) => void;
   onOpenDay: () => void;
 }) {
   const staffOptions = getVisibleStaffOptions(gameState);
   const soloPenaltyActive = gameState.day >= 5;
   const isDayFive = gameState.day === 5;
   const hasHelper = Boolean(gameState.helperAssignment);
+  const research = gameState.research ?? 0;
+  const rushStart = getRushStart(gameState.day);
 
   return (
     <div className="helper-picker" aria-label="Day-start helper assignment">
@@ -132,21 +138,29 @@ export function HelperStartPanel({
           : "Pick one task for a helper, or open alone."}
       </p>}
       <p className="opening-till">In the till <strong>{formatAsche(gameState.resources.money)}</strong></p>
+      {onTrainHelper && (
+        <p className="action-hint">
+          <strong>{research} Research</strong> for staff training. Wipe dirty tables yourself to earn it.
+          A wipe that makes room for an extra recovery heart earns 2 Research.
+        </p>
+      )}
       {gameState.day === 3 ? (
         <p className="action-hint">
           In stock: coffee {gameState.supplies.coffee} · milk {gameState.supplies.milk} · pastries {gameState.supplies.pastries}
         </p>
       ) : null}
-      {soloPenaltyActive && !isDayFive ? (
+      {rushStart !== null ? (
         <p className="helper-picker__warn">
-          The dilemma: a helper costs money up front, but opening alone wears
-          on you — expect about <strong>+10 stress</strong> by closing.
+          Two guests arrive together after the first {rushStart} guests. Solo shifts risk
+          stronger reputation losses from complaints and add <strong>+10 stress</strong> at closing.
         </p>
       ) : null}
       {staffOptions.map((staffOption) => {
-        const cost = getHelperDailyCost(staffOption.id, staffOption.dailyCost, gameState.day);
+        const cost = getHelperDailyCost(staffOption.id, gameState.day);
         const canAfford = gameState.resources.money >= cost;
         const trial = gameState.day === 3 && staffOption.id === "jana";
+        const training = staffTraining[staffOption.id];
+        const trained = gameState.trainedStaff?.includes(staffOption.id);
         return <fieldset key={staffOption.id}>
           <legend>
             {isDayFive && <StaffPortrait className="helper-picker__portrait" helperId={staffOption.id} alt="" />}
@@ -178,6 +192,17 @@ export function HelperStartPanel({
               </label>
             ))}
           </div>
+          {onTrainHelper && (
+            <div className="helper-training">
+              <small>{training.name} · {training.effect}</small>
+              {trained ? <span>Trained</span> : (
+                <button type="button" className="secondary-button"
+                  disabled={research < training.cost} onClick={() => onTrainHelper(staffOption.id)}>
+                  Train {staffOption.name} · {training.cost} Research
+                </button>
+              )}
+            </div>
+          )}
         </fieldset>;
       })}
       {hasHelper ? <button type="button" className="secondary-button" onClick={onClearHelper}>Work alone instead</button> : null}
@@ -208,7 +233,7 @@ export function RestockControls({
   const preview = getRestockPreview(gameState);
   const nextShiftHelpCost = gameState.day === 4
     ? Math.min(...getVisibleStaffOptions({ ...gameState, day: 5 }).map(
-      option => getHelperDailyCost(option.id, option.dailyCost, 5)
+      option => getHelperDailyCost(option.id, 5)
     ))
     : null;
   const nothingToBuy = restockIngredients.every(

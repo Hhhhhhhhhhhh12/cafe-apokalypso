@@ -19,6 +19,7 @@ export function ResourceHud({ gameState }: ResourceHudProps) {
     <section className="panel resource-panel" aria-label="Café resources">
       <dl className="resource-list">
         <ResourceItem label="Cash" value={`${formatAsche(gameState.resources.money)}`} numericValue={gameState.resources.money} />
+        <ResourceItem label="Research" value={gameState.research ?? 0} numericValue={gameState.research ?? 0} />
         <ResourceItem
           label="Coffee"
           value={gameState.supplies.coffee}

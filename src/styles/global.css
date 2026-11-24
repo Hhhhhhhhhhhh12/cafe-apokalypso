@@ -2989,6 +2989,16 @@ button.cafe-table {
   gap: 2px;
 }
 
+.helper-training {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.6rem;
+  margin-top: 0.5rem;
+  color: #5a4537;
+  font-size: 0.85rem;
+}
+
 .helper-task__label {
   font-weight: 700;
 }

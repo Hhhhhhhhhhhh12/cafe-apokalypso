@@ -11,6 +11,7 @@ import {
   hasSecondBrewGroup
 } from "../../game/engine/selectors";
 import { DAILY_FIXED_COST } from "../../game/engine/management";
+import { getPendingRushGuests, getRushComplaintPenalty } from "../../game/engine/rush";
 import type { GameAction, GameState } from "../../game/types/game";
 import { HelperStartPanel, OpeningEquipment, RestockControls } from "./CafeManagement";
 import { GuestService } from "./GuestService";
@@ -119,6 +120,13 @@ export function CafeInteraction({
               {Boolean(gameState.dayManagement.heartsRestored) && (
                 <p className="guest-recovery"><span aria-hidden="true">♥ </span>{gameState.dayManagement.heartsRestored} hearts restored</p>
               )}
+              {(gameState.dayManagement.researchEarned ?? 0) > 0 &&
+                <p>{gameState.dayManagement.researchEarned} Research earned from wiping tables.</p>}
+              {gameState.dayManagement.rush?.tip ? (
+                <p>Rush handled · +{formatAsche(gameState.dayManagement.rush.tip)} · Rep +{gameState.dayManagement.rush.reputationGained}</p>
+              ) : gameState.dayManagement.rush?.reputationLost ? (
+                <p>Rush complaints · Rep −{gameState.dayManagement.rush.reputationLost}</p>
+              ) : null}
               {gameState.day === 3 ? (
                 <>
                   <p>{summary.helperAutonomyRecap ?? summary.helperRecap}</p>
@@ -166,6 +174,7 @@ function DoorControls({
         gameState={gameState}
         onSelectHelper={(helperId, taskId) => onAction({ type: "select_helper", helperId, taskId })}
         onClearHelper={() => onAction({ type: "clear_helper" })}
+        onTrainHelper={(helperId) => onAction({ type: "train_helper", helperId })}
         onOpenDay={() => onAction({ type: "open_day" })}
       />
     );
@@ -194,6 +203,7 @@ function DoorControls({
 
   const canClose = canCompleteCurrentDay(gameState);
   const objective = getObjectiveStatus(gameState);
+  const rushGuests = getPendingRushGuests(gameState);
   return (
     <>
       <div id="cafe-door-hint" className="cafe-interaction__receipt">
@@ -203,6 +213,9 @@ function DoorControls({
         <p>Rent and utilities cost {formatAsche(DAILY_FIXED_COST)} at closing.</p>
         {gameState.resources.money <= DAILY_FIXED_COST ? <p>Closing now will empty the till.</p> : null}
         {gameState.resources.cleanliness < 40 ? <p>A messy room costs reputation at closing.</p> : null}
+        {rushGuests > 0 && (
+          <p>Closing with {rushGuests} rush {rushGuests === 1 ? "guest" : "guests"} waiting costs up to {rushGuests * getRushComplaintPenalty(gameState)} reputation.</p>
+        )}
       </div>
       <button
         type="button"

@@ -63,11 +63,11 @@
   }
 }
 
-/* One row of eight while there is room for it (overrides the 4-column
+/* One row while there is room for it (overrides the 4-column
    fallback global.css applies below 1180px). */
 @media (min-width: 901px) {
   .workspace-grid--cafe > .resource-panel .resource-list {
-    grid-template-columns: repeat(8, minmax(0, 1fr));
+    grid-template-columns: repeat(9, minmax(0, 1fr));
   }
 }
 
@@ -208,6 +208,18 @@
   border-color: #793c2c;
   background: #793c2c;
   color: #fff5e2;
+}
+
+.cafe-rush-callout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem 0.75rem;
+  margin: 0 0 0.5rem;
+  padding: 0.4rem 0.65rem;
+  border-inline-start: 3px solid #983f2e;
+  background: #fbe3d5;
+  color: #793c2c;
+  font-size: 0.85rem;
 }
 
 .cafe-threshold-display {

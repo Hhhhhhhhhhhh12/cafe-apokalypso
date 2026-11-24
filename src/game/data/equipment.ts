@@ -48,8 +48,8 @@ export const equipmentSlots = [
     tiers: [
       { tier: 0, name: "No Machine", cost: 0, reputationBonus: 0, dailyRepBonus: 0 },
       { tier: 1, name: "Used Single-Group Machine", cost: 18, reputationBonus: 0, dailyRepBonus: 0 },
-      { tier: 2, name: "Refurbished Two-Group", cost: 34, reputationBonus: 2, dailyRepBonus: 0 },
-      { tier: 3, name: "Gleaming Espresso Tower", cost: 60, reputationBonus: 4, dailyRepBonus: 1 }
+      { tier: 2, name: "Refurbished Two-Group", cost: 40, reputationBonus: 2, dailyRepBonus: 0 },
+      { tier: 3, name: "Gleaming Espresso Tower", cost: 70, reputationBonus: 4, dailyRepBonus: 1 }
     ]
   },
   {
@@ -77,8 +77,8 @@ export const equipmentSlots = [
     tiers: [
       { tier: 0, name: "Standing Room Only", cost: 0, reputationBonus: 0, dailyRepBonus: 0 },
       { tier: 1, name: "Second-hand Tables & Chairs", cost: 14, reputationBonus: 0, dailyRepBonus: 0 },
-      { tier: 2, name: "Matched Café Set", cost: 30, reputationBonus: 2, dailyRepBonus: 1 },
-      { tier: 3, name: "Cosy Lounge Corner", cost: 52, reputationBonus: 4, dailyRepBonus: 2 }
+      { tier: 2, name: "Matched Café Set", cost: 36, reputationBonus: 2, dailyRepBonus: 1 },
+      { tier: 3, name: "Cosy Lounge Corner", cost: 62, reputationBonus: 4, dailyRepBonus: 2 }
     ]
   },
   {
@@ -88,8 +88,8 @@ export const equipmentSlots = [
     tiers: [
       { tier: 0, name: "Cash Box Only", cost: 0, reputationBonus: 0, dailyRepBonus: 0 },
       { tier: 1, name: "Basic Till", cost: 10, reputationBonus: 0, dailyRepBonus: 0 },
-      { tier: 2, name: "Card Terminal", cost: 26, reputationBonus: 2, dailyRepBonus: 1 },
-      { tier: 3, name: "Pro POS with Customer Display", cost: 46, reputationBonus: 4, dailyRepBonus: 2 }
+      { tier: 2, name: "Card Terminal", cost: 32, reputationBonus: 2, dailyRepBonus: 1 },
+      { tier: 3, name: "Pro POS with Customer Display", cost: 56, reputationBonus: 4, dailyRepBonus: 2 }
     ]
   }
 ] as const satisfies readonly EquipmentSlotDefinition[];

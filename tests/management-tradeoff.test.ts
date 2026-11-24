@@ -598,7 +598,7 @@ describe("management tradeoff system", () => {
     expect(changedState.helperAssignment?.helperId).toBe("jana");
   });
 
-  it.each([[3, 2], [4, 14]] as const)("charges Jana's Day %i opening fee of %i Asche", (day, fee) => {
+  it.each([[3, 2], [4, 7]] as const)("charges Jana's Day %i opening fee of %i Asche", (day, fee) => {
     const before = createDayStartState(day);
     const selected = gameReducer(before, { type: "select_helper", helperId: "jana", taskId: "service" });
     expect(selected.helperAssignment?.dailyCost).toBe(fee);
@@ -779,8 +779,8 @@ describe("management tradeoff system", () => {
     expect({ ...unaffordable, statusMessage: poor.statusMessage }).toEqual(poor);
     const bought = gameReducer(state, { type: "buy_upgrade", upgradeId: "cleaning-kit" });
     expect(bought.purchasedUpgrades).toContain("cleaning-kit");
-    expect(bought.resources.money).toBe(state.resources.money - 14);
-    expect(bought.dayManagement.moneySpent).toBe(state.dayManagement.moneySpent + 14);
+    expect(bought.resources.money).toBe(state.resources.money - 18);
+    expect(bought.dayManagement.moneySpent).toBe(state.dayManagement.moneySpent + 18);
     expect(bought.dayManagement.actionPointsRemaining).toBe(state.dayManagement.actionPointsRemaining);
     const duplicate = gameReducer(bought, { type: "buy_upgrade", upgradeId: "cleaning-kit" });
     expect({ ...duplicate, statusMessage: bought.statusMessage }).toEqual(bought);
@@ -1028,7 +1028,7 @@ describe("fail-state and reputation-scaled income", () => {
     const dayEnd: GameState = {
       ...initial,
       dayPhase: "day_end",
-      resources: { ...initial.resources, money: 12 }
+      resources: { ...initial.resources, money: 16 }
     };
     const spent = gameReducer(dayEnd, { type: "upgrade_decor", slot: "plant" });
     expect(spent.resources.money).toBe(0);
@@ -1363,16 +1363,16 @@ describe("fail-state and reputation-scaled income", () => {
       resources: { ...createInitialGameState().resources, money: 42, reputation: 25 }
     };
 
-    // Plant tier 1 -> 2 costs €12 and grants +1 reputation, once.
+    // Plant tier 1 -> 2 costs 16 Asche and grants +1 reputation, once.
     const upgraded = gameReducer(dayEnd, { type: "upgrade_decor", slot: "plant" });
     expect(upgraded.decor.plant).toBe(2);
-    expect(upgraded.resources.money).toBe(30);
+    expect(upgraded.resources.money).toBe(26);
     expect(upgraded.resources.reputation).toBe(26);
 
     // The second plant is its own purchasable counter slot, with its own price.
     const counterPlant = gameReducer(dayEnd, { type: "upgrade_decor", slot: "plant2" });
     expect(counterPlant.decor.plant2).toBe(2);
-    expect(counterPlant.resources.money).toBe(32);
+    expect(counterPlant.resources.money).toBe(28);
     expect(counterPlant.resources.reputation).toBe(26);
 
     // Not enough money is blocked.

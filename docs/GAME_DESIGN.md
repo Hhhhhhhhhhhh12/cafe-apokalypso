@@ -193,6 +193,21 @@ Café Apokalypso should not develop too slowly. The first seven in-game days mus
 
 Week 1 remains grounded in normal café management, but it should provide a clear sense of escalation by the end of day 7. The first explicit apocalyptic hook appears at the end of week 1 through an official letter registering the café as apocalyptically relevant caffeine infrastructure.
 
+Wages and restocking compete with décor, equipment and operational upgrades for
+Asche. The starter kit is within reach at setup. Larger purchases take several
+shifts of saving. Fully restoring two hearts at a clean table earns a 2 Asche tip.
+
+Wiping a dirty table yourself earns one Research. When the wipe makes a second
+heart of recovery possible for the next guest, it earns two. Spend Research on
+permanent training before opening. Hire the trained helper to use their skill.
+
+Days 5–7 each bring a two-guest rush. Serving both orders promptly while
+restoring a heart earns 4 Asche and up to two reputation points. The shift report
+records complaints from long waits, wrong orders, walkouts, and closing on the
+queue. Complaints cost two reputation per guest when Paula works alone and one
+with help. The guests' requests for somewhere to sit after a long attempt
+continue the week's clues about what the café offers.
+
 Week 2 should escalate faster with visible weirdness, daily KASSANDRA forecasts, the first clearly strange guest interactions, the first small apocalyptic incident, and stronger delegation systems.
 
 ### Soft-Roguelite Structure

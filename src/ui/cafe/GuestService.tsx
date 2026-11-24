@@ -13,7 +13,8 @@ import {
   hasActionCapacity,
   hasSecondBrewGroup
 } from "../../game/engine/selectors";
-import { findSubstituteProduct, getMissingIngredients, PATIENCE_TICK } from "../../game/engine/management";
+import { CLEAN_TABLE_RECOVERY_TIP, findSubstituteProduct, getMissingIngredients, PATIENCE_TICK } from "../../game/engine/management";
+import { getRushComplaintPenalty, isRushGuest } from "../../game/engine/rush";
 import type { ProductId } from "../../game/types/content";
 import type { GameState } from "../../game/types/game";
 
@@ -60,7 +61,7 @@ export function GuestService({
           {nextGuest.recovery && (
             <div className="guest-recovery">
               <RecoveryHearts {...nextGuest.recovery} />
-              {nextGuest.recovery.restored === 2 && <small>Clean table bonus</small>}
+              {nextGuest.recovery.restored === 2 && <small>Clean table bonus · {formatAsche(CLEAN_TABLE_RECOVERY_TIP)} tip</small>}
               {(canImproveRecoveryByTidying(gameState) || gameState.dayManagement.dirtyTableIds.some(id => canImproveRecoveryByCleaning(gameState, id))) &&
                 <small>Clean café and clear table · +1 extra</small>}
             </div>
@@ -91,6 +92,8 @@ export function GuestService({
           {patienceState?.critical && canAct ? (
             <span className="next-guest__cue">
               One more action that uses patience and this guest leaves unserved.
+              {isRushGuest(gameState) &&
+                ` The wait already risks ${getRushComplaintPenalty(gameState)} reputation if you serve now.`}
             </span>
           ) : null}
         </div>

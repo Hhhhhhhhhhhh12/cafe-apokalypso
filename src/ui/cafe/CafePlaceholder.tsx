@@ -13,6 +13,7 @@ import {
   getDioramaGuestVisibility,
   getGuestForCustomer,
   getGuestPatienceState,
+  getManualWipeResearch,
   getNarrativeEventCards,
   getNextGuestPreview,
   getRecoveredGuestNames,
@@ -22,6 +23,7 @@ import {
   isDaySevenRush,
   isEarlyKassandraConsult
 } from "../../game/engine/selectors";
+import { getPendingRushGuests, isRushGuest, RUSH_GUESTS } from "../../game/engine/rush";
 import "./firstCup.css";
 import { useBohnAppearance } from "./bohnAppearance";
 import { DayOneVines } from "./DayOneVines";
@@ -138,11 +140,14 @@ export function CafePlaceholder({
   const isDayEnd = gameState.dayPhase === "day_end";
   const isFinalShift = gameState.day === 7;
   const finalRush = isDaySevenRush(gameState);
+  const rush = isRushGuest(gameState) ? gameState.dayManagement.rush : undefined;
   const letterDelivered = isDaySevenLetterDelivered(gameState);
 
   const shiftOver = gameState.cafeClosed || gameState.demoComplete;
   const showQueueGuest = isOpen && actionPointsRemaining > 0 && !shiftOver;
-  const followingGuest = (finalRush || (gameState.day >= 4 && !isFinalShift)) && showQueueGuest && actionPointsRemaining > 1
+  const showFollowingGuest = getPendingRushGuests(gameState) > 1 ||
+    (actionPointsRemaining > 1 && (finalRush || (gameState.day >= 4 && !isFinalShift)));
+  const followingGuest = showQueueGuest && showFollowingGuest
     ? getGuestForCustomer(gameState, queuePosition + 1)
     : undefined;
   const canInteract = Boolean(onAction) && !shiftOver && !introActive;
@@ -467,6 +472,13 @@ export function CafePlaceholder({
         ) : null}
       </div>
 
+      {rush && !shiftOver && (
+        <p className="cafe-rush-callout">
+          <strong>Rush · {rush.satisfied}/{RUSH_GUESTS} satisfied</strong>
+          <span>Serve both guests their orders before they are ready to leave and restore a heart to earn a rush tip.</span>
+        </p>
+      )}
+
       {onAction && (
         <p className="status-message" role="status" aria-live="polite" aria-atomic="true">
           <span key={gameState.statusMessage} className="status-message__text">{gameState.statusMessage}</span>
@@ -716,6 +728,7 @@ export function CafePlaceholder({
                 const cleanLabel = janaCanClear ? "ask Jana to clear it (0 actions)" : "wipe it down (1 action)";
                 const recoverySeat = recovery?.current === 1 && recovery.tableId === pos;
                 const recoveryWipe = canImproveRecoveryByCleaning(gameState, pos);
+                const wipeResearch = getManualWipeResearch(gameState, pos);
                 const clickable = dirty && isOpen && !shiftOver && !introActive &&
                   (actionPointsRemaining > 0 || janaCanClear) && Boolean(onCleanTable || onAction);
                 const className = `cafe-table cafe-table--${pos} cafe-table--tier-${gameState.equipment.seating}`;
@@ -728,14 +741,15 @@ export function CafePlaceholder({
                   {clickable && <span className="cafe-cue cafe-cue--wipe" aria-hidden="true">
                     <span className="cafe-wipe-icon" />
                     {recoveryWipe && <span className="cafe-recovery-seat">♥</span>}
-                    <span className="cafe-wipe-label">{janaCanClear ? "Ask Jana" : "Wipe"}</span>
+                    <span className="cafe-wipe-label">{janaCanClear ? "Ask Jana" : `Wipe +${wipeResearch}`}</span>
                   </span>}
                 </>;
                 return <div key={pos} className={`cafe-table-set cafe-table-set--${pos}`} data-table-id={pos}>
                   <span className={`cafe-chair cafe-chair--side cafe-table--tier-${gameState.equipment.seating}`} aria-hidden="true" />
                   {clickable ? <button type="button" className={`${className} cafe-table--clickable`}
-                    aria-label={`Dirty ${pos} table — ${cleanLabel}${recoveryWipe ? " · Enables one extra recovery heart" : ""}`}
-                    title={cleanLabel} onClick={() => cleanTable(pos)}>{inner}</button> : <div className={className} aria-hidden="true">{inner}</div>}
+                    aria-label={`Dirty ${pos} table — ${cleanLabel}${recoveryWipe ? " · Enables one extra recovery heart" : ""}${wipeResearch ? ` · +${wipeResearch} Research` : ""}`}
+                    title={wipeResearch ? `${cleanLabel} · +${wipeResearch} Research` : cleanLabel}
+                    onClick={() => cleanTable(pos)}>{inner}</button> : <div className={className} aria-hidden="true">{inner}</div>}
                   {seatedGuests.filter(id => approvedSeats[id].table === pos).map(id => <CafeTableGuest key={id} guestId={id} />)}
                   <span className={`cafe-chair cafe-chair--front cafe-table--tier-${gameState.equipment.seating}`} aria-hidden="true" />
                 </div>;

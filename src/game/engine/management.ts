@@ -435,7 +435,11 @@ export function getIngredientRequirement(
 }
 
 export const TABLE_CLEANLINESS_GAIN = 12;
-export const JANA_TABLE_CLEANLINESS_GAIN = 1;
+export const CLEAN_TABLE_RECOVERY_TIP = 2;
+
+export function getJanaTableCleanlinessGain(state: GameState): number {
+  return state.trainedStaff?.includes("jana") ? 6 : 1;
+}
 
 export function canJanaClearTable(state: GameState): boolean {
   return (state.day === 3 || state.day === 5) &&
@@ -445,8 +449,9 @@ export function canJanaClearTable(state: GameState): boolean {
     state.dayManagement.helperAutonomousActions === 0;
 }
 
-export function getHelperDailyCost(helperId: StaffOptionId, regularCost: number, day: GameState["day"]): number {
-  return helperId === "jana" && day === 3 ? 2 : regularCost;
+export function getHelperDailyCost(helperId: StaffOptionId, day: GameState["day"]): number {
+  if (helperId === "jana" && day === 3) return 2;
+  return weekOneStaffOptions.find((staff) => staff.id === helperId)!.dailyCost;
 }
 
 export function createHelperAssignment(
@@ -464,7 +469,7 @@ export function createHelperAssignment(
     helperId,
     taskId,
     locked: false,
-    dailyCost: getHelperDailyCost(helperId, staffOption.dailyCost, day),
+    dailyCost: getHelperDailyCost(helperId, day),
     flavorLine: getHelperFlavorLine(helperId, taskId),
     autonomyLevel: getHelperAutonomyLevel(day)
   };

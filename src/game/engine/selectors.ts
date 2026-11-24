@@ -13,7 +13,7 @@ import {
   ACTION_BUDGET_BY_DAY,
   canJanaClearTable,
   TABLE_CLEANLINESS_GAIN,
-  JANA_TABLE_CLEANLINESS_GAIN,
+  getJanaTableCleanlinessGain,
   applySupplyPurchase,
   getCleanlinessLabel,
   getEarnedPrice,
@@ -250,9 +250,16 @@ export function canImproveRecoveryByCleaning(state: GameState, tableId: TableId)
   const jana = canJanaClearTable(state);
   if (state.dayManagement.actionPointsRemaining < (jana ? 1 : 2) ||
       (!jana && getGuestPatienceState(state)?.critical)) return false;
-  const gain = jana ? JANA_TABLE_CLEANLINESS_GAIN : TABLE_CLEANLINESS_GAIN;
+  const gain = jana ? getJanaTableCleanlinessGain(state) : TABLE_CLEANLINESS_GAIN;
   return state.resources.cleanliness + gain >= 50 &&
     (recovery.tableId === tableId || !state.dayManagement.dirtyTableIds.includes(recovery.tableId));
+}
+
+export function getManualWipeResearch(state: GameState, tableId: TableId): number {
+  if (state.dayPhase !== "open" || state.equipment.seating < 1 ||
+      !state.dayManagement.dirtyTableIds.includes(tableId) ||
+      !hasActionCapacity(state) || canJanaClearTable(state)) return 0;
+  return canImproveRecoveryByCleaning(state, tableId) ? 2 : 1;
 }
 
 /** Room upkeep costs an action even with Jana; leave time to serve the same guest. */

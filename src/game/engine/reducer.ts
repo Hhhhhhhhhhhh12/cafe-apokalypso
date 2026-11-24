@@ -8,6 +8,7 @@ import {
 import { weekOneAchievements, weekOneDays, weekOneEvents, weekOneUpgrades } from "../data";
 import { DAY_ONE_FATOU_SERVED_FRAGMENT } from "../data/days";
 import { getDecorDailyBonuses, getDecorTier, getMaxDecorTier } from "../data/decor";
+import { staffTraining } from "../data/staff";
 import {
   getEquipmentDailyBonuses,
   getEquipmentTier,
@@ -26,10 +27,12 @@ import {
   getIngredientLabel,
   getKassandraReceipt,
   getKassandraConsultLine,
+  getManualWipeResearch,
   getMoneyRecoveryWarning,
   getRestockPreview,
   getServedGuestIds,
   getServeLineForCustomer,
+  getVisibleStaffOptions,
   hasSecondBrewGroup,
   isEarlyKassandraConsult,
   isDaySevenLetterDelivered,
@@ -38,13 +41,24 @@ import {
 import { getObjectiveStatus } from "./objectives";
 import { formatAsche, roundAscheEarnings } from "./currency";
 import {
+  getPendingRushGuests,
+  getRushComplaintPenalty,
+  getRushStart,
+  isRushGuest,
+  NELE_RUSH_TIP_BONUS,
+  RUSH_GUESTS,
+  RUSH_REPUTATION_BONUS,
+  RUSH_TIP
+} from "./rush";
+import {
   getDayFiveHelperRecap,
   getHelperAutonomyRecapLine,
   applyProductConsumption,
   applySupplyPurchase,
   canJanaClearTable,
+  CLEAN_TABLE_RECOVERY_TIP,
   TABLE_CLEANLINESS_GAIN,
-  JANA_TABLE_CLEANLINESS_GAIN,
+  getJanaTableCleanlinessGain,
   clampMeter,
   clampResource,
   COMFORTABLE_CAPACITY_BY_DAY,
@@ -96,6 +110,7 @@ import type {
   HelperTaskId,
   IngredientKey,
   ResourceState,
+  ShiftRush,
   SupplyState,
   TableId
 } from "../types/game";
@@ -150,7 +165,13 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     };
   }
 
-  const nextState = appendActionFeedback(state, applyAction(state, action), action);
+  let nextState = appendActionFeedback(state, applyAction(state, action), action);
+  if (isRushGuest(nextState) && !isRushGuest(state)) {
+    nextState = {
+      ...nextState,
+      statusMessage: `${nextState.statusMessage} Two guests arrive together, looking for a place to recover. Rush begins.`
+    };
+  }
 
   if (action.type === "reset_game") {
     return nextState;
@@ -193,6 +214,8 @@ function appendActionFeedback(before: GameState, after: GameState, action: GameA
   const changes: string[] = [];
   const restoredHearts = (after.dayManagement.heartsRestored ?? 0) - (before.dayManagement.heartsRestored ?? 0);
   if (restoredHearts > 0) changes.push(`Hearts +${restoredHearts}`);
+  const researchEarned = (after.research ?? 0) - (before.research ?? 0);
+  if (researchEarned > 0) changes.push(`Research +${researchEarned}`);
   const moneyDelta = Math.round((after.resources.money - before.resources.money) * 100) / 100;
   if (moneyDelta !== 0) {
     changes.push(`${moneyDelta > 0 ? "+" : "−"}${formatAsche(Math.abs(moneyDelta))}`);
@@ -262,6 +285,9 @@ function applyAction(state: GameState, action: GameAction): GameState {
 
     case "clear_helper":
       return clearHelper(state);
+
+    case "train_helper":
+      return trainHelper(state, action.helperId);
 
     case "open_day":
       return openDay(state);
@@ -383,7 +409,7 @@ function serveProduct(state: GameState, productId: ProductId): GameState {
       ...servedState,
       statusMessage: `${formatMissingSupply(
         missingIngredients
-      )} ${requestedProduct.name} becomes ${substitute.name}. The guest accepts this. Rep −1.`
+      )} ${requestedProduct.name} becomes ${substitute.name}. The guest accepts this. Rep −1. ${servedState.statusMessage}`
     };
   }
 
@@ -407,6 +433,7 @@ function applySuccessfulServe(
   const flavorLines: string[] = [];
   const recoveryLines: string[] = [];
   const guestReactionLines: string[] = [];
+  const rush = management.rush && { ...management.rush };
   const helperImpact = management.dayFiveHelperImpact && { ...management.dayFiveHelperImpact };
 
   for (let index = 0; index < orderCount; index += 1) {
@@ -447,8 +474,32 @@ function applySuccessfulServe(
 
     const recovery = servedGuest && getGuestRecovery({ ...workingState, resources, dayManagement: management }, servedGuest.id);
     if (recovery && servedGuest?.recoveryLine) recoveryLines.push(servedGuest.recoveryLine);
+    const recoveryTip = recovery?.restored === 2 ? CLEAN_TABLE_RECOVERY_TIP : 0;
     if (recovery) {
       management.heartsRestored = (management.heartsRestored ?? 0) + recovery.restored;
+    }
+    if (recoveryTip > 0) {
+      flavorLines.push(`A guest leaves ${formatAsche(recoveryTip)} for the clean table.`);
+    }
+    // Price is agreed before this guest can complain about their service.
+    const offerMultiplier = workingState.dayManagement.offerReviewed ? 1.1 : 1;
+    const earned = getEarnedPrice(product.basePrice * offerMultiplier, resources.reputation);
+    const queuePosition = management.customersServed + management.guestsLost;
+    const inRush = rush && isRushGuest(workingState, queuePosition);
+    if (rush && inRush) {
+      const wanted = servedGuest && getGuestWantedProductId(workingState, servedGuest);
+      const matched = !wanted || wanted === product.id || servedGuest?.appreciatedProductIds?.includes(product.id);
+      const timely = index > 0 || management.currentGuestPatience > PATIENCE_TICK;
+      rush.heartsRestored += recovery?.restored ?? 0;
+      if (matched && timely) {
+        rush.satisfied += 1;
+      } else {
+        const penalty = getRushComplaintPenalty(state);
+        const reputation = clampMeter(resources.reputation - penalty);
+        rush.reputationLost += resources.reputation - reputation;
+        resources = { ...resources, reputation };
+        flavorLines.push(`${servedGuest?.name ?? "The guest"} leaves a complaint about ${matched ? "the wait" : "the order mix-up"}. Rep −${penalty}.`);
+      }
     }
     supplies = applyProductConsumption(product, supplies, workingState.helperAssignment);
     const suppliesUsed = getSuppliesUsedForProduct(product, workingState.helperAssignment);
@@ -456,14 +507,11 @@ function applySuccessfulServe(
       if (index > 0) helperImpact.extraOrders += 1;
       helperImpact.milkSaved += getIngredientRequirement(product, "milk", null) - suppliesUsed.milk;
     }
-    // Income scales with reputation; offer review adds a 10 % daily boost.
-    const offerMultiplier = workingState.dayManagement.offerReviewed ? 1.1 : 1;
-    const earned = getEarnedPrice(product.basePrice * offerMultiplier, resources.reputation);
     // cleaning-kit upgrade halves the cleanliness cost per serve (2 → 1).
     const cleanlinessDrop = workingState.purchasedUpgrades.includes("cleaning-kit") ? 1 : 2;
     resources = {
       ...resources,
-      money: clampResource(resources.money + earned),
+      money: clampResource(resources.money + earned + recoveryTip),
       cleanliness: clampMeter(resources.cleanliness - cleanlinessDrop),
       stress: applyCapacityStress(resources.stress, management.customersServed, workingState.day)
     };
@@ -483,7 +531,7 @@ function applySuccessfulServe(
       servedGuestIds: servedGuest
         ? [...getServedGuestIds({ ...workingState, dayManagement: management }), servedGuest.id]
         : management.servedGuestIds,
-      moneyEarned: clampResource(management.moneyEarned + earned),
+      moneyEarned: clampResource(management.moneyEarned + earned + recoveryTip),
       suppliesUsed: addSupplies(management.suppliesUsed, suppliesUsed)
     };
 
@@ -648,6 +696,17 @@ function applySuccessfulServe(
 
   }
 
+  if (rush && rush.tip === 0 && rush.satisfied === RUSH_GUESTS && rush.heartsRestored > 0) {
+    const neleBonus = state.helperAssignment?.helperId === "nele" && state.trainedStaff?.includes("nele")
+      ? NELE_RUSH_TIP_BONUS : 0;
+    rush.tip = RUSH_TIP + neleBonus;
+    const reputation = clampMeter(resources.reputation + RUSH_REPUTATION_BONUS);
+    rush.reputationGained = reputation - resources.reputation;
+    resources = { ...resources, reputation, money: clampResource(resources.money + rush.tip) };
+    management.moneyEarned = clampResource(management.moneyEarned + rush.tip);
+    flavorLines.push(`Both rush orders landed. A guest asks if this table will be here when they come back. Rush tip +${formatAsche(rush.tip)}, Rep +${rush.reputationGained}.`);
+  }
+
   if (helperExtraOrder) {
     management = {
       ...management,
@@ -670,7 +729,11 @@ function applySuccessfulServe(
       mood: resources.stress >= 61 ? "strained" : resources.stress >= 41 ? "busy" : "calm"
     },
     guestMemory,
-    dayManagement: helperImpact ? { ...management, dayFiveHelperImpact: helperImpact } : management,
+    dayManagement: {
+      ...management,
+      ...(rush ? { rush } : {}),
+      ...(helperImpact ? { dayFiveHelperImpact: helperImpact } : {})
+    },
     completedActions: addUniqueDayAction(workingState.completedActions, "take_order"),
     statusMessage: statusParts.join(" ")
   };
@@ -789,12 +852,13 @@ function cleanTable(state: GameState, tableId: TableId | undefined): GameState {
     };
   }
 
+  const researchEarned = tableId ? getManualWipeResearch(state, tableId) : 0;
   const actionState = spendActionPoint(state, "clean the tables");
   if (!actionState) {
     return noActionCapacityState(state);
   }
 
-  const { state: tickedState, walkoutLine } = applyPatienceTick(actionState);
+  const { state: tickedState, walkoutLine } = applyPatienceTick(actionState, tableId);
   const capacity = COMFORTABLE_CAPACITY_BY_DAY[tickedState.day];
   const slowWindowReduction =
     tickedState.dayManagement.customersServed < capacity &&
@@ -809,6 +873,7 @@ function cleanTable(state: GameState, tableId: TableId | undefined): GameState {
 
   return {
     ...tickedState,
+    ...(researchEarned > 0 ? { research: (state.research ?? 0) + researchEarned } : {}),
     completedActions: addUniqueDayAction(tickedState.completedActions, "clean_tables"),
     resources: {
       ...tickedState.resources,
@@ -818,6 +883,9 @@ function cleanTable(state: GameState, tableId: TableId | undefined): GameState {
     },
     dayManagement: {
       ...tickedState.dayManagement,
+      ...(researchEarned > 0 ? {
+        researchEarned: (tickedState.dayManagement.researchEarned ?? 0) + researchEarned
+      } : {}),
       cleaningActions: tickedState.dayManagement.cleaningActions + 1,
       dirtyTableIds: tableId
         ? tickedState.dayManagement.dirtyTableIds.filter((dirtyTableId) => dirtyTableId !== tableId)
@@ -1126,6 +1194,26 @@ function clearHelper(state: GameState): GameState {
   };
 }
 
+function trainHelper(state: GameState, helperId: StaffOptionId): GameState {
+  if (state.dayPhase !== "day_start" || !getVisibleStaffOptions(state).some((staff) => staff.id === helperId)) {
+    return { ...state, statusMessage: "Staff training is available before opening, when the helper is on the roster." };
+  }
+  if (state.trainedStaff?.includes(helperId)) {
+    return { ...state, statusMessage: "That training is already complete." };
+  }
+  const training = staffTraining[helperId];
+  const research = state.research ?? 0;
+  if (research < training.cost) {
+    return { ...state, statusMessage: `Training requires ${training.cost} Research. Wipe dirty tables yourself to earn it.` };
+  }
+  return {
+    ...state,
+    research: research - training.cost,
+    trainedStaff: [...(state.trainedStaff ?? []), helperId],
+    statusMessage: `Training complete: ${training.name}. ${training.effect}`
+  };
+}
+
 function applyMorningBonuses(resources: ResourceState, state: GameState): ResourceState {
   const decorBonuses = getDecorDailyBonuses(state.decor);
   const equipmentBonuses = getEquipmentDailyBonuses(state.equipment);
@@ -1149,7 +1237,7 @@ function openDay(state: GameState): GameState {
   }
 
   const assignment = state.helperAssignment;
-  const helperFee = assignment ? getHelperDailyCost(assignment.helperId, assignment.dailyCost, state.day) : 0;
+  const helperFee = assignment ? getHelperDailyCost(assignment.helperId, state.day) : 0;
   if (assignment && state.resources.money < helperFee) {
     return {
       ...state,
@@ -1165,8 +1253,13 @@ function openDay(state: GameState): GameState {
   const levelBonuses = state.helperAssignment ? getEmployeeLevelBonuses(helperLevel) : { extraAP: 0, tipBonus: 0 };
   const modifier = getCurrentDayModifier(state);
   const shortStaffedPenalty = modifier.id === "short-staffed" && !state.helperAssignment ? 1 : 0;
+  const baristaTraining = assignment?.helperId === "nino" && assignment.taskId === "barista" &&
+    state.trainedStaff?.includes("nino") ? 1 : 0;
   const management: GameState["dayManagement"] = {
     ...state.dayManagement,
+    ...(getRushStart(state.day) !== null ? {
+      rush: { satisfied: 0, heartsRestored: 0, reputationLost: 0, tip: 0, reputationGained: 0 }
+    } : {}),
     ...(state.dayManagement.doubleEspressoServed ? { doubleEspressoServed: false } : {}),
     moneySpent: clampResource(state.dayManagement.moneySpent + helperFee),
     helperExtraOrdersRemaining: getHelperExtraOrders(state),
@@ -1181,6 +1274,7 @@ function openDay(state: GameState): GameState {
       state.dayManagement.actionPointsRemaining +
       levelBonuses.extraAP -
       shortStaffedPenalty +
+      baristaTraining +
       (state.purchasedUpgrades.includes("second-table") ? 1 : 0)
   };
 
@@ -1363,6 +1457,24 @@ function applyDayEndConsequences(state: GameState): GameState {
   let management = { ...state.dayManagement };
   const flavorLines: string[] = [];
   let soloStressRecap: string | undefined;
+
+  if (management.rush) {
+    const rush: ShiftRush = { ...management.rush };
+    const pendingGuests = getPendingRushGuests(state);
+    if (pendingGuests > 0) {
+      const reputation = clampMeter(resources.reputation - pendingGuests * getRushComplaintPenalty(state));
+      rush.reputationLost += resources.reputation - reputation;
+      resources = { ...resources, reputation };
+      flavorLines.push(`You closed with ${pendingGuests} rush ${pendingGuests === 1 ? "guest" : "guests"} still waiting for a table.`);
+    }
+    if (rush.tip > 0) {
+      flavorLines.push(`Rush handled: ${rush.heartsRestored} hearts restored, +${formatAsche(rush.tip)} and Rep +${rush.reputationGained}.`);
+    }
+    if (rush.reputationLost > 0) {
+      flavorLines.push(`Complaints during the rush cost ${rush.reputationLost} reputation.`);
+    }
+    management.rush = rush;
+  }
 
   const janaMaintainsCleaning =
     state.helperAssignment?.helperId === "jana" &&
@@ -2212,7 +2324,7 @@ function setNextGuestPatience(state: GameState): GameState {
   // Messy café (cleanliness < 50) costs every arriving guest one patience tick —
   // they're already irritated before they even order.
   const messyPenalty = baseMax > 0 && state.resources.cleanliness < 50 ? PATIENCE_TICK : 0;
-  const rushPenalty = isDaySevenRush(state) ? PATIENCE_TICK : 0;
+  const rushPenalty = isDaySevenRush(state) || (isRushGuest(state) && !state.helperAssignment) ? PATIENCE_TICK : 0;
   const max = baseMax > 0 ? Math.max(PATIENCE_TICK, baseMax - messyPenalty - rushPenalty) : 0;
   return {
     ...state,
@@ -2236,7 +2348,7 @@ function setNextGuestPatience(state: GameState): GameState {
  * and "autonomous" acts on every one. The counter only tracks work that was
  * actually completed, so the day-end recap stays truthful.
  */
-function applyHelperAutonomy(state: GameState, actionsWithoutServing: number): GameState {
+function applyHelperAutonomy(state: GameState, actionsWithoutServing: number, playerTable?: TableId): GameState {
   const assignment = state.helperAssignment;
   const level = assignment?.autonomyLevel;
 
@@ -2255,12 +2367,12 @@ function applyHelperAutonomy(state: GameState, actionsWithoutServing: number): G
     return state;
   }
 
-  const [tableId] = state.dayManagement.dirtyTableIds;
+  const tableId = state.dayManagement.dirtyTableIds.find((id) => id !== playerTable);
   return tableId ? clearTableWithJana(state, tableId) : state;
 }
 
 function clearTableWithJana(state: GameState, tableId: TableId): GameState {
-  const cleanliness = clampMeter(state.resources.cleanliness + JANA_TABLE_CLEANLINESS_GAIN);
+  const cleanliness = clampMeter(state.resources.cleanliness + getJanaTableCleanlinessGain(state));
   const impact = state.dayManagement.dayFiveHelperImpact;
   return {
     ...state,
@@ -2285,7 +2397,7 @@ function clearTableWithJana(state: GameState, tableId: TableId): GameState {
  * Returns the updated state and an optional walkout narrative line.
  * On Day 1–3 patience still drains (teaching the mechanic) but no one leaves.
  */
-function applyPatienceTick(state: GameState): { state: GameState; walkoutLine: string } {
+function applyPatienceTick(state: GameState, playerTable?: TableId): { state: GameState; walkoutLine: string } {
   const { dayManagement: management } = state;
   if (management.currentGuestPatienceMax === 0) {
     return { state, walkoutLine: "" };
@@ -2305,7 +2417,7 @@ function applyPatienceTick(state: GameState): { state: GameState; walkoutLine: s
     };
 
     return {
-      state: applyHelperAutonomy(tickedState, newActionsWithoutServing),
+      state: applyHelperAutonomy(tickedState, newActionsWithoutServing, playerTable),
       walkoutLine: ""
     };
   }
@@ -2314,16 +2426,20 @@ function applyPatienceTick(state: GameState): { state: GameState; walkoutLine: s
   const queuePos = management.customersServed + management.guestsLost;
   const guest = getGuestForCustomer(state, queuePos);
   const guestName = guest?.name ?? "The guest";
+  const rush = isRushGuest(state) && management.rush;
+  const penalty = rush ? getRushComplaintPenalty(state) : WALKOUT_REPUTATION_PENALTY;
+  const reputation = clampMeter(state.resources.reputation - penalty);
 
   const afterWalkout: GameState = {
     ...state,
     resources: {
       ...state.resources,
       stress: clampMeter(state.resources.stress + WALKOUT_STRESS),
-      reputation: clampMeter(state.resources.reputation - WALKOUT_REPUTATION_PENALTY)
+      reputation
     },
     dayManagement: {
       ...management,
+      ...(rush ? { rush: { ...rush, reputationLost: rush.reputationLost + state.resources.reputation - reputation } } : {}),
       currentGuestPatience: 0,
       actionsWithoutServing: newActionsWithoutServing,
       guestsLost: management.guestsLost + 1,
@@ -2333,6 +2449,6 @@ function applyPatienceTick(state: GameState): { state: GameState; walkoutLine: s
 
   return {
     state: setNextGuestPatience(afterWalkout),
-    walkoutLine: `${guestName} ran out of patience and left without ordering. Stress +${WALKOUT_STRESS}, Rep −1.`
+    walkoutLine: `${guestName} ran out of patience and left without ordering. Stress +${WALKOUT_STRESS}, Rep −${penalty}.`
   };
 }
